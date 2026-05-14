@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Community Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --purple: #b400ff;
+    --pink: #ff00c8;
+    --gold: #ffd700;
+    --green: #00ff88;
+    --orange: #ff8c00;
+    --red: #ff3355;
+    --dark: #04000f;
+    --darker: #020008;
+    --surface: #0a0020;
+    --surface2: #110030;
+    --surface3: #1a0040;
+    --text: #e8d5ff;
+    --muted: #6b4d8a;
+    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff33;
+    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff33;
+    --glow-pink: 0 0 20px #ff00c888, 0 0 40px #ff00c833;
+    --glow-gold: 0 0 20px #ffd70088, 0 0 40px #ffd70033;
+    --glow-green: 0 0 20px #00ff8888, 0 0 40px #00ff8833;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { background:var(--darker); color:var(--text); font-family:'Rajdhani',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(0,245,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(180,0,255,0.02) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+    animation:gridMove 25s linear infinite;
+  }
+  @keyframes gridMove{to{transform:translateY(40px)}}
+
+  /* NAV */
+  nav {
+    position:sticky; top:0; z-index:100;
+    display:flex; align-items:center; gap:10px; padding:12px 16px;
+    background:rgba(4,0,15,0.95); backdrop-filter:blur(24px);
+    border-bottom:1px solid rgba(0,245,255,0.1);
+  }
+  .logo { font-family:'Orbitron',monospace; font-size:16px; font-weight:900; background:linear-gradient(90deg,var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:2px; cursor:pointer; }
+  .logo em { -webkit-text-fill-color:var(--pink); font-style:normal; }
+  .nav-title { font-family:'Orbitron',monospace; font-size:11px; color:var(--cyan); letter-spacing:2px; margin-right:auto; }
+  .nav-coin { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:16px; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.2); font-family:'Orbitron',monospace; font-size:10px; color:var(--gold); cursor:pointer; }
+  .nav-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; border:2px solid var(--cyan); box-shadow:var(--glow-cyan); cursor:pointer; }
+
+  /* PAGE */
+  .page { position:relative; z-index:1; padding:16px 16px 80px; }
+
+  /* HERO */
+  .hero {
+    text-align:center; padding:24px 16px 20px;
+    background:radial-gradient(ellipse at 50% 0%, rgba(180,0,255,0.12) 0%, transparent 70%);
+    margin-bottom:20px; position:relative; overflow:hidden;
+    animation:fadeUp 0.5s ease both;
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+  .hero-icon { font-size:48px; margin-bottom:10px; animation:float 3s ease-in-out infinite; display:block; }
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+  .hero-title { font-family:'Orbitron',monospace; font-size:20px; font-weight:900; background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:2px; margin-bottom:6px; }
+  .hero-sub { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+  .hero-sub b { color:var(--cyan); }
+
+  .hero-stats { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .hs { padding:6px 12px; border-radius:16px; background:var(--surface); border:1px solid rgba(0,245,255,0.1); font-family:'Orbitron',monospace; font-size:9px; letter-spacing:1px; }
+
+  /* CATEGORY TABS */
+  .cat-scroll { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; margin-bottom:16px; padding-bottom:2px; }
+  .cat-scroll::-webkit-scrollbar { display:none; }
+  .cat-chip {
+    flex-shrink:0; padding:8px 14px; border-radius:20px;
+    background:var(--surface); border:1px solid rgba(0,245,255,0.1);
+    font-size:12px; color:var(--muted); cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; gap:5px; white-space:nowrap;
+  }
+  .cat-chip.active { border-color:var(--cyan); color:var(--cyan); background:rgba(0,245,255,0.08); box-shadow:var(--glow-cyan); }
+  .cat-chip:hover:not(.active) { border-color:rgba(0,245,255,0.3); color:var(--text); }
+
+  /* SECTION */
+  .sec-title { font-family:'Orbitron',monospace; font-size:9px; letter-spacing:2px; color:var(--purple); margin:16px 0 10px; display:flex; align-items:center; gap:8px; }
+  .sec-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(180,0,255,0.4),transparent); }
+
+  /* FEATURED COLLAB */
+  .featured-collab {
+    border-radius:16px; overflow:hidden;
+    background:linear-gradient(135deg,rgba(0,245,255,0.05),rgba(180,0,255,0.08));
+    border:1px solid rgba(0,245,255,0.2);
+    box-shadow:var(--glow-cyan); margin-bottom:16px;
+    animation:fadeUp 0.4s ease both;
+  }
+  .fc-header { padding:14px 16px; background:linear-gradient(135deg,rgba(0,245,255,0.08),rgba(180,0,255,0.06)); border-bottom:1px solid rgba(0,245,255,0.1); }
+  .fc-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:4px; background:rgba(0,245,255,0.1); border:1px solid rgba(0,245,255,0.3); font-family:'Orbitron',monospace; font-size:8px; color:var(--cyan); letter-spacing:1px; margin-bottom:6px; }
+  .fc-title { font-size:15px; font-weight:700; color:#fff; margin-bottom:4px; }
+  .fc-desc { font-size:12px; color:var(--muted); line-height:1.5; }
+
+  /* ROLES NEEDED */
+  .roles-row { display:flex; gap:6px; flex-wrap:wrap; padding:12px 16px; border-bottom:1px solid rgba(0,245,255,0.05); }
+  .role-tag {
+    padding:4px 10px; border-radius:16px; font-size:11px; cursor:pointer;
+    display:flex; align-items:center; gap:4px; transition:all 0.2s;
+  }
+  .role-tag.open { background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.3); color:var(--green); }
+  .role-tag.filled { background:rgba(107,77,138,0.2); border:1px solid rgba(107,77,138,0.3); color:var(--muted); }
+  .role-tag.you { background:rgba(0,245,255,0.1); border:1px solid var(--cyan); color:var(--cyan); box-shadow:var(--glow-cyan); }
+
+  /* COLLAB MEMBERS */
+  .members-row { display:flex; align-items:center; gap:-8px; padding:10px 16px 12px; }
+  .member-av { width:32px; height:32px; border-radius:50%; border:2px solid var(--darker); display:flex; align-items:center; justify-content:center; font-size:13px; margin-left:-6px; }
+  .member-av:first-child { margin-left:0; }
+  .members-count { font-size:11px; color:var(--muted); margin-left:8px; }
+  .join-btn { margin-left:auto; padding:7px 16px; border-radius:8px; background:linear-gradient(135deg,var(--cyan),var(--purple)); border:none; color:var(--dark); font-family:'Orbitron',monospace; font-size:9px; letter-spacing:1px; font-weight:700; cursor:pointer; box-shadow:var(--glow-cyan); transition:all 0.2s; }
+  .join-btn:hover { transform:scale(1.05); }
+
+  /* COMMUNITY CARDS */
+  .community-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
+
+  .comm-card {
+    border-radius:12px; overflow:hidden; cursor:pointer;
+    background:var(--surface); border:1px solid rgba(0,245,255,0.07);
+    transition:all 0.2s; animation:fadeUp 0.4s ease both;
+  }
+  .comm-card:active { transform:scale(0.97); }
+  .comm-card:nth-child(1){animation-delay:0.05s}
+  .comm-card:nth-child(2){animation-delay:0.1s}
+  .comm-card:nth-child(3){animation-delay:0.15s}
+  .comm-card:nth-child(4){animation-delay:0.2s}
+
+  .cc-banner { height:70px; display:flex; align-items:center; justify-content:center; font-size:30px; position:relative; }
+  .cc-members-badge { position:absolute; bottom:6px; right:6px; padding:2px 7px; border-radius:10px; background:rgba(0,0,0,0.7); font-family:'Orbitron',monospace; font-size:8px; color:var(--cyan); }
+  .cc-live-badge { position:absolute; top:6px; left:6px; display:flex; align-items:center; gap:3px; padding:2px 6px; border-radius:4px; background:rgba(255,0,80,0.15); border:1px solid rgba(255,0,80,0.4); font-family:'Orbitron',monospace; font-size:7px; color:#ff0050; }
+  .cc-dot { width:4px; height:4px; border-radius:50%; background:#ff0050; animation:blink 0.8s infinite; }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+  .cc-info { padding:8px 10px; }
+  .cc-name { font-family:'Orbitron',monospace; font-size:10px; font-weight:700; color:#fff; margin-bottom:2px; letter-spacing:0.5px; }
+  .cc-desc { font-size:10px; color:var(--muted); line-height:1.3; }
+  .cc-tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
+  .cc-tag { padding:2px 6px; border-radius:4px; font-size:9px; }
+
+  /* AI FEATURES */
+  .ai-features { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .ai-card {
+    display:flex; align-items:center; gap:12px; padding:12px 14px;
+    border-radius:12px; background:var(--surface); border:1px solid rgba(180,0,255,0.12);
+    cursor:pointer; transition:all 0.2s; animation:fadeUp 0.4s ease both;
+  }
+  .ai-card:hover { border-color:rgba(180,0,255,0.3); background:var(--surface2); }
+  .ai-card:nth-child(1){animation-delay:0.05s}
+  .ai-card:nth-child(2){animation-delay:0.1s}
+  .ai-card:nth-child(3){animation-delay:0.15s}
+  .ai-card:nth-child(4){animation-delay:0.2s}
+  .ai-card:nth-child(5){animation-delay:0.25s}
+  .ai-card:nth-child(6){animation-delay:0.3s}
+
+  .ai-icon { width:44px; height:44px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ai-info { flex:1; min-width:0; }
+  .ai-name { font-size:13px; font-weight:700; color:#fff; margin-bottom:2px; }
+  .ai-desc { font-size:11px; color:var(--muted); line-height:1.4; }
+  .ai-badge { padding:3px 8px; border-radius:12px; font-family:'Orbitron',monospace; font-size:8px; letter-spacing:0.5px; flex-shrink:0; }
+
+  /* ACTIVE COLLABS */
+  .collab-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .collab-item {
+    display:flex; gap:10px; align-items:center; padding:10px 12px;
+    border-radius:10px; background:var(--surface); border:1px solid rgba(0,245,255,0.07);
+    cursor:pointer; transition:all 0.2s; animation:fadeUp 0.3s ease both;
+  }
+  .collab-item:hover { border-color:rgba(0,245,255,0.2); }
+  .ci-icon { width:40px; height:40px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .ci-info { flex:1; min-width:0; }
+  .ci-title { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+  .ci-meta { font-size:10px; color:var(--muted); }
+  .ci-coins { font-family:'Orbitron',monospace; font-size:10px; color:var(--gold); flex-shrink:0; }
+
+  /* CREATE BTN */
+  .create-fab {
+    position:fixed; bottom:72px; right:16px; z-index:50;
+    width:52px; height:52px; border-radius:50%;
+    background:linear-gradient(135deg,var(--cyan),var(--purple));
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; cursor:pointer; box-shadow:var(--glow-cyan);
+    border:1px solid rgba(255,255,255,0.2); transition:transform 0.3s;
+    animation:float 3s ease-in-out infinite;
+  }
+  .create-fab:hover { transform:scale(1.1) !important; }
+
+  /* CREATE MODAL */
+  .modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:none; align-items:flex-end; justify-content:center; }
+  .modal-overlay.show { display:flex; }
+  .modal-sheet {
+    background:var(--surface); border-radius:20px 20px 0 0;
+    border:1px solid rgba(0,245,255,0.2); border-bottom:none;
+    padding:20px 16px 32px; width:100%; max-width:500px;
+    animation:slideUp 0.3s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-title { font-family:'Orbitron',monospace; font-size:13px; color:var(--cyan); letter-spacing:1px; margin-bottom:16px; text-align:center; }
+  .modal-types { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .mt-btn { padding:12px 8px; border-radius:10px; text-align:center; cursor:pointer; background:var(--surface2); border:1px solid rgba(0,245,255,0.1); transition:all 0.2s; }
+  .mt-btn:hover { border-color:var(--cyan); background:rgba(0,245,255,0.08); }
+  .mt-btn.selected { border-color:var(--cyan); background:rgba(0,245,255,0.1); box-shadow:var(--glow-cyan); }
+  .mt-icon { font-size:22px; margin-bottom:4px; }
+  .mt-label { font-family:'Orbitron',monospace; font-size:8px; color:var(--text); letter-spacing:0.5px; }
+  .modal-input { width:100%; background:var(--surface2); border:1px solid rgba(0,245,255,0.15); border-radius:10px; padding:10px 14px; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:14px; outline:none; margin-bottom:10px; transition:border-color 0.2s; }
+  .modal-input:focus { border-color:var(--cyan); }
+  .modal-input::placeholder { color:var(--muted); }
+  .modal-create-btn { width:100%; padding:13px; border-radius:10px; background:linear-gradient(135deg,var(--cyan),var(--purple)); border:none; color:var(--dark); font-family:'Orbitron',monospace; font-size:11px; letter-spacing:2px; font-weight:900; cursor:pointer; box-shadow:var(--glow-cyan); transition:all 0.2s; }
+  .modal-create-btn:hover { transform:scale(1.02); }
+  .modal-close { text-align:center; margin-top:10px; color:var(--muted); font-size:12px; cursor:pointer; }
+
+  /* BOTTOM TABS */
+  .tab-bar { position:fixed; bottom:0; left:0; right:0; height:56px; z-index:100; display:flex; align-items:stretch; background:rgba(4,0,15,0.97); backdrop-filter:blur(24px); border-top:1px solid rgba(0,245,255,0.08); }
+  .tab-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; transition:all 0.2s; position:relative; }
+  .tab-item::after { content:''; position:absolute; top:0; left:15%; right:15%; height:2px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,var(--cyan),var(--purple)); opacity:0; transition:opacity 0.2s; }
+  .tab-item.active::after { opacity:1; }
+  .tab-icon { font-size:19px; filter:grayscale(0.5) opacity(0.55); transition:all 0.2s; }
+  .tab-item.active .tab-icon { filter:drop-shadow(0 0 5px var(--cyan)); transform:scale(1.1); }
+  .tab-label { font-family:'Orbitron',monospace; font-size:7px; letter-spacing:0.5px; color:var(--muted); transition:color 0.2s; }
+  .tab-item.active .tab-label { color:var(--cyan); }
+
+  .neon-div { height:1px; background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent); margin:14px 0; opacity:0.2; }
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-thumb { background:var(--purple); border-radius:4px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">DDOTT<em>.</em>TV</div>
+  <div class="nav-title">🌐 COMMUNITY</div>
+  <div class="nav-coin">🪙 1,247</div>
+  <div class="nav-avatar">D</div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-icon">🌐</span>
+    <div class="hero-title">COMMUNITY CENTER</div>
+    <div class="hero-sub">
+      Random talents come together. <b>AI helps you build.</b><br>
+      Singer + Lyricist + Editor = One masterpiece. 🎭
+    </div>
+    <div class="hero-stats">
+      <div class="hs" style="color:var(--cyan)">🎭 12.4K Creators</div>
+      <div class="hs" style="color:var(--green)">⚡ 847 Active Collabs</div>
+      <div class="hs" style="color:var(--gold)">🪙 2.4M Coins Earned</div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="cat-scroll">
+    <div class="cat-chip active" onclick="setcat(this)">🌟 All</div>
+    <div class="cat-chip" onclick="setcat(this)">🎵 Music</div>
+    <div class="cat-chip" onclick="setcat(this)">🎬 Short Films</div>
+    <div class="cat-chip" onclick="setcat(this)">😂 Comedy</div>
+    <div class="cat-chip" onclick="setcat(this)">🎭 Drama</div>
+    <div class="cat-chip" onclick="setcat(this)">📰 News</div>
+    <div class="cat-chip" onclick="setcat(this)">📚 Education</div>
+    <div class="cat-chip" onclick="setcat(this)">🎙️ Podcast</div>
+    <div class="cat-chip" onclick="setcat(this)">🤖 AI Project</div>
+  </div>
+
+  <!-- FEATURED COLLAB -->
+  <div class="sec-title">🔥 FEATURED COLLAB</div>
+  <div class="featured-collab">
+    <div class="fc-header">
+      <div class="fc-tag">⚡ OPEN COLLAB</div>
+      <div class="fc-title">Malayalam Indie Song — "Dubai Dreams" 🎵</div>
+      <div class="fc-desc">A song about leaving home and building a life in Dubai. Need vocalist, lyricist, music producer & video editor. AI will handle mixing & mastering.</div>
+    </div>
+    <div class="roles-row">
+      <div class="role-tag you">🎤 Vocalist (You)</div>
+      <div class="role-tag open">✍️ Lyricist</div>
+      <div class="role-tag open">🎹 Producer</div>
+      <div class="role-tag filled">🎬 Editor ✓</div>
+      <div class="role-tag open">🎨 Designer</div>
+    </div>
+    <div class="members-row">
+      <div class="member-av" style="background:linear-gradient(135deg,#00f5ff,#b400ff)">D</div>
+      <div class="member-av" style="background:linear-gradient(135deg,#ff00c8,#b400ff)">A</div>
+      <div class="member-av" style="background:linear-gradient(135deg,#ffd700,#ff8c00)">R</div>
+      <div class="members-count">3 / 5 joined · <span style="color:var(--green)">2 slots open</span></div>
+      <button class="join-btn" onclick="showJoin()">JOIN ➤</button>
+    </div>
+  </div>
+
+  <!-- COMMUNITIES -->
+  <div class="sec-title">🌐 COMMUNITIES</div>
+  <div class="community-grid">
+    <div class="comm-card" onclick="openComm('music')">
+      <div class="cc-banner" style="background:linear-gradient(135deg,#1a0030,#000820)">
+        🎵
+        <div class="cc-members-badge">8.2K</div>
+        <div class="cc-live-badge"><div class="cc-dot"></div>LIVE</div>
+      </div>
+      <div class="cc-info">
+        <div class="cc-name">MUSIC HUB</div>
+        <div class="cc-desc">Singers, producers, lyricists collaborate</div>
+        <div class="cc-tags">
+          <div class="cc-tag" style="background:rgba(180,0,255,0.1);color:var(--purple)">Malayalam</div>
+          <div class="cc-tag" style="background:rgba(0,245,255,0.1);color:var(--cyan)">Hindi</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comm-card" onclick="openComm('film')">
+      <div class="cc-banner" style="background:linear-gradient(135deg,#001020,#000a18)">
+        🎬
+        <div class="cc-members-badge">5.6K</div>
+      </div>
+      <div class="cc-info">
+        <div class="cc-name">FILM STUDIO</div>
+        <div class="cc-desc">Short films, scripts, cinematography</div>
+        <div class="cc-tags">
+          <div class="cc-tag" style="background:rgba(255,0,200,0.1);color:var(--pink)">Drama</div>
+          <div class="cc-tag" style="background:rgba(0,255,136,0.1);color:var(--green)">Comedy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comm-card" onclick="openComm('news')">
+      <div class="cc-banner" style="background:linear-gradient(135deg,#0a1000,#050800)">
+        📰
+        <div class="cc-members-badge">3.1K</div>
+        <div class="cc-live-badge"><div class="cc-dot"></div>LIVE</div>
+      </div>
+      <div class="cc-info">
+        <div class="cc-name">AI NEWS</div>
+        <div class="cc-desc">News in your language, AI-powered</div>
+        <div class="cc-tags">
+          <div class="cc-tag" style="background:rgba(255,215,0,0.1);color:var(--gold)">Malayalam</div>
+          <div class="cc-tag" style="background:rgba(0,245,255,0.1);color:var(--cyan)">Arabic</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comm-card" onclick="openComm('edu')">
+      <div class="cc-banner" style="background:linear-gradient(135deg,#100020,#080010)">
+        📚
+        <div class="cc-members-badge">4.8K</div>
+      </div>
+      <div class="cc-info">
+        <div class="cc-name">EDU CENTER</div>
+        <div class="cc-desc">AI teacher, live sessions, any subject</div>
+        <div class="cc-tags">
+          <div class="cc-tag" style="background:rgba(0,255,136,0.1);color:var(--green)">Free</div>
+          <div class="cc-tag" style="background:rgba(180,0,255,0.1);color:var(--purple)">AI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI FEATURES -->
+  <div class="sec-title">🤖 AI SUPERPOWERS</div>
+  <div class="ai-features">
+
+    <div class="ai-card">
+      <div class="ai-icon" style="background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.2)">📰</div>
+      <div class="ai-info">
+        <div class="ai-name">AI News Reader</div>
+        <div class="ai-desc">World news in Malayalam, Hindi, Arabic, English — AI voice reads it live</div>
+      </div>
+      <div class="ai-badge" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--green)">LIVE</div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-icon" style="background:rgba(180,0,255,0.1);border:1px solid rgba(180,0,255,0.2)">🌐</div>
+      <div class="ai-info">
+        <div class="ai-name">Auto Translation</div>
+        <div class="ai-desc">Every video translated to your language automatically with AI subtitles</div>
+      </div>
+      <div class="ai-badge" style="background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.3);color:var(--cyan)">50+ LANG</div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-icon" style="background:rgba(255,0,200,0.1);border:1px solid rgba(255,0,200,0.2)">🤖</div>
+      <div class="ai-info">
+        <div class="ai-name">AI Human Talk</div>
+        <div class="ai-desc">Live AI support for any work, life, or project questions — 24/7</div>
+      </div>
+      <div class="ai-badge" style="background:rgba(255,0,200,0.1);border:1px solid rgba(255,0,200,0.3);color:var(--pink)">24/7</div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-icon" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2)">📚</div>
+      <div class="ai-info">
+        <div class="ai-name">AI Teacher Live</div>
+        <div class="ai-desc">Real-time AI teaching for any subject — math, coding, language, science</div>
+      </div>
+      <div class="ai-badge" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:var(--gold)">FREE</div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-icon" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2)">🎙️</div>
+      <div class="ai-info">
+        <div class="ai-name">AI Podcasts</div>
+        <div class="ai-desc">Auto-generated podcasts on any topic — tech, crypto, culture, sports</div>
+      </div>
+      <div class="ai-badge" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--green)">NEW</div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-icon" style="background:rgba(180,0,255,0.1);border:1px solid rgba(180,0,255,0.2)">🎵</div>
+      <div class="ai-info">
+        <div class="ai-name">AI Music Mixer</div>
+        <div class="ai-desc">AI mixes and masters your collab tracks automatically — studio quality</div>
+      </div>
+      <div class="ai-badge" style="background:rgba(180,0,255,0.1);border:1px solid rgba(180,0,255,0.3);color:var(--purple)">BETA</div>
+    </div>
+
+  </div>
+
+  <!-- ACTIVE COLLABS -->
+  <div class="sec-title">⚡ ACTIVE COLLABS</div>
+  <div class="collab-list">
+
+    <div class="collab-item">
+      <div class="ci-icon" style="background:rgba(180,0,255,0.1)">🎭</div>
+      <div class="ci-info">
+        <div class="ci-title">Short Comedy Film — "Termux Life" 😂</div>
+        <div class="ci-meta">Need: Director, Actor · 4 members</div>
+      </div>
+      <div class="ci-coins">+200 🪙</div>
+    </div>
+
+    <div class="collab-item">
+      <div class="ci-icon" style="background:rgba(0,245,255,0.1)">📰</div>
+      <div class="ci-info">
+        <div class="ci-title">Dubai Tech News — Weekly Malayalam Show</div>
+        <div class="ci-meta">Need: Anchor, Editor · 3 members</div>
+      </div>
+      <div class="ci-coins">+150 🪙</div>
+    </div>
+
+    <div class="collab-item">
+      <div class="ci-icon" style="background:rgba(255,215,0,0.1)">📚</div>
+      <div class="ci-info">
+        <div class="ci-title">Malayalam Coding Tutorial Series</div>
+        <div class="ci-meta">Need: Teacher, Designer · 2 members</div>
+      </div>
+      <div class="ci-coins">+300 🪙</div>
+    </div>
+
+    <div class="collab-item">
+      <div class="ci-icon" style="background:rgba(0,255,136,0.1)">🎙️</div>
+      <div class="ci-info">
+        <div class="ci-title">Web3 & Crypto Podcast — Weekly</div>
+        <div class="ci-meta">Need: Host, Research · 5 members</div>
+      </div>
+      <div class="ci-coins">+100 🪙</div>
+    </div>
+
+    <div class="collab-item">
+      <div class="ci-icon" style="background:rgba(255,0,200,0.1)">🎬</div>
+      <div class="ci-info">
+        <div class="ci-title">IND → DXB Documentary</div>
+        <div class="ci-meta">Need: Filmmaker, Narrator · 6 members</div>
+      </div>
+      <div class="ci-coins">+500 🪙</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- CREATE FAB -->
+<div class="create-fab" onclick="showCreate()" title="Create Collab">➕</div>
+
+<!-- CREATE MODAL -->
+<div class="modal-overlay" id="createModal" onclick="hideCreate(event)">
+  <div class="modal-sheet">
+    <div class="modal-title">🌐 CREATE COLLAB</div>
+    <div class="modal-types">
+      <div class="mt-btn selected" onclick="selType(this)"><div class="mt-icon">🎵</div><div class="mt-label">MUSIC</div></div>
+      <div class="mt-btn" onclick="selType(this)"><div class="mt-icon">🎬</div><div class="mt-label">FILM</div></div>
+      <div class="mt-btn" onclick="selType(this)"><div class="mt-icon">😂</div><div class="mt-label">COMEDY</div></div>
+      <div class="mt-btn" onclick="selType(this)"><div class="mt-icon">📰</div><div class="mt-label">NEWS</div></div>
+      <div class="mt-btn" onclick="selType(this)"><div class="mt-icon">📚</div><div class="mt-label">EDUCATION</div></div>
+      <div class="mt-btn" onclick="selType(this)"><div class="mt-icon">🎙️</div><div class="mt-label">PODCAST</div></div>
+    </div>
+    <input class="modal-input" placeholder="Collab title...">
+    <input class="modal-input" placeholder="What roles do you need?">
+    <input class="modal-input" placeholder="Emo Coins reward per member...">
+    <button class="modal-create-btn" onclick="createCollab()">🚀 CREATE COLLAB</button>
+    <div class="modal-close" onclick="hideCreate()">Cancel</div>
+  </div>
+</div>
+
+<!-- BOTTOM TABS -->
+<div class="tab-bar">
+  <div class="tab-item" onclick="window.location='ddott-tv-app.html'"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
+  <div class="tab-item" onclick="window.location='ddott-home-v2.html'"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
+  <div class="tab-item active"><div class="tab-icon">🌐</div><div class="tab-label">COMMUNITY</div></div>
+  <div class="tab-item" onclick="window.location='ddott-emo-coins.html'"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
+  <div class="tab-item" onclick="window.location='ddott-creator-studio.html'"><div class="tab-icon">🎬</div><div class="tab-label">STUDIO</div></div>
+</div>
+
+<script>
+  function setcat(el) {
+    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function showCreate() { document.getElementById('createModal').classList.add('show'); }
+  function hideCreate(e) {
+    if(!e || e.target === document.getElementById('createModal'))
+      document.getElementById('createModal').classList.remove('show');
+  }
+
+  function selType(el) {
+    document.querySelectorAll('.mt-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function createCollab() {
+    document.getElementById('createModal').classList.remove('show');
+    // Show toast
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#00ff88,#00f5ff);color:#020008;font-family:Orbitron,monospace;font-size:10px;padding:10px 20px;border-radius:20px;z-index:300;letter-spacing:1px;font-weight:700;';
+    t.textContent = '🚀 COLLAB CREATED!';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  function showJoin() {
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#b400ff,#00f5ff);color:#020008;font-family:Orbitron,monospace;font-size:10px;padding:10px 20px;border-radius:20px;z-index:300;letter-spacing:1px;font-weight:700;white-space:nowrap;';
+    t.textContent = '🎵 JOINED DUBAI DREAMS COLLAB!';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  function openComm(type) {
+    const names = {music:'MUSIC HUB',film:'FILM STUDIO',news:'AI NEWS',edu:'EDU CENTER'};
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#b400ff,#ff00c8);color:#fff;font-family:Orbitron,monospace;font-size:10px;padding:10px 20px;border-radius:20px;z-index:300;letter-spacing:1px;font-weight:700;white-space:nowrap;';
+    t.textContent = `🌐 Opening ${names[type]}...`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+  }
+</script>
+</body>
+</html>

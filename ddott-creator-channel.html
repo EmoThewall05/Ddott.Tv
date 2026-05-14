@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Creator Channel</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --purple: #b400ff;
+    --pink: #ff00c8;
+    --dark: #04000f;
+    --darker: #020008;
+    --surface: #0a0020;
+    --surface2: #110030;
+    --text: #e8d5ff;
+    --muted: #6b4d8a;
+    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff33;
+    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff33;
+    --glow-pink: 0 0 20px #ff00c888, 0 0 40px #ff00c833;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridMove 25s linear infinite;
+  }
+  @keyframes gridMove { to { transform: translateY(44px); } }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    background: rgba(4,0,15,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,245,255,0.12);
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 17px; font-weight: 900;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  .logo span { -webkit-text-fill-color: var(--pink); }
+
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid rgba(0,245,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 15px; transition: all 0.3s;
+  }
+  .nav-icon:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+  .nav-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    border: 2px solid var(--cyan); box-shadow: var(--glow-cyan);
+  }
+
+  /* BANNER */
+  .banner {
+    position: relative; z-index: 1;
+    height: 180px; overflow: hidden;
+    background: linear-gradient(135deg, #000510 0%, #0a0030 40%, #1a0040 70%, #000820 100%);
+  }
+
+  .banner-fx {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 60%, rgba(0,245,255,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 40%, rgba(180,0,255,0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(255,0,200,0.1) 0%, transparent 40%);
+    animation: bannerPulse 6s ease-in-out infinite alternate;
+  }
+  @keyframes bannerPulse {
+    from { opacity: 0.7; }
+    to { opacity: 1; }
+  }
+
+  /* Floating particles in banner */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(100%) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.5; }
+    100% { transform: translateY(-200%) scale(1.5); opacity: 0; }
+  }
+
+  .banner-text {
+    position: absolute; bottom: 16px; right: 20px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; letter-spacing: 3px;
+    color: rgba(0,245,255,0.4);
+    text-transform: uppercase;
+  }
+
+  /* PROFILE SECTION */
+  .profile-section {
+    position: relative; z-index: 2;
+    padding: 0 16px 0;
+    margin-top: -50px;
+  }
+
+  .profile-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .creator-pfp {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    border: 3px solid var(--darker);
+    box-shadow: var(--glow-purple), var(--glow-cyan);
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .verified-badge {
+    position: absolute; bottom: 2px; right: 2px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    border: 2px solid var(--darker);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .profile-actions { display: flex; gap: 8px; align-items: center; padding-bottom: 4px; }
+
+  .sub-btn {
+    padding: 9px 20px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none; color: var(--dark);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; box-shadow: var(--glow-cyan);
+    transition: all 0.3s;
+  }
+  .sub-btn:hover { transform: scale(1.05); }
+  .sub-btn.subscribed {
+    background: var(--surface2);
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    box-shadow: none;
+  }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid rgba(0,245,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; transition: all 0.2s;
+  }
+  .icon-btn:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+
+  /* CREATOR INFO */
+  .creator-info { margin-bottom: 14px; }
+
+  .creator-name-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 2px;
+  }
+
+  .creator-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px; font-weight: 900; color: #fff;
+  }
+
+  .live-now {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 4px;
+    background: rgba(255,0,80,0.15);
+    border: 1px solid rgba(255,0,80,0.5);
+    font-family: 'Orbitron', monospace;
+    font-size: 8px; color: #ff0050; letter-spacing: 1px;
+  }
+  .live-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #ff0050; animation: blink 0.8s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .creator-handle {
+    font-size: 13px; color: var(--muted); margin-bottom: 8px;
+  }
+  .creator-handle span { color: var(--cyan); }
+
+  .creator-bio {
+    font-size: 13px; color: #a888cc; line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .creator-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tag {
+    padding: 4px 10px; border-radius: 20px;
+    background: rgba(0,245,255,0.08);
+    border: 1px solid rgba(0,245,255,0.2);
+    font-size: 11px; color: var(--cyan); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tag:hover { background: rgba(0,245,255,0.15); box-shadow: var(--glow-cyan); }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-bottom: 16px;
+  }
+
+  .stat-card {
+    padding: 12px 8px;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid rgba(0,245,255,0.1);
+    text-align: center;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .stat-card:hover { border-color: rgba(0,245,255,0.3); }
+
+  .stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px; font-weight: 700;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 2px;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; }
+
+  /* EMO COINS CREATOR */
+  .emo-creator-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(180,0,255,0.1), rgba(0,245,255,0.05));
+    border-radius: 10px;
+    border: 1px solid rgba(180,0,255,0.3);
+    margin-bottom: 16px;
+  }
+  .emo-left { display: flex; align-items: center; gap: 10px; }
+  .emo-icon { font-size: 22px; }
+  .emo-info-label { font-family:'Orbitron',monospace; font-size:9px; color:var(--purple); letter-spacing:1px; }
+  .emo-info-val { font-family:'Orbitron',monospace; font-size:16px; font-weight:900; color:var(--pink); }
+  .tip-creator-btn {
+    padding: 8px 16px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px; letter-spacing: 1px; font-weight:700;
+    cursor: pointer; box-shadow: var(--glow-purple);
+    transition: all 0.2s;
+  }
+  .tip-creator-btn:hover { transform: scale(1.05); }
+
+  /* TABS */
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+    margin-bottom: 16px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 10px 16px; white-space: nowrap;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    color: var(--muted); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* FILTER ROW */
+  .filter-row {
+    display: flex; gap: 8px; margin-bottom: 14px;
+    overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+
+  .filter-chip {
+    padding: 6px 14px; border-radius: 20px; white-space: nowrap;
+    background: var(--surface); border: 1px solid rgba(0,245,255,0.15);
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .filter-chip.active {
+    background: rgba(0,245,255,0.1);
+    border-color: var(--cyan); color: var(--cyan);
+  }
+  .filter-chip:hover:not(.active) { border-color: rgba(0,245,255,0.3); color: var(--text); }
+
+  /* VIDEO GRID */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px; margin-bottom: 20px;
+  }
+
+  .video-card {
+    border-radius: 10px; overflow: hidden;
+    background: var(--surface);
+    border: 1px solid rgba(0,245,255,0.08);
+    cursor: pointer; transition: all 0.25s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .video-card:hover {
+    border-color: rgba(0,245,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,245,255,0.08);
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(12px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  .video-card:nth-child(1){animation-delay:0.05s}
+  .video-card:nth-child(2){animation-delay:0.1s}
+  .video-card:nth-child(3){animation-delay:0.15s}
+  .video-card:nth-child(4){animation-delay:0.2s}
+  .video-card:nth-child(5){animation-delay:0.25s}
+  .video-card:nth-child(6){animation-delay:0.3s}
+
+  .vc-thumb {
+    position: relative;
+    padding-top: 56.25%;
+    overflow: hidden;
+  }
+
+  .vc-thumb-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+
+  .vc-dur {
+    position: absolute; bottom: 6px; right: 6px;
+    font-family: 'Orbitron', monospace; font-size: 9px;
+    background: rgba(0,0,0,0.85); padding: 2px 6px;
+    border-radius: 4px; color: var(--cyan);
+  }
+
+  .vc-live-badge {
+    position: absolute; top: 6px; left: 6px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 3px 7px; border-radius: 4px;
+    background: rgba(255,0,80,0.9);
+    font-family: 'Orbitron', monospace; font-size: 8px;
+    color: #fff; letter-spacing: 1px; font-weight:700;
+  }
+
+  .vc-new-badge {
+    position: absolute; top: 6px; left: 6px;
+    padding: 3px 7px; border-radius: 4px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    font-family: 'Orbitron', monospace; font-size: 8px;
+    color: var(--dark); letter-spacing: 1px; font-weight:700;
+  }
+
+  .vc-info { padding: 8px 10px 10px; }
+  .vc-title {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    margin-bottom: 4px; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .vc-meta { font-size: 11px; color: var(--muted); }
+  .vc-views { color: var(--pink); font-size: 10px; margin-top: 2px; }
+
+  /* FEATURED / PINNED */
+  .featured-card {
+    border-radius: 12px; overflow: hidden;
+    background: var(--surface);
+    border: 1px solid rgba(0,245,255,0.2);
+    margin-bottom: 14px;
+    cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 0 30px rgba(0,245,255,0.05);
+  }
+  .featured-card:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+
+  .fc-thumb {
+    position: relative; padding-top: 40%;
+    background: linear-gradient(135deg, #000820, #1a0040);
+    overflow: hidden;
+  }
+  .fc-thumb-inner {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 50px;
+  }
+  .fc-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(transparent 30%, rgba(4,0,15,0.9));
+  }
+  .fc-badge {
+    position: absolute; top: 10px; left: 10px;
+    padding: 4px 10px; border-radius: 4px;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    font-family: 'Orbitron', monospace; font-size: 9px;
+    color: #fff; letter-spacing: 2px; font-weight:700;
+    box-shadow: var(--glow-purple);
+  }
+  .fc-dur {
+    position: absolute; bottom: 10px; right: 10px;
+    font-family: 'Orbitron', monospace; font-size: 10px;
+    background: rgba(0,0,0,0.85); padding: 3px 8px;
+    border-radius: 4px; color: var(--cyan);
+  }
+  .fc-info { padding: 12px 14px; }
+  .fc-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .fc-meta { font-size: 12px; color: var(--muted); display: flex; gap: 12px; }
+
+  /* PLAYLISTS */
+  .playlist-card {
+    display: flex; gap: 12px; padding: 10px;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid rgba(180,0,255,0.1);
+    margin-bottom: 10px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .playlist-card:hover { border-color: rgba(180,0,255,0.3); }
+
+  .pl-thumb {
+    width: 90px; height: 56px; border-radius: 8px;
+    flex-shrink: 0; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .pl-thumb-bg { position: absolute; inset: 0; }
+  .pl-count {
+    position: absolute; bottom: 0; right: 0;
+    background: rgba(0,0,0,0.8); padding: 2px 5px;
+    font-family: 'Orbitron', monospace; font-size: 8px; color: var(--cyan);
+    border-radius: 4px 0 8px 0;
+  }
+
+  .pl-info { flex: 1; min-width: 0; }
+  .pl-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .pl-meta { font-size: 11px; color: var(--muted); }
+
+  /* ABOUT TAB */
+  .about-section { padding: 4px 0; }
+  .about-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,245,255,0.06);
+  }
+  .about-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .about-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; letter-spacing: 0.5px; }
+  .about-val { font-size: 13px; color: var(--text); }
+  .about-link { color: var(--cyan); text-decoration: none; }
+
+  /* MILESTONES */
+  .milestone {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid rgba(0,245,255,0.08);
+    margin-bottom: 8px;
+  }
+  .ms-icon { font-size: 22px; }
+  .ms-label { font-size: 13px; color: var(--text); flex: 1; }
+  .ms-val {
+    font-family: 'Orbitron', monospace; font-size: 11px;
+    color: var(--cyan);
+  }
+
+  /* NEON DIVIDER */
+  .neon-div {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+    margin: 14px 0; opacity: 0.3;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'Orbitron', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--purple);
+    margin-bottom: 12px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(180,0,255,0.4), transparent);
+  }
+
+  /* BUTTERFLY FAB */
+  .butterfly-fab {
+    position: fixed; bottom: 24px; right: 20px;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; cursor: pointer;
+    box-shadow: var(--glow-purple), var(--glow-cyan);
+    z-index: 200; animation: float 3s ease-in-out infinite;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: transform 0.3s;
+  }
+  @keyframes float {
+    0%,100%{transform:translateY(0) rotate(-5deg)}
+    50%{transform:translateY(-8px) rotate(5deg)}
+  }
+  .butterfly-fab:hover { transform: scale(1.15) !important; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--darker); }
+  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
+
+  /* SCROLLABLE CONTENT */
+  .page-content {
+    position: relative; z-index: 1;
+    padding: 0 0 80px;
+  }
+
+  .padded { padding: 0 16px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">DDOTT<span>.</span>TV</div>
+  <div class="nav-right">
+    <div class="nav-icon">🔍</div>
+    <div class="nav-icon">⋯</div>
+    <div class="nav-avatar">D</div>
+  </div>
+</nav>
+
+<div class="page-content">
+
+  <!-- BANNER -->
+  <div class="banner">
+    <div class="banner-fx"></div>
+    <!-- particles -->
+    <div class="particle" style="width:4px;height:4px;background:var(--cyan);left:15%;animation-duration:5s;animation-delay:0s;"></div>
+    <div class="particle" style="width:3px;height:3px;background:var(--purple);left:35%;animation-duration:7s;animation-delay:1s;"></div>
+    <div class="particle" style="width:5px;height:5px;background:var(--pink);left:55%;animation-duration:4s;animation-delay:2s;"></div>
+    <div class="particle" style="width:3px;height:3px;background:var(--cyan);left:75%;animation-duration:6s;animation-delay:0.5s;"></div>
+    <div class="particle" style="width:4px;height:4px;background:var(--purple);left:90%;animation-duration:5.5s;animation-delay:1.5s;"></div>
+    <div class="banner-text">DWIN UNIVERSE · DUBAI 🇦🇪</div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="profile-section">
+    <div class="profile-top">
+      <div class="creator-pfp">
+        🦋
+        <div class="verified-badge">✓</div>
+      </div>
+      <div class="profile-actions">
+        <div class="icon-btn" title="Share">↗</div>
+        <div class="icon-btn" title="More">⋯</div>
+        <button class="sub-btn" id="subBtn" onclick="toggleSub()">SUBSCRIBE</button>
+      </div>
+    </div>
+
+    <div class="creator-info">
+      <div class="creator-name-row">
+        <div class="creator-name">Emobies05</div>
+        <div class="live-now"><div class="live-dot"></div>LIVE</div>
+      </div>
+      <div class="creator-handle">@divin · <span>Dwin Universe</span> · Dubai 🇦🇪</div>
+      <div class="creator-bio">
+        Self-taught dev building entire ecosystems from a phone 📱 —
+        TheWall Web3 wallet, Emowall AI, Emobies repair platform & Ddott TV.
+        Termux + Acode + sheer will. 🔥
+      </div>
+      <div class="creator-tags">
+        <div class="tag">#Web3</div>
+        <div class="tag">#MobileDev</div>
+        <div class="tag">#BuildInPublic</div>
+        <div class="tag">#AI</div>
+        <div class="tag">#DwinUniverse</div>
+        <div class="tag">#Termux</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-val">84.2K</div>
+        <div class="stat-label">Subscribers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">312</div>
+        <div class="stat-label">Videos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">4.8M</div>
+        <div class="stat-label">Total Views</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">96%</div>
+        <div class="stat-label">Like Rate</div>
+      </div>
+    </div>
+
+    <!-- EMO COINS -->
+    <div class="emo-creator-bar">
+      <div class="emo-left">
+        <div class="emo-icon">🪙</div>
+        <div>
+          <div class="emo-info-label">EMO COINS EARNED</div>
+          <div class="emo-info-val">128,450</div>
+        </div>
+      </div>
+      <button class="tip-creator-btn">💜 TIP</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this,'videos')">📺 Videos</div>
+      <div class="tab" onclick="switchTab(this,'featured')">⭐ Featured</div>
+      <div class="tab" onclick="switchTab(this,'playlists')">📂 Playlists</div>
+      <div class="tab" onclick="switchTab(this,'about')">ℹ️ About</div>
+    </div>
+  </div>
+
+  <!-- VIDEOS TAB -->
+  <div id="videos-panel" class="padded">
+    <div class="filter-row">
+      <div class="filter-chip active" onclick="setFilter(this)">All</div>
+      <div class="filter-chip" onclick="setFilter(this)">Recent</div>
+      <div class="filter-chip" onclick="setFilter(this)">Popular</div>
+      <div class="filter-chip" onclick="setFilter(this)">Web3</div>
+      <div class="filter-chip" onclick="setFilter(this)">AI</div>
+      <div class="filter-chip" onclick="setFilter(this)">Shorts</div>
+    </div>
+
+    <div class="video-grid">
+      <div class="video-card">
+        <div class="vc-thumb">
+          <div class="vc-thumb-bg" style="background:linear-gradient(135deg,#000820,#1a0040)">📱</div>
+          <div class="vc-live-badge"><div class="live-dot"></div>LIVE</div>
+          <div class="vc-dur">LIVE</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-title">Building Ddott TV Player V2 LIVE 🔥</div>
+          <div class="vc-meta">2 hrs ago</div>
+          <div class="vc-views">🔴 4.2K watching</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="vc-thumb">
+          <div class="vc-thumb-bg" style="background:linear-gradient(135deg,#050018,#200040)">🔗</div>
+          <div class="vc-new-badge">NEW</div>
+          <div class="vc-dur">37:45</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-title">Web3 Wallet from a Phone</div>
+          <div class="vc-meta">1 day ago</div>
+          <div class="vc-views">🔥 128K views</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="vc-thumb">
+          <div class="vc-thumb-bg" style="background:linear-gradient(135deg,#001520,#003040)">🦋</div>
+          <div class="vc-dur">19:33</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-title">Emowall AI — 7 Brain Architecture</div>
+          <div class="vc-meta">3 days ago</div>
+          <div class="vc-views">⚡ 52K views</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="vc-thumb">
+          <div class="vc-thumb-bg" style="background:linear-gradient(135deg,#100020,#300040)">🪙</div>
+          <div class="vc-dur">14:08</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-title">Emo Coins Tokenomics Deep Dive</div>
+          <div class="vc-meta">5 days ago</div>
+          <div class="vc-views">💜 38K views</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="vc-thumb">
+          <div class="vc-thumb-bg" style="background:linear-gradient(135deg,#000510,#0a0030)">🚀</div>
+          <div class="vc-dur">22:50</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-title">Launching on Google Play — Full TWA Build</div>
+          <div class="vc-meta">1 week ago</div>
+          <div class="vc-views">🚀 61K views</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="vc-thumb">
+          <div class="vc-thumb-bg" style="background:linear-gradient(135deg,#080010,#180030)">⚡</div>
+          <div class="vc-dur">8:12</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-title">Perfect PWA Score — How I did it</div>
+          <div class="vc-meta">2 weeks ago</div>
+          <div class="vc-views">⚡ 29K views</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURED TAB -->
+  <div id="featured-panel" class="padded" style="display:none">
+    <div class="section-label">Pinned Video</div>
+    <div class="featured-card">
+      <div class="fc-thumb">
+        <div class="fc-thumb-inner">🌐</div>
+        <div class="fc-overlay"></div>
+        <div class="fc-badge">📌 PINNED</div>
+        <div class="fc-dur">1:02:14</div>
+      </div>
+      <div class="fc-info">
+        <div class="fc-title">The Dwin Universe — Full Ecosystem Breakdown</div>
+        <div class="fc-meta">
+          <span>🎬 312K views</span>
+          <span>📅 1 month ago</span>
+          <span>❤ 28K</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Latest Upload</div>
+    <div class="featured-card">
+      <div class="fc-thumb" style="background:linear-gradient(135deg,#000820,#200040)">
+        <div class="fc-thumb-inner">📱</div>
+        <div class="fc-overlay"></div>
+        <div class="fc-badge" style="background:linear-gradient(90deg,var(--cyan),var(--purple));color:var(--dark)">🆕 NEW</div>
+        <div class="fc-dur">37:45</div>
+      </div>
+      <div class="fc-info">
+        <div class="fc-title">Building Web3 on Mobile — Full Stack Dev from a Phone</div>
+        <div class="fc-meta">
+          <span>🔥 128K views</span>
+          <span>📅 1 day ago</span>
+          <span>❤ 24K</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="neon-div"></div>
+    <div class="section-label">Milestones</div>
+
+    <div class="milestone">
+      <div class="ms-icon">🏆</div>
+      <div class="ms-label">Hit 80K Subscribers</div>
+      <div class="ms-val">2 weeks ago</div>
+    </div>
+    <div class="milestone">
+      <div class="ms-icon">🎬</div>
+      <div class="ms-label">4 Million Total Views</div>
+      <div class="ms-val">1 month ago</div>
+    </div>
+    <div class="milestone">
+      <div class="ms-icon">🚀</div>
+      <div class="ms-label">3 Apps on Google Play</div>
+      <div class="ms-val">3 months ago</div>
+    </div>
+    <div class="milestone">
+      <div class="ms-icon">⭐</div>
+      <div class="ms-label">Perfect PWA Score — TheWall</div>
+      <div class="ms-val">2 weeks ago</div>
+    </div>
+  </div>
+
+  <!-- PLAYLISTS TAB -->
+  <div id="playlists-panel" class="padded" style="display:none">
+    <div class="section-label">Collections</div>
+
+    <div class="playlist-card">
+      <div class="pl-thumb" style="background:linear-gradient(135deg,#000820,#1a0040)">
+        <div class="pl-thumb-bg"></div>
+        🔗
+        <div class="pl-count">12 videos</div>
+      </div>
+      <div class="pl-info">
+        <div class="pl-title">TheWall — Full Build Series</div>
+        <div class="pl-meta">Web3 · 5-chain wallet · Alchemy</div>
+      </div>
+    </div>
+
+    <div class="playlist-card">
+      <div class="pl-thumb" style="background:linear-gradient(135deg,#050018,#200040)">
+        🦋
+        <div class="pl-count">8 videos</div>
+      </div>
+      <div class="pl-info">
+        <div class="pl-title">Emowall AI — Architecture Deep Dives</div>
+        <div class="pl-meta">AI · 7 Brains · Gemini + Claude</div>
+      </div>
+    </div>
+
+    <div class="playlist-card">
+      <div class="pl-thumb" style="background:linear-gradient(135deg,#001020,#003040)">
+        📺
+        <div class="pl-count">6 videos</div>
+      </div>
+      <div class="pl-info">
+        <div class="pl-title">Ddott TV — Building a Streaming Platform</div>
+        <div class="pl-meta">Frontend · HTML · Neon Design</div>
+      </div>
+    </div>
+
+    <div class="playlist-card">
+      <div class="pl-thumb" style="background:linear-gradient(135deg,#100010,#300020)">
+        📱
+        <div class="pl-count">15 videos</div>
+      </div>
+      <div class="pl-info">
+        <div class="pl-title">Mobile Dev Masterclass — Termux + Acode</div>
+        <div class="pl-meta">Termux · Acode · Node.js · Flutter</div>
+      </div>
+    </div>
+
+    <div class="playlist-card">
+      <div class="pl-thumb" style="background:linear-gradient(135deg,#080010,#180030)">
+        🪙
+        <div class="pl-count">5 videos</div>
+      </div>
+      <div class="pl-info">
+        <div class="pl-title">Emo Coins — Creator Economy</div>
+        <div class="pl-meta">Tokenomics · Web3 · Rewards</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT TAB -->
+  <div id="about-panel" class="padded" style="display:none">
+    <div class="about-section">
+      <div class="about-row">
+        <div class="about-icon">📝</div>
+        <div>
+          <div class="about-label">ABOUT</div>
+          <div class="about-val">Self-taught developer building the entire Dwin Universe ecosystem from a phone in Dubai. No laptop. No desktop. Just Termux, Acode, and sheer will. 🔥</div>
+        </div>
+      </div>
+      <div class="about-row">
+        <div class="about-icon">📍</div>
+        <div>
+          <div class="about-label">LOCATION</div>
+          <div class="about-val">Dubai, UAE 🇦🇪 · Originally from India 🇮🇳</div>
+        </div>
+      </div>
+      <div class="about-row">
+        <div class="about-icon">🔗</div>
+        <div>
+          <div class="about-label">LINKS</div>
+          <div class="about-val">
+            <a class="about-link" href="#">thewall.e-mobies.com</a><br>
+            <a class="about-link" href="#">github.com/Emobies05</a><br>
+            <a class="about-link" href="#">play.google.com · Emobies</a>
+          </div>
+        </div>
+      </div>
+      <div class="about-row">
+        <div class="about-icon">📅</div>
+        <div>
+          <div class="about-label">JOINED</div>
+          <div class="about-val">Ddott TV · Day 1 Creator</div>
+        </div>
+      </div>
+      <div class="about-row">
+        <div class="about-icon">🛠</div>
+        <div>
+          <div class="about-label">TECH STACK</div>
+          <div class="about-val">Next.js · Flutter · Node.js · MongoDB · Alchemy · Claude AI · Gemini · Vercel · Termux · Acode</div>
+        </div>
+      </div>
+      <div class="about-row">
+        <div class="about-icon">🌐</div>
+        <div>
+          <div class="about-label">ECOSYSTEM</div>
+          <div class="about-val">TheWall · Emowall AI 2.0 · Emobies · Emo AI Pro · Ddott TV</div>
+        </div>
+      </div>
+      <div class="about-row">
+        <div class="about-icon">🪙</div>
+        <div>
+          <div class="about-label">EMO COINS EARNED (TOTAL)</div>
+          <div class="about-val" style="color:var(--pink);font-family:'Orbitron',monospace;font-size:18px;font-weight:900;">128,450 🪙</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BUTTERFLY FAB -->
+<div class="butterfly-fab" title="Emowall AI">🦋</div>
+
+<script>
+  function switchTab(el, tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    ['videos','featured','playlists','about'].forEach(p => {
+      document.getElementById(p+'-panel').style.display = p === tab ? 'block' : 'none';
+    });
+  }
+
+  function setFilter(el) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  let subscribed = false;
+  function toggleSub() {
+    subscribed = !subscribed;
+    const btn = document.getElementById('subBtn');
+    btn.textContent = subscribed ? '✓ SUBSCRIBED' : 'SUBSCRIBE';
+    btn.classList.toggle('subscribed', subscribed);
+  }
+</script>
+</body>
+</html>

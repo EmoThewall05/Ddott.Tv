@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00f5ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ddott TV">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff; --purple: #b400ff; --pink: #ff00c8;
+    --gold: #ffd700; --green: #00ff88;
+    --dark: #04000f; --darker: #020008;
+    --surface: #0a0020; --surface2: #110030;
+    --text: #e8d5ff; --muted: #6b4d8a;
+    --nav-h: 58px; --tab-h: 56px;
+    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff33;
+    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff33;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; width:100%; background:var(--darker); color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:linear-gradient(rgba(0,245,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(180,0,255,0.02) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+    animation:gridMove 25s linear infinite;
+  }
+  @keyframes gridMove{to{transform:translateY(40px)}}
+
+  /* TOP NAV */
+  .top-nav {
+    position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:200;
+    display:flex; align-items:center; gap:8px; padding:0 14px;
+    background:rgba(4,0,15,0.96); backdrop-filter:blur(24px);
+    border-bottom:1px solid rgba(0,245,255,0.1);
+  }
+  .logo { font-family:'Orbitron',monospace; font-size:17px; font-weight:900; background:linear-gradient(90deg,var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:3px; cursor:pointer; flex-shrink:0; }
+  .logo em { -webkit-text-fill-color:var(--pink); font-style:normal; }
+  .nav-search { flex:1; display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid rgba(0,245,255,0.12); border-radius:20px; padding:5px 12px; }
+  .nav-search input { background:none; border:none; outline:none; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:13px; width:100%; }
+  .nav-search input::placeholder { color:var(--muted); }
+  .nav-coins { display:flex; align-items:center; gap:4px; padding:5px 9px; border-radius:16px; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.2); cursor:pointer; flex-shrink:0; }
+  .coins-val { font-family:'Orbitron',monospace; font-size:10px; color:var(--gold); font-weight:700; }
+  .nav-notif { width:34px; height:34px; border-radius:50%; background:var(--surface2); border:1px solid rgba(0,245,255,0.12); display:flex; align-items:center; justify-content:center; font-size:15px; cursor:pointer; position:relative; flex-shrink:0; }
+  .notif-dot { position:absolute; top:4px; right:4px; width:7px; height:7px; border-radius:50%; background:var(--pink); border:1px solid var(--darker); animation:blink 2s infinite; }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+  .nav-avatar { width:34px; height:34px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--purple),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; cursor:pointer; border:2px solid var(--cyan); box-shadow:var(--glow-cyan); }
+
+  /* FRAME AREA */
+  .frame-area { position:fixed; top:var(--nav-h); bottom:var(--tab-h); left:0; right:0; z-index:1; overflow:hidden; }
+
+  /* HOME */
+  .home-screen { width:100%; height:100%; overflow-y:auto; background:var(--darker); }
+  .home-screen::-webkit-scrollbar { width:3px; }
+  .home-screen::-webkit-scrollbar-thumb { background:var(--purple); border-radius:4px; }
+  .hero { padding:20px 16px 14px; background:linear-gradient(180deg,rgba(180,0,255,0.07) 0%,transparent 100%); }
+  .hero-greet { font-size:11px; color:var(--muted); letter-spacing:1px; margin-bottom:3px; }
+  .hero-name { font-family:'Orbitron',monospace; font-size:20px; font-weight:900; color:#fff; margin-bottom:1px; }
+  .hero-sub { font-size:12px; color:var(--muted); }
+  .hero-sub b { color:var(--cyan); font-weight:600; }
+
+  /* LIVE BANNER */
+  .live-banner { margin:12px 16px; border-radius:14px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,0,80,0.3); box-shadow:0 0 24px rgba(255,0,80,0.08); transition:transform 0.2s; animation:fadeUp 0.4s ease both; }
+  .live-banner:active { transform:scale(0.98); }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .lb-inner { padding:16px; background:linear-gradient(135deg,#0d0008,#18001e,#001018); display:flex; align-items:center; gap:12px; }
+  .lb-live-tag { display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:4px; background:rgba(255,0,80,0.12); border:1px solid rgba(255,0,80,0.35); font-family:'Orbitron',monospace; font-size:8px; color:#ff0050; letter-spacing:1px; margin-bottom:3px; }
+  .lb-dot { width:4px; height:4px; border-radius:50%; background:#ff0050; animation:blink 0.8s infinite; }
+  .lb-title { font-size:13px; font-weight:700; color:#fff; }
+  .lb-meta { font-size:10px; color:var(--muted); margin-top:1px; }
+  .lb-btn { padding:7px 14px; border-radius:7px; background:linear-gradient(135deg,var(--cyan),var(--purple)); border:none; color:var(--dark); font-family:'Orbitron',monospace; font-size:8px; letter-spacing:1px; font-weight:700; cursor:pointer; flex-shrink:0; box-shadow:var(--glow-cyan); }
+
+  /* STATS */
+  .stats-strip { display:flex; gap:7px; padding:0 16px; overflow-x:auto; scrollbar-width:none; margin-bottom:2px; }
+  .stats-strip::-webkit-scrollbar { display:none; }
+  .stat-pill { flex-shrink:0; padding:7px 12px; border-radius:18px; background:var(--surface); border:1px solid rgba(0,245,255,0.08); display:flex; align-items:center; gap:5px; }
+  .sp-val { font-family:'Orbitron',monospace; font-size:11px; font-weight:700; }
+  .sp-lbl { font-size:10px; color:var(--muted); }
+  .neon-div { height:1px; background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent); margin:10px 16px; opacity:0.2; }
+  .sec-title { font-family:'Orbitron',monospace; font-size:9px; letter-spacing:2px; color:var(--purple); margin:14px 16px 10px; display:flex; align-items:center; gap:8px; }
+  .sec-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(180,0,255,0.4),transparent); }
+
+  /* GRID */
+  .pages-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; padding:0 16px; }
+  .page-card { border-radius:13px; padding:14px 12px; cursor:pointer; background:var(--surface); border:1px solid rgba(0,245,255,0.07); transition:transform 0.15s; position:relative; overflow:hidden; animation:fadeUp 0.4s ease both; }
+  .page-card:active { transform:scale(0.96); }
+  .page-card:nth-child(1){animation-delay:.05s}.page-card:nth-child(2){animation-delay:.1s}.page-card:nth-child(3){animation-delay:.15s}.page-card:nth-child(4){animation-delay:.2s}.page-card:nth-child(5){animation-delay:.25s}.page-card:nth-child(6){animation-delay:.3s}.page-card:nth-child(7){animation-delay:.35s}.page-card:nth-child(8){animation-delay:.4s}
+  .pc-icon { font-size:26px; margin-bottom:7px; }
+  .pc-title { font-family:'Orbitron',monospace; font-size:10px; font-weight:700; color:#fff; margin-bottom:2px; letter-spacing:0.5px; }
+  .pc-desc { font-size:10px; color:var(--muted); line-height:1.4; }
+  .pc-badge { position:absolute; top:7px; right:7px; padding:2px 6px; border-radius:4px; font-family:'Orbitron',monospace; font-size:7px; letter-spacing:0.5px; font-weight:700; }
+  .b-live{background:rgba(255,0,80,0.12);border:1px solid rgba(255,0,80,0.35);color:#ff0050}
+  .b-new{background:rgba(0,245,255,0.08);border:1px solid rgba(0,245,255,0.25);color:var(--cyan)}
+  .b-ai{background:rgba(180,0,255,0.1);border:1px solid rgba(180,0,255,0.3);color:var(--purple)}
+  .b-msg{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff}
+
+  /* IFRAME */
+  .iframe-wrapper { width:100%; height:100%; display:none; position:relative; }
+  .iframe-wrapper.show { display:block; }
+  .page-loader { position:absolute; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; background:var(--darker); }
+  .loader-orb { width:54px; height:54px; border-radius:50%; background:radial-gradient(circle,rgba(180,0,255,0.4),rgba(0,245,255,0.2)); display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:var(--glow-purple); animation:orbFloat 1.5s ease-in-out infinite; }
+  @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .loader-text { font-family:'Orbitron',monospace; font-size:10px; color:var(--cyan); letter-spacing:2px; animation:pulse 1s ease-in-out infinite; }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .loader-bar { width:100px; height:2px; background:rgba(255,255,255,0.07); border-radius:2px; overflow:hidden; }
+  .loader-fill { height:100%; background:linear-gradient(90deg,var(--cyan),var(--purple)); border-radius:2px; animation:loadBar 1.2s ease-in-out infinite; }
+  @keyframes loadBar{0%{width:0%;margin-left:0}60%{width:60%}100%{width:0%;margin-left:100%}}
+
+  #pageFrame { width:100%; height:100%; border:none; opacity:0; transition:opacity 0.3s ease; background:var(--darker); }
+  #pageFrame.loaded { opacity:1; }
+
+  /* BOTTOM TABS */
+  .tab-bar { position:fixed; bottom:0; left:0; right:0; height:var(--tab-h); z-index:200; display:flex; align-items:stretch; background:rgba(4,0,15,0.97); backdrop-filter:blur(24px); border-top:1px solid rgba(0,245,255,0.08); }
+  .tab-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; transition:all 0.2s; position:relative; padding:5px 2px; }
+  .tab-item::after { content:''; position:absolute; top:0; left:15%; right:15%; height:2px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,var(--cyan),var(--purple)); opacity:0; transition:opacity 0.2s; }
+  .tab-item.active::after { opacity:1; }
+  .tab-icon { font-size:19px; transition:all 0.2s; filter:grayscale(0.5) opacity(0.55); }
+  .tab-item.active .tab-icon { filter:drop-shadow(0 0 5px var(--cyan)); transform:scale(1.1); }
+  .tab-label { font-family:'Orbitron',monospace; font-size:7px; letter-spacing:0.5px; color:var(--muted); transition:color 0.2s; }
+  .tab-item.active .tab-label { color:var(--cyan); }
+  .tab-badge { position:absolute; top:3px; right:calc(50% - 20px); width:15px; height:15px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--pink)); display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; }
+  .flash-overlay { position:fixed; inset:0; z-index:150; background:var(--darker); opacity:0; pointer-events:none; transition:opacity 0.12s ease; }
+  .flash-overlay.on { opacity:0.4; }
+</style>
+</head>
+<body>
+
+<div class="flash-overlay" id="flash"></div>
+
+<div class="top-nav">
+  <div class="logo" onclick="goHome()">DDOTT<em>.</em>TV</div>
+  <div class="nav-search"><span style="color:var(--muted)">🔍</span><input type="text" placeholder="Search..."></div>
+  <div class="nav-coins" onclick="nav('coins')"><span>🪙</span><div class="coins-val">1,247</div></div>
+  <div class="nav-notif" onclick="nav('messages')">🔔<div class="notif-dot"></div></div>
+  <div class="nav-avatar" onclick="nav('channel')">D</div>
+</div>
+
+<div class="frame-area">
+
+  <div class="home-screen" id="homeScreen">
+    <div class="hero">
+      <div class="hero-greet">Good evening, Divin 👋</div>
+      <div class="hero-name">Dwin Universe</div>
+      <div class="hero-sub">Dubai 🇦🇪 · <b>84.2K subscribers</b> · Day 14 🔥</div>
+    </div>
+
+    <div class="live-banner" onclick="nav('player')">
+      <div class="lb-inner">
+        <div style="font-size:32px;flex-shrink:0">📱</div>
+        <div style="flex:1">
+          <div class="lb-live-tag"><div class="lb-dot"></div>LIVE NOW</div>
+          <div class="lb-title">Building Ddott TV — Nav Shell</div>
+          <div class="lb-meta">Emobies05 · 4.2K watching 👁</div>
+        </div>
+        <button class="lb-btn">WATCH</button>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-pill"><div class="sp-val" style="color:var(--cyan)">4.8M</div><div class="sp-lbl">Views</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--gold)">1,247🪙</div><div class="sp-lbl">Coins</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--green)">+86</div><div class="sp-lbl">Today</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--pink)">96%</div><div class="sp-lbl">Likes</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--purple)">312</div><div class="sp-lbl">Videos</div></div>
+    </div>
+
+    <div class="neon-div"></div>
+    <div class="sec-title">DDOTT TV</div>
+
+    <div class="pages-grid">
+      <div class="page-card" onclick="nav('home')" style="border-color:rgba(0,245,255,0.15)">
+        <div class="pc-badge b-live">LIVE</div>
+        <div class="pc-icon">🏠</div><div class="pc-title">Home Feed</div><div class="pc-desc">Videos, trending & live streams</div>
+      </div>
+      <div class="page-card" onclick="nav('player')" style="border-color:rgba(180,0,255,0.15)">
+        <div class="pc-badge b-new">V2</div>
+        <div class="pc-icon">📺</div><div class="pc-title">Video Player</div><div class="pc-desc">Neon player + stickers & comments</div>
+      </div>
+      <div class="page-card" onclick="nav('channel')">
+        <div class="pc-icon">👤</div><div class="pc-title">Creator Channel</div><div class="pc-desc">Profile, videos & playlists</div>
+      </div>
+      <div class="page-card" onclick="nav('messages')" style="border-color:rgba(255,0,200,0.12)">
+        <div class="pc-badge b-msg">5</div>
+        <div class="pc-icon">💬</div><div class="pc-title">Messaging</div><div class="pc-desc">Chat, stickers 🍕🚀 & voice</div>
+      </div>
+      <div class="page-card" onclick="nav('coins')" style="border-color:rgba(255,215,0,0.12)">
+        <div class="pc-icon">🪙</div><div class="pc-title">Emo Coins</div><div class="pc-desc">Earn, convert & leaderboard</div>
+      </div>
+      <div class="page-card" onclick="nav('ai')" style="border-color:rgba(180,0,255,0.2)">
+        <div class="pc-badge b-ai">AI</div>
+        <div class="pc-icon">🦋</div><div class="pc-title">Emowall AI</div><div class="pc-desc">7-Brain Claude AI butterfly</div>
+      </div>
+      <div class="page-card" onclick="nav('studio')">
+        <div class="pc-icon">🎬</div><div class="pc-title">Creator Studio</div><div class="pc-desc">Upload, spot pay & script AI</div>
+      </div>
+      <div class="page-card" onclick="nav('landing')" style="border-color:rgba(255,0,200,0.1)">
+        <div class="pc-icon">🌐</div><div class="pc-title">Landing Page</div><div class="pc-desc">Ddott TV public homepage</div>
+      </div>
+    </div>
+
+    <div class="sec-title" style="margin-top:18px">DWIN UNIVERSE</div>
+    <div class="pages-grid" style="margin-bottom:20px">
+      <div class="page-card" onclick="window.open('https://thewall.e-mobies.com','_blank')" style="border-color:rgba(0,245,255,0.15)">
+        <div class="pc-icon">🔗</div><div class="pc-title">TheWall</div><div class="pc-desc">5-chain Web3 wallet · Live ↗</div>
+      </div>
+      <div class="page-card" style="opacity:0.55">
+        <div class="pc-icon">📱</div><div class="pc-title">Emobies</div><div class="pc-desc">Mobile repair platform</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IFRAME -->
+  <div class="iframe-wrapper" id="iframeWrapper">
+    <div class="page-loader" id="pageLoader">
+      <div class="loader-orb">🦋</div>
+      <div class="loader-text">LOADING...</div>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+    <iframe id="pageFrame" src="" onload="onFrameLoad()"></iframe>
+  </div>
+
+</div>
+
+<div class="tab-bar">
+  <div class="tab-item active" id="t-home" onclick="goHome()"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
+  <div class="tab-item" id="t-feed" onclick="nav('home')"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
+  <div class="tab-item" id="t-messages" onclick="nav('messages')"><div class="tab-icon">💬</div><div class="tab-label">CHAT</div><div class="tab-badge">5</div></div>
+  <div class="tab-item" id="t-coins" onclick="nav('coins')"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
+  <div class="tab-item" id="t-studio" onclick="nav('studio')"><div class="tab-icon">🎬</div><div class="tab-label">STUDIO</div></div>
+</div>
+
+<script>
+  const pages = {
+    home:'ddott-home-v2.html', player:'ddott-player-v2.html',
+    channel:'ddott-creator-channel.html', messages:'ddott-messaging.html',
+    coins:'ddott-emo-coins.html', ai:'ddott-ai-butterfly.html',
+    studio:'ddott-creator-studio.html', landing:'ddott-landing-v2.html'
+  };
+  const tabMap = { home:'t-feed', player:'t-feed', channel:'t-home', messages:'t-messages', coins:'t-coins', ai:'t-home', studio:'t-studio', landing:'t-home' };
+
+  // Inject into iframe to hide its own nav & tab bar
+  const HIDE_CSS = `<style id="__sf__">
+    nav, .top-nav, .tab-bar, .studio-tabs + * > nav { display:none!important; }
+    body { padding-top:0!important; margin-top:0!important; }
+    .studio-tabs { top:0!important; position:sticky; }
+    .butterfly-fab { bottom:12px!important; }
+    .mode-bar { top:0!important; }
+  </style>`;
+
+  let current = null;
+
+  function flash(cb){ const f=document.getElementById('flash'); f.classList.add('on'); setTimeout(()=>{f.classList.remove('on');if(cb)cb();},120); }
+  function setTab(id){ document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active')); if(id) document.getElementById(id)?.classList.add('active'); }
+
+  function nav(page){
+    if(!pages[page]) return;
+    flash(); current = page;
+    document.getElementById('homeScreen').style.display = 'none';
+    const w = document.getElementById('iframeWrapper');
+    w.classList.add('show');
+    document.getElementById('pageLoader').style.display = 'flex';
+    const f = document.getElementById('pageFrame');
+    f.classList.remove('loaded');
+    f.src = pages[page];
+    setTab(tabMap[page]||null);
+    document.getElementById('t-home').classList.remove('active');
+  }
+
+  function onFrameLoad(){
+    const f = document.getElementById('pageFrame');
+    try {
+      const doc = f.contentDocument || f.contentWindow.document;
+      if(doc && !doc.getElementById('__sf__')) {
+        doc.head.insertAdjacentHTML('beforeend', HIDE_CSS);
+      }
+    } catch(e){}
+    setTimeout(()=>{
+      document.getElementById('pageLoader').style.display='none';
+      f.classList.add('loaded');
+    },250);
+  }
+
+  function goHome(){
+    flash(); current=null;
+    document.getElementById('homeScreen').style.display='';
+    document.getElementById('iframeWrapper').classList.remove('show');
+    document.getElementById('pageFrame').src='';
+    setTab('t-home');
+  }
+
+  document.querySelector('.logo').addEventListener('click',()=>{ if(current) goHome(); });
+</script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").then(()=>console.log("SW registered")).catch(e=>console.log(e));}</script></body>
+</html>

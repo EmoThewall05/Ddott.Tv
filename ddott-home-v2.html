@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott.TV — Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030508;--bg2:#070b12;--bg3:#0c1220;--bg4:#111827;
+  --cyan:#00e5ff;--cyan2:rgba(0,229,255,0.1);--cyan3:rgba(0,229,255,0.05);
+  --purple:#b44fff;--purple2:rgba(180,79,255,0.1);
+  --magenta:#ff2d9b;--gold:#ffd84d;--green:#00ff88;
+  --white:#e8f4ff;--dim:rgba(232,244,255,0.45);--dimmer:rgba(232,244,255,0.2);
+  --border:rgba(0,229,255,0.12);--border-p:rgba(180,79,255,0.12);
+  --sidebar:220px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--white);font-family:'Exo 2',sans-serif;display:flex;flex-direction:column;}
+
+/* Grid bg */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0;}
+
+/* TOPBAR */
+.topbar{height:54px;background:rgba(3,5,8,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;z-index:50;position:relative;backdrop-filter:blur(12px);}
+
+.tlogo{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.tlogo-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:#000;}
+.tlogo-text{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;}
+.tlogo-tv{background:var(--purple);color:white;font-size:8px;padding:1px 5px;margin-left:2px;vertical-align:super;}
+
+.search-wrap{flex:1;max-width:480px;margin:0 auto;position:relative;}
+.search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Exo 2',sans-serif;font-size:13px;padding:7px 36px 7px 14px;outline:none;transition:border-color .2s;}
+.search-wrap input::placeholder{color:var(--dimmer);}
+.search-wrap input:focus{border-color:var(--cyan);}
+.search-wrap input:focus+.s-icon{color:var(--cyan);}
+.s-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--dimmer);font-size:14px;pointer-events:none;transition:color .2s;}
+
+.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto;}
+
+.coin-pill{display:flex;align-items:center;gap:8px;background:rgba(255,216,77,0.08);border:1px solid rgba(255,216,77,0.2);padding:5px 12px;cursor:pointer;transition:background .2s;}
+.coin-pill:hover{background:rgba(255,216,77,0.14);}
+.cpill-icon{font-size:14px;}
+.cpill-amt{font-family:'Orbitron',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;}
+.cpill-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,216,77,0.5);}
+
+.icon-btn{width:34px;height:34px;background:var(--bg3);border:1px solid var(--border);color:var(--dim);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;position:relative;transition:border-color .2s,color .2s;}
+.icon-btn:hover{border-color:var(--cyan);color:var(--white);}
+.notif-dot{position:absolute;top:5px;right:5px;width:5px;height:5px;background:var(--magenta);border-radius:50%;}
+
+.upload-btn{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;color:#000;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:opacity .2s;}
+.upload-btn:hover{opacity:.85;}
+
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#000;cursor:pointer;flex-shrink:0;}
+
+/* LAYOUT */
+.app-body{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:rgba(3,5,8,0.95);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bg3);}
+
+.nav-sec{padding:16px 0 6px;}
+.nav-sec-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dimmer);padding:0 16px 8px;}
+
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .15s,color .15s;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:600;color:var(--dim);position:relative;}
+.nav-item:hover{background:var(--cyan3);color:var(--white);}
+.nav-item.active{background:var(--cyan2);color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--cyan),var(--purple));}
+.nav-ico{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--magenta);color:white;font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;padding:2px 6px;border-radius:10px;}
+
+.s-div{height:1px;background:var(--border);margin:6px 16px;}
+
+/* Subscriptions */
+.sub-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;transition:background .15s;font-size:11px;color:var(--dim);}
+.sub-item:hover{background:var(--cyan3);color:var(--white);}
+.sub-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:9px;color:#000;font-weight:700;}
+.sub-live{margin-left:auto;background:var(--magenta);color:white;font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;padding:2px 5px;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:20px 24px;background:transparent;}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-thumb{background:var(--bg3);}
+
+/* Categories */
+.cats{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.cat{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;background:var(--bg3);border:1px solid var(--border);color:var(--dim);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.cat:hover{border-color:var(--cyan);color:var(--cyan);}
+.cat.active{background:linear-gradient(135deg,var(--cyan),var(--purple));border-color:transparent;color:#000;}
+
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-hd h2{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);}
+.sec-hd a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);text-decoration:none;}
+
+/* FEATURED */
+.featured{display:grid;grid-template-columns:1fr 320px;gap:1px;margin-bottom:28px;background:var(--border);}
+.feat-thumb{position:relative;aspect-ratio:16/9;background:var(--bg3);overflow:hidden;cursor:pointer;}
+.feat-thumb:hover .play-ov{opacity:1;}
+.play-ov{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;}
+.play-circle{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:20px;padding-left:4px;box-shadow:0 0 30px rgba(0,229,255,0.5);}
+.thumb-grad{position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,rgba(0,0,0,.8),transparent);}
+.thumb-dur{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.85);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:2px 7px;color:white;}
+.earn-badge{position:absolute;top:8px;left:8px;background:rgba(255,216,77,0.15);border:1px solid rgba(255,216,77,0.35);font-family:'Orbitron',monospace;font-size:10px;font-weight:700;padding:3px 8px;color:var(--gold);}
+.spot-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,var(--cyan),var(--purple));font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1px;padding:3px 8px;color:#000;}
+.thumb-vis{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;}
+
+.feat-info{background:var(--bg2);padding:20px;}
+.feat-cat{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);background:var(--cyan2);border:1px solid var(--border);padding:3px 8px;display:inline-block;margin-bottom:10px;}
+.feat-title{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;line-height:1.3;margin-bottom:10px;}
+.feat-desc{font-size:12px;line-height:1.6;color:var(--dim);font-weight:300;flex:1;margin-bottom:14px;}
+.ch-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.ch-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:11px;color:#000;font-weight:700;flex-shrink:0;}
+.ch-name{font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;}
+.ch-subs{font-size:10px;color:var(--dimmer);}
+.sub-btn{margin-left:auto;background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;color:#000;font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;cursor:pointer;transition:opacity .15s;}
+.sub-btn:hover{opacity:.85;}
+.sub-btn.subbed{background:transparent;border:1px solid var(--border);color:var(--dim);}
+.stats-r{display:flex;gap:16px;}
+.stat-v{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:var(--white);}
+.stat-l{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dimmer);}
+
+/* VIDEO GRID */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1px;background:var(--border);margin-bottom:28px;}
+.vcard{background:var(--bg2);cursor:pointer;transition:background .15s;overflow:hidden;}
+.vcard:hover{background:var(--bg3);}
+.vcard:hover .vc-inner{transform:scale(1.04);}
+.vc-thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--bg3);}
+.vc-inner{width:100%;height:100%;transition:transform .3s;display:flex;align-items:center;justify-content:center;}
+.vc-dur{position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,.9);font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:2px 5px;color:white;}
+.vc-earn{position:absolute;top:5px;right:5px;background:rgba(255,216,77,0.15);border:1px solid rgba(255,216,77,0.3);font-family:'Orbitron',monospace;font-size:11px;font-weight:900;padding:1px 6px;color:var(--gold);}
+.vc-live{position:absolute;top:5px;left:5px;background:var(--magenta);font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 7px;color:white;display:flex;align-items:center;gap:4px;}
+.ldot{width:5px;height:5px;background:white;border-radius:50%;animation:lb 1s infinite;}
+@keyframes lb{0%,100%{opacity:1;}50%{opacity:.2;}}
+.vc-spot{position:absolute;bottom:5px;left:5px;background:linear-gradient(135deg,var(--cyan),var(--purple));font-family:'Space Mono',monospace;font-size:7px;font-weight:700;letter-spacing:1px;padding:2px 6px;color:#000;}
+
+.vc-info{padding:10px 12px;}
+.vc-top{display:flex;gap:8px;margin-bottom:6px;}
+.vc-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:9px;color:#000;font-weight:700;}
+.vc-title{font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.vc-bot{display:flex;align-items:center;justify-content:space-between;}
+.vc-ch{font-size:10px;color:var(--dimmer);}
+.vc-views{font-size:10px;color:var(--dimmer);}
+
+/* RIGHT PANEL */
+.rpanel{width:280px;border-left:1px solid var(--border);background:rgba(3,5,8,0.95);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+.rp-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rp-tab{flex:1;padding:12px 4px;text-align:center;font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dimmer);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.rp-tab.active{color:var(--cyan);border-color:var(--cyan);}
+.rp-tab:hover{color:var(--white);}
+.rp-body{flex:1;overflow-y:auto;padding:14px;}
+.rp-body::-webkit-scrollbar{width:3px;}
+.rp-body::-webkit-scrollbar-thumb{background:var(--bg3);}
+
+/* Wallet card mini */
+.wallet-mini{
+  background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(180,79,255,0.06));
+  border:1px solid var(--border);padding:18px;margin-bottom:12px;position:relative;overflow:hidden;
+}
+.wallet-mini::before{content:'🦋';position:absolute;right:12px;top:12px;font-size:22px;opacity:.4;animation:bf 4s ease-in-out infinite;}
+@keyframes bf{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}}
+.wm-addr{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--dimmer);margin-bottom:2px;}
+.wm-name{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;color:var(--cyan);margin-bottom:12px;}
+.wm-lbl{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--dimmer);margin-bottom:4px;}
+.wm-amt{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:var(--white);letter-spacing:-1px;}
+.wm-streak{margin-top:12px;display:flex;align-items:center;gap:8px;}
+.streak-pill{background:rgba(255,216,77,0.1);border:1px solid rgba(255,216,77,0.2);font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 10px;color:var(--gold);}
+.wm-prog{height:2px;background:var(--bg4);margin-top:12px;margin-bottom:4px;overflow:hidden;}
+.wm-prog-fill{height:100%;background:linear-gradient(to right,var(--cyan),var(--purple));width:68%;}
+.wm-prog-lbl{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:8px;color:var(--dimmer);}
+.convert-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;color:#000;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:9px;cursor:pointer;transition:opacity .2s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));}
+.convert-btn:hover{opacity:.85;}
+
+.rp-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dimmer);margin-bottom:10px;}
+
+.mission{display:flex;align-items:center;gap:9px;padding:9px 10px;background:var(--bg3);margin-bottom:3px;cursor:pointer;transition:background .15s;border:1px solid transparent;transition:border-color .15s;}
+.mission:hover{border-color:var(--border);}
+.m-ico{font-size:14px;}
+.m-info{flex:1;}
+.m-name{font-family:'Exo 2',sans-serif;font-size:11px;font-weight:600;}
+.m-prog{font-size:10px;color:var(--dimmer);}
+.m-rew{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--gold);font-weight:900;}
+.m-check{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.04);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:8px;}
+.m-check.done{background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.3);color:var(--green);}
+
+.trend-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.trend-item:last-child{border-bottom:none;}
+.trend-thumb{width:76px;height:46px;background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.trend-info{flex:1;}
+.trend-title{font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.trend-meta{font-size:9px;color:var(--dimmer);}
+
+/* BUTTERFLY FAB */
+.bfab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;z-index:200;box-shadow:0 0 20px rgba(0,229,255,0.2),0 0 40px rgba(180,79,255,0.1);animation:bf 4s ease-in-out infinite;transition:transform .2s,box-shadow .2s;}
+.bfab:hover{transform:scale(1.12);box-shadow:0 0 30px rgba(0,229,255,0.4),0 0 60px rgba(180,79,255,0.2);}
+
+/* AI PANEL */
+.aipanel{position:fixed;bottom:88px;right:24px;width:300px;background:var(--bg2);border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,.7);z-index:199;display:none;flex-direction:column;max-height:440px;}
+.aipanel.open{display:flex;}
+.ai-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.ai-name{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:var(--cyan);}
+.ai-sub{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--dimmer);}
+.ai-x{margin-left:auto;background:none;border:none;color:var(--dimmer);font-size:18px;cursor:pointer;}
+.ai-x:hover{color:var(--white);}
+.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.ai-msgs::-webkit-scrollbar{width:3px;}
+.ai-msgs::-webkit-scrollbar-thumb{background:var(--bg3);}
+.ai-msg{max-width:88%;padding:9px 12px;font-size:12px;line-height:1.5;}
+.ai-msg.bot{background:var(--bg3);align-self:flex-start;border-left:2px solid var(--cyan);}
+.ai-msg.user{background:var(--cyan2);border:1px solid var(--border);align-self:flex-end;font-size:11px;}
+.ai-chips-row{display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px;border-top:1px solid var(--border);}
+.ai-chip{background:var(--bg3);border:1px solid var(--border);color:var(--dim);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:4px 9px;cursor:pointer;transition:border-color .15s,color .15s;}
+.ai-chip:hover{border-color:var(--cyan);color:var(--white);}
+.ai-in-row{display:flex;border-top:1px solid var(--border);}
+.ai-input{flex:1;background:var(--bg3);border:none;color:var(--white);font-family:'Exo 2',sans-serif;font-size:12px;padding:10px 12px;outline:none;}
+.ai-input::placeholder{color:var(--dimmer);}
+.ai-send{background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;color:#000;padding:0 14px;cursor:pointer;font-size:13px;font-weight:700;}
+.typing{display:flex;gap:4px;align-items:center;}
+.typing span{width:5px;height:5px;background:var(--cyan);border-radius:50%;opacity:.4;animation:td 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-4px);opacity:1;}}
+
+@keyframes fi{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.main{animation:fi .4s ease;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="tlogo">
+    <div class="tlogo-icon">d</div>
+    <div class="tlogo-text">DDOTT<span class="tlogo-tv">TV</span></div>
+  </div>
+  <div class="search-wrap">
+    <input type="text" placeholder="Search videos, creators, topics...">
+    <span class="s-icon">🔍</span>
+  </div>
+  <div class="topbar-right">
+    <div class="coin-pill">
+      <span class="cpill-icon">🪙</span>
+      <div>
+        <div class="cpill-amt">247</div>
+        <div class="cpill-lbl">Emo Coins</div>
+      </div>
+    </div>
+    <div class="icon-btn">🔔<span class="notif-dot"></span></div>
+    <button class="upload-btn">+ Upload</button>
+    <div class="avatar">DV</div>
+  </div>
+</header>
+
+<div class="app-body">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="nav-sec">
+    <div class="nav-item active"><span class="nav-ico">🏠</span>Home</div>
+    <div class="nav-item"><span class="nav-ico">🔥</span>Trending</div>
+    <div class="nav-item"><span class="nav-ico">📺</span>Live Now<span class="nav-badge">3</span></div>
+    <div class="nav-item"><span class="nav-ico">⚡</span>Shorts</div>
+    <div class="nav-item"><span class="nav-ico">🎭</span>Originals</div>
+  </div>
+  <div class="s-div"></div>
+  <div class="nav-sec">
+    <div class="nav-sec-lbl">My Space</div>
+    <div class="nav-item"><span class="nav-ico">📚</span>Library</div>
+    <div class="nav-item"><span class="nav-ico">🕐</span>History</div>
+    <div class="nav-item"><span class="nav-ico">🪙</span>Emo Coins</div>
+    <div class="nav-item"><span class="nav-ico">💬</span>Messages<span class="nav-badge">5</span></div>
+    <div class="nav-item"><span class="nav-ico">⚙️</span>Creator Studio</div>
+  </div>
+  <div class="s-div"></div>
+  <div class="nav-sec">
+    <div class="nav-sec-lbl">Subscriptions</div>
+    <div class="sub-item">
+      <div class="sub-av" style="background:linear-gradient(135deg,#00e5ff,#7b2fff)">NK</div>
+      NeonKreator<span class="sub-live">LIVE</span>
+    </div>
+    <div class="sub-item"><div class="sub-av" style="background:linear-gradient(135deg,#b44fff,#ff2d9b)">CW</div>CryptoWave</div>
+    <div class="sub-item"><div class="sub-av" style="background:linear-gradient(135deg,#00e5ff,#00ff88)">VM</div>VibesMaker</div>
+    <div class="sub-item"><div class="sub-av" style="background:linear-gradient(135deg,#ffd84d,#ff8c00)">AS</div>ArtStudio88</div>
+    <div class="sub-item"><div class="sub-av" style="background:linear-gradient(135deg,#ff2d9b,#b44fff)">LX</div>LuxeCinema</div>
+  </div>
+  <div class="s-div"></div>
+  <div class="nav-sec">
+    <div class="nav-sec-lbl">Dwin Universe</div>
+    <div class="nav-item"><span class="nav-ico">🔗</span>TheWall</div>
+    <div class="nav-item"><span class="nav-ico">🦋</span>Emowall AI</div>
+    <div class="nav-item"><span class="nav-ico">🎬</span>Creator Hub</div>
+  </div>
+</nav>
+
+<!-- MAIN FEED -->
+<main class="main">
+  <!-- Categories -->
+  <div class="cats">
+    <div class="cat active">All</div>
+    <div class="cat">Crypto</div>
+    <div class="cat">Tech</div>
+    <div class="cat">Music</div>
+    <div class="cat">Gaming</div>
+    <div class="cat">Art</div>
+    <div class="cat">Finance</div>
+    <div class="cat">Lifestyle</div>
+    <div class="cat">Science</div>
+    <div class="cat">Comedy</div>
+  </div>
+
+  <!-- Featured -->
+  <div class="sec-hd"><h2>Featured</h2><a href="#">View all →</a></div>
+  <div class="featured" style="margin-bottom:28px;">
+    <div class="feat-thumb" onclick="openPlayer()">
+      <div class="thumb-vis" style="background:linear-gradient(135deg,#030d1a,#0a0a2e,#1a0330)">🌌</div>
+      <div class="thumb-grad"></div>
+      <div class="play-ov"><div class="play-circle">▶</div></div>
+      <div class="thumb-dur">18:42</div>
+      <div class="earn-badge">+12 🪙</div>
+      <div class="spot-badge">⚡ SPOT PAYMENT</div>
+    </div>
+    <div class="feat-info" style="display:flex;flex-direction:column;">
+      <span class="feat-cat">Crypto</span>
+      <div class="feat-title">The Future of Web3 — How Blockchain is Rewriting Finance in 2025</div>
+      <div class="feat-desc">A deep dive into DeFi, NFT markets, and what the next wave of crypto adoption means for everyday users. Creator receives instant Spot Payment.</div>
+      <div class="ch-row">
+        <div class="ch-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">CW</div>
+        <div><div class="ch-name">CryptoWave</div><div class="ch-subs">148K subscribers</div></div>
+        <button class="sub-btn subbed">✓ Subscribed</button>
+      </div>
+      <div class="stats-r">
+        <div><div class="stat-v">2.4M</div><div class="stat-l">Views</div></div>
+        <div><div class="stat-v">84K</div><div class="stat-l">Likes</div></div>
+        <div><div class="stat-v" style="color:var(--gold)">+12</div><div class="stat-l" style="color:rgba(255,216,77,0.5)">Coins</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trending Now -->
+  <div class="sec-hd"><h2>Trending Now</h2><a href="#">See more →</a></div>
+  <div class="vgrid" style="margin-bottom:28px;">
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#0a0015,#1a0030)">🎵</div><div class="vc-dur">4:22</div><div class="vc-earn">+3🪙</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--green))">VM</div><div class="vc-title">Midnight Frequencies — Lo-fi Beats for Late Night Sessions</div></div><div class="vc-bot"><span class="vc-ch">VibesMaker</span><span class="vc-views">👁 892K</span></div></div>
+    </div>
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-live"><span class="ldot"></span>LIVE</div><div class="vc-inner" style="background:linear-gradient(135deg,#001510,#003020)">🎮</div><div class="vc-earn">+8🪙</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">NK</div><div class="vc-title">LIVE: Building a Game From Scratch in 24 Hours Challenge</div></div><div class="vc-bot"><span class="vc-ch">NeonKreator</span><span class="vc-views">👁 12.4K live</span></div></div>
+    </div>
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#150a00,#301500)">🎨</div><div class="vc-dur">22:15</div><div class="vc-earn">+15🪙</div><div class="vc-spot">⚡SPOT</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,#ffd84d,#ff8c00)">AS</div><div class="vc-title">Digital Painting Masterclass: Character Design Sketch to Finish</div></div><div class="vc-bot"><span class="vc-ch">ArtStudio88</span><span class="vc-views">👁 340K</span></div></div>
+    </div>
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#0a000f,#1a0030)">📊</div><div class="vc-dur">31:08</div><div class="vc-earn">+20🪙</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--magenta),var(--purple))">LX</div><div class="vc-title">How I Made $10K in Emo Coins This Month — Full Strategy</div></div><div class="vc-bot"><span class="vc-ch">LuxeCinema</span><span class="vc-views">👁 1.1M</span></div></div>
+    </div>
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#001515,#003030)">🔬</div><div class="vc-dur">14:55</div><div class="vc-earn">+10🪙</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--green))">SV</div><div class="vc-title">Quantum Computing & Crypto Security — 2025 Breakdown</div></div><div class="vc-bot"><span class="vc-ch">ScienceVault</span><span class="vc-views">👁 567K</span></div></div>
+    </div>
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#0f000a,#2a0020)">🎤</div><div class="vc-dur">8:30</div><div class="vc-earn">+5🪙</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--magenta),#ff8c00)">MR</div><div class="vc-title">Studio Session Vlog — Recording My First EP Zero Budget</div></div><div class="vc-bot"><span class="vc-ch">MusicRealm</span><span class="vc-views">👁 223K</span></div></div>
+    </div>
+  </div>
+
+  <!-- For You -->
+  <div class="sec-hd"><h2>For You</h2><a href="#">Refresh →</a></div>
+  <div class="vgrid">
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#001020,#002040)">💹</div><div class="vc-dur">27:44</div><div class="vc-earn">+18🪙</div><div class="vc-spot">⚡SPOT</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">CW</div><div class="vc-title">Emo Coin Strategy: Maximise Daily Earnings on Ddott TV</div></div><div class="vc-bot"><span class="vc-ch">CryptoWave</span><span class="vc-views">👁 780K</span></div></div>
+    </div>
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#150010,#300030)">🎭</div><div class="vc-dur">11:20</div><div class="vc-earn">+7🪙</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,#ffd84d,#ff8c00)">AS</div><div class="vc-title">3D Motion Graphics — Blender for Complete Beginners 2025</div></div><div class="vc-bot"><span class="vc-ch">ArtStudio88</span><span class="vc-views">👁 419K</span></div></div>
+    </div>
+    <div class="vcard" onclick="openPlayer()">
+      <div class="vc-thumb"><div class="vc-live"><span class="ldot"></span>LIVE</div><div class="vc-inner" style="background:linear-gradient(135deg,#050010,#100025)">🎸</div><div class="vc-earn">+6🪙</div></div>
+      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--magenta),#ff8c00)">MR</div><div class="vc-title">LIVE: Sunday Acoustic Session — Requests Welcome</div></div><div class="vc-bot"><span class="vc-ch">MusicRealm</span><span class="vc-views">👁 3.2K live</span></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- RIGHT PANEL -->
+<aside class="rpanel">
+  <div class="rp-tabs">
+    <div class="rp-tab active" id="rt-coins" onclick="rTab('coins')">Coins</div>
+    <div class="rp-tab" id="rt-trending" onclick="rTab('trending')">Trending</div>
+    <div class="rp-tab" id="rt-missions" onclick="rTab('missions')">Missions</div>
+  </div>
+
+  <!-- COINS -->
+  <div class="rp-body" id="rp-coins">
+    <div class="wallet-mini">
+      <div class="wm-addr">0x...8ea3</div>
+      <div class="wm-name">MY DDOTT WALLET</div>
+      <div class="wm-lbl">Total Emo Coins</div>
+      <div class="wm-amt">247</div>
+      <div class="wm-streak"><span class="streak-pill">🔥 Day 7</span><span style="font-size:10px;color:var(--dimmer)">+1 coin today</span></div>
+      <div class="wm-prog"><div class="wm-prog-fill"></div></div>
+      <div class="wm-prog-lbl"><span>247 / 500</span><span>68%</span></div>
+      <button class="convert-btn">🔗 Convert via TheWall</button>
+    </div>
+    <div class="rp-lbl" style="margin-bottom:10px;">Today's Earnings</div>
+    <div class="mission"><span class="m-ico">📅</span><div class="m-info"><div class="m-name">Daily Login</div><div class="m-prog">Claimed</div></div><span class="m-rew">+1</span><div class="m-check done">✓</div></div>
+    <div class="mission"><span class="m-ico">▶️</span><div class="m-info"><div class="m-name">Watch 30 min</div><div class="m-prog">18 / 30 min</div></div><span class="m-rew">+5</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">👍</span><div class="m-info"><div class="m-name">Like 3 videos</div><div class="m-prog">1 / 3</div></div><span class="m-rew">+3</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">💬</span><div class="m-info"><div class="m-name">Leave a comment</div><div class="m-prog">Not done</div></div><span class="m-rew">+2</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">📤</span><div class="m-info"><div class="m-name">Share a video</div><div class="m-prog">Not done</div></div><span class="m-rew">+2</span><div class="m-check"></div></div>
+  </div>
+
+  <!-- TRENDING -->
+  <div class="rp-body" id="rp-trending" style="display:none;">
+    <div class="rp-lbl" style="margin-bottom:12px;">Trending Videos</div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#0a0015,#1a0030)">🎵</div><div class="trend-info"><div class="trend-title">Midnight Frequencies Lo-fi Beats</div><div class="trend-meta">892K · +3🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#0a000f,#1a0030)">📊</div><div class="trend-info"><div class="trend-title">How I Made $10K in Emo Coins</div><div class="trend-meta">1.1M · +20🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#001515,#003030)">🔬</div><div class="trend-info"><div class="trend-title">Quantum Computing & Crypto Security</div><div class="trend-meta">567K · +10🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#150010,#300030)">🎭</div><div class="trend-info"><div class="trend-title">Blender for Beginners 2025</div><div class="trend-meta">419K · +7🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#001020,#002040)">💹</div><div class="trend-info"><div class="trend-title">Emo Coin Strategy Guide</div><div class="trend-meta">780K · +18🪙</div></div></div>
+  </div>
+
+  <!-- MISSIONS -->
+  <div class="rp-body" id="rp-missions" style="display:none;">
+    <div class="rp-lbl">Daily Missions</div>
+    <div class="mission"><span class="m-ico">📅</span><div class="m-info"><div class="m-name">Daily Login</div><div class="m-prog">Claimed</div></div><span class="m-rew">+1</span><div class="m-check done">✓</div></div>
+    <div class="mission"><span class="m-ico">▶️</span><div class="m-info"><div class="m-name">Watch 30 min</div><div class="m-prog">18 / 30</div></div><span class="m-rew">+5</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">📤</span><div class="m-info"><div class="m-name">Share a video</div><div class="m-prog">Not done</div></div><span class="m-rew">+2</span><div class="m-check"></div></div>
+    <div style="height:12px;"></div>
+    <div class="rp-lbl">Weekly Missions</div>
+    <div class="mission"><span class="m-ico">🎬</span><div class="m-info"><div class="m-name">Upload a video</div><div class="m-prog">0 / 1</div></div><span class="m-rew">+50</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">👥</span><div class="m-info"><div class="m-name">Get 10 subscribers</div><div class="m-prog">6 / 10</div></div><span class="m-rew">+30</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">🔥</span><div class="m-info"><div class="m-name">7-day streak</div><div class="m-prog">7 / 7</div></div><span class="m-rew">+20</span><div class="m-check done">✓</div></div>
+  </div>
+</aside>
+</div>
+
+<!-- BUTTERFLY FAB -->
+<div class="bfab" onclick="toggleAI()">🦋</div>
+
+<!-- AI PANEL -->
+<div class="aipanel" id="aiPanel">
+  <div class="ai-head">
+    <span style="font-size:20px;">🦋</span>
+    <div><div class="ai-name">Butterfly AI</div><div class="ai-sub">Powered by Emo Key · Dwin Universe</div></div>
+    <button class="ai-x" onclick="toggleAI()">×</button>
+  </div>
+  <div class="ai-msgs" id="aiMsgs">
+    <div class="ai-msg bot">Hey Divin! 👋 I'm your Butterfly AI across the Dwin Universe. I can recommend videos, help with Emo Coins, guide your TheWall conversion, or answer anything about Ddott TV!</div>
+  </div>
+  <div class="ai-chips-row">
+    <div class="ai-chip" onclick="sendSug('Recommend videos for me')">🎬 Recommend</div>
+    <div class="ai-chip" onclick="sendSug('How earn more coins?')">🪙 Earn tips</div>
+    <div class="ai-chip" onclick="sendSug('Convert to TheWall')">🔗 Convert</div>
+    <div class="ai-chip" onclick="sendSug('What is Spot Payment?')">⚡ Spot Pay</div>
+  </div>
+  <div class="ai-in-row">
+    <input class="ai-input" id="aiInp" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendAI()">
+    <button class="ai-send" onclick="sendAI()">➤</button>
+  </div>
+</div>
+
+<script>
+// Right panel tabs
+function rTab(t){
+  ['coins','trending','missions'].forEach(x=>{
+    document.getElementById('rp-'+x).style.display=x===t?'block':'none';
+    document.getElementById('rt-'+x).classList.toggle('active',x===t);
+  });
+}
+
+// Category chips
+document.querySelectorAll('.cat').forEach(c=>{
+  c.addEventListener('click',()=>{document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));c.classList.add('active');});
+});
+
+// Sub btn
+document.querySelectorAll('.sub-btn').forEach(b=>{
+  b.addEventListener('click',e=>{e.stopPropagation();b.classList.toggle('subbed');b.textContent=b.classList.contains('subbed')?'✓ Subscribed':'Subscribe';});
+});
+
+// Open player mock
+function openPlayer(){
+  const o=document.createElement('div');
+  o.style.cssText='position:fixed;inset:0;background:rgba(3,5,8,0.95);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;';
+  o.innerHTML=`
+    <div style="font-size:52px;filter:drop-shadow(0 0 20px rgba(0,229,255,0.5));">🦋</div>
+    <div style="font-family:Orbitron,sans-serif;font-size:14px;letter-spacing:3px;color:rgba(0,229,255,0.7);text-transform:uppercase;">Video Player Screen — Coming Soon</div>
+    <button onclick="this.parentElement.remove()" style="margin-top:8px;background:linear-gradient(135deg,#00e5ff,#b44fff);border:none;color:#000;font-family:Orbitron,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px 28px;cursor:pointer;">Close</button>`;
+  document.body.appendChild(o);
+}
+
+// AI
+function toggleAI(){document.getElementById('aiPanel').classList.toggle('open');}
+const replies=[
+  "Based on your watch history, check out CryptoWave's Emo Coin strategy video — earn 18 coins! 🪙",
+  "You're at 247 coins — just 253 away from your first TheWall conversion. Keep watching! 🔥",
+  "Spot Payment lets fans pay creators instantly via Web3 wallet — no middlemen! ⚡",
+  "Your Day 7 streak bonus just kicked in! Log in tomorrow to keep the streak alive 🔥",
+];
+let ri=0;
+function sendAI(){
+  const inp=document.getElementById('aiInp');
+  const msg=inp.value.trim();if(!msg)return;
+  addAIMsg(msg,'user');inp.value='';
+  const msgs=document.getElementById('aiMsgs');
+  const t=document.createElement('div');t.className='ai-msg bot';t.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(t);msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{t.remove();addAIMsg(replies[ri%replies.length],'bot');ri++;},1100);
+}
+function sendSug(txt){document.getElementById('aiInp').value=txt;sendAI();}
+function addAIMsg(txt,type){
+  const msgs=document.getElementById('aiMsgs');
+  const d=document.createElement('div');d.className=`ai-msg ${type}`;d.textContent=txt;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+</script>
+</body>
+</html>

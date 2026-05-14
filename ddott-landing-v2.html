@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Your Community, Your Cinema</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #030508;
+  --bg2: #070b12;
+  --bg3: #0c1220;
+  --cyan: #00e5ff;
+  --cyan2: rgba(0,229,255,0.12);
+  --cyan3: rgba(0,229,255,0.06);
+  --purple: #b44fff;
+  --purple2: rgba(180,79,255,0.12);
+  --magenta: #ff2d9b;
+  --white: #e8f4ff;
+  --dim: rgba(232,244,255,0.45);
+  --dimmer: rgba(232,244,255,0.2);
+  --gold: #ffd84d;
+  --border-c: rgba(0,229,255,0.15);
+  --border-p: rgba(180,79,255,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white);font-family:'Exo 2',sans-serif;overflow-x:hidden;cursor:none;}
+
+/* Cursor */
+.cur{position:fixed;width:10px;height:10px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:screen;}
+.cur-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(0,229,255,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .12s ease-out,width .2s,height .2s;}
+
+/* Grid bg */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;z-index:0;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 48px;
+  background:linear-gradient(to bottom,rgba(3,5,8,0.95),transparent);
+}
+.nav-logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;
+  color:#000;
+}
+.logo-text{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;}
+.logo-text .tv{
+  background:var(--purple);color:white;
+  font-size:11px;padding:2px 6px;
+  margin-left:4px;vertical-align:super;
+}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{font-family:'Exo 2',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--cyan);}
+.nav-cta{
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  color:#000;border:none;padding:11px 26px;cursor:none;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  transition:opacity .2s,transform .2s;
+}
+.nav-cta:hover{opacity:.85;transform:translateY(-1px);}
+
+/* HERO */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:120px 48px 80px;
+  position:relative;overflow:hidden;
+}
+.hero-glow{
+  position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:600px;
+  background:radial-gradient(ellipse,rgba(0,229,255,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-glow2{
+  position:absolute;bottom:10%;right:15%;
+  width:400px;height:400px;
+  background:radial-gradient(ellipse,rgba(180,79,255,0.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* Butterfly hero */
+.hero-butterfly{
+  font-size:80px;
+  display:block;margin-bottom:24px;
+  position:relative;z-index:1;
+  animation:butterfly-float 5s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(0,229,255,0.5)) drop-shadow(0 0 40px rgba(180,79,255,0.3));
+}
+@keyframes butterfly-float{
+  0%,100%{transform:translateY(0) rotate(-3deg) scale(1);}
+  25%{transform:translateY(-12px) rotate(3deg) scale(1.05);}
+  50%{transform:translateY(-6px) rotate(-1deg) scale(0.98);}
+  75%{transform:translateY(-16px) rotate(4deg) scale(1.03);}
+}
+
+.hero-eyebrow{
+  position:relative;z-index:1;
+  font-family:'Space Mono',monospace;
+  font-size:11px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:20px;
+  display:flex;align-items:center;justify-content:center;gap:16px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';display:block;width:40px;height:1px;background:linear-gradient(to right,transparent,var(--cyan));}
+.hero-eyebrow::after{background:linear-gradient(to left,transparent,var(--cyan));}
+
+.hero-title{
+  position:relative;z-index:1;
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(48px,8vw,100px);
+  font-weight:900;line-height:1;
+  letter-spacing:-1px;margin-bottom:8px;
+}
+.hero-title .line1{
+  background:linear-gradient(135deg,var(--white),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;
+}
+.hero-title .line2{
+  background:linear-gradient(135deg,var(--purple),var(--magenta));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;
+}
+.hero-title .line3{
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;
+}
+
+.hero-sub{
+  position:relative;z-index:1;
+  font-family:'Orbitron',sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:4px;text-transform:uppercase;
+  color:var(--dim);margin-top:12px;margin-bottom:32px;
+}
+
+.hero-desc{
+  position:relative;z-index:1;
+  max-width:560px;font-size:16px;line-height:1.8;
+  color:var(--dim);font-weight:300;margin-bottom:48px;
+}
+.hero-desc strong{color:var(--white);font-weight:600;}
+
+.hero-btns{position:relative;z-index:1;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:64px;}
+.btn-primary{
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  color:#000;border:none;padding:16px 36px;cursor:none;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  transition:opacity .2s,transform .2s;text-decoration:none;display:inline-block;
+}
+.btn-primary:hover{opacity:.85;transform:translateY(-2px);}
+.btn-outline{
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:transparent;border:1px solid var(--border-c);
+  color:var(--cyan);padding:16px 36px;cursor:none;
+  transition:background .2s,transform .2s;text-decoration:none;display:inline-block;
+}
+.btn-outline:hover{background:var(--cyan2);transform:translateY(-2px);}
+
+/* Stats */
+.hero-stats{
+  position:relative;z-index:1;
+  display:flex;gap:48px;justify-content:center;flex-wrap:wrap;
+}
+.stat-item{text-align:center;}
+.stat-num{
+  font-family:'Orbitron',sans-serif;font-size:32px;font-weight:900;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;
+}
+.stat-lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dimmer);}
+
+/* TICKER */
+.ticker{
+  border-top:1px solid var(--border-c);
+  border-bottom:1px solid var(--border-c);
+  padding:16px 0;overflow:hidden;
+  background:rgba(0,229,255,0.02);position:relative;z-index:1;
+}
+.ticker-inner{display:flex;gap:60px;animation:tick 25s linear infinite;white-space:nowrap;}
+.tick-item{display:flex;align-items:center;gap:12px;flex-shrink:0;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dimmer);}
+.tick-item span{color:var(--cyan);font-size:14px;}
+.tick-dot{width:3px;height:3px;background:var(--purple);border-radius:50%;}
+@keyframes tick{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* SECTIONS */
+section{padding:120px 48px;position:relative;z-index:1;}
+.s-label{
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.s-label::after{content:'';display:block;width:40px;height:1px;background:var(--cyan);opacity:.4;}
+.s-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(36px,5vw,64px);font-weight:900;
+  line-height:1.05;letter-spacing:-0.5px;margin-bottom:16px;
+}
+.s-title .c{background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.s-sub{font-size:16px;color:var(--dim);font-weight:300;line-height:1.7;max-width:600px;}
+
+/* HOW IT WORKS */
+.hiw{background:var(--bg);}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:60px;background:var(--border-c);}
+.step{
+  background:var(--bg);padding:40px 28px;
+  position:relative;overflow:hidden;
+  transition:background .3s;
+}
+.step::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--cyan),var(--purple));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.step:hover{background:var(--bg2);}
+.step:hover::before{transform:scaleX(1);}
+.step-n{font-family:'Orbitron',sans-serif;font-size:64px;font-weight:900;color:rgba(0,229,255,0.06);line-height:1;margin-bottom:20px;transition:color .3s;}
+.step:hover .step-n{color:rgba(0,229,255,0.12);}
+.step-icon{font-size:28px;margin-bottom:14px;}
+.step h3{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;margin-bottom:10px;}
+.step p{font-size:13px;line-height:1.7;color:var(--dim);font-weight:300;}
+
+/* FEATURES */
+.features{background:var(--bg2);}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:60px;background:var(--border-c);}
+.feat-card{
+  background:var(--bg2);padding:48px 40px;
+  position:relative;overflow:hidden;transition:background .3s;
+}
+.feat-card:hover{background:var(--bg3);}
+.feat-card.wide{grid-column:span 2;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;}
+.feat-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at var(--mx,50%) var(--my,50%),rgba(0,229,255,0.04) 0%,transparent 70%);
+  pointer-events:none;transition:opacity .3s;opacity:0;
+}
+.feat-card:hover::after{opacity:1;}
+.feat-icon{font-size:32px;margin-bottom:20px;}
+.feat-card h3{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px;letter-spacing:.5px;}
+.feat-card p{font-size:14px;line-height:1.7;color:var(--dim);font-weight:300;}
+
+/* Spot payment visual */
+.spot-visual{background:var(--bg3);border:1px solid var(--border-c);padding:24px;}
+.spot-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;margin-bottom:8px;
+  border:1px solid var(--border-c);background:rgba(0,229,255,0.03);
+  transition:border-color .2s;
+}
+.spot-row:hover{border-color:var(--cyan);}
+.spot-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--dim);}
+.spot-val{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;color:var(--cyan);}
+.spot-btn{
+  width:100%;margin-top:12px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border:none;color:#000;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:12px;cursor:none;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+}
+
+/* EMO COINS */
+.emocoin{background:var(--bg);}
+.ec-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.ec-visual{position:relative;height:420px;display:flex;align-items:center;justify-content:center;}
+
+/* Wallet card */
+.wallet-card{
+  width:280px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(180,79,255,0.08));
+  border:1px solid var(--border-c);
+  padding:28px;position:relative;z-index:2;
+  box-shadow:0 0 60px rgba(0,229,255,0.1),0 0 120px rgba(180,79,255,0.08);
+}
+.wc-addr{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dimmer);margin-bottom:4px;}
+.wc-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;margin-bottom:20px;color:var(--cyan);}
+.wc-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dimmer);margin-bottom:6px;}
+.wc-amount{font-family:'Orbitron',sans-serif;font-size:36px;font-weight:900;color:var(--white);letter-spacing:-1px;}
+.wc-butterfly{position:absolute;right:16px;top:16px;font-size:32px;opacity:0.6;animation:butterfly-float 4s ease-in-out infinite;}
+
+/* Orbit rings */
+.orbit{position:absolute;border-radius:50%;border:1px solid;animation:spin linear infinite;}
+.o1{width:320px;height:320px;border-color:rgba(0,229,255,0.1);animation-duration:10s;}
+.o2{width:380px;height:380px;border-color:rgba(180,79,255,0.08);animation-duration:15s;animation-direction:reverse;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.orbit-dot{position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;box-shadow:0 0 12px currentColor;}
+.o1 .orbit-dot{background:var(--cyan);color:var(--cyan);}
+.o2 .orbit-dot{background:var(--purple);color:var(--purple);}
+
+.ec-list{list-style:none;display:flex;flex-direction:column;gap:14px;}
+.ec-item{
+  display:flex;align-items:center;gap:16px;
+  padding:16px 20px;
+  background:var(--bg2);border:1px solid var(--border-c);
+  transition:border-color .2s,background .2s;
+}
+.ec-item:hover{background:var(--bg3);border-color:var(--cyan);}
+.ec-badge{
+  font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;
+  color:var(--cyan);min-width:50px;
+  text-shadow:0 0 12px rgba(0,229,255,0.5);
+}
+.ec-desc{font-size:13px;color:var(--dim);font-weight:300;}
+
+/* COMMUNITY CINEMA */
+.cinema{background:var(--bg2);}
+.cinema-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.cinema-visual{
+  position:relative;
+  background:var(--bg3);border:1px solid var(--border-p);
+  padding:32px;overflow:hidden;
+}
+.cinema-screen{
+  background:linear-gradient(135deg,#1a0a2e,#0a1a2e);
+  padding:40px 32px;text-align:center;margin-bottom:20px;
+  position:relative;overflow:hidden;
+}
+.cinema-screen::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(180,79,255,0.15) 0%,transparent 70%);
+}
+.cinema-title-big{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--purple);margin-bottom:6px;}
+.cinema-title{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--white);position:relative;}
+.cinema-badge{
+  display:inline-block;margin-top:12px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  color:#000;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;
+  padding:4px 12px;position:relative;
+}
+.cinema-audience{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;}
+.aud-dot{width:10px;height:10px;border-radius:50%;background:var(--purple);opacity:0.4;transition:opacity .3s;}
+.aud-dot:nth-child(odd){background:var(--cyan);animation:aud-pulse 2s infinite;}
+.aud-dot:nth-child(3n){animation-delay:.5s;}
+.aud-dot:nth-child(5n){animation-delay:1s;}
+@keyframes aud-pulse{0%,100%{opacity:.3;}50%{opacity:.8;}}
+
+/* MODES */
+.modes{background:var(--bg);}
+.modes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:60px;background:var(--border-p);}
+.mode-card{
+  background:var(--bg);padding:48px 32px;text-align:center;
+  position:relative;overflow:hidden;cursor:none;
+  transition:background .3s;
+}
+.mode-card:hover{background:var(--bg2);}
+.mode-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(to right,var(--cyan),var(--purple));
+  transform:scaleX(0);transform-origin:center;transition:transform .4s;
+}
+.mode-card:hover::before{transform:scaleX(1);}
+.mode-icon{font-size:52px;margin-bottom:20px;display:block;filter:drop-shadow(0 0 16px rgba(0,229,255,0.4));animation:butterfly-float 4s ease-in-out infinite;}
+.mode-card:nth-child(2) .mode-icon{animation-delay:1s;filter:drop-shadow(0 0 16px rgba(180,79,255,0.4));}
+.mode-card:nth-child(3) .mode-icon{animation-delay:2s;filter:drop-shadow(0 0 16px rgba(255,45,155,0.4));}
+.mode-name{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;margin-bottom:8px;color:var(--cyan);}
+.mode-card:nth-child(2) .mode-name{color:var(--purple);}
+.mode-card:nth-child(3) .mode-name{color:var(--magenta);}
+.mode-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dimmer);margin-bottom:16px;}
+.mode-desc{font-size:13px;line-height:1.7;color:var(--dim);font-weight:300;}
+
+/* ECOSYSTEM */
+.ecosystem{background:var(--bg2);}
+.eco-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:60px;background:var(--border-c);}
+.eco-card{
+  background:var(--bg2);padding:36px 24px;
+  border-top:2px solid transparent;transition:border-color .3s,background .3s;
+}
+.eco-card:hover{background:var(--bg3);border-color:var(--cyan);}
+.eco-card.active{border-color:var(--cyan);}
+.eco-card:nth-child(2):hover,.eco-card:nth-child(2).active{border-color:var(--purple);}
+.eco-name{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;margin-bottom:6px;}
+.eco-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px;}
+.eco-card:nth-child(2) .eco-tag{color:var(--purple);}
+.eco-card:nth-child(3) .eco-tag{color:var(--magenta);}
+.eco-card:nth-child(4) .eco-tag{color:var(--gold);}
+.eco-desc{font-size:13px;line-height:1.6;color:var(--dim);font-weight:300;}
+
+/* CTA */
+.cta-section{
+  padding:120px 48px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.05),rgba(180,79,255,0.05));
+  border-top:1px solid var(--border-c);
+  text-align:center;position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(0,229,255,0.06) 0%,transparent 70%);
+}
+.cta-butterfly{font-size:64px;display:block;margin-bottom:24px;filter:drop-shadow(0 0 24px rgba(0,229,255,0.6));animation:butterfly-float 4s ease-in-out infinite;position:relative;z-index:1;}
+.cta-title{font-family:'Orbitron',sans-serif;font-size:clamp(40px,5vw,72px);font-weight:900;line-height:1.1;margin-bottom:20px;position:relative;z-index:1;}
+.cta-title span{background:linear-gradient(135deg,var(--cyan),var(--purple),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.cta-sub{font-size:16px;color:var(--dim);font-weight:300;margin-bottom:40px;position:relative;z-index:1;}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;}
+
+/* FOOTER */
+footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48px 40px;}
+.footer-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:48px;}
+.footer-logo-wrap .tagline{font-size:12px;color:var(--dimmer);margin-top:6px;font-style:italic;}
+.footer-links{display:flex;gap:64px;}
+.footer-col h4{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dimmer);margin-bottom:16px;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-col a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s;}
+.footer-col a:hover{color:var(--cyan);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:24px;border-top:1px solid var(--border-c);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dimmer);}
+.dwin-pill{background:var(--cyan2);border:1px solid var(--border-c);padding:4px 12px;color:var(--cyan);font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+
+/* Scroll animations */
+.fade-up{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease;}
+.fade-up.vis{opacity:1;transform:translateY(0);}
+
+/* Mobile */
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  .nav-links{display:none;}
+  section{padding:80px 20px;}
+  .hero{padding:100px 20px 60px;}
+  .steps-grid{grid-template-columns:1fr 1fr;}
+  .feat-grid{grid-template-columns:1fr;}
+  .feat-card.wide{grid-column:span 1;grid-template-columns:1fr;}
+  .ec-inner,.cinema-inner{grid-template-columns:1fr;}
+  .ec-visual{height:280px;}
+  .modes-grid{grid-template-columns:1fr;}
+  .eco-grid{grid-template-columns:1fr 1fr;}
+  .footer-top{flex-direction:column;gap:32px;}
+  .footer-links{flex-direction:column;gap:32px;}
+  .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+  .hero-stats{gap:24px;}
+}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="curRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-icon">d</div>
+    <div class="logo-text">Ddott<span class="tv">TV</span></div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#earn">Earn</a></li>
+    <li><a href="#cinema">Cinema</a></li>
+    <li><a href="#ecosystem">Ecosystem</a></li>
+  </ul>
+  <button class="nav-cta">Join Waitlist</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <span class="hero-butterfly">🦋</span>
+  <div class="hero-eyebrow">The Future of Decentralised Cinema</div>
+
+  <h1 class="hero-title">
+    <span class="line1">WATCH.</span>
+    <span class="line2">CREATE.</span>
+    <span class="line3">EARN ANYWHERE.</span>
+  </h1>
+
+  <div class="hero-sub">Your Community, Your Cinema</div>
+
+  <p class="hero-desc">
+    Our community-owned ecosystem — upload and start making <strong>spot payments</strong>, in open-commission proceeds for creators. <strong>Emo AI integrated</strong> across every screen.
+  </p>
+
+  <div class="hero-btns">
+    <a href="#" class="btn-primary">Explore Platform</a>
+    <a href="#features" class="btn-outline">How It Works</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num">100+</span>
+      <span class="stat-lbl">Offline Screens</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">LIVE</span>
+      <span class="stat-lbl">Spot Payments</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">5</span>
+      <span class="stat-lbl">Chains Supported</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">∞</span>
+      <span class="stat-lbl">Community Governed</span>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <div class="tick-item"><span>⚡</span> Spot Payments Live</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🦋</span> Emo AI Integrated</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🎬</span> Community Governed</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🪙</span> Emo Coins + TheWall</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>📺</span> 100+ Offline Screens</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🔗</span> 5 Chain Wallet</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🎭</span> Script Verification</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>⚡</span> Spot Payments Live</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🦋</span> Emo AI Integrated</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🎬</span> Community Governed</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🪙</span> Emo Coins + TheWall</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>📺</span> 100+ Offline Screens</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🔗</span> 5 Chain Wallet</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🎭</span> Script Verification</div><div class="tick-dot"></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="hiw" id="features">
+  <div class="s-label">How It Works</div>
+  <h2 class="s-title">Four Steps to <span class="c">Earning</span></h2>
+  <p class="s-sub">Upload, watch, earn Emo Coins — convert via TheWall to crypto and real money. We'll guide you every step.</p>
+  <div class="steps-grid">
+    <div class="step fade-up">
+      <div class="step-n">01</div>
+      <div class="step-icon">📱</div>
+      <h3>Join & Login Daily</h3>
+      <p>Sign up free. Every daily login gives +1 Emo Coin automatically. Build your streak and multiply your rewards.</p>
+    </div>
+    <div class="step fade-up" style="transition-delay:.1s">
+      <div class="step-n">02</div>
+      <div class="step-icon">🎬</div>
+      <h3>Watch or Upload</h3>
+      <p>Earn coins watching content based on watch time. Creators earn via views, engagement, and Spot Payments from fans.</p>
+    </div>
+    <div class="step fade-up" style="transition-delay:.2s">
+      <div class="step-n">03</div>
+      <div class="step-icon">🪙</div>
+      <h3>Stack Emo Coins</h3>
+      <p>Coins stack in your Ddott Wallet. Subscribe to creators, tip them, or hold until you're ready to convert.</p>
+    </div>
+    <div class="step fade-up" style="transition-delay:.3s">
+      <div class="step-n">04</div>
+      <div class="step-icon">🔗</div>
+      <h3>Convert via TheWall</h3>
+      <p>Connect your Web3 wallet. Convert Emo Coins to ETH, SOL, ARB and more — then to real money. We educate you how.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="earn">
+  <div class="s-label">Platform Features</div>
+  <h2 class="s-title">Everything in <span class="c">One Place</span></h2>
+  <div class="feat-grid">
+
+    <div class="feat-card fade-up">
+      <div class="feat-icon">⚡</div>
+      <h3>Spot Payment</h3>
+      <p>Enable instant Web3 wallet payment directly to creators. Fans pay creators in real time — no middlemen, no delays. Enable Spot Payment in one click from Creator Studio.</p>
+    </div>
+
+    <div class="feat-card fade-up" style="transition-delay:.1s">
+      <div class="feat-icon">🎭</div>
+      <h3>Script Verification</h3>
+      <p>All content goes through script verification before going live. Ensures quality and protects the community. Status tracked live in your Creator Dashboard.</p>
+    </div>
+
+    <div class="feat-card wide fade-up">
+      <div>
+        <div class="feat-icon">💳</div>
+        <h3>Ddott Wallet & Spot Payment</h3>
+        <p>Your in-app wallet holds Emo Coins and connects to your Web3 wallet. Enable Spot Payment to let your audience pay you instantly. Track balance, conversions, and payment history all in one place.</p>
+      </div>
+      <div class="spot-visual">
+        <div class="spot-row">
+          <span class="spot-label">💰 Total Ddott Coins</span>
+          <span class="spot-val">$7,890.45</span>
+        </div>
+        <div class="spot-row">
+          <span class="spot-label">🔗 Web3 Wallet</span>
+          <span class="spot-val" style="font-size:14px;color:var(--purple);">0x...8ea3 ✓</span>
+        </div>
+        <div class="spot-row">
+          <span class="spot-label">⚡ Spot Payment</span>
+          <span class="spot-val" style="font-size:14px;color:#00ff88;">ENABLED</span>
+        </div>
+        <button class="spot-btn">Enable Spot Payment →</button>
+      </div>
+    </div>
+
+    <div class="feat-card fade-up">
+      <div class="feat-icon">💬</div>
+      <h3>Community Messaging</h3>
+      <p>Text, voice messages, stickers and image sharing. 1-on-1 DMs and group chats for creator communities. Voice-to-text transcription built in.</p>
+    </div>
+
+    <div class="feat-card fade-up" style="transition-delay:.1s">
+      <div class="feat-icon">📊</div>
+      <h3>Creator Studio</h3>
+      <p>Full dashboard with analytics, content manager, agreement tracking, and payment history. Everything a creator needs to grow their channel and income.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- EMO COINS -->
+<section class="emocoin">
+  <div class="ec-inner">
+    <div class="ec-visual">
+      <div class="orbit o2"><div class="orbit-dot"></div></div>
+      <div class="orbit o1"><div class="orbit-dot"></div></div>
+      <div class="wallet-card">
+        <div class="wc-addr">ACCOUNT ADDRESS · 0x...8ea3</div>
+        <div class="wc-name">MY Ddott WALLET</div>
+        <div class="wc-label">TOTAL DDOTT COINS</div>
+        <div class="wc-amount">$7,890.45</div>
+        <div class="wc-butterfly">🦋</div>
+      </div>
+    </div>
+
+    <div class="fade-up">
+      <div class="s-label">Emo Coin Economy</div>
+      <h2 class="s-title">Real Value.<br><span class="c">Real Rewards.</span></h2>
+      <p class="s-sub" style="margin-bottom:32px;">Every interaction earns coins. Every coin converts to real money via TheWall. We'll show you exactly how — step by step.</p>
+      <ul class="ec-list">
+        <li class="ec-item"><span class="ec-badge">+1</span><span class="ec-desc">Daily login streak — automatic every day</span></li>
+        <li class="ec-item"><span class="ec-badge">+⏱</span><span class="ec-desc">Watch time rewards — earn as you watch</span></li>
+        <li class="ec-item"><span class="ec-badge">+👁</span><span class="ec-desc">Creator views & engagement bonuses</span></li>
+        <li class="ec-item"><span class="ec-badge">⚡</span><span class="ec-desc">Spot Payments — direct from fans instantly</span></li>
+        <li class="ec-item"><span class="ec-badge">→₿</span><span class="ec-desc">Convert via TheWall → Crypto → Cash</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY CINEMA -->
+<section class="cinema" id="cinema">
+  <div class="cinema-inner">
+    <div class="fade-up">
+      <div class="s-label">Community Cinema</div>
+      <h2 class="s-title">Beyond the <span class="c">Screen</span></h2>
+      <p class="s-sub" style="margin-bottom:24px;">Ddott TV isn't just online. We bring community cinema to villages, towns, and cities — offline screens where communities gather to watch Ddott Originals together. Spot Payments work offline too.</p>
+      <p class="s-sub">"Your Community, Your Cinema" — everywhere, for everyone.</p>
+    </div>
+    <div class="cinema-visual fade-up" style="transition-delay:.15s">
+      <div class="cinema-screen">
+        <div class="cinema-title-big">Ddott Originals</div>
+        <div class="cinema-title">THE SCROLL OF HOPE</div>
+        <div class="cinema-badge">⚡ Spot Payment</div>
+      </div>
+      <div class="cinema-audience">
+        <!-- 30 audience dots -->
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+        <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THREE MODES -->
+<section class="modes">
+  <div style="text-align:center;">
+    <div class="s-label" style="justify-content:center;margin-bottom:16px;">Three Modes</div>
+    <h2 class="s-title" style="margin-bottom:16px;">One <span class="c">Ecosystem</span></h2>
+    <p class="s-sub" style="margin:0 auto 0;">Access the full Dwin Universe through a single Emo Key — three powerful modes, one unified experience.</p>
+  </div>
+  <div class="modes-grid">
+    <div class="mode-card fade-up">
+      <span class="mode-icon">🦋</span>
+      <div class="mode-name">EMOWALL MODE</div>
+      <div class="mode-tag">AI · Safety · 8 Modes</div>
+      <p class="mode-desc">Safety-focused AI assistant with 8 specialized modes and 7-brains architecture. Emotional resonance and connection at its core.</p>
+    </div>
+    <div class="mode-card fade-up" style="transition-delay:.1s">
+      <span class="mode-icon">🦋</span>
+      <div class="mode-name">DDOTT TV</div>
+      <div class="mode-tag">Watch · Create · Earn</div>
+      <p class="mode-desc">The full video platform. Upload, stream, earn Emo Coins, spot payments, community cinema. Your content, your revenue.</p>
+    </div>
+    <div class="mode-card fade-up" style="transition-delay:.2s">
+      <span class="mode-icon">🦋</span>
+      <div class="mode-name">CREATOR HUB</div>
+      <div class="mode-tag">Studio · Analytics · Agreements</div>
+      <p class="mode-desc">Professional creator tools. Dashboard, content manager, script verification, payment tracking and agreements all in one place.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM -->
+<section class="ecosystem" id="ecosystem">
+  <div class="s-label">Dwin Universe</div>
+  <h2 class="s-title">One Key. <span class="c">Everything.</span></h2>
+  <p class="s-sub">The Emo Key unlocks the entire Dwin Universe ecosystem across all platforms.</p>
+  <div class="eco-grid">
+    <div class="eco-card active fade-up">
+      <div class="eco-name">Ddott TV</div>
+      <div class="eco-tag">Content Layer</div>
+      <div class="eco-desc">Watch, create, earn. Community cinema. Spot payments. The video platform that pays everyone.</div>
+    </div>
+    <div class="eco-card fade-up" style="transition-delay:.1s">
+      <div class="eco-name">TheWall</div>
+      <div class="eco-tag">Web3 Wallet</div>
+      <div class="eco-desc">5-chain crypto wallet. ETH, SOL, MON, ARB, BTC. Convert Emo Coins to crypto to cash.</div>
+    </div>
+    <div class="eco-card fade-up" style="transition-delay:.2s">
+      <div class="eco-name">Emowall AI</div>
+      <div class="eco-tag">AI Platform</div>
+      <div class="eco-desc">Safety-focused AI with 8 modes. 7-brains architecture powering intelligence across the universe.</div>
+    </div>
+    <div class="eco-card fade-up" style="transition-delay:.3s">
+      <div class="eco-name">Emo AI Pro</div>
+      <div class="eco-tag">AI Assistant</div>
+      <div class="eco-desc">Multi-model AI with butterfly companion UI. Available on Android Play Store now.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <span class="cta-butterfly">🦋</span>
+  <h2 class="cta-title">Ready to <span>Watch.<br>Create. Earn?</span></h2>
+  <p class="cta-sub">Join the future of decentralised cinema. Free to start — Web3 wallet optional.</p>
+  <div class="cta-btns">
+    <a href="#" class="btn-primary">Join the Waitlist</a>
+    <a href="#" class="btn-outline">Explore Platform</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-logo-wrap">
+      <div class="nav-logo">
+        <div class="logo-icon">d</div>
+        <div class="logo-text">Ddott<span class="tv">TV</span></div>
+      </div>
+      <div class="tagline">Your Community, Your Cinema</div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Spot Payment</a></li>
+          <li><a href="#">Creator Studio</a></li>
+          <li><a href="#">Community Cinema</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Ecosystem</h4>
+        <ul>
+          <li><a href="#">TheWall</a></li>
+          <li><a href="#">Emowall AI</a></li>
+          <li><a href="#">Emo AI Pro</a></li>
+          <li><a href="#">Emobies</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Ddott TV · Dwin Universe</span>
+    <span class="dwin-pill">Dwin Universe</span>
+  </div>
+</footer>
+
+<script>
+// Custom cursor
+const cur = document.getElementById('cur');
+const ring = document.getElementById('curRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function animRing(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
+document.querySelectorAll('a,button,.feat-card,.step,.mode-card,.eco-card,.spot-row').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';ring.style.width='48px';ring.style.height='48px';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';ring.style.width='32px';ring.style.height='32px';});
+});
+
+// Mouse glow on feature cards
+document.querySelectorAll('.feat-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=((e.clientX-r.left)/r.width*100).toFixed(1);
+    const y=((e.clientY-r.top)/r.height*100).toFixed(1);
+    card.style.setProperty('--mx',x+'%');
+    card.style.setProperty('--my',y+'%');
+  });
+});
+
+// Scroll fade
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+
+// Cat chips interactive
+document.querySelectorAll('.cat-chip').forEach(c=>{
+  c.addEventListener('click',()=>{document.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');});
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Player V2</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --purple: #b400ff;
+    --pink: #ff00c8;
+    --dark: #04000f;
+    --darker: #020008;
+    --surface: #0a0020;
+    --surface2: #110030;
+    --text: #e8d5ff;
+    --muted: #6b4d8a;
+    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff44;
+    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff44;
+    --glow-pink: 0 0 20px #ff00c888, 0 0 40px #ff00c844;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridShift 20s linear infinite;
+  }
+
+  @keyframes gridShift {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(40px); }
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(180,0,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(0,245,255,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: rgba(4,0,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,245,255,0.15);
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+
+  .logo span {
+    color: var(--pink);
+    -webkit-text-fill-color: var(--pink);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid rgba(0,245,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+  }
+
+  .nav-icon:hover {
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+
+  /* VIDEO CONTAINER */
+  .video-container {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid rgba(0,245,255,0.2);
+    box-shadow: 0 0 60px rgba(0,245,255,0.1), 0 0 120px rgba(180,0,255,0.08);
+    margin-bottom: 20px;
+  }
+
+  .video-wrap {
+    position: relative;
+    padding-top: 56.25%;
+    background: linear-gradient(135deg, #000510, #0a0020);
+  }
+
+  /* Fake video content */
+  .video-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    background: linear-gradient(135deg, #000510 0%, #080020 50%, #000510 100%);
+  }
+
+  .video-placeholder .scene {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .scene-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0;
+    animation: scanline 4s linear infinite;
+  }
+
+  .scene-line:nth-child(2) { animation-delay: 1.3s; }
+  .scene-line:nth-child(3) { animation-delay: 2.6s; }
+
+  @keyframes scanline {
+    0% { top: -2%; opacity: 0; }
+    5% { opacity: 0.6; }
+    95% { opacity: 0.6; }
+    100% { top: 102%; opacity: 0; }
+  }
+
+  .play-btn-big {
+    position: relative;
+    z-index: 2;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--glow-cyan), var(--glow-purple);
+    transition: all 0.3s;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: var(--glow-cyan), var(--glow-purple); transform: scale(1); }
+    50% { box-shadow: 0 0 40px #00f5ffaa, 0 0 80px #b400ffaa; transform: scale(1.05); }
+  }
+
+  .play-btn-big:hover { transform: scale(1.1) !important; }
+  .play-btn-big svg { margin-left: 4px; }
+
+  .video-title-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 40px 20px 20px;
+    background: linear-gradient(transparent, rgba(4,0,15,0.9));
+    z-index: 2;
+  }
+
+  .vtitle {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    text-shadow: var(--glow-cyan);
+  }
+
+  /* CONTROLS */
+  .controls {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 12px 16px 14px;
+    background: linear-gradient(transparent, rgba(4,0,15,0.95));
+    z-index: 10;
+  }
+
+  .progress-wrap {
+    position: relative;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    overflow: visible;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 38%;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    border-radius: 4px;
+    box-shadow: var(--glow-cyan);
+    position: relative;
+    transition: width 0.1s;
+  }
+
+  .progress-thumb {
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: var(--glow-cyan);
+    transition: transform 0.2s;
+  }
+
+  .progress-wrap:hover .progress-thumb { transform: translateY(-50%) scale(1.4); }
+
+  /* Chapter markers */
+  .chapter-dot {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--purple);
+    box-shadow: var(--glow-purple);
+    cursor: pointer;
+  }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ctrl-btn {
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    line-height: 1;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+  }
+
+  .ctrl-btn:hover { color: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan)); }
+
+  .time {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .time span { color: var(--cyan); }
+
+  .vol-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .vol-slider {
+    width: 70px;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .vol-fill {
+    height: 100%;
+    width: 75%;
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+    border-radius: 3px;
+  }
+
+  .ctrl-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .quality-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quality-badge:hover {
+    background: var(--cyan);
+    color: var(--dark);
+    box-shadow: var(--glow-cyan);
+  }
+
+  /* INFO SECTION */
+  .info-section {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 20px;
+  }
+
+  .video-info h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .video-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .meta-chip {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .meta-chip.hot { color: var(--pink); }
+
+  .action-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .act-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,245,255,0.2);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .act-btn:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .act-btn.primary {
+    background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(180,0,255,0.15));
+    border-color: var(--purple);
+    color: var(--cyan);
+  }
+
+  .act-btn.primary:hover {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color: var(--dark);
+    border-color: transparent;
+  }
+
+  /* EMO COINS */
+  .emo-tip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid rgba(180,0,255,0.3);
+    min-width: 120px;
+  }
+
+  .emo-coins-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: var(--purple);
+    letter-spacing: 2px;
+  }
+
+  .emo-coin-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .tip-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none;
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: var(--glow-purple);
+    transition: all 0.2s;
+    font-weight: 700;
+  }
+
+  .tip-btn:hover { transform: scale(1.05); }
+
+  /* CREATOR + DESCRIPTION */
+  .creator-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid rgba(0,245,255,0.1);
+    margin-bottom: 16px;
+  }
+
+  .creator-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .creator-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 2px solid var(--purple);
+    box-shadow: var(--glow-purple);
+    flex-shrink: 0;
+  }
+
+  .creator-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+
+  .creator-subs {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .follow-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none;
+    color: var(--dark);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: var(--glow-cyan);
+    transition: all 0.3s;
+  }
+
+  .follow-btn:hover { transform: scale(1.05); opacity: 0.9; }
+
+  /* DESCRIPTION */
+  .desc-box {
+    padding: 14px 16px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid rgba(180,0,255,0.1);
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #a888cc;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .desc-box:hover { border-color: rgba(180,0,255,0.3); }
+
+  .desc-tag {
+    display: inline-block;
+    color: var(--cyan);
+    margin-right: 6px;
+    font-size: 12px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+  }
+
+  .tab {
+    padding: 10px 18px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .tab.active {
+    color: var(--cyan);
+    border-bottom-color: var(--cyan);
+    text-shadow: 0 0 12px var(--cyan);
+  }
+
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* COMMENTS */
+  .comment-input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .comment-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    border: 1px solid var(--purple);
+    flex-shrink: 0;
+  }
+
+  .comment-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid rgba(0,245,255,0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    min-height: 40px;
+  }
+
+  .comment-input:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,245,255,0.1); }
+  .comment-input::placeholder { color: var(--muted); }
+
+  /* COMMENT CARDS */
+  .comment {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .comment-body { flex: 1; }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .comment-user {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+  }
+
+  .comment-time { font-size: 11px; color: var(--muted); }
+
+  .comment-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 14px;
+  }
+
+  .ca-btn {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+
+  .ca-btn:hover { color: var(--cyan); }
+  .ca-btn.liked { color: var(--pink); }
+
+  /* STICKERS */
+  .sticker-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .sticker-row::-webkit-scrollbar { display: none; }
+
+  .sticker {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid rgba(0,245,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .sticker:hover {
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+    transform: scale(1.1);
+  }
+
+  /* QUEUE / NEXT UP */
+  .section-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--purple);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(180,0,255,0.4), transparent);
+  }
+
+  .queue-card {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid rgba(0,245,255,0.08);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .queue-card:hover {
+    border-color: rgba(0,245,255,0.25);
+    background: var(--surface2);
+  }
+
+  .queue-thumb {
+    width: 100px;
+    height: 60px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .qt-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--surface2), #200040);
+  }
+
+  .qt-emoji { position: relative; z-index: 1; }
+
+  .qt-dur {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    background: rgba(0,0,0,0.8);
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: var(--cyan);
+    z-index: 1;
+  }
+
+  .queue-info { flex: 1; min-width: 0; }
+
+  .queue-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .queue-meta { font-size: 11px; color: var(--muted); }
+
+  .queue-card.playing {
+    border-color: var(--cyan);
+    background: linear-gradient(135deg, rgba(0,245,255,0.05), rgba(180,0,255,0.05));
+  }
+
+  .now-playing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: var(--glow-cyan);
+    animation: blink 1s ease-in-out infinite;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* BUTTERFLY AI */
+  .butterfly-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: var(--glow-purple), var(--glow-cyan);
+    z-index: 200;
+    animation: float 3s ease-in-out infinite;
+    transition: transform 0.3s;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-8px) rotate(5deg); }
+  }
+
+  .butterfly-fab:hover { transform: scale(1.15) !important; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--darker); }
+  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
+
+  /* NEON DIVIDER */
+  .neon-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+    margin: 20px 0;
+    opacity: 0.4;
+  }
+
+  /* LIVE BADGE */
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    background: rgba(255,0,80,0.15);
+    border: 1px solid rgba(255,0,80,0.5);
+    border-radius: 4px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: #ff0050;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff0050;
+    animation: blink 0.8s ease-in-out infinite;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .info-section { grid-template-columns: 1fr; }
+    .emo-tip { flex-direction: row; min-width: unset; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">DDOTT<span>.</span>TV</div>
+  <div class="nav-right">
+    <div class="nav-icon">🔍</div>
+    <div class="nav-icon">🔔</div>
+    <div class="avatar">D</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- VIDEO PLAYER -->
+  <div class="video-container">
+    <div class="video-wrap">
+      <div class="video-placeholder">
+        <div class="scene">
+          <div class="scene-line"></div>
+          <div class="scene-line"></div>
+          <div class="scene-line"></div>
+        </div>
+        <div class="play-btn-big" id="playBtn">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+        <div class="video-title-overlay">
+          <div class="vtitle">▶ DDOTT TV — EPISODE 01</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-fill" id="progressFill">
+          <div class="progress-thumb"></div>
+        </div>
+        <div class="chapter-dot" style="left:25%"></div>
+        <div class="chapter-dot" style="left:60%"></div>
+        <div class="chapter-dot" style="left:82%"></div>
+      </div>
+      <div class="ctrl-row">
+        <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button class="ctrl-btn" title="Skip -10s">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8zm-1.1 11H10v-3.26L9 13.26V12.4l1.8-.6h.1V16zm3.28-1.07c0 .43-.06.79-.17 1.07a1.2 1.2 0 01-.46.62c-.19.13-.43.2-.71.2s-.51-.07-.7-.2a1.22 1.22 0 01-.46-.62c-.11-.28-.17-.64-.17-1.07v-.48c0-.44.06-.8.17-1.07a1.2 1.2 0 01.46-.62c.19-.13.43-.2.71-.2s.51.07.71.2c.19.13.35.34.46.62.11.27.17.63.17 1.07v.48zm-.85-.58c0-.26-.02-.47-.07-.63a.53.53 0 00-.2-.33.55.55 0 00-.63 0 .54.54 0 00-.2.33c-.05.16-.07.37-.07.63v.67c0 .26.02.48.07.64a.54.54 0 00.2.34.55.55 0 00.63 0 .54.54 0 00.2-.34c.05-.16.07-.38.07-.64v-.67z"/></svg>
+        </button>
+        <button class="ctrl-btn" title="Skip +10s">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8zm-1.1 11H10v-3.26L9 13.26V12.4l1.8-.6h.1V16zm3.28-1.07c0 .43-.06.79-.17 1.07a1.2 1.2 0 01-.46.62c-.19.13-.43.2-.71.2s-.51-.07-.7-.2a1.22 1.22 0 01-.46-.62c-.11-.28-.17-.64-.17-1.07v-.48c0-.44.06-.8.17-1.07a1.2 1.2 0 01.46-.62c.19-.13.43-.2.71-.2s.51.07.71.2c.19.13.35.34.46.62.11.27.17.63.17 1.07v.48zm-.85-.58c0-.26-.02-.47-.07-.63a.53.53 0 00-.2-.33.55.55 0 00-.63 0 .54.54 0 00-.2.33c-.05.16-.07.37-.07.63v.67c0 .26.02.48.07.64a.54.54 0 00.2.34.55.55 0 00.63 0 .54.54 0 00.2-.34c.05-.16.07-.38.07-.64v-.67z"/></svg>
+        </button>
+        <div class="vol-wrap">
+          <button class="ctrl-btn">🔊</button>
+          <div class="vol-slider"><div class="vol-fill" id="volFill"></div></div>
+        </div>
+        <div class="time"><span id="currentTime">14:22</span> / 37:45</div>
+        <div class="ctrl-right">
+          <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+          <div class="quality-badge" id="qualityBtn">4K</div>
+          <button class="ctrl-btn" title="Picture in Picture">⧉</button>
+          <button class="ctrl-btn" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDEO INFO -->
+  <div class="info-section">
+    <div class="video-info">
+      <h1>Building Web3 on Mobile — Full Stack Dev from a Phone 📱</h1>
+      <div class="video-meta">
+        <div class="meta-chip">👁 128.4K views</div>
+        <div class="meta-chip">📅 2 hours ago</div>
+        <div class="meta-chip hot">🔥 Trending #3</div>
+        <div class="meta-chip">⏱ 37:45</div>
+      </div>
+      <div class="action-btns">
+        <button class="act-btn primary">👍 24.1K</button>
+        <button class="act-btn">👎</button>
+        <button class="act-btn">↗ Share</button>
+        <button class="act-btn">+ Save</button>
+        <button class="act-btn">✂️ Clip</button>
+        <button class="act-btn">⋯</button>
+      </div>
+    </div>
+    <div class="emo-tip">
+      <div class="emo-coins-label">EMO COINS</div>
+      <div class="emo-coin-val">🪙 450</div>
+      <button class="tip-btn">TIP CREATOR</button>
+    </div>
+  </div>
+
+  <!-- CREATOR BAR -->
+  <div class="creator-bar">
+    <div class="creator-left">
+      <div class="creator-avatar">🦋</div>
+      <div>
+        <div class="creator-name">Divin · Emobies05</div>
+        <div class="creator-subs">84.2K subscribers · Dwin Universe</div>
+      </div>
+    </div>
+    <button class="follow-btn">FOLLOW</button>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="desc-box">
+    Building an entire Web3 wallet from a phone — no laptop, no desktop. Just Termux, Acode, and sheer will. This is the full build session for TheWall — 5-chain crypto wallet powered by Alchemy + Claude AI. 🔥
+    <br><br>
+    <span class="desc-tag">#DwinUniverse</span>
+    <span class="desc-tag">#TheWall</span>
+    <span class="desc-tag">#Web3</span>
+    <span class="desc-tag">#BuildInPublic</span>
+    <span class="desc-tag">#MobileDev</span>
+    <br><br>
+    <span style="color: var(--cyan); font-size:12px;">▼ Show more</span>
+  </div>
+
+  <div class="neon-divider"></div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this, 'comments')">💬 Comments (3.2K)</div>
+    <div class="tab" onclick="switchTab(this, 'queue')">📺 Up Next</div>
+    <div class="tab" onclick="switchTab(this, 'chat')">⚡ Live Chat</div>
+  </div>
+
+  <!-- COMMENTS TAB -->
+  <div id="comments-panel">
+    <!-- STICKERS -->
+    <div class="sticker-row">
+      <div class="sticker" title="Pizza">🍕</div>
+      <div class="sticker" title="Rocket">🚀</div>
+      <div class="sticker" title="Fire">🔥</div>
+      <div class="sticker" title="Butterfly">🦋</div>
+      <div class="sticker" title="Diamond">💎</div>
+      <div class="sticker" title="Lightning">⚡</div>
+      <div class="sticker" title="Crown">👑</div>
+      <div class="sticker" title="Star">⭐</div>
+      <div class="sticker" title="Coin">🪙</div>
+      <div class="sticker" title="Heart">💜</div>
+    </div>
+
+    <!-- COMMENT INPUT -->
+    <div class="comment-input-row">
+      <div class="comment-avatar">D</div>
+      <textarea class="comment-input" placeholder="Add a comment... or drop a sticker 🍕" rows="1" id="commentInput"></textarea>
+    </div>
+
+    <!-- COMMENTS -->
+    <div class="comment">
+      <div class="comment-avatar" style="background: linear-gradient(135deg,#ff00c8,#b400ff)">A</div>
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="comment-user">@alexcrypto</span>
+          <span class="comment-time">1h ago</span>
+        </div>
+        <div class="comment-text">Building a full Web3 wallet from a PHONE?! Absolute unit. That Alchemy integration looked clean 🔥🔥</div>
+        <div class="comment-actions">
+          <div class="ca-btn liked">❤ 412</div>
+          <div class="ca-btn">Reply</div>
+          <div class="ca-btn">🚀 Tip</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comment">
+      <div class="comment-avatar" style="background: linear-gradient(135deg,#00f5ff,#0050ff)">S</div>
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="comment-user">@sophiaweb3</span>
+          <span class="comment-time">45m ago</span>
+        </div>
+        <div class="comment-text">Divin you're insane bro 😭 Termux + Acode + deploying to Vercel?? I can't even do this on my MacBook Pro 💀</div>
+        <div class="comment-actions">
+          <div class="ca-btn">❤ 287</div>
+          <div class="ca-btn">Reply</div>
+          <div class="ca-btn">🚀 Tip</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comment">
+      <div class="comment-avatar" style="background: linear-gradient(135deg,#ffaa00,#ff5500)">R</div>
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="comment-user">@ryanbuilds</span>
+          <span class="comment-time">30m ago</span>
+        </div>
+        <div class="comment-text">🍕🍕🍕 this is the content I came for. The Emowall AI section was 🤯 — Claude Haiku for in-app AI is such a smart move</div>
+        <div class="comment-actions">
+          <div class="ca-btn">❤ 156</div>
+          <div class="ca-btn">Reply</div>
+          <div class="ca-btn">🚀 Tip</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comment">
+      <div class="comment-avatar" style="background: linear-gradient(135deg,#00ff88,#00f5ff)">M</div>
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="comment-user">@miadev</span>
+          <span class="comment-time">12m ago</span>
+        </div>
+        <div class="comment-text">🚀🚀 dropped 50 Emo Coins just for this. Dubai to the world bro. The Dwin Universe is going to be massive fr 🦋</div>
+        <div class="comment-actions">
+          <div class="ca-btn">❤ 94</div>
+          <div class="ca-btn">Reply</div>
+          <div class="ca-btn">🚀 Tip</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUEUE TAB -->
+  <div id="queue-panel" style="display:none">
+    <div class="section-label">Now Playing</div>
+
+    <div class="queue-card playing">
+      <div class="queue-thumb">
+        <div class="qt-bg"></div>
+        <div class="qt-emoji">📱</div>
+        <div class="qt-dur">37:45</div>
+      </div>
+      <div class="queue-info">
+        <div class="queue-title">Building Web3 on Mobile — Full Stack Dev</div>
+        <div class="queue-meta">Emobies05 · 128K views</div>
+      </div>
+      <div class="now-playing-dot"></div>
+    </div>
+
+    <div class="section-label" style="margin-top:16px">Up Next</div>
+
+    <div class="queue-card">
+      <div class="queue-thumb">
+        <div class="qt-bg" style="background: linear-gradient(135deg,#000820,#200040)"></div>
+        <div class="qt-emoji">🔗</div>
+        <div class="qt-dur">28:12</div>
+      </div>
+      <div class="queue-info">
+        <div class="queue-title">TheWall — 5 Chain Wallet Deep Dive</div>
+        <div class="queue-meta">Emobies05 · 84K views</div>
+      </div>
+    </div>
+
+    <div class="queue-card">
+      <div class="queue-thumb">
+        <div class="qt-bg" style="background: linear-gradient(135deg,#001020,#002040)"></div>
+        <div class="qt-emoji">🦋</div>
+        <div class="qt-dur">19:33</div>
+      </div>
+      <div class="queue-info">
+        <div class="queue-title">Emowall AI — 7 Brain Architecture Explained</div>
+        <div class="queue-meta">Emobies05 · 52K views</div>
+      </div>
+    </div>
+
+    <div class="queue-card">
+      <div class="queue-thumb">
+        <div class="qt-bg" style="background: linear-gradient(135deg,#100020,#300040)"></div>
+        <div class="qt-emoji">🪙</div>
+        <div class="qt-dur">14:08</div>
+      </div>
+      <div class="queue-info">
+        <div class="queue-title">Emo Coins — Tokenomics & Creator Economy</div>
+        <div class="queue-meta">Emobies05 · 38K views</div>
+      </div>
+    </div>
+
+    <div class="queue-card">
+      <div class="queue-thumb">
+        <div class="qt-bg" style="background: linear-gradient(135deg,#050015,#150030)"></div>
+        <div class="qt-emoji">🚀</div>
+        <div class="qt-dur">22:50</div>
+      </div>
+      <div class="queue-info">
+        <div class="queue-title">Ddott TV — Building a Streaming Platform</div>
+        <div class="queue-meta">Emobies05 · 61K views</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE CHAT TAB -->
+  <div id="chat-panel" style="display:none">
+    <div style="padding: 24px; text-align: center; color: var(--muted);">
+      <div style="font-size: 40px; margin-bottom: 12px;">⚡</div>
+      <div style="font-family:'Orbitron',monospace; font-size:12px; color: var(--cyan); margin-bottom: 8px;">LIVE CHAT</div>
+      <div style="font-size: 13px;">Live chat will appear here during streams.<br>Coming in Messaging V1 🦋</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BUTTERFLY AI FAB -->
+<div class="butterfly-fab" title="Emowall AI">🦋</div>
+
+<script>
+  // Play/Pause toggle
+  let playing = false;
+  const playBtn = document.getElementById('playBtn');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+
+  playBtn.addEventListener('click', togglePlay);
+  playPauseBtn.addEventListener('click', togglePlay);
+
+  function togglePlay() {
+    playing = !playing;
+    playPauseBtn.innerHTML = playing
+      ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`
+      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+    playBtn.style.opacity = playing ? '0' : '1';
+    if (playing) simulateProgress();
+  }
+
+  // Progress simulation
+  let progress = 38;
+  let timer;
+  function simulateProgress() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      if (!playing) { clearInterval(timer); return; }
+      progress = Math.min(progress + 0.05, 100);
+      document.getElementById('progressFill').style.width = progress + '%';
+      // update time
+      const total = 37 * 60 + 45;
+      const cur = Math.floor((progress / 100) * total);
+      const m = Math.floor(cur / 60);
+      const s = cur % 60;
+      document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    }, 500);
+  }
+
+  // Progress click
+  document.getElementById('progressWrap').addEventListener('click', function(e) {
+    const rect = this.getBoundingClientRect();
+    progress = ((e.clientX - rect.left) / rect.width) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+  });
+
+  // Volume
+  document.querySelector('.vol-slider').addEventListener('click', function(e) {
+    const rect = this.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    document.getElementById('volFill').style.width = pct + '%';
+  });
+
+  // Quality toggle
+  const qualities = ['4K', '1080p', '720p', '480p'];
+  let qi = 0;
+  document.getElementById('qualityBtn').addEventListener('click', function() {
+    qi = (qi + 1) % qualities.length;
+    this.textContent = qualities[qi];
+  });
+
+  // Tabs
+  function switchTab(el, tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    ['comments', 'queue', 'chat'].forEach(p => {
+      document.getElementById(p + '-panel').style.display = p === tab ? 'block' : 'none';
+    });
+  }
+
+  // Stickers
+  document.querySelectorAll('.sticker').forEach(s => {
+    s.addEventListener('click', function() {
+      const inp = document.getElementById('commentInput');
+      inp.value += this.textContent + ' ';
+      inp.focus();
+      this.style.transform = 'scale(1.3)';
+      setTimeout(() => this.style.transform = '', 300);
+    });
+  });
+
+  // Comment input auto-resize
+  document.getElementById('commentInput').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  });
+</script>
+</body>
+</html>

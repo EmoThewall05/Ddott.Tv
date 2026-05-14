@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Creator Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --purple: #b400ff;
+    --pink: #ff00c8;
+    --gold: #ffd700;
+    --green: #00ff88;
+    --red: #ff3355;
+    --dark: #04000f;
+    --darker: #020008;
+    --surface: #0a0020;
+    --surface2: #110030;
+    --surface3: #180040;
+    --text: #e8d5ff;
+    --muted: #6b4d8a;
+    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff33;
+    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff33;
+    --glow-pink: 0 0 20px #ff00c888, 0 0 40px #ff00c833;
+    --glow-green: 0 0 20px #00ff8888, 0 0 40px #00ff8833;
+    --glow-gold: 0 0 20px #ffd70088, 0 0 40px #ffd70033;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,0,255,0.022) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+    animation: gridMove 22s linear infinite;
+  }
+  @keyframes gridMove { to { transform: translateY(40px); } }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 16px;
+    background: rgba(4,0,15,0.93);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,245,255,0.12);
+  }
+  .logo {
+    font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 900;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  .logo span { -webkit-text-fill-color: var(--pink); }
+  .nav-title {
+    font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700;
+    color: var(--cyan); letter-spacing: 1px; margin-right: auto;
+  }
+  .nav-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid rgba(0,245,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px; transition: all 0.2s;
+  }
+  .nav-btn:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+
+  /* STUDIO TABS */
+  .studio-tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+    background: rgba(4,0,15,0.8);
+    overflow-x: auto; scrollbar-width: none;
+    position: sticky; top: 57px; z-index: 90;
+  }
+  .studio-tabs::-webkit-scrollbar { display: none; }
+  .stab {
+    padding: 11px 18px; white-space: nowrap; flex-shrink: 0;
+    font-family: 'Rajdhani', sans-serif; font-size: 13px;
+    font-weight: 600; letter-spacing: 1px;
+    color: var(--muted); cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+  .stab:hover:not(.active) { color: var(--text); }
+
+  /* PAGE */
+  .page { position: relative; z-index: 1; padding: 16px 16px 80px; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'Orbitron', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--purple);
+    margin-bottom: 12px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(180,0,255,0.4), transparent);
+  }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed rgba(0,245,255,0.25);
+    border-radius: 16px; padding: 32px 20px;
+    text-align: center; cursor: pointer;
+    background: rgba(0,245,255,0.02);
+    transition: all 0.3s; margin-bottom: 16px;
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--cyan);
+    background: rgba(0,245,255,0.06);
+    box-shadow: var(--glow-cyan);
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .upload-icon { font-size: 44px; margin-bottom: 12px; animation: bounce 2s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  .upload-title {
+    font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700;
+    color: #fff; margin-bottom: 4px;
+  }
+  .upload-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .upload-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 20px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none; color: var(--dark);
+    font-family: 'Orbitron', monospace; font-size: 10px;
+    letter-spacing: 1px; font-weight: 700; cursor: pointer;
+    box-shadow: var(--glow-cyan); transition: all 0.2s;
+  }
+  .upload-btn:hover { transform: scale(1.04); }
+
+  input[type="file"] { display: none; }
+
+  /* UPLOAD PROGRESS */
+  .upload-progress {
+    display: none; padding: 14px 16px; border-radius: 12px;
+    background: var(--surface); border: 1px solid rgba(0,245,255,0.15);
+    margin-bottom: 14px;
+  }
+  .upload-progress.show { display: block; }
+  .up-file-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .up-thumb {
+    width: 50px; height: 34px; border-radius: 6px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .up-file-info { flex: 1; min-width: 0; }
+  .up-filename { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .up-filesize { font-size: 10px; color: var(--muted); }
+  .up-pct { font-family:'Orbitron',monospace; font-size:12px; color:var(--cyan); }
+  .up-track { height:4px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; }
+  .up-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    border-radius: 4px; box-shadow: 0 0 8px rgba(0,245,255,0.4);
+    transition: width 0.3s ease;
+  }
+
+  /* FORM FIELDS */
+  .form-group { margin-bottom: 14px; animation: fadeUp 0.4s ease both; }
+  .form-label {
+    font-family: 'Orbitron', monospace; font-size: 9px;
+    letter-spacing: 1.5px; color: var(--muted);
+    margin-bottom: 6px; display: block;
+  }
+  .form-input, .form-textarea, .form-select {
+    width: 100%; background: var(--surface);
+    border: 1px solid rgba(0,245,255,0.15);
+    border-radius: 10px; padding: 10px 14px;
+    color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,245,255,0.08);
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+  .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  .form-select { color: var(--text); background-image: none; cursor: pointer; }
+  .form-select option { background: var(--surface2); color: var(--text); }
+
+  /* TAGS INPUT */
+  .tags-wrap {
+    background: var(--surface); border: 1px solid rgba(0,245,255,0.15);
+    border-radius: 10px; padding: 6px 10px;
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    cursor: text; transition: border-color 0.2s;
+  }
+  .tags-wrap:focus-within { border-color: var(--cyan); }
+  .tag-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 16px;
+    background: rgba(0,245,255,0.1); border: 1px solid rgba(0,245,255,0.2);
+    font-size: 12px; color: var(--cyan);
+  }
+  .tag-chip .remove { cursor: pointer; opacity: 0.6; font-size: 10px; }
+  .tag-chip .remove:hover { opacity: 1; }
+  .tags-input {
+    background: none; border: none; outline: none; padding: 4px;
+    color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 13px;
+    min-width: 80px; flex: 1;
+  }
+  .tags-input::placeholder { color: var(--muted); }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border-radius: 10px;
+    background: var(--surface); border: 1px solid rgba(0,245,255,0.08);
+    margin-bottom: 8px; cursor: pointer;
+  }
+  .toggle-left { display: flex; align-items: center; gap: 10px; }
+  .toggle-icon { font-size: 18px; }
+  .toggle-label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .toggle-desc { font-size: 11px; color: var(--muted); }
+  .toggle-switch {
+    width: 42px; height: 24px; border-radius: 12px;
+    background: rgba(255,255,255,0.1); position: relative;
+    transition: background 0.3s; flex-shrink: 0;
+  }
+  .toggle-switch.on { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+  .toggle-switch::after {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px;
+    transition: transform 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .toggle-switch.on::after { transform: translateX(18px); }
+
+  /* THUMBNAIL PICKER */
+  .thumb-row {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
+    margin-bottom: 8px;
+  }
+  .thumb-opt {
+    aspect-ratio: 16/9; border-radius: 8px; overflow: hidden;
+    border: 2px solid rgba(0,245,255,0.1); cursor: pointer;
+    transition: all 0.2s; position: relative;
+    display: flex; align-items: center; justify-content: center; font-size: 24px;
+  }
+  .thumb-opt.selected { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+  .thumb-opt:hover { border-color: rgba(0,245,255,0.4); }
+  .thumb-bg { position: absolute; inset: 0; }
+
+  /* PUBLISH BTN */
+  .publish-btn {
+    width: 100%; padding: 14px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none; color: var(--dark);
+    font-family: 'Orbitron', monospace; font-size: 12px;
+    letter-spacing: 2px; font-weight: 900; cursor: pointer;
+    box-shadow: var(--glow-cyan); transition: all 0.3s;
+    margin-top: 8px;
+  }
+  .publish-btn:hover { transform: scale(1.02); box-shadow: var(--glow-cyan), var(--glow-purple); }
+
+  /* SPOT PAYMENT */
+  .spot-hero {
+    border-radius: 16px; padding: 20px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(180,0,255,0.1));
+    border: 1px solid rgba(255,215,0,0.2);
+    box-shadow: var(--glow-gold);
+    margin-bottom: 16px; text-align: center;
+    animation: fadeUp 0.4s ease both;
+  }
+  .spot-icon { font-size: 40px; margin-bottom: 8px; }
+  .spot-title { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--gold); margin-bottom:4px; }
+  .spot-sub { font-size:12px; color:var(--muted); }
+
+  .spot-types { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .spot-type {
+    padding: 14px 12px; border-radius: 12px; cursor: pointer;
+    background: var(--surface); border: 2px solid rgba(0,245,255,0.1);
+    text-align: center; transition: all 0.2s;
+  }
+  .spot-type.selected { border-color: var(--gold); background: rgba(255,215,0,0.06); box-shadow: var(--glow-gold); }
+  .spot-type:hover { border-color: rgba(255,215,0,0.3); }
+  .st-icon { font-size:24px; margin-bottom:6px; }
+  .st-label { font-family:'Orbitron',monospace; font-size:10px; color:var(--text); letter-spacing:0.5px; }
+  .st-desc { font-size:10px; color:var(--muted); margin-top:2px; }
+
+  .amount-row {
+    display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .amt-btn {
+    flex: 1; min-width: 60px; padding: 10px 8px; border-radius: 8px;
+    text-align: center; cursor: pointer;
+    background: var(--surface); border: 1px solid rgba(180,0,255,0.2);
+    font-family:'Orbitron',monospace; font-size:11px; color:var(--text);
+    transition: all 0.2s;
+  }
+  .amt-btn.selected { border-color:var(--gold); color:var(--gold); background:rgba(255,215,0,0.08); box-shadow:var(--glow-gold); }
+  .amt-btn:hover { border-color:rgba(255,215,0,0.4); }
+
+  .payment-methods { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .pm-btn {
+    display:flex; align-items:center; gap:6px; padding:8px 14px;
+    border-radius:8px; cursor:pointer;
+    background:var(--surface); border:1px solid rgba(0,245,255,0.15);
+    font-size:12px; color:var(--muted); transition:all 0.2s; flex-shrink:0;
+  }
+  .pm-btn.selected { border-color:var(--cyan); color:var(--cyan); background:rgba(0,245,255,0.08); }
+
+  .spot-send-btn {
+    width:100%; padding:13px; border-radius:12px;
+    background:linear-gradient(135deg,var(--gold),#ff8c00);
+    border:none; color:var(--dark);
+    font-family:'Orbitron',monospace; font-size:11px;
+    letter-spacing:1px; font-weight:900; cursor:pointer;
+    box-shadow:var(--glow-gold); transition:all 0.2s;
+  }
+  .spot-send-btn:hover { transform:scale(1.02); }
+
+  /* SPOT HISTORY */
+  .spot-item {
+    display:flex; align-items:center; gap:10px; padding:10px 0;
+    border-bottom:1px solid rgba(0,245,255,0.05);
+  }
+  .spot-item:last-child { border-bottom:none; }
+  .si-icon { width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px; }
+  .si-info { flex:1;min-width:0; }
+  .si-title { font-size:13px;font-weight:600;color:var(--text); }
+  .si-meta { font-size:10px;color:var(--muted); }
+  .si-amt { font-family:'Orbitron',monospace;font-size:12px;font-weight:700;white-space:nowrap; }
+
+  /* SCRIPT VERIFY */
+  .sv-hero {
+    border-radius:16px;padding:18px;
+    background:linear-gradient(135deg,rgba(0,245,255,0.06),rgba(180,0,255,0.08));
+    border:1px solid rgba(0,245,255,0.2);
+    margin-bottom:16px;text-align:center;
+    animation:fadeUp 0.4s ease both;
+  }
+  .sv-orb {
+    width:60px;height:60px;border-radius:50%;margin:0 auto 10px;
+    background:radial-gradient(circle,rgba(0,245,255,0.3),rgba(180,0,255,0.5));
+    display:flex;align-items:center;justify-content:center;font-size:28px;
+    box-shadow:var(--glow-cyan);animation:orbFloat 4s ease-in-out infinite;
+  }
+  @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .sv-title { font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:4px; }
+  .sv-sub { font-size:12px;color:var(--muted); }
+
+  .script-input-wrap {
+    background:var(--surface);border:1px solid rgba(0,245,255,0.15);
+    border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    transition:border-color 0.2s;
+  }
+  .script-input-wrap:focus-within { border-color:var(--cyan); }
+  .script-textarea {
+    width:100%;background:none;border:none;outline:none;
+    color:var(--text);font-family:'Rajdhani',sans-serif;font-size:13px;
+    resize:none;min-height:120px;line-height:1.6;
+  }
+  .script-textarea::placeholder { color:var(--muted); }
+  .script-footer {
+    display:flex;justify-content:space-between;align-items:center;margin-top:8px;
+  }
+  .char-count { font-size:10px;color:var(--muted); }
+  .script-tools { display:flex;gap:6px; }
+  .script-tool {
+    padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;
+    background:var(--surface2);border:1px solid rgba(0,245,255,0.1);
+    color:var(--muted);transition:all 0.2s;
+  }
+  .script-tool:hover { border-color:var(--cyan);color:var(--cyan); }
+
+  /* AI CHECKS */
+  .checks-grid { display:flex;flex-direction:column;gap:8px;margin-bottom:14px; }
+  .check-item {
+    display:flex;align-items:center;gap:10px;padding:10px 14px;
+    border-radius:10px;background:var(--surface);
+    border:1px solid rgba(0,245,255,0.08);transition:all 0.3s;
+  }
+  .check-item.pass { border-color:rgba(0,255,136,0.25);background:rgba(0,255,136,0.04); }
+  .check-item.fail { border-color:rgba(255,51,85,0.25);background:rgba(255,51,85,0.04); }
+  .check-item.warn { border-color:rgba(255,165,0,0.25);background:rgba(255,165,0,0.04); }
+  .check-item.scanning { border-color:rgba(0,245,255,0.2); }
+
+  .ci-icon { font-size:18px;flex-shrink:0; }
+  .ci-info { flex:1; }
+  .ci-label { font-size:13px;font-weight:600;color:var(--text); }
+  .ci-detail { font-size:10px;color:var(--muted); }
+  .ci-status { font-size:12px;flex-shrink:0;font-weight:600; }
+  .ci-status.pass { color:var(--green); }
+  .ci-status.fail { color:var(--red); }
+  .ci-status.warn { color:#ffa500; }
+  .ci-status.scanning {
+    color:var(--cyan);
+    animation:scanPulse 1s ease-in-out infinite;
+  }
+  @keyframes scanPulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+  /* SCORE */
+  .score-card {
+    border-radius:14px;padding:16px;text-align:center;
+    background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,245,255,0.06));
+    border:1px solid rgba(0,255,136,0.2);
+    margin-bottom:14px;display:none;
+    animation:fadeUp 0.4s ease both;
+  }
+  .score-card.show { display:block; }
+  .score-val {
+    font-family:'Orbitron',monospace;font-size:48px;font-weight:900;
+    background:linear-gradient(90deg,var(--green),var(--cyan));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .score-label { font-family:'Orbitron',monospace;font-size:10px;color:var(--muted);letter-spacing:2px; }
+  .score-badges { display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap; }
+  .score-badge {
+    padding:4px 10px;border-radius:16px;font-size:11px;
+    display:flex;align-items:center;gap:4px;
+  }
+
+  .verify-btn {
+    width:100%;padding:13px;border-radius:12px;
+    background:linear-gradient(135deg,var(--cyan),var(--purple));
+    border:none;color:var(--dark);
+    font-family:'Orbitron',monospace;font-size:11px;
+    letter-spacing:2px;font-weight:900;cursor:pointer;
+    box-shadow:var(--glow-cyan);transition:all 0.2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .verify-btn:hover { transform:scale(1.02); }
+  .verify-btn:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
+
+  /* STATS ROW */
+  .studio-stats {
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;
+  }
+  .sts-card {
+    padding:12px 10px;border-radius:12px;text-align:center;
+    background:var(--surface);border:1px solid rgba(0,245,255,0.08);
+    animation:fadeUp 0.3s ease both;
+  }
+  .sts-val { font-family:'Orbitron',monospace;font-size:15px;font-weight:700;margin-bottom:2px; }
+  .sts-label { font-size:10px;color:var(--muted); }
+
+  /* NEON DIV */
+  .neon-div { height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent);margin:14px 0;opacity:0.3; }
+
+  /* BUTTERFLY FAB */
+  .butterfly-fab {
+    position:fixed;bottom:24px;right:20px;
+    width:52px;height:52px;border-radius:50%;
+    background:linear-gradient(135deg,var(--purple),var(--cyan));
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;cursor:pointer;
+    box-shadow:var(--glow-purple),var(--glow-cyan);
+    z-index:200;animation:float 3s ease-in-out infinite;
+    border:1px solid rgba(255,255,255,0.2);
+  }
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+
+  /* SUCCESS TOAST */
+  .toast {
+    position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);
+    background:linear-gradient(135deg,var(--green),var(--cyan));
+    color:var(--dark);font-family:'Orbitron',monospace;font-size:10px;
+    letter-spacing:1px;font-weight:700;padding:10px 20px;border-radius:20px;
+    opacity:0;transition:all 0.4s;z-index:300;white-space:nowrap;
+  }
+  .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-thumb { background:var(--purple);border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">DDOTT<span>.</span>TV</div>
+  <div class="nav-title">🎬 CREATOR STUDIO</div>
+  <div class="nav-btn" title="Analytics">📊</div>
+  <div class="nav-btn" title="Settings">⚙️</div>
+</nav>
+
+<!-- STUDIO TABS -->
+<div class="studio-tabs">
+  <div class="stab active" onclick="switchTab(this,'upload')">📤 Upload</div>
+  <div class="stab" onclick="switchTab(this,'spot')">🪙 Spot Pay</div>
+  <div class="stab" onclick="switchTab(this,'script')">🧠 Script AI</div>
+  <div class="stab" onclick="switchTab(this,'dashboard')">📊 Dashboard</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="page">
+
+  <!-- ===== UPLOAD TAB ===== -->
+  <div id="upload-panel">
+    <input type="file" id="fileInput" accept="video/*" onchange="handleFile(this)">
+
+    <!-- Drop Zone -->
+    <div class="upload-zone" id="uploadZone"
+      onclick="document.getElementById('fileInput').click()"
+      ondragover="handleDrag(event,true)" ondragleave="handleDrag(event,false)" ondrop="handleDrop(event)">
+      <div class="upload-icon">🎬</div>
+      <div class="upload-title">Drop Your Video Here</div>
+      <div class="upload-sub">MP4, MOV, AVI · Max 4GB · Up to 4K</div>
+      <button class="upload-btn" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+        📤 SELECT FILE
+      </button>
+    </div>
+
+    <!-- Upload Progress -->
+    <div class="upload-progress" id="uploadProgress">
+      <div class="up-file-row">
+        <div class="up-thumb">🎬</div>
+        <div class="up-file-info">
+          <div class="up-filename" id="upFilename">video.mp4</div>
+          <div class="up-filesize" id="upFilesize">–</div>
+        </div>
+        <div class="up-pct" id="upPct">0%</div>
+      </div>
+      <div class="up-track"><div class="up-fill" id="upFill"></div></div>
+    </div>
+
+    <div class="section-label">Video Details</div>
+
+    <div class="form-group" style="animation-delay:0.05s">
+      <label class="form-label">TITLE</label>
+      <input class="form-input" type="text" placeholder="Give your video a killer title..." id="vidTitle">
+    </div>
+
+    <div class="form-group" style="animation-delay:0.1s">
+      <label class="form-label">DESCRIPTION</label>
+      <textarea class="form-textarea" placeholder="Tell your audience what this is about..."></textarea>
+    </div>
+
+    <div class="form-group" style="animation-delay:0.12s">
+      <label class="form-label">CATEGORY</label>
+      <select class="form-select">
+        <option>🌐 Web3 & Crypto</option>
+        <option>📱 Mobile Dev</option>
+        <option>🤖 AI & Tech</option>
+        <option>🎮 Gaming</option>
+        <option>🎵 Music</option>
+        <option>🎨 Creative</option>
+        <option>📚 Education</option>
+        <option>🏆 Live</option>
+      </select>
+    </div>
+
+    <div class="form-group" style="animation-delay:0.14s">
+      <label class="form-label">TAGS</label>
+      <div class="tags-wrap" id="tagsWrap" onclick="document.getElementById('tagInput').focus()">
+        <div class="tag-chip">#Web3 <span class="remove" onclick="removeTag(this)">✕</span></div>
+        <div class="tag-chip">#DwinUniverse <span class="remove" onclick="removeTag(this)">✕</span></div>
+        <div class="tag-chip">#BuildInPublic <span class="remove" onclick="removeTag(this)">✕</span></div>
+        <input class="tags-input" id="tagInput" placeholder="Add tag..." onkeydown="handleTagKey(event)">
+      </div>
+    </div>
+
+    <div class="section-label">Thumbnail</div>
+    <div class="thumb-row">
+      <div class="thumb-opt selected" onclick="selectThumb(this)">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#000820,#1a0040)"></div>
+        📱
+      </div>
+      <div class="thumb-opt" onclick="selectThumb(this)">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#050018,#300040)"></div>
+        🦋
+      </div>
+      <div class="thumb-opt" onclick="selectThumb(this)">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#001020,#003040)"></div>
+        🔗
+      </div>
+    </div>
+    <button class="upload-btn" style="width:100%;justify-content:center;margin-bottom:14px;" onclick="document.getElementById('fileInput').click()">
+      🖼 UPLOAD CUSTOM THUMBNAIL
+    </button>
+
+    <div class="section-label">Settings</div>
+
+    <div class="toggle-row" onclick="toggleSwitch(this)">
+      <div class="toggle-left">
+        <div class="toggle-icon">👁</div>
+        <div>
+          <div class="toggle-label">Public</div>
+          <div class="toggle-desc">Visible to all viewers</div>
+        </div>
+      </div>
+      <div class="toggle-switch on"></div>
+    </div>
+
+    <div class="toggle-row" onclick="toggleSwitch(this)">
+      <div class="toggle-left">
+        <div class="toggle-icon">🔔</div>
+        <div>
+          <div class="toggle-label">Notify Subscribers</div>
+          <div class="toggle-desc">Send push notification</div>
+        </div>
+      </div>
+      <div class="toggle-switch on"></div>
+    </div>
+
+    <div class="toggle-row" onclick="toggleSwitch(this)">
+      <div class="toggle-left">
+        <div class="toggle-icon">🪙</div>
+        <div>
+          <div class="toggle-label">Enable Emo Coins</div>
+          <div class="toggle-desc">Allow tips on this video</div>
+        </div>
+      </div>
+      <div class="toggle-switch on"></div>
+    </div>
+
+    <div class="toggle-row" onclick="toggleSwitch(this)">
+      <div class="toggle-left">
+        <div class="toggle-icon">💬</div>
+        <div>
+          <div class="toggle-label">Comments</div>
+          <div class="toggle-desc">Allow viewer comments</div>
+        </div>
+      </div>
+      <div class="toggle-switch on"></div>
+    </div>
+
+    <button class="publish-btn" onclick="publishVideo()">🚀 PUBLISH VIDEO</button>
+  </div>
+
+  <!-- ===== SPOT PAYMENT TAB ===== -->
+  <div id="spot-panel" style="display:none">
+    <div class="spot-hero">
+      <div class="spot-icon">🪙</div>
+      <div class="spot-title">SPOT PAYMENT</div>
+      <div class="spot-sub">Get paid directly for your content & services</div>
+    </div>
+
+    <div class="section-label">Payment Type</div>
+    <div class="spot-types">
+      <div class="spot-type selected" onclick="selectSpotType(this)">
+        <div class="st-icon">🎬</div>
+        <div class="st-label">VIDEO</div>
+        <div class="st-desc">Exclusive content</div>
+      </div>
+      <div class="spot-type" onclick="selectSpotType(this)">
+        <div class="st-icon">🔴</div>
+        <div class="st-label">LIVE</div>
+        <div class="st-desc">Stream access</div>
+      </div>
+      <div class="spot-type" onclick="selectSpotType(this)">
+        <div class="st-icon">📚</div>
+        <div class="st-label">COURSE</div>
+        <div class="st-desc">Tutorial series</div>
+      </div>
+      <div class="spot-type" onclick="selectSpotType(this)">
+        <div class="st-icon">💼</div>
+        <div class="st-label">SERVICE</div>
+        <div class="st-desc">1:1 consultation</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">TITLE / DESCRIPTION</label>
+      <input class="form-input" type="text" placeholder="e.g. Full Termux Setup Guide..." style="margin-bottom:8px">
+      <textarea class="form-textarea" placeholder="Describe what the buyer gets..." style="min-height:60px"></textarea>
+    </div>
+
+    <div class="section-label">Amount</div>
+    <div class="amount-row">
+      <div class="amt-btn" onclick="selectAmt(this,'50')">50 🪙</div>
+      <div class="amt-btn selected" onclick="selectAmt(this,'100')">100 🪙</div>
+      <div class="amt-btn" onclick="selectAmt(this,'500')">500 🪙</div>
+      <div class="amt-btn" onclick="selectAmt(this,'custom')">Custom</div>
+    </div>
+    <div class="form-group" id="customAmtWrap" style="display:none">
+      <input class="form-input" type="number" placeholder="Enter amount in Emo Coins..." min="1">
+    </div>
+
+    <div class="section-label">Accept Via</div>
+    <div class="payment-methods">
+      <div class="pm-btn selected" onclick="selectPM(this)">🪙 Emo Coins</div>
+      <div class="pm-btn" onclick="selectPM(this)">🌍 ETH</div>
+      <div class="pm-btn" onclick="selectPM(this)">🌙 SOL</div>
+      <div class="pm-btn" onclick="selectPM(this)">⚡ BTC</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">DELIVERY METHOD</label>
+      <select class="form-select">
+        <option>📥 Instant Download Link</option>
+        <option>🔗 Private URL Access</option>
+        <option>💬 DM on Ddott TV</option>
+        <option>📧 Email Delivery</option>
+      </select>
+    </div>
+
+    <button class="spot-send-btn" onclick="createSpotPayment()">⚡ CREATE SPOT PAYMENT LINK</button>
+
+    <div class="neon-div"></div>
+    <div class="section-label">Recent Payments</div>
+
+    <div class="spot-item">
+      <div class="si-icon" style="background:rgba(0,255,136,0.1)">✅</div>
+      <div class="si-info">
+        <div class="si-title">Termux Setup Guide</div>
+        <div class="si-meta">@alexcrypto · 2h ago</div>
+      </div>
+      <div class="si-amt" style="color:var(--green)">+100 🪙</div>
+    </div>
+
+    <div class="spot-item">
+      <div class="si-icon" style="background:rgba(0,255,136,0.1)">✅</div>
+      <div class="si-info">
+        <div class="si-title">TheWall Dev Consultation</div>
+        <div class="si-meta">@miadev · Yesterday</div>
+      </div>
+      <div class="si-amt" style="color:var(--green)">+500 🪙</div>
+    </div>
+
+    <div class="spot-item">
+      <div class="si-icon" style="background:rgba(0,245,255,0.1)">⏳</div>
+      <div class="si-info">
+        <div class="si-title">Flutter Crash Course</div>
+        <div class="si-meta">@ryanbuilds · Pending</div>
+      </div>
+      <div class="si-amt" style="color:var(--cyan)">200 🪙</div>
+    </div>
+
+    <div class="spot-item">
+      <div class="si-icon" style="background:rgba(0,255,136,0.1)">✅</div>
+      <div class="si-info">
+        <div class="si-title">Next.js PWA Tutorial</div>
+        <div class="si-meta">@sophiaweb3 · 3 days ago</div>
+      </div>
+      <div class="si-amt" style="color:var(--green)">+150 🪙</div>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPT AI TAB ===== -->
+  <div id="script-panel" style="display:none">
+    <div class="sv-hero">
+      <div class="sv-orb">🧠</div>
+      <div class="sv-title">AI SCRIPT VERIFICATION</div>
+      <div class="sv-sub">Claude AI checks your script before publishing</div>
+    </div>
+
+    <div class="section-label">Your Script</div>
+    <div class="script-input-wrap">
+      <textarea class="script-textarea" id="scriptText" placeholder="Paste your video script here...
+&#10;Emowall AI will check for:
+• Content guidelines
+• Engagement quality  
+• SEO optimization
+• Readability score
+• Originality check"
+        oninput="updateCharCount(this)"></textarea>
+      <div class="script-footer">
+        <div class="char-count" id="charCount">0 / 5000 characters</div>
+        <div class="script-tools">
+          <div class="script-tool" onclick="generateScript()">✨ Generate</div>
+          <div class="script-tool" onclick="clearScript()">🗑 Clear</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI CHECKS -->
+    <div class="section-label">Verification Checks</div>
+    <div class="checks-grid" id="checksGrid">
+      <div class="check-item" id="chk-guidelines">
+        <div class="ci-icon">📋</div>
+        <div class="ci-info">
+          <div class="ci-label">Content Guidelines</div>
+          <div class="ci-detail">Ddott TV community standards</div>
+        </div>
+        <div class="ci-status">—</div>
+      </div>
+      <div class="check-item" id="chk-engagement">
+        <div class="ci-icon">⚡</div>
+        <div class="ci-info">
+          <div class="ci-label">Engagement Quality</div>
+          <div class="ci-detail">Hook, pacing & call-to-action</div>
+        </div>
+        <div class="ci-status">—</div>
+      </div>
+      <div class="check-item" id="chk-seo">
+        <div class="ci-icon">🔍</div>
+        <div class="ci-info">
+          <div class="ci-label">SEO Optimization</div>
+          <div class="ci-detail">Keywords & discoverability</div>
+        </div>
+        <div class="ci-status">—</div>
+      </div>
+      <div class="check-item" id="chk-readability">
+        <div class="ci-icon">📖</div>
+        <div class="ci-info">
+          <div class="ci-label">Readability Score</div>
+          <div class="ci-detail">Clarity & structure</div>
+        </div>
+        <div class="ci-status">—</div>
+      </div>
+      <div class="check-item" id="chk-originality">
+        <div class="ci-icon">🦋</div>
+        <div class="ci-info">
+          <div class="ci-label">Originality Check</div>
+          <div class="ci-detail">Unique & authentic content</div>
+        </div>
+        <div class="ci-status">—</div>
+      </div>
+    </div>
+
+    <!-- SCORE -->
+    <div class="score-card" id="scoreCard">
+      <div class="score-val" id="scoreVal">—</div>
+      <div class="score-label">SCRIPT SCORE</div>
+      <div class="score-badges" id="scoreBadges"></div>
+    </div>
+
+    <button class="verify-btn" id="verifyBtn" onclick="verifyScript()">
+      <span>🧠</span> VERIFY WITH EMOWALL AI
+    </button>
+  </div>
+
+  <!-- ===== DASHBOARD TAB ===== -->
+  <div id="dashboard-panel" style="display:none">
+    <div class="section-label">This Month</div>
+    <div class="studio-stats">
+      <div class="sts-card" style="animation-delay:0.05s">
+        <div class="sts-val" style="color:var(--cyan)">312</div>
+        <div class="sts-label">Videos</div>
+      </div>
+      <div class="sts-card" style="animation-delay:0.1s">
+        <div class="sts-val" style="color:var(--green)">4.8M</div>
+        <div class="sts-label">Views</div>
+      </div>
+      <div class="sts-card" style="animation-delay:0.15s">
+        <div class="sts-val" style="color:var(--gold)">128K</div>
+        <div class="sts-label">🪙 Earned</div>
+      </div>
+      <div class="sts-card" style="animation-delay:0.2s">
+        <div class="sts-val" style="color:var(--purple)">84.2K</div>
+        <div class="sts-label">Subs</div>
+      </div>
+      <div class="sts-card" style="animation-delay:0.25s">
+        <div class="sts-val" style="color:var(--pink)">96%</div>
+        <div class="sts-label">Like Rate</div>
+      </div>
+      <div class="sts-card" style="animation-delay:0.3s">
+        <div class="sts-val" style="color:var(--cyan)">14</div>
+        <div class="sts-label">Streak 🔥</div>
+      </div>
+    </div>
+
+    <div class="section-label">Top Performing Videos</div>
+    <div id="topVideos">
+      ${[
+        {emoji:'📱',title:'Building Web3 on Mobile',views:'128K',coins:'4,200 🪙'},
+        {emoji:'🚀',title:'Launching on Google Play',views:'61K',coins:'2,100 🪙'},
+        {emoji:'🦋',title:'Emowall AI — 7 Brain Architecture',views:'52K',coins:'1,800 🪙'},
+        {emoji:'⚡',title:'Perfect PWA Score',views:'29K',coins:'980 🪙'},
+      ].map((v,i) => `
+        <div class="spot-item">
+          <div class="si-icon" style="background:var(--surface2);font-size:18px">${v.emoji}</div>
+          <div class="si-info">
+            <div class="si-title">${v.title}</div>
+            <div class="si-meta">👁 ${v.views} views</div>
+          </div>
+          <div class="si-amt" style="color:var(--gold)">${v.coins}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="neon-div"></div>
+    <div class="section-label">Quick Actions</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="publish-btn" style="margin:0;font-size:10px" onclick="switchTab(document.querySelector('.stab'),'upload')">📤 NEW VIDEO</button>
+      <button class="spot-send-btn" style="margin:0;font-size:10px" onclick="switchTab(document.querySelectorAll('.stab')[1],'spot')">🪙 SPOT PAY</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- BUTTERFLY FAB -->
+<div class="butterfly-fab" title="Emowall AI">🦋</div>
+
+<script>
+  // Tab switching
+  function switchTab(el, tab) {
+    document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    ['upload','spot','script','dashboard'].forEach(p => {
+      const panel = document.getElementById(p+'-panel');
+      if (panel) panel.style.display = p === tab ? 'block' : 'none';
+    });
+  }
+
+  // Upload
+  function handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById('upFilename').textContent = file.name;
+    document.getElementById('upFilesize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+    document.getElementById('uploadProgress').classList.add('show');
+    document.getElementById('vidTitle').value = file.name.replace(/\.[^/.]+$/, '');
+    simulateUpload();
+  }
+
+  function simulateUpload() {
+    let pct = 0;
+    const fill = document.getElementById('upFill');
+    const pctEl = document.getElementById('upPct');
+    const timer = setInterval(() => {
+      pct = Math.min(pct + Math.random() * 8, 100);
+      fill.style.width = pct + '%';
+      pctEl.textContent = Math.floor(pct) + '%';
+      if (pct >= 100) {
+        clearInterval(timer);
+        pctEl.textContent = '✓ Done';
+        pctEl.style.color = 'var(--green)';
+        showToast('✓ VIDEO UPLOADED SUCCESSFULLY');
+      }
+    }, 200);
+  }
+
+  function handleDrag(e, over) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.toggle('dragover', over);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('fileInput').files = dt.files;
+      handleFile(document.getElementById('fileInput'));
+    }
+  }
+
+  // Toggles
+  function toggleSwitch(row) {
+    const sw = row.querySelector('.toggle-switch');
+    sw.classList.toggle('on');
+  }
+
+  // Tags
+  function handleTagKey(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = e.target.value.trim().replace(/^#/, '');
+      if (!val) return;
+      const chip = document.createElement('div');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `#${val} <span class="remove" onclick="removeTag(this)">✕</span>`;
+      document.getElementById('tagsWrap').insertBefore(chip, e.target);
+      e.target.value = '';
+    }
+  }
+
+  function removeTag(el) {
+    el.closest('.tag-chip').remove();
+  }
+
+  // Thumbnail
+  function selectThumb(el) {
+    document.querySelectorAll('.thumb-opt').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // Publish
+  function publishVideo() {
+    const title = document.getElementById('vidTitle').value.trim();
+    if (!title) {
+      showToast('⚠️ ADD A TITLE FIRST!');
+      return;
+    }
+    showToast('🚀 VIDEO PUBLISHED TO DDOTT TV!');
+  }
+
+  // Spot payment
+  function selectSpotType(el) {
+    document.querySelectorAll('.spot-type').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectAmt(el, val) {
+    document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('customAmtWrap').style.display = val === 'custom' ? 'block' : 'none';
+  }
+
+  function selectPM(el) {
+    el.classList.toggle('selected');
+  }
+
+  function createSpotPayment() {
+    showToast('⚡ SPOT PAYMENT LINK CREATED!');
+  }
+
+  // Script verification
+  function updateCharCount(el) {
+    document.getElementById('charCount').textContent = `${el.value.length} / 5000 characters`;
+  }
+
+  function clearScript() {
+    document.getElementById('scriptText').value = '';
+    document.getElementById('charCount').textContent = '0 / 5000 characters';
+    resetChecks();
+  }
+
+  function resetChecks() {
+    const checks = ['guidelines','engagement','seo','readability','originality'];
+    checks.forEach(c => {
+      const el = document.getElementById('chk-'+c);
+      el.className = 'check-item';
+      el.querySelector('.ci-status').className = 'ci-status';
+      el.querySelector('.ci-status').textContent = '—';
+    });
+    document.getElementById('scoreCard').classList.remove('show');
+    document.getElementById('verifyBtn').disabled = false;
+    document.getElementById('verifyBtn').innerHTML = '<span>🧠</span> VERIFY WITH EMOWALL AI';
+  }
+
+  function generateScript() {
+    const scripts = [
+      `Hey everyone! Welcome back to Ddott TV. Today I'm going to show you something that's going to blow your mind — building a complete Web3 wallet entirely from a phone using Termux and Acode.\n\nNo laptop. No desktop. Just a phone and sheer determination.\n\nHere's what we're building: TheWall — a 5-chain crypto wallet supporting Ethereum, Solana, Monad, Arbitrum, and Bitcoin. All powered by Alchemy infrastructure and integrated with Claude AI.\n\nLet's get into it. First, open Termux and run pkg update...`,
+      `What's up Dwin Universe! In today's video, I'm breaking down the 7-brain AI architecture of Emowall AI 2.0.\n\nIf you've been wondering how a single AI can handle crypto research, code generation, content creation, and real-time market analysis simultaneously — this is for you.\n\nStay till the end because I'm dropping a special feature that no other mobile AI has right now. Let's go!`
+    ];
+    document.getElementById('scriptText').value = scripts[Math.floor(Math.random() * scripts.length)];
+    updateCharCount(document.getElementById('scriptText'));
+  }
+
+  async function verifyScript() {
+    const script = document.getElementById('scriptText').value.trim();
+    if (!script) { showToast('⚠️ PASTE A SCRIPT FIRST!'); return; }
+
+    const btn = document.getElementById('verifyBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="ci-status scanning">🧠</span> SCANNING...';
+
+    const checks = ['guidelines','engagement','seo','readability','originality'];
+    const results = [
+      { status: 'pass', text: '✓ PASS', detail: 'No policy violations detected' },
+      { status: 'pass', text: '✓ PASS', detail: 'Strong hook & clear CTA found' },
+      { status: 'warn', text: '⚠ FAIR', detail: 'Add more target keywords' },
+      { status: 'pass', text: '✓ PASS', detail: 'Clear and well-structured' },
+      { status: 'pass', text: '✓ PASS', detail: 'Unique content detected' }
+    ];
+
+    // Animate each check one by one
+    for (let i = 0; i < checks.length; i++) {
+      const el = document.getElementById('chk-' + checks[i]);
+      const st = el.querySelector('.ci-status');
+      const detail = el.querySelector('.ci-detail');
+
+      // scanning state
+      el.className = 'check-item scanning';
+      st.className = 'ci-status scanning';
+      st.textContent = '●';
+
+      await delay(600 + i * 200);
+
+      // result
+      const r = results[i];
+      el.className = `check-item ${r.status}`;
+      st.className = `ci-status ${r.status}`;
+      st.textContent = r.text;
+      detail.textContent = r.detail;
+    }
+
+    // Show score
+    await delay(400);
+    const score = 88;
+    document.getElementById('scoreVal').textContent = score;
+    document.getElementById('scoreBadges').innerHTML = `
+      <div class="score-badge" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--green)">✓ Guidelines OK</div>
+      <div class="score-badge" style="background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.3);color:var(--cyan)">⚡ High Engagement</div>
+      <div class="score-badge" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:var(--gold)">⚠ SEO: Add Keywords</div>
+    `;
+    document.getElementById('scoreCard').classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '<span>✓</span> VERIFIED — RE-CHECK';
+    showToast('✓ SCRIPT VERIFIED — SCORE: ' + score + '/100');
+  }
+
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Toast
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Render dashboard top videos
+  document.getElementById('topVideos').innerHTML = [
+    {emoji:'📱',title:'Building Web3 on Mobile',views:'128K',coins:'4,200 🪙'},
+    {emoji:'🚀',title:'Launching on Google Play',views:'61K',coins:'2,100 🪙'},
+    {emoji:'🦋',title:'Emowall AI — 7 Brain Architecture',views:'52K',coins:'1,800 🪙'},
+    {emoji:'⚡',title:'Perfect PWA Score',views:'29K',coins:'980 🪙'},
+  ].map(v => `
+    <div class="spot-item">
+      <div class="si-icon" style="background:var(--surface2)">${v.emoji}</div>
+      <div class="si-info">
+        <div class="si-title">${v.title}</div>
+        <div class="si-meta">👁 ${v.views} views</div>
+      </div>
+      <div class="si-amt" style="color:var(--gold)">${v.coins}</div>
+    </div>
+  `).join('');
+</script>
+</body>
+</html>

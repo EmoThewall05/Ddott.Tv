@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Emo Coins</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --purple: #b400ff;
+    --pink: #ff00c8;
+    --gold: #ffd700;
+    --green: #00ff88;
+    --red: #ff3355;
+    --dark: #04000f;
+    --darker: #020008;
+    --surface: #0a0020;
+    --surface2: #110030;
+    --surface3: #180040;
+    --text: #e8d5ff;
+    --muted: #6b4d8a;
+    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff33;
+    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff33;
+    --glow-gold: 0 0 20px #ffd70088, 0 0 40px #ffd70033;
+    --glow-green: 0 0 20px #00ff8888, 0 0 40px #00ff8833;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px);
+    background-size: 36px 36px;
+    pointer-events: none; z-index: 0;
+    animation: gridMove 28s linear infinite;
+  }
+  @keyframes gridMove { to { transform: translateY(36px); } }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(255,215,0,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(180,0,255,0.08) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: rgba(4,0,15,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,215,0,0.12);
+  }
+  .logo {
+    font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  .logo span { -webkit-text-fill-color: var(--pink); }
+  .nav-title {
+    font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700;
+    color: var(--gold); letter-spacing: 1px; margin-right: auto;
+  }
+  .nav-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid rgba(255,215,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 15px; transition: all 0.2s;
+  }
+  .nav-btn:hover { border-color: var(--gold); box-shadow: var(--glow-gold); }
+  .nav-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    border: 2px solid var(--cyan); box-shadow: var(--glow-cyan);
+  }
+
+  /* PAGE */
+  .page { position: relative; z-index: 1; padding: 16px 16px 80px; }
+
+  /* HERO COIN CARD */
+  .hero-card {
+    border-radius: 20px; padding: 24px 20px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(180,0,255,0.12) 50%, rgba(0,245,255,0.06) 100%);
+    border: 1px solid rgba(255,215,0,0.25);
+    box-shadow: var(--glow-gold), 0 20px 60px rgba(0,0,0,0.4);
+    margin-bottom: 16px; position: relative; overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  .hero-card::before {
+    content: '🪙';
+    position: absolute; right: -10px; top: -10px;
+    font-size: 100px; opacity: 0.07;
+    animation: coinSpin 8s linear infinite;
+  }
+  @keyframes coinSpin { to { transform: rotate(360deg); } }
+
+  .hero-label {
+    font-family: 'Orbitron', monospace; font-size: 9px;
+    letter-spacing: 3px; color: var(--gold); margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .hero-balance {
+    font-family: 'Orbitron', monospace; font-size: 48px; font-weight: 900;
+    background: linear-gradient(90deg, var(--gold), var(--pink), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1; margin-bottom: 4px;
+    animation: countUp 1.5s ease both;
+  }
+  @keyframes countUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+  .hero-usd {
+    font-size: 13px; color: var(--muted); margin-bottom: 16px;
+  }
+  .hero-usd span { color: var(--green); }
+
+  /* PROGRESS BAR */
+  .level-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px;
+  }
+  .level-label { font-family:'Orbitron',monospace; font-size:10px; color:var(--gold); letter-spacing:1px; }
+  .level-next { font-size:11px; color:var(--muted); }
+
+  .progress-track {
+    height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 6px; overflow: hidden; margin-bottom: 8px;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--gold), var(--pink));
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(255,215,0,0.5);
+    transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .streak-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .streak-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 20px;
+    background: rgba(255,100,0,0.15);
+    border: 1px solid rgba(255,100,0,0.4);
+    font-family:'Orbitron',monospace; font-size:9px;
+    color: #ff6400; letter-spacing:1px;
+  }
+  .streak-dot { width:6px;height:6px;border-radius:50%;background:#ff6400;animation:blink 0.8s infinite; }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+  .streak-text { font-size:11px; color:var(--muted); }
+
+  /* QUICK STATS */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(2,1fr); gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    padding: 14px 14px;
+    background: var(--surface);
+    border-radius: 14px; border: 1px solid rgba(0,245,255,0.1);
+    transition: all 0.2s; cursor: default;
+    animation: fadeUp 0.5s ease both;
+  }
+  .stat-card:nth-child(1){animation-delay:0.1s}
+  .stat-card:nth-child(2){animation-delay:0.15s}
+  .stat-card:nth-child(3){animation-delay:0.2s}
+  .stat-card:nth-child(4){animation-delay:0.25s}
+  .stat-card:hover { border-color: rgba(0,245,255,0.25); transform:translateY(-2px); }
+
+  .sc-icon { font-size:20px; margin-bottom:6px; }
+  .sc-val {
+    font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .sc-label { font-size: 11px; color: var(--muted); }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'Orbitron', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--purple);
+    margin-bottom: 12px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(180,0,255,0.4), transparent);
+  }
+
+  /* EARN TASKS */
+  .task-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 12px;
+    background: var(--surface); border: 1px solid rgba(0,245,255,0.08);
+    margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .task-card:hover { border-color: rgba(0,245,255,0.2); background: var(--surface2); }
+  .task-card.done { opacity: 0.5; border-color: rgba(0,255,136,0.2); }
+
+  .task-icon-wrap {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .task-info { flex: 1; min-width: 0; }
+  .task-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .task-desc { font-size: 11px; color: var(--muted); }
+  .task-reward {
+    font-family: 'Orbitron', monospace; font-size: 11px;
+    color: var(--gold); white-space: nowrap; flex-shrink: 0;
+  }
+  .task-progress-mini {
+    height: 3px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden; margin-top: 4px;
+  }
+  .tpm-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+  .check-circle {
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--green), #00cc66);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; box-shadow: var(--glow-green);
+  }
+
+  /* CHART */
+  .chart-card {
+    padding: 16px; border-radius: 14px;
+    background: var(--surface); border: 1px solid rgba(0,245,255,0.1);
+    margin-bottom: 16px; animation: fadeUp 0.5s 0.2s ease both;
+  }
+  .chart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .chart-title { font-family:'Orbitron',monospace; font-size:11px; color:#fff; letter-spacing:1px; }
+  .chart-period {
+    display: flex; gap: 4px;
+  }
+  .period-btn {
+    padding: 3px 8px; border-radius: 4px; font-size:10px; cursor:pointer;
+    font-family:'Orbitron',monospace; letter-spacing:0.5px;
+    border: 1px solid rgba(0,245,255,0.15); color:var(--muted);
+    transition: all 0.2s;
+  }
+  .period-btn.active { background:rgba(0,245,255,0.1); border-color:var(--cyan); color:var(--cyan); }
+
+  /* BAR CHART */
+  .bar-chart {
+    display: flex; align-items: flex-end; gap: 4px; height: 80px; margin-bottom: 6px;
+  }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    background: linear-gradient(to top, var(--purple), var(--cyan));
+    transition: height 1s cubic-bezier(0.4,0,0.2,1);
+    min-height: 4px; position: relative; cursor: pointer;
+  }
+  .bar:hover { filter: brightness(1.3); }
+  .bar.gold { background: linear-gradient(to top, #ff8c00, var(--gold)); }
+  .bar-label { font-size: 9px; color: var(--muted); font-family:'Orbitron',monospace; }
+
+  /* CONVERT CARD */
+  .convert-card {
+    border-radius: 14px; padding: 16px;
+    background: linear-gradient(135deg, rgba(180,0,255,0.1), rgba(0,245,255,0.06));
+    border: 1px solid rgba(180,0,255,0.25);
+    margin-bottom: 16px; animation: fadeUp 0.5s 0.3s ease both;
+  }
+  .convert-title { font-family:'Orbitron',monospace; font-size:11px; color:var(--purple); letter-spacing:1px; margin-bottom:12px; }
+
+  .convert-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .convert-box {
+    flex: 1; background: var(--surface); border-radius: 10px;
+    border: 1px solid rgba(0,245,255,0.15); padding: 10px 12px;
+  }
+  .cb-label { font-size:10px; color:var(--muted); margin-bottom:2px; }
+  .cb-val { font-family:'Orbitron',monospace; font-size:18px; font-weight:700; color:#fff; }
+  .cb-unit { font-size:10px; color:var(--muted); }
+  .convert-arrow {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0; cursor: pointer;
+    box-shadow: var(--glow-purple); transition: transform 0.3s;
+  }
+  .convert-arrow:hover { transform: rotate(180deg); }
+
+  .convert-chains {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .chain-chip {
+    padding: 5px 10px; border-radius: 8px; cursor: pointer;
+    border: 1px solid rgba(0,245,255,0.15); background: var(--surface);
+    font-size: 11px; color: var(--muted); transition: all 0.2s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .chain-chip.active { border-color: var(--cyan); color: var(--cyan); background: rgba(0,245,255,0.08); }
+  .chain-chip:hover { border-color: rgba(0,245,255,0.3); }
+
+  .convert-btn {
+    width: 100%; padding: 12px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; color: #fff;
+    font-family: 'Orbitron', monospace; font-size: 11px;
+    letter-spacing: 1px; font-weight: 700; cursor: pointer;
+    box-shadow: var(--glow-purple); transition: all 0.2s;
+  }
+  .convert-btn:hover { transform: scale(1.02); }
+
+  /* LEADERBOARD */
+  .lb-card {
+    border-radius: 14px; overflow: hidden;
+    background: var(--surface); border: 1px solid rgba(255,215,0,0.1);
+    margin-bottom: 16px; animation: fadeUp 0.5s 0.35s ease both;
+  }
+
+  .lb-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,245,255,0.05);
+    transition: background 0.2s; cursor: pointer;
+  }
+  .lb-row:hover { background: rgba(0,245,255,0.03); }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row.me { background: rgba(180,0,255,0.08); border-left: 3px solid var(--purple); }
+
+  .lb-rank {
+    font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700;
+    width: 28px; text-align: center; flex-shrink: 0;
+  }
+  .rank-1 { color: var(--gold); text-shadow: var(--glow-gold); }
+  .rank-2 { color: #c0c0c0; }
+  .rank-3 { color: #cd7f32; }
+  .rank-n { color: var(--muted); }
+
+  .lb-avatar {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .lb-info { flex: 1; min-width: 0; }
+  .lb-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .lb-sub { font-size: 10px; color: var(--muted); }
+  .lb-coins {
+    font-family: 'Orbitron', monospace; font-size: 11px;
+    color: var(--gold); white-space: nowrap;
+  }
+
+  /* TRANSACTION HISTORY */
+  .tx-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,245,255,0.05);
+    animation: fadeUp 0.3s ease both;
+  }
+  .tx-item:last-child { border-bottom: none; }
+
+  .tx-icon {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .tx-time { font-size: 10px; color: var(--muted); }
+  .tx-amount {
+    font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700;
+    white-space: nowrap;
+  }
+  .tx-amount.plus { color: var(--green); }
+  .tx-amount.minus { color: var(--red); }
+
+  /* TABS */
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+    margin-bottom: 14px; overflow-x: auto; scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 9px 16px; white-space: nowrap;
+    font-family: 'Rajdhani', sans-serif; font-size: 13px;
+    font-weight: 600; letter-spacing: 1px; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+  /* NEON DIVIDER */
+  .neon-div {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--purple), transparent);
+    margin: 16px 0; opacity: 0.3;
+  }
+
+  /* BUTTERFLY FAB */
+  .butterfly-fab {
+    position: fixed; bottom: 24px; right: 20px;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; cursor: pointer;
+    box-shadow: var(--glow-purple), var(--glow-cyan);
+    z-index: 200; animation: float 3s ease-in-out infinite;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  @keyframes float { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-8px) rotate(5deg)} }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">DDOTT<span>.</span>TV</div>
+  <div class="nav-title">🪙 EMO COINS</div>
+  <div class="nav-btn">📤</div>
+  <div class="nav-avatar">D</div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO BALANCE -->
+  <div class="hero-card">
+    <div class="hero-label">MY DDOTT WALLET · 0x...8ea3</div>
+    <div class="hero-balance" id="balanceDisplay">1,247</div>
+    <div class="hero-usd">≈ <span>$6.24 USD</span> · 1 EMO = $0.005</div>
+
+    <div class="level-row">
+      <div class="level-label">🔥 LEVEL 7 — NEON CREATOR</div>
+      <div class="level-next">1,247 / 2,000</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="heroProgress"></div>
+    </div>
+    <div class="streak-row">
+      <div class="streak-badge"><div class="streak-dot"></div>DAY 14 STREAK</div>
+      <div class="streak-text">+2 bonus coins/day 🎯</div>
+    </div>
+  </div>
+
+  <!-- QUICK STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="sc-icon">📈</div>
+      <div class="sc-val" style="color:var(--green)">+86</div>
+      <div class="sc-label">Earned Today</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon">💸</div>
+      <div class="sc-val" style="color:var(--pink)">-150</div>
+      <div class="sc-label">Spent Today</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon">🏆</div>
+      <div class="sc-val" style="color:var(--gold)">128,450</div>
+      <div class="sc-label">All Time Earned</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon">🎁</div>
+      <div class="sc-val" style="color:var(--cyan)">3,200</div>
+      <div class="sc-label">Tips Received</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'earn')">⚡ Earn</div>
+    <div class="tab" onclick="switchTab(this,'history')">📜 History</div>
+    <div class="tab" onclick="switchTab(this,'chart')">📊 Chart</div>
+    <div class="tab" onclick="switchTab(this,'convert')">🔄 Convert</div>
+    <div class="tab" onclick="switchTab(this,'leaderboard')">👑 Ranks</div>
+  </div>
+
+  <!-- EARN TAB -->
+  <div id="earn-panel">
+    <div class="section-label">Daily Tasks</div>
+
+    <div class="task-card done">
+      <div class="task-icon-wrap" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);">📅</div>
+      <div class="task-info">
+        <div class="task-name">Daily Login</div>
+        <div class="task-desc">Claimed · Day 14 streak bonus!</div>
+      </div>
+      <div class="task-reward">+3 🪙</div>
+      <div class="check-circle">✓</div>
+    </div>
+
+    <div class="task-card">
+      <div class="task-icon-wrap" style="background:rgba(0,245,255,0.08);border:1px solid rgba(0,245,255,0.15);">📺</div>
+      <div class="task-info">
+        <div class="task-name">Watch 30 Minutes</div>
+        <div class="task-desc">18 / 30 min completed</div>
+        <div class="task-progress-mini"><div class="tpm-fill" style="width:60%"></div></div>
+      </div>
+      <div class="task-reward">+10 🪙</div>
+    </div>
+
+    <div class="task-card">
+      <div class="task-icon-wrap" style="background:rgba(180,0,255,0.08);border:1px solid rgba(180,0,255,0.15);">👍</div>
+      <div class="task-info">
+        <div class="task-name">Like 3 Videos</div>
+        <div class="task-desc">1 / 3 liked</div>
+        <div class="task-progress-mini"><div class="tpm-fill" style="width:33%"></div></div>
+      </div>
+      <div class="task-reward">+5 🪙</div>
+    </div>
+
+    <div class="task-card">
+      <div class="task-icon-wrap" style="background:rgba(255,0,200,0.08);border:1px solid rgba(255,0,200,0.15);">💬</div>
+      <div class="task-info">
+        <div class="task-name">Leave a Comment</div>
+        <div class="task-desc">Not done yet</div>
+        <div class="task-progress-mini"><div class="tpm-fill" style="width:0%"></div></div>
+      </div>
+      <div class="task-reward">+5 🪙</div>
+    </div>
+
+    <div class="task-card">
+      <div class="task-icon-wrap" style="background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.15);">↗</div>
+      <div class="task-info">
+        <div class="task-name">Share a Video</div>
+        <div class="task-desc">Not done yet</div>
+        <div class="task-progress-mini"><div class="tpm-fill" style="width:0%"></div></div>
+      </div>
+      <div class="task-reward">+8 🪙</div>
+    </div>
+
+    <div class="neon-div"></div>
+    <div class="section-label">Creator Bonuses</div>
+
+    <div class="task-card">
+      <div class="task-icon-wrap" style="background:rgba(0,245,255,0.08);border:1px solid rgba(0,245,255,0.15);">🎬</div>
+      <div class="task-info">
+        <div class="task-name">Upload a Video</div>
+        <div class="task-desc">Earn coins per 1K views</div>
+      </div>
+      <div class="task-reward">+50 🪙</div>
+    </div>
+
+    <div class="task-card">
+      <div class="task-icon-wrap" style="background:rgba(180,0,255,0.08);border:1px solid rgba(180,0,255,0.15);">🔴</div>
+      <div class="task-info">
+        <div class="task-name">Go Live (30 min)</div>
+        <div class="task-desc">Bonus for viewer tips</div>
+      </div>
+      <div class="task-reward">+100 🪙</div>
+    </div>
+
+    <div class="task-card">
+      <div class="task-icon-wrap" style="background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.15);">👑</div>
+      <div class="task-info">
+        <div class="task-name">Get 10 New Subscribers</div>
+        <div class="task-desc">7 / 10 this week</div>
+        <div class="task-progress-mini"><div class="tpm-fill" style="width:70%"></div></div>
+      </div>
+      <div class="task-reward">+200 🪙</div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="history-panel" style="display:none">
+    <div class="section-label">Recent Transactions</div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(0,255,136,0.1)">📅</div>
+      <div class="tx-info">
+        <div class="tx-name">Daily Login Streak</div>
+        <div class="tx-time">Today · 8:00 AM</div>
+      </div>
+      <div class="tx-amount plus">+3 🪙</div>
+    </div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(255,0,200,0.1)">🪙</div>
+      <div class="tx-info">
+        <div class="tx-name">Tip from @alexcrypto</div>
+        <div class="tx-time">Today · 11:36 AM</div>
+      </div>
+      <div class="tx-amount plus">+100 🪙</div>
+    </div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(0,245,255,0.1)">📺</div>
+      <div class="tx-info">
+        <div class="tx-name">Watch Time Bonus</div>
+        <div class="tx-time">Today · 12:00 PM</div>
+      </div>
+      <div class="tx-amount plus">+10 🪙</div>
+    </div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(255,51,85,0.1)">💸</div>
+      <div class="tx-info">
+        <div class="tx-name">Tip sent to @miadev</div>
+        <div class="tx-time">Today · 2:30 PM</div>
+      </div>
+      <div class="tx-amount minus">-50 🪙</div>
+    </div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(255,215,0,0.1)">🎬</div>
+      <div class="tx-info">
+        <div class="tx-name">Video Upload Reward</div>
+        <div class="tx-time">Yesterday · 6:00 PM</div>
+      </div>
+      <div class="tx-amount plus">+50 🪙</div>
+    </div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(180,0,255,0.1)">🔴</div>
+      <div class="tx-info">
+        <div class="tx-name">Live Stream Bonus</div>
+        <div class="tx-time">Yesterday · 9:00 PM</div>
+      </div>
+      <div class="tx-amount plus">+100 🪙</div>
+    </div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(255,51,85,0.1)">🔄</div>
+      <div class="tx-info">
+        <div class="tx-name">Converted to ETH</div>
+        <div class="tx-time">2 days ago</div>
+      </div>
+      <div class="tx-amount minus">-100 🪙</div>
+    </div>
+
+    <div class="tx-item">
+      <div class="tx-icon" style="background:rgba(0,255,136,0.1)">🏆</div>
+      <div class="tx-info">
+        <div class="tx-name">Leaderboard Bonus #3</div>
+        <div class="tx-time">Last week</div>
+      </div>
+      <div class="tx-amount plus">+500 🪙</div>
+    </div>
+  </div>
+
+  <!-- CHART TAB -->
+  <div id="chart-panel" style="display:none">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">COINS EARNED</div>
+        <div class="chart-period">
+          <div class="period-btn active" onclick="setPeriod(this,'7d')">7D</div>
+          <div class="period-btn" onclick="setPeriod(this,'30d')">30D</div>
+          <div class="period-btn" onclick="setPeriod(this,'all')">ALL</div>
+        </div>
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+      <div style="display:flex;justify-content:space-between;padding:0 2px">
+        <!-- labels injected by JS -->
+      </div>
+    </div>
+
+    <div class="section-label">Weekly Summary</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="sc-icon">📈</div>
+        <div class="sc-val" style="color:var(--green)">+486</div>
+        <div class="sc-label">This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon">📅</div>
+        <div class="sc-val" style="color:var(--cyan)">69.4</div>
+        <div class="sc-label">Daily Avg</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon">🔝</div>
+        <div class="sc-val" style="color:var(--gold)">152</div>
+        <div class="sc-label">Best Day</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon">🔥</div>
+        <div class="sc-val" style="color:var(--pink)">14</div>
+        <div class="sc-label">Day Streak</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERT TAB -->
+  <div id="convert-panel" style="display:none">
+    <div class="convert-card">
+      <div class="convert-title">🔄 CONVERT EMO COINS</div>
+
+      <div class="convert-row">
+        <div class="convert-box">
+          <div class="cb-label">FROM</div>
+          <div class="cb-val" id="convertFrom">100</div>
+          <div class="cb-unit">🪙 EMO COINS</div>
+        </div>
+        <div class="convert-arrow" onclick="flipConvert()">⇄</div>
+        <div class="convert-box">
+          <div class="cb-label">TO</div>
+          <div class="cb-val" id="convertTo">0.0005</div>
+          <div class="cb-unit" id="convertUnit">ETH (Earth)</div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-bottom:8px">Select Chain</div>
+      <div class="convert-chains">
+        <div class="chain-chip active" onclick="selectChain(this,'ETH','Earth','0.0005')">🌍 Earth/ETH</div>
+        <div class="chain-chip" onclick="selectChain(this,'SOL','Soul','0.008')">🌙 Soul/SOL</div>
+        <div class="chain-chip" onclick="selectChain(this,'MON','Moon','0.05')">🌕 Moon/MON</div>
+        <div class="chain-chip" onclick="selectChain(this,'ARB','Orbit','0.0005')">🚀 Orbit/ARB</div>
+        <div class="chain-chip" onclick="selectChain(this,'BTC','Birth','0.0000001')">⚡ Birth/BTC</div>
+      </div>
+
+      <div style="margin:10px 0;padding:10px;background:var(--surface);border-radius:8px;font-size:11px;color:var(--muted)">
+        Rate: 100 🪙 = 0.0005 ETH · Network fee: ~0.001 ETH
+      </div>
+
+      <button class="convert-btn" onclick="doConvert()">CONVERT VIA THEWALL ⚡</button>
+    </div>
+
+    <div class="section-label">TheWall Integration</div>
+    <div class="task-card" style="cursor:default">
+      <div class="task-icon-wrap" style="background:rgba(0,245,255,0.08);border:1px solid rgba(0,245,255,0.2);">🔗</div>
+      <div class="task-info">
+        <div class="task-name">TheWall Connected</div>
+        <div class="task-desc">0x...8ea3 · 5 chains active</div>
+      </div>
+      <div style="color:var(--green);font-size:12px;">✓ LINKED</div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD TAB -->
+  <div id="leaderboard-panel" style="display:none">
+    <div class="section-label">Top Earners This Week</div>
+    <div class="lb-card">
+      <div class="lb-row">
+        <div class="lb-rank rank-1">🥇</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#ffd700,#ff8c00)">N</div>
+        <div class="lb-info">
+          <div class="lb-name">NeonKreator</div>
+          <div class="lb-sub">84 videos · 120K subs</div>
+        </div>
+        <div class="lb-coins">24,820 🪙</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank rank-2">🥈</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#c0c0c0,#808080)">C</div>
+        <div class="lb-info">
+          <div class="lb-name">CryptoWave</div>
+          <div class="lb-sub">62 videos · 98K subs</div>
+        </div>
+        <div class="lb-coins">18,440 🪙</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank rank-3">🥉</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#cd7f32,#8b4513)">V</div>
+        <div class="lb-info">
+          <div class="lb-name">VibesMaker</div>
+          <div class="lb-sub">45 videos · 76K subs</div>
+        </div>
+        <div class="lb-coins">14,210 🪙</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank rank-n">4</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#00f5ff,#0050ff)">S</div>
+        <div class="lb-info">
+          <div class="lb-name">sophiaweb3</div>
+          <div class="lb-sub">38 videos · 61K subs</div>
+        </div>
+        <div class="lb-coins">11,800 🪙</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank rank-n">5</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#ffaa00,#ff5500)">R</div>
+        <div class="lb-info">
+          <div class="lb-name">ryanbuilds</div>
+          <div class="lb-sub">29 videos · 44K subs</div>
+        </div>
+        <div class="lb-coins">9,340 🪙</div>
+      </div>
+
+      <!-- divider -->
+      <div style="padding:6px 14px;text-align:center;font-size:10px;color:var(--muted);border-bottom:1px solid rgba(0,245,255,0.05)">· · · · ·</div>
+
+      <!-- Me -->
+      <div class="lb-row me">
+        <div class="lb-rank" style="color:var(--purple);font-size:12px;">23</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,var(--purple),var(--cyan))">D</div>
+        <div class="lb-info">
+          <div class="lb-name">Emobies05 <span style="color:var(--cyan);font-size:10px;">(You)</span></div>
+          <div class="lb-sub">312 videos · 84.2K subs</div>
+        </div>
+        <div class="lb-coins">1,247 🪙</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BUTTERFLY FAB -->
+<div class="butterfly-fab" title="Emowall AI">🦋</div>
+
+<script>
+  // Animate hero progress
+  setTimeout(() => {
+    document.getElementById('heroProgress').style.width = '62.35%';
+  }, 300);
+
+  // Tabs
+  function switchTab(el, tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    ['earn','history','chart','convert','leaderboard'].forEach(p => {
+      document.getElementById(p+'-panel').style.display = p === tab ? 'block' : 'none';
+    });
+    if (tab === 'chart') renderChart();
+  }
+
+  // Bar chart
+  const chartData7 = [42, 68, 35, 95, 52, 110, 86];
+  const chartData30 = [42,68,35,95,52,110,86,72,48,120,88,60,45,95,130,78,55,92,68,115,82,48,70,95,108,62,85,120,95,86];
+  const days7 = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  function renderChart(data = chartData7, labels = days7) {
+    const chart = document.getElementById('barChart');
+    const max = Math.max(...data);
+    chart.innerHTML = data.map((val, i) => `
+      <div class="bar-col">
+        <div class="bar ${i === data.length-1 ? 'gold':''}"
+          style="height:${(val/max)*70}px;animation-delay:${i*0.05}s"
+          title="${val} coins"></div>
+        <div class="bar-label">${labels[i] || ''}</div>
+      </div>
+    `).join('');
+  }
+
+  function setPeriod(el, period) {
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    if (period === '7d') renderChart(chartData7, days7);
+    else if (period === '30d') renderChart(chartData30, chartData30.map((_,i)=>i+1));
+    else renderChart([...chartData30, ...chartData7], [...chartData30.map((_,i)=>i+1),...days7]);
+  }
+
+  // Chain select
+  function selectChain(el, ticker, name, rate) {
+    document.querySelectorAll('.chain-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    const amt = parseInt(document.getElementById('convertFrom').textContent.replace(/,/g,'')) || 100;
+    document.getElementById('convertTo').textContent = (amt * parseFloat(rate) / 100).toFixed(8).replace(/\.?0+$/, '') || '0';
+    document.getElementById('convertUnit').textContent = ticker + ' (' + name + ')';
+  }
+
+  function flipConvert() {
+    const arrow = document.querySelector('.convert-arrow');
+    arrow.style.transform = 'rotate(180deg)';
+    setTimeout(() => arrow.style.transform = '', 300);
+  }
+
+  function doConvert() {
+    const from = document.getElementById('convertFrom').textContent;
+    const to = document.getElementById('convertTo').textContent;
+    const unit = document.getElementById('convertUnit').textContent;
+    alert(`Converting ${from} 🪙 → ${to} ${unit}\n\nRedirecting to TheWall... ⚡`);
+  }
+
+  // Animate balance counter
+  function animateCount(target, duration = 1500) {
+    const el = document.getElementById('balanceDisplay');
+    let start = 0, step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start = Math.min(start + step, target);
+      el.textContent = Math.floor(start).toLocaleString();
+      if (start >= target) clearInterval(timer);
+    }, 16);
+  }
+  setTimeout(() => animateCount(1247), 200);
+</script>
+</body>
+</html>

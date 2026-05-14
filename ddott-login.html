@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Login</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0f; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.container { width: 90%; max-width: 400px; }
+.logo { text-align: center; margin-bottom: 40px; }
+.logo h1 { font-size: 2rem; background: linear-gradient(135deg, #00f5ff, #bf00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.card { background: #13131a; border: 1px solid #2a2a3a; border-radius: 16px; padding: 32px; }
+.tabs { display: flex; margin-bottom: 24px; background: #0a0a0f; border-radius: 8px; padding: 4px; }
+.tab { flex: 1; padding: 10px; text-align: center; border-radius: 6px; cursor: pointer; color: #888; font-size: 0.9rem; transition: all 0.3s; }
+.tab.active { background: #1a1a2e; color: #00f5ff; }
+input { width: 100%; padding: 14px; background: #0a0a0f; border: 1px solid #2a2a3a; border-radius: 10px; color: #fff; font-size: 0.95rem; margin-bottom: 16px; outline: none; }
+input:focus { border-color: #00f5ff; }
+button { width: 100%; padding: 14px; background: linear-gradient(135deg, #00f5ff, #bf00ff); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.msg { text-align: center; margin-top: 16px; font-size: 0.9rem; color: #888; }
+.error { color: #ff4444; }
+.success { color: #00ff88; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo"><h1>DDOTT.TV</h1><p style="color:#888;margin-top:8px">Dwin Universe</p></div>
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+    <div id="login-form">
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <button onclick="handleLogin()">Login</button>
+    </div>
+    <div id="signup-form" style="display:none">
+      <input type="text" id="signup-username" placeholder="Username">
+      <input type="email" id="signup-email" placeholder="Email">
+      <input type="password" id="signup-password" placeholder="Password">
+      <button onclick="handleSignup()">Create Account</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const msg = document.getElementById('msg');
+  msg.innerHTML = 'Logging in...';
+  const { data, error } = await signIn(email, password);
+  if (error) { msg.innerHTML = '<span class="error">' + error.message + '</span>'; return; }
+  msg.innerHTML = '<span class="success">Success!</span>';
+  setTimeout(() => window.location.href = 'ddott-tv-app.html', 1000);
+}
+
+async function handleSignup() {
+  const username = document.getElementById('signup-username').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const msg = document.getElementById('msg');
+  msg.innerHTML = 'Creating account...';
+  const { data, error } = await signUp(email, password, username);
+  if (error) { msg.innerHTML = '<span class="error">' + error.message + '</span>'; return; }
+  msg.innerHTML = '<span class="success">Account created! Check your email.</span>';
+}
+</script>
+</body>
+</html>
