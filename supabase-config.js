@@ -5,3 +5,6 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Tables ready: waitlist, profiles, videos
+
+// Fix auth redirect
+const AUTH_REDIRECT = 'https://ddott-tv.vercel.app/ddott-tv-app.html';
