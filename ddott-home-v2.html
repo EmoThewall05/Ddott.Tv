@@ -524,3 +524,25 @@ function addAIMsg(txt,type){
 <script src="home-script.js"></script>
 </body>
 </html>
+<script>
+// Real videos patch - inject after page loads
+document.addEventListener('DOMContentLoaded', async () => {
+  const s = window.supabase.createClient('https://havmduragglvstlxrgag.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q')
+  const {data} = await s.from('videos').select('*').order('created_at',{ascending:false}).limit(20)
+  if(!data||!data.length) return
+  const grid = document.querySelector('.video-grid') || document.querySelector('.videos') || document.querySelector('.feed') || document.querySelector('.content')
+  if(!grid) return
+  const html = data.map(v=>`
+    <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden;margin-bottom:12px;">
+      <video src="${v.video_url}" style="width:100%;height:180px;object-fit:cover;background:#000;" controls preload="none"></video>
+      <div style="padding:12px;">
+        <div style="font-weight:bold;margin-bottom:4px;">${v.title}</div>
+        <div style="color:#666;font-size:0.8rem;">${v.category} · 👁 ${v.views||0} · 👍 ${v.likes||0}</div>
+      </div>
+    </div>`).join('')
+  const realSection = document.createElement('div')
+  realSection.style.cssText = 'padding:15px;'
+  realSection.innerHTML = '<div style="color:#00f5ff;font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">🔴 LIVE VIDEOS</div>' + html
+  grid.prepend(realSection)
+})
+</script>
