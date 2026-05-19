@@ -1,34 +1,42 @@
+const SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q'
+
 async function signUp(email, password, username) {
-  const { data, error } = await db.auth.signUp({ email, password });
-  if (error) return { error };
-  
-  if (data.user) {
-    await db.from('profiles').insert({
-      id: data.user.id,
-      username: username,
-      display_name: username,
-      emo_coins: 0
-    });
-  }
-  return { data };
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const { data, error } = await client.auth.signUp({ email, password })
+  if (error) return { error }
+  await client.from('profiles').insert({
+    id: data.user.id,
+    username,
+    emo_coins: 100,
+    streak_days: 1,
+    last_login: new Date().toISOString().split('T')[0]
+  })
+  return { data }
 }
 
 async function signIn(email, password) {
-  const { data, error } = await db.auth.signInWithPassword({ email, password });
-  return { data, error };
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const { data, error } = await client.auth.signInWithPassword({ email, password })
+  if (error) return { error }
+  localStorage.setItem('ddott_user', JSON.stringify(data.user))
+  localStorage.setItem('ddott_session', JSON.stringify(data.session))
+  return { data }
 }
 
 async function signOut() {
-  await db.auth.signOut();
-  window.location.href = 'ddott-landing-v2.html';
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  await client.auth.signOut()
+  localStorage.removeItem('ddott_user')
+  localStorage.removeItem('ddott_session')
+  window.location.href = 'ddott-login.html'
 }
 
-async function getUser() {
-  const { data: { user } } = await db.auth.getUser();
-  return user;
+function getUser() {
+  const user = localStorage.getItem('ddott_user')
+  return user ? JSON.parse(user) : null
 }
 
-async function getProfile(userId) {
-  const { data } = await db.from('profiles').select('*').eq('id', userId).single();
-  return data;
+function requireAuth() {
+  if (!getUser()) window.location.href = 'ddott-login.html'
 }
