@@ -45,3 +45,4 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) }
   }
 }
+// netlify function fix Wed May 20 00:25:26 +04 2026
