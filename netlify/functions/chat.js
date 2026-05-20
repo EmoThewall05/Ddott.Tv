@@ -1,4 +1,6 @@
-exports.handler = async (event) => {
+const fetch = require('node-fetch')
+
+exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -7,6 +9,10 @@ exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' }
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) }
   }
 
   try {
@@ -30,7 +36,7 @@ exports.handler = async (event) => {
 
     const data = await response.json()
 
-    if (data.result?.response) {
+    if (data.result && data.result.response) {
       return {
         statusCode: 200,
         headers,
@@ -39,11 +45,17 @@ exports.handler = async (event) => {
         })
       }
     } else {
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'No response', raw: data }) }
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'No response from AI', raw: data })
+      }
     }
   } catch (err) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) }
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: err.message })
+    }
   }
 }
-// netlify function fix Wed May 20 00:25:26 +04 2026
-// netlify function fix Wed May 20 02:01:05 +04 2026
