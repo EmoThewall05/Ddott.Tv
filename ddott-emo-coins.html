@@ -154,7 +154,17 @@ function getLevel(coins) {
 
 async function loadProfile() {
   const profile = await getProfile()
-  if (!profile) { window.location.href = 'ddott-login.html'; return }
+  if (!profile) {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { window.location.href = 'ddott-login.html'; return; }
+    await db.from('profiles').insert({
+      id: user.id,
+      emo_coins: 0,
+      streak_days: 0,
+      earned_today: 0
+    });
+    profile = { emo_coins: 0, streak_days: 0, earned_today: 0 };
+  }
   currentProfile = profile
 
   const coins = profile.emo_coins || 0
