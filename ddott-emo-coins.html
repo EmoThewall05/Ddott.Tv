@@ -281,7 +281,11 @@ async function dailyClaim() {
   loadEmoCoins();
 }
 
-window.addEventListener('DOMContentLoaded', loadEmoCoins);
+window.addEventListener('DOMContentLoaded', async () => {
+  await new Promise(r => setTimeout(r, 500));
+  if (typeof db === 'undefined') { console.log('db not ready'); return; }
+  loadEmoCoins();
+});
 </script>
 </body>
 </html>
