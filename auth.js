@@ -21,6 +21,7 @@ async function signIn(email, password) {
   if (error) return { error }
   localStorage.setItem('ddott_user', JSON.stringify(data.user))
   localStorage.setItem('ddott_session', JSON.stringify(data.session))
+  window.location.href = 'ddott-tv-app.html'
   return { data }
 }
 
