@@ -133,7 +133,7 @@
 <div class="top-nav">
   <div class="logo" onclick="goHome()">DDOTT<em>.</em>TV</div>
   <div class="nav-search"><span style="color:var(--muted)">🔍</span><input type="text" placeholder="Search..."></div>
-  <div class="nav-coins" onclick="nav('coins')"><span>🪙</span><div class="coins-val">1,247</div></div>
+  <div class="nav-coins" onclick="nav('coins')"><span>🪙</span><div class="coins-val" id="navCoins">...</div></div>
   <div class="nav-notif" onclick="nav('messages')">🔔<div class="notif-dot"></div></div>
   <div class="nav-avatar" onclick="nav('channel')">D</div>
 </div>
@@ -142,9 +142,9 @@
 
   <div class="home-screen" id="homeScreen">
     <div class="hero">
-      <div class="hero-greet">Good evening, Divin 👋</div>
-      <div class="hero-name">Dwin Universe</div>
-      <div class="hero-sub">Dubai 🇦🇪 · <b>84.2K subscribers</b> · Day 14 🔥</div>
+      <div class="hero-greet" id="heroGreet">Good evening 👋</div>
+      <div class="hero-name" id="heroName">Dwin Universe</div>
+      <div class="hero-sub" id="heroSub">Loading...</div>
     </div>
 
     <div class="live-banner" onclick="nav('player')">
@@ -160,11 +160,11 @@
     </div>
 
     <div class="stats-strip">
-      <div class="stat-pill"><div class="sp-val" style="color:var(--cyan)">4.8M</div><div class="sp-lbl">Views</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--gold)">1,247🪙</div><div class="sp-lbl">Coins</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--green)">+86</div><div class="sp-lbl">Today</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--cyan)" id="statViews">...</div><div class="sp-lbl">Views</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--gold)" id="statCoins">...</div><div class="sp-lbl">Coins</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--green)" id="statToday">...</div><div class="sp-lbl">Today</div></div>
       <div class="stat-pill"><div class="sp-val" style="color:var(--pink)">96%</div><div class="sp-lbl">Likes</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--purple)">312</div><div class="sp-lbl">Videos</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--purple)" id="statVideos">...</div><div class="sp-lbl">Videos</div></div>
     </div>
 
     <div class="neon-div"></div>
@@ -293,5 +293,65 @@
 
   document.querySelector('.logo').addEventListener('click',()=>{ if(current) goHome(); });
 </script>
-<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").then(()=>console.log("SW registered")).catch(e=>console.log(e));}</script></body>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").then(()=>console.log("SW registered")).catch(e=>console.log(e));}</script>
+<script>
+async function loadRealStats() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  // Get user profile
+  const { data: profile } = await db
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  // Get emo coins
+  const { data: coins } = await db
+    .from('emo_coins')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  // Get platform stats
+  const { count: userCount } = await db
+    .from('profiles')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: videoCount } = await db
+    .from('videos')
+    .select('*', { count: 'exact', head: true });
+
+  // Get today earned
+  const today = new Date().toISOString().split('T')[0];
+  const { data: todayTx } = await db
+    .from('emo_transactions')
+    .select('amount')
+    .eq('user_id', user.id)
+    .gte('created_at', today);
+  const todayEarned = todayTx ? todayTx.reduce((a,b) => a + b.amount, 0) : 0;
+
+  // Hour greeting
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  const name = profile?.username || user.email.split('@')[0];
+
+  // Update UI
+  const streak = coins?.streak_days || 0;
+  const balance = coins?.balance || 0;
+
+  document.getElementById('heroGreet').textContent = greet + ', ' + name + ' 👋';
+  document.getElementById('heroSub').innerHTML = 'Dubai 🇦🇪 · <b>' + userCount + ' members</b> · Day ' + streak + ' 🔥';
+  document.getElementById('navCoins').textContent = balance.toLocaleString();
+  document.getElementById('statCoins').textContent = balance + '🪙';
+  document.getElementById('statToday').textContent = '+' + todayEarned;
+  document.getElementById('statVideos').textContent = videoCount || 0;
+  document.getElementById('statViews').textContent = '0';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadRealStats, 800);
+});
+</script>
+</body>
 </html>
