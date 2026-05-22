@@ -1293,7 +1293,9 @@
     // Q1 options
     renderOptions('q1options', [correctDur, fakeDur1, fakeDur2].sort(() => Math.random() - 0.5), 'q1');
     // Q2 options
-    renderOptions('q2options', [videoCreator, 'Emobies05', 'DwinTV'].filter((v,i,a)=>a.indexOf(v)===i).sort(() => Math.random() - 0.5), 'q2');
+    const creatorOpts = [videoCreator, 'Emobies05', 'DwinTV'].filter((v,i,a)=>a.indexOf(v)===i && v !== videoCreator);
+    creatorOpts.unshift(videoCreator);
+    renderOptions('q2options', creatorOpts.slice(0,3).sort(() => Math.random() - 0.5), 'q2');
     // Q3 options
     renderOptions('q3options', [videoCategory, 'Music', 'Tech', 'Education'].filter((v,i,a)=>a.indexOf(v)===i).slice(0,3).sort(() => Math.random() - 0.5), 'q3');
 
