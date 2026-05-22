@@ -927,20 +927,34 @@
   <!-- VIDEO PLAYER -->
   <div class="video-container">
     <div class="video-wrap">
-      <div class="video-placeholder">
-        <div class="scene">
-          <div class="scene-line"></div>
-          <div class="scene-line"></div>
-          <div class="scene-line"></div>
+      <video id="realVideo" style="width:100%;border-radius:12px;background:#000;max-height:320px;" controls controlsList="nodownload">
+        <source src="" type="video/mp4">
+      </video>
+
+      <!-- QUIZ BOX -->
+      <div id="quizBox" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.92);z-index:50;border-radius:12px;padding:20px;overflow-y:auto;">
+        <div style="color:#00f5ff;font-family:'Orbitron',sans-serif;font-size:14px;margin-bottom:16px;">🎬 Proof of Watch</div>
+        <div style="color:#fff;font-size:13px;margin-bottom:20px;">Answer to earn your Emo Coins! ⏱️ <span id="quizTimer" style="color:#ffd84d;font-weight:bold;">60</span>s</div>
+
+        <div style="margin-bottom:16px;">
+          <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q1. How long was this video?</div>
+          <div id="q1options" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
-        <div class="play-btn-big" id="playBtn">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
+
+        <div style="margin-bottom:16px;">
+          <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q2. Who uploaded this video?</div>
+          <div id="q2options" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
-        <div class="video-title-overlay">
-          <div class="vtitle">▶ DDOTT TV — EPISODE 01</div>
+
+        <div style="margin-bottom:20px;">
+          <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q3. What category is this video?</div>
+          <div id="q3options" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
+
+        <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">
+          Submit & Earn Coins 🪙
+        </button>
+        <div id="quizResult" style="margin-top:12px;text-align:center;font-size:13px;"></div>
       </div>
     </div>
 
@@ -1210,39 +1224,152 @@
 <div class="butterfly-fab" title="Emowall AI">🦋</div>
 
 <script>
-  // Play/Pause toggle
-  let playing = false;
-  const playBtn = document.getElementById('playBtn');
+  // Real video element
+  const video = document.getElementById('realVideo');
   const playPauseBtn = document.getElementById('playPauseBtn');
 
-  playBtn.addEventListener('click', togglePlay);
-  playPauseBtn.addEventListener('click', togglePlay);
+  // Load video from URL params
+  const params = new URLSearchParams(window.location.search);
+  const videoUrl = params.get('url') || '';
+  const videoTitle = params.get('title') || 'Ddott TV Video';
+  const videoCreator = params.get('creator') || 'Unknown';
+  const videoCategory = params.get('category') || 'General';
+  if (videoUrl) video.src = videoUrl;
 
-  function togglePlay() {
-    playing = !playing;
-    playPauseBtn.innerHTML = playing
-      ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`
-      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-    playBtn.style.opacity = playing ? '0' : '1';
-    if (playing) simulateProgress();
+  // Update title
+  const titleEl = document.querySelector('.video-info h1');
+  if (titleEl) titleEl.textContent = videoTitle;
+
+  // Play/Pause
+  playPauseBtn.addEventListener('click', () => {
+    if (video.paused) { video.play(); } else { video.pause(); }
+  });
+
+  video.addEventListener('play', () => {
+    playPauseBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+  });
+
+  video.addEventListener('pause', () => {
+    playPauseBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+  });
+
+  // Progress bar sync
+  video.addEventListener('timeupdate', () => {
+    if (!video.duration) return;
+    const pct = (video.currentTime / video.duration) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    const m = Math.floor(video.currentTime / 60);
+    const s = Math.floor(video.currentTime % 60);
+    document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  });
+
+  // Progress click seek
+  document.getElementById('progressWrap').addEventListener('click', function(e) {
+    if (!video.duration) return;
+    const rect = this.getBoundingClientRect();
+    video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
+  });
+
+  // VIDEO END — show quiz
+  video.addEventListener('ended', () => {
+    showQuiz();
+  });
+
+  // QUIZ SYSTEM
+  let quizAnswers = {};
+  let quizCorrect = {};
+  let quizTimerInt;
+
+  function showQuiz() {
+    const dur = video.duration || 0;
+    const mins = Math.floor(dur / 60);
+    const secs = Math.floor(dur % 60);
+    const correctDur = mins + ' min ' + secs + ' sec';
+    const fakeDur1 = (mins + 1) + ' min ' + secs + ' sec';
+    const fakeDur2 = (mins > 0 ? mins - 1 : mins + 2) + ' min ' + secs + ' sec';
+
+    quizCorrect = { q1: correctDur, q2: videoCreator, q3: videoCategory };
+
+    // Q1 options
+    renderOptions('q1options', [correctDur, fakeDur1, fakeDur2].sort(() => Math.random() - 0.5), 'q1');
+    // Q2 options
+    renderOptions('q2options', [videoCreator, 'Emobies05', 'DwinTV'].filter((v,i,a)=>a.indexOf(v)===i).sort(() => Math.random() - 0.5), 'q2');
+    // Q3 options
+    renderOptions('q3options', [videoCategory, 'Music', 'Tech', 'Education'].filter((v,i,a)=>a.indexOf(v)===i).slice(0,3).sort(() => Math.random() - 0.5), 'q3');
+
+    document.getElementById('quizBox').style.display = 'block';
+
+    // 60 second timer
+    let t = 60;
+    quizTimerInt = setInterval(() => {
+      t--;
+      document.getElementById('quizTimer').textContent = t;
+      if (t <= 0) { clearInterval(quizTimerInt); autoFailQuiz(); }
+    }, 1000);
   }
 
-  // Progress simulation
-  let progress = 38;
-  let timer;
-  function simulateProgress() {
-    clearInterval(timer);
-    timer = setInterval(() => {
-      if (!playing) { clearInterval(timer); return; }
-      progress = Math.min(progress + 0.05, 100);
-      document.getElementById('progressFill').style.width = progress + '%';
-      // update time
-      const total = 37 * 60 + 45;
-      const cur = Math.floor((progress / 100) * total);
-      const m = Math.floor(cur / 60);
-      const s = cur % 60;
-      document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2,'0')}`;
-    }, 500);
+  function renderOptions(containerId, options, qKey) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;';
+      btn.onclick = () => {
+        container.querySelectorAll('button').forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+        btn.style.background = 'rgba(0,245,255,0.15)';
+        btn.style.borderColor = '#00f5ff';
+        quizAnswers[qKey] = opt;
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  async function submitQuiz() {
+    clearInterval(quizTimerInt);
+    let correct = 0;
+    if (quizAnswers.q1 === quizCorrect.q1) correct++;
+    if (quizAnswers.q2 === quizCorrect.q2) correct++;
+    if (quizAnswers.q3 === quizCorrect.q3) correct++;
+
+    const resultEl = document.getElementById('quizResult');
+
+    if (correct >= 2) {
+      const coinsEarned = 5;
+      resultEl.innerHTML = '✅ ' + correct + '/3 correct! +' + coinsEarned + ' Emo Coins earned! 🪙';
+      resultEl.style.color = '#00f5ff';
+      await creditCoins(coinsEarned);
+    } else {
+      resultEl.innerHTML = '❌ ' + correct + '/3 correct. Watch fully to earn coins!';
+      resultEl.style.color = '#ff4466';
+    }
+
+    document.getElementById('quizSubmit').disabled = true;
+    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; }, 3000);
+  }
+
+  function autoFailQuiz() {
+    document.getElementById('quizResult').innerHTML = '⏱️ Time up! No coins this time.';
+    document.getElementById('quizResult').style.color = '#ff4466';
+    document.getElementById('quizSubmit').disabled = true;
+    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; }, 2000);
+  }
+
+  async function creditCoins(amount) {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    const { data: coins } = await db.from('emo_coins').select('*').eq('user_id', user.id).single();
+    if (!coins) return;
+    await db.from('emo_coins').update({
+      balance: coins.balance + amount,
+      total_earned: (coins.total_earned || 0) + amount
+    }).eq('user_id', user.id);
+    await db.from('emo_transactions').insert({
+      user_id: user.id,
+      amount: amount,
+      type: 'watch_complete',
+      description: 'Video watch reward: ' + videoTitle
+    });
   }
 
   // Progress click
