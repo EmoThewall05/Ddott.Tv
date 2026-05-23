@@ -942,13 +942,11 @@
         </div>
 
         <div style="margin-bottom:16px;">
-          <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q2. Who uploaded this video?</div>
-          <div id="q2options" style="display:flex;flex-direction:column;gap:8px;"></div>
+
         </div>
 
         <div style="margin-bottom:20px;">
-          <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q3. What category is this video?</div>
-          <div id="q3options" style="display:flex;flex-direction:column;gap:8px;"></div>
+
         </div>
 
         <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">
@@ -1288,16 +1286,12 @@
     const fakeDur1 = (mins + 1) + ' min ' + secs + ' sec';
     const fakeDur2 = (mins > 0 ? mins - 1 : mins + 2) + ' min ' + secs + ' sec';
 
-    quizCorrect = { q1: correctDur, q2: videoCreator, q3: videoCategory };
+    quizCorrect = { q1: correctDur };
 
     // Q1 options
     renderOptions('q1options', [correctDur, fakeDur1, fakeDur2].sort(() => Math.random() - 0.5), 'q1');
-    // Q2 options
-    const creatorOpts = [videoCreator, 'Emobies05', 'DwinTV'].filter((v,i,a)=>a.indexOf(v)===i && v !== videoCreator);
-    creatorOpts.unshift(videoCreator);
-    renderOptions('q2options', creatorOpts.slice(0,3).sort(() => Math.random() - 0.5), 'q2');
-    // Q3 options
-    renderOptions('q3options', [videoCategory, 'Music', 'Tech', 'Education'].filter((v,i,a)=>a.indexOf(v)===i).slice(0,3).sort(() => Math.random() - 0.5), 'q3');
+
+
 
     document.getElementById('quizBox').style.display = 'block';
 
@@ -1331,18 +1325,16 @@
     clearInterval(quizTimerInt);
     let correct = 0;
     if (quizAnswers.q1 === quizCorrect.q1) correct++;
-    if (quizAnswers.q2 === quizCorrect.q2) correct++;
-    if (quizAnswers.q3 === quizCorrect.q3) correct++;
 
     const resultEl = document.getElementById('quizResult');
 
-    if (correct >= 2) {
+    if (correct >= 1) {
       const coinsEarned = 5;
-      resultEl.innerHTML = '✅ ' + correct + '/3 correct! +' + coinsEarned + ' Emo Coins earned! 🪙';
+      resultEl.innerHTML = '✅ Correct! +' + coinsEarned + ' Emo Coins earned! 🪙';
       resultEl.style.color = '#00f5ff';
       await creditCoins(coinsEarned);
     } else {
-      resultEl.innerHTML = '❌ ' + correct + '/3 correct. Watch fully to earn coins!';
+      resultEl.innerHTML = '❌ Wrong answer! Watch the video again to earn coins. 👀';
       resultEl.style.color = '#ff4466';
     }
 
