@@ -255,7 +255,7 @@
   function flash(cb){ const f=document.getElementById('flash'); f.classList.add('on'); setTimeout(()=>{f.classList.remove('on');if(cb)cb();},120); }
   function setTab(id){ document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active')); if(id) document.getElementById(id)?.classList.add('active'); }
 
-  function nav(page){
+  function nav(page, params){
     if(!pages[page]) return;
     flash(); current = page;
     document.getElementById('homeScreen').style.display = 'none';
@@ -264,7 +264,8 @@
     document.getElementById('pageLoader').style.display = 'flex';
     const f = document.getElementById('pageFrame');
     f.classList.remove('loaded');
-    f.src = pages[page];
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    f.src = pages[page] + qs;
     setTab(tabMap[page]||null);
     document.getElementById('t-home').classList.remove('active');
   }
