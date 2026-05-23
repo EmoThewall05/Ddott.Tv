@@ -225,6 +225,19 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 @keyframes fi{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .main{animation:fi .4s ease;}
+
+@media (max-width: 768px) {
+  :root { --sidebar: 0px; }
+  .sidebar { display: none !important; }
+  .right-panel { display: none !important; }
+  .app-body { flex-direction: column; overflow-y: auto; }
+  .main-feed { padding: 12px; overflow-y: unset; }
+  .featured { grid-template-columns: 1fr; }
+  .feat-thumb { height: 200px; }
+  .vgrid { grid-template-columns: 1fr 1fr; }
+  .topbar { padding: 0 10px; gap: 8px; }
+  .upload-btn span { display: none; }
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
