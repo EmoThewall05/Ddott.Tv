@@ -575,3 +575,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   grid.prepend(realSection)
 })
 </script>
+<style>
+@media (max-width: 900px) {
+  :root { --sidebar: 0px; }
+  .sidebar { display: none !important; }
+  .rpanel { display: none !important; }
+  .app-body { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+  .main { padding: 12px; overflow-y: unset; width: 100%; }
+  .featured { grid-template-columns: 1fr; }
+  .feat-thumb { height: 220px; }
+  .feat-info { padding: 14px; }
+  .vgrid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .topbar { padding: 0 10px; gap: 6px; }
+  .upload-btn span { display: none; }
+  .search-wrap { max-width: 200px; }
+  .cats { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .cats::-webkit-scrollbar { display: none; }
+}
+</style>
