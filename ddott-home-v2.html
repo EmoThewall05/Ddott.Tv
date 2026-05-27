@@ -622,3 +622,18 @@ async function loadRealVideos() {
 }
 document.addEventListener('DOMContentLoaded', loadRealVideos);
 </script>
+<script>
+async function loadHomeCoins() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    const { data } = await db.from('profiles').select('emo_coins').eq('id', user.id).single();
+    if (data) {
+      document.getElementById('coin-amt').textContent = data.emo_coins || 0;
+      const avatar = document.getElementById('user-avatar');
+      if (avatar) avatar.textContent = (user.email||'D')[0].toUpperCase();
+    }
+  } catch(e) { console.log(e); }
+}
+document.addEventListener('DOMContentLoaded', loadHomeCoins);
+</script>
