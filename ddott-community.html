@@ -611,3 +611,16 @@ async function loadCoins() {
 
 document.addEventListener('DOMContentLoaded', () => { loadCollabs(); loadCoins(); });
 </script>
+<script>
+async function loadRealStats() {
+  try {
+    const { data } = await supa.from('community_stats').select('*').single();
+    if (!data) return;
+    const stats = document.querySelectorAll('.hs');
+    if (stats[0]) stats[0].textContent = `🎭 ${data.total_creators} Creators`;
+    if (stats[1]) stats[1].textContent = `⚡ ${data.active_collabs} Active Collabs`;
+    if (stats[2]) stats[2].textContent = `🪙 ${data.total_coins_earned} Coins Earned`;
+  } catch(e) { console.log(e); }
+}
+document.addEventListener('DOMContentLoaded', () => { loadCollabs(); loadCoins(); loadRealStats(); });
+</script>
