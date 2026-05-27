@@ -593,3 +593,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   .cats::-webkit-scrollbar { display: none; }
 }
 </style>
+<script>
+async function loadRealVideos() {
+  try {
+    const { data } = await db.from('videos').select('*').order('created_at',{ascending:false}).limit(10);
+    if (!data || !data.length) return;
+    const grid = document.getElementById('video-grid');
+    if (!grid) return;
+    const realHtml = data.map(v => `
+      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','Creator','${v.category}')">
+        <div class="vc-thumb">
+          <video src="${v.video_url}" style="width:100%;height:100%;object-fit:cover;" preload="none"></video>
+          <div class="vc-earn">+5🪙</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-top">
+            <div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">D</div>
+            <div class="vc-title">${v.title}</div>
+          </div>
+          <div class="vc-bot">
+            <span class="vc-ch">${v.category}</span>
+            <span class="vc-views">👁 ${v.views||0}</span>
+          </div>
+        </div>
+      </div>`).join('');
+    grid.innerHTML = realHtml + grid.innerHTML;
+  } catch(e) { console.log(e); }
+}
+document.addEventListener('DOMContentLoaded', loadRealVideos);
+</script>
