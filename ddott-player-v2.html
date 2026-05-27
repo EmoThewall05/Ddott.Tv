@@ -1416,3 +1416,68 @@
 </script>
 </body>
 </html>
+<script>
+// Real player data
+const urlParams = new URLSearchParams(window.location.search);
+const videoId = urlParams.get('id');
+
+async function loadVideoData() {
+  if (!videoId) return;
+  const { data: v } = await db.from('videos').select('*').eq('id', videoId).single();
+  if (!v) return;
+  // Update views
+  await db.from('videos').update({ views: (v.views||0) + 1 }).eq('id', videoId);
+  // Update UI
+  document.querySelectorAll('.meta-chip')[0].textContent = `👁 ${(v.views||0)+1} views`;
+  document.querySelector('.video-title-main') && (document.querySelector('.video-title-main').textContent = v.title);
+}
+
+async function loadComments() {
+  if (!videoId) return;
+  const { data } = await db.from('comments').select('*').eq('video_id', videoId).order('created_at', {ascending: false}).limit(20);
+  if (!data || !data.length) return;
+  const panel = document.getElementById('comments-panel');
+  const realHtml = data.map(c => `
+    <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#b44fff);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0;">${(c.username||'U')[0].toUpperCase()}</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">@${c.username||'user'}</div>
+        <div style="font-size:12px;color:rgba(232,244,255,0.7);">${c.content}</div>
+        <div style="font-size:10px;color:rgba(232,244,255,0.3);margin-top:4px;">❤ ${c.likes||0}</div>
+      </div>
+    </div>`).join('');
+  panel.innerHTML = realHtml + panel.innerHTML;
+}
+
+async function postComment() {
+  if (!videoId) return;
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+  const inp = document.getElementById('commentInput');
+  const content = inp.value.trim();
+  if (!content) return;
+  const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
+  await db.from('comments').insert({ video_id: videoId, user_id: user.id, username: profile?.username || user.email?.split('@')[0], content });
+  inp.value = '';
+  loadComments();
+}
+
+async function likeVideo() {
+  if (!videoId) return;
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+  await db.from('video_likes').insert({ video_id: videoId, user_id: user.id });
+  const { count } = await db.from('video_likes').select('*', {count:'exact'}).eq('video_id', videoId);
+  document.querySelector('.like-count') && (document.querySelector('.like-count').textContent = count || 0);
+}
+
+// Hook comment submit
+document.addEventListener('DOMContentLoaded', () => {
+  loadVideoData();
+  loadComments();
+  const submitBtn = document.querySelector('.comment-submit');
+  if (submitBtn) submitBtn.addEventListener('click', postComment);
+  const likeBtn = document.querySelector('.like-btn');
+  if (likeBtn) likeBtn.addEventListener('click', likeVideo);
+});
+</script>
