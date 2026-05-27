@@ -552,3 +552,62 @@
 </script>
 </body>
 </html>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q';
+const supa = window.supabase.createClient('https://havmduragglvstlxrgag.supabase.co', ANON);
+
+// Load real collabs
+async function loadCollabs() {
+  const { data } = await supa.from('collabs').select('*').eq('status','open').order('created_at',{ascending:false}).limit(10);
+  if (!data || !data.length) return;
+  const list = document.querySelector('.collab-list');
+  const icons = {music:'🎵',film:'🎬',comedy:'😂',news:'📰',education:'📚',podcast:'🎙️'};
+  const colors = {music:'rgba(180,0,255,0.1)',film:'rgba(0,245,255,0.1)',comedy:'rgba(255,215,0,0.1)',news:'rgba(0,255,136,0.1)',education:'rgba(255,215,0,0.1)',podcast:'rgba(255,0,200,0.1)'};
+  const realItems = data.map(c => `
+    <div class="collab-item">
+      <div class="ci-icon" style="background:${colors[c.type]||'rgba(180,0,255,0.1)'}">${icons[c.type]||'🎭'}</div>
+      <div class="ci-info">
+        <div class="ci-title">${c.title}</div>
+        <div class="ci-meta">${c.roles_needed||''} · ${c.members_count}/${c.max_members} members</div>
+      </div>
+      <div class="ci-coins">+${c.coins_reward} 🪙</div>
+    </div>`).join('');
+  list.innerHTML = realItems + list.innerHTML;
+}
+
+// Real create collab
+async function createCollab() {
+  const { data: { user } } = await supa.auth.getUser();
+  if (!user) { alert('Login required!'); return; }
+  const inputs = document.querySelectorAll('.modal-input');
+  const title = inputs[0].value.trim();
+  const roles = inputs[1].value.trim();
+  const coins = parseInt(inputs[2].value) || 0;
+  const type = document.querySelector('.mt-btn.selected .mt-label').textContent.toLowerCase();
+  if (!title) { alert('Add a title!'); return; }
+  const { error } = await supa.from('collabs').insert({ user_id: user.id, title, type, roles_needed: roles, coins_reward: coins });
+  document.getElementById('createModal').classList.remove('show');
+  inputs[0].value = ''; inputs[1].value = ''; inputs[2].value = '';
+  if (!error) { loadCollabs(); showToast('🚀 COLLAB CREATED!'); }
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#00ff88,#00f5ff);color:#020008;font-family:Orbitron,monospace;font-size:10px;padding:10px 20px;border-radius:20px;z-index:300;letter-spacing:1px;font-weight:700;white-space:nowrap;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// Load real coins
+async function loadCoins() {
+  const { data: { user } } = await supa.auth.getUser();
+  if (!user) return;
+  const { data } = await supa.from('profiles').select('emo_coins').eq('id', user.id).single();
+  if (data) document.querySelector('.nav-coin').innerHTML = `🪙 ${data.emo_coins}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => { loadCollabs(); loadCoins(); });
+</script>
