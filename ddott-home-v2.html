@@ -536,9 +536,9 @@ function addAIMsg(txt,type){
 </script>
 <script src="home-script.js"></script>
 <script>
-function openPlayer(url, title, creator, category) {
+function openPlayer(url, title, creator, category, id) {
   const params = {
-    url: url || 'https://www.w3schools.com/html/mov_bbb.mp4',
+    url: url || 'https://www.w3schools.com/html/mov_bbb.mp4', id: id || '',
     title: title || 'Ddott TV',
     creator: creator || 'Unknown',
     category: category || 'General'
@@ -601,7 +601,7 @@ async function loadRealVideos() {
     const grid = document.getElementById('video-grid');
     if (!grid) return;
     const realHtml = data.map(v => `
-      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','Creator','${v.category}')">
+      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','Creator','${v.category}','${v.id}')">
         <div class="vc-thumb">
           <video src="${v.video_url}" style="width:100%;height:100%;object-fit:cover;" preload="none"></video>
           <div class="vc-earn">+5🪙</div>
