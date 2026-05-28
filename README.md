@@ -1,161 +1,354 @@
-# 📺 Ddott TV
-### The Future of Decentralised Cinema
+# 📺 Ddott.TV
 
-**WATCH. CREATE. EARN ANYWHERE.**
+> **The Creator Platform built on mobile. No laptop. No excuses.**
+> Videos · Live · Community · AI · Web3 — all in one.
 
-Built from Dubai 🇦🇪 · Powered by Seven Brains 🧠 · Made for World 🌏
 
----
 
-## 🌐 Live Demo
-🔗 [ddott-tv.netlify.app](https://ddott-tv.netlify.app)
+![Platform](https://img.shields.io/badge/Platform-Web-cyan)
 
----
+ 
 
-## 🦋 What is Ddott TV?
+![Stack](https://img.shields.io/badge/Stack-Supabase%20%2B%20Vanilla%20JS-purple)
 
-Ddott TV is a **Web3-integrated streaming platform** — community-owned ecosystem where creators upload content and immediately receive spot payments in Emo Coins. Advanced **Emowall AI** architecture seamlessly integrated across every screen.
+ 
 
-**Built entirely on a phone** using Termux + Acode. No laptop, no desktop.
+![Built on](https://img.shields.io/badge/Built%20on-Mobile%20%28Termux%20%2B%20Acode%29-green)
 
----
+ 
 
-## 📱 Pages
+![Status](https://img.shields.io/badge/Status-Active%20Development-orange)
 
-| Page | File | Status |
-|------|------|--------|
-| 🏠 Navigation Shell | `ddott-tv-app.html` | ✅ Live |
-| 📺 Home Feed V2 | `ddott-home-v2.html` | ✅ Live |
-| 🎬 Video Player V2 | `ddott-player-v2.html` | ✅ Live |
-| 👤 Creator Channel | `ddott-creator-channel.html` | ✅ Live |
-| 💬 Messaging + Voice | `ddott-messaging.html` | ✅ Live |
-| 🪙 Emo Coins Dashboard | `ddott-emo-coins.html` | ✅ Live |
-| 🦋 **AI Butterfly Chat** | `ddott-ai-butterfly.html` | ✅ **NEW** |
-| 🎬 Creator Studio | `ddott-creator-studio.html` | ✅ Live |
-| 🌐 Community Center | `ddott-community.html` | ✅ Live |
-| 🌍 Landing Page V2 | `ddott-landing-v2.html` | ✅ Live |
-| 🔐 Login | `ddott-login.html` | ✅ Live |
+
 
 ---
 
-## ⚡ Features
+## 🌐 Live
 
-| Feature | Description |
-|---------|-------------|
-| ⚡ **Spot Payments** | Instant non-custodial Web3 payments to creators |
-| 🦋 **Emo AI Integrated** | 7-Brain Claude-powered AI across all screens |
-| 🎬 **Community Governed** | Decentralized content moderation |
-| 🪙 **Emo Coins + TheWall** | Earn coins, convert to ETH/SOL/BTC/ARB/MON |
-| 📺 **100+ Offline Screens** | Physical media nodes in rural areas |
-| 🔗 **5 Chain Wallet** | TheWall Web3 integration |
-| 🎭 **Script Verification** | AI checks content before publishing |
+| Page | URL |
+|---|---|
+| Platform | https://emothewwall05.github.io/Ddott.Tv |
+| Video Player | `ddott-player-v2.html?id=<video_id>` |
+| TheWall (Web3) | https://thewall-web3-iie7.vercel.app |
 
 ---
 
-## 🔄 How It Works
+## 🧭 What is Ddott.TV?
 
-### Four Steps to Earning
+Ddott.TV is a next-generation creator video platform — part OTT streaming, part creator economy, part AI-powered community hub.
 
-**01 📱 Join & Login Daily**
-- Sign up free. Every daily login = +1 Emo Coin
-- Build streak to multiply rewards
+Built entirely on **Android mobile** using Termux + Acode, it is the flagship product of **Dwin Universe** — an indie builder ecosystem connecting creators, developers, and communities across Dubai, Kerala, and beyond.
 
-**02 🎬 Watch or Upload**
-- Earn coins via active watch time
-- Creators scale earnings via views, engagement, direct fan tips
-
-**03 🪙 Stack Emo Coins**
-- Coins in integrated Ddott Wallet
-- Subscribe to creators, issue micro-tips, hold assets
-
-**04 🔗 Convert via TheWall**
-- Bind Web3 non-custodial wallet
-- Convert Emo Coins to ETH, SOL, ARB, MON, BTC instantly
+Ddott.TV is not just a video platform. It is:
+- A **community collab engine** where creators with different skills unite to build content together
+- A **coin economy** where watching, liking, and creating earns real EMO COINS
+- A **Web3 gateway** — EMO COINS convert to crypto directly via TheWall wallet
+- An **AI-powered content network** — news, teaching, translation, podcasts, music mixing, all AI-driven
+- A home for **Dwin Universe** — TheWall, Emowall AI, Emobies, and future projects
 
 ---
 
-## 🛡️ Emowall Live Streaming SOS Gate
+## ✨ Platform Features
 
-**Child Protection System**
-
-When SOS trigger initiates:
-1. Encrypted app-approval via Emowall app
-2. Parent biometric/PIN clearance
-3. Auto encrypted stream to Ddott.TV live network
-4. Background AI filters malicious content
-5. Location tracking (legal protection only)
-6. Decentralized crowd-support monitoring
-
-&gt; *"Emowall App verification approval process complete aayale Ddott TV live SOS routing module functional aaku"*
+### 🏠 Home Feed
+- Personalized video feed pulling live from Supabase
+- Live stream cards with real-time viewer count
+- Trending, latest, and creator-followed content
+- Stats dashboard — Views, Coins, Likes, Videos at a glance
 
 ---
 
-## 🎓 Hey Students Node
+### 📺 Video Player (V2)
+- Full custom neon dark player UI
+- Real-time view count (increments on every load via Supabase)
+- Like system with duplicate prevention
+- **Sticker reactions** — 🍕 🚀 🔥 🦋 💎 ⚡ 👑 ⭐ 🪙 💜 drop on video
+- **EMO COINS Tip Creator** — tip directly from the player
+- **Proof of Watch Quiz** — answer a question after watching to earn EMO COINS
+- Comments tab — real Supabase comments, no mock data
+- Up Next tab — video queue
+- Live Chat tab — real-time chat during streams
+- Description with tags, timestamps, share, save, clip actions
+- 4K / LIVE / fullscreen / pip controls
 
-**"Hey Students, Good Morning!"**
-
-- Free decentralized global learning framework
-- Kerala students & technical learners focus
-- TheWall 5-chain crypto wallet + Community AI Teacher
-- Learn: Cryptographic ledger verification, programming logic, algorithmic code architecture
-- **Complete free** - no premium fees
-
-&gt; *"Padikkaan aagrahikkunna kuttikalkkum yuvalifekalkkum technical ledger protocols, software compilation frameworks complete free aayi interactive space-il live aayi execute cheyyan olla structural module"*
-
----
-
-## 🏘️ Community Cinema
-
-**Beyond the Screen**
-
-- Physical media nodes in rural areas, towns, cities
-- Offline screens hosting Ddott Originals
-- Spot Payment terminals operate offline
-- Local populations engage together
-
-&gt; *"Your Community, Your Cinema" — Everywhere, For Everyone*
+#### 🎬 Proof of Watch — Video Quiz
+After watching a video, a timed quiz appears:
+- Question generated from video content
+- Multiple choice answers
+- Correct answer → **+5 EMO COINS** credited instantly to wallet
+- Wrong answer → no coins, can retry next video
+- Powered by Supabase (`video_quizzes` table) — creator sets Q&A at upload time
 
 ---
 
-## 🔗 Dwin Universe Integration
+### 🌐 Community Center
+> *Random talents come together. AI helps you build.*
 
-| Project | Role |
-|---------|------|
-| 🛡️ **Emowall AI 2.0** | Safety backbone + 8 protection modes |
-| 🧱 **TheWall** | 5-chain Web3 wallet + gasless transactions |
-| 📱 **Emobies** | Mobile repair platform |
-| 🦋 **Emo AI Pro** | Emotional intelligence layer |
-| 🔑 **Emo-Key** | Ecosystem API key generator |
-| 📺 **Ddott TV** | **This project** — Streaming + Community |
+The Community Center is where creators collaborate across skills to produce content no single person could make alone.
 
----
+**Singer + Lyricist + Editor = One masterpiece. 🎭**
 
-## 🛠 Tech Stack
+#### Community Categories
+| Category | Description |
+|---|---|
+| 🎵 Music Hub | Singers, producers, lyricists — Malayalam, Hindi |
+| 🎬 Film Studio | Short films, scripts, cinematography — Drama, Comedy |
+| 📰 AI News | News in your language, AI-powered — Malayalam, Arabic |
+| 📚 Edu Center | AI teacher, live sessions, any subject — Free |
+| 😂 Comedy | Sketches, reels, stand-up collabs |
+| 🎙️ Podcast | Auto and manual podcasts on any topic |
+| 🤖 AI Projects | Build AI tools together as a community |
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | HTML, CSS, JavaScript (vanilla) |
-| AI | Claude API (Emowall AI 7-Brain) |
-| Backend | Netlify Functions |
-| Hosting | Netlify |
-| PWA | manifest.json + sw.js |
+#### Open Collabs
+Creators post open collaboration slots:
+- Set required roles (Vocalist, Lyricist, Producer, Editor, Designer)
+- Members join and fill slots
+- EMO COINS reward on completion
+- AI handles mixing, mastering, subtitles automatically
 
----
-
-## 👤 Developer
-
-**Divin (Emobies05 / Dwin 05)**
-- Dubai 🇦🇪
-- Built entirely on phone using Termux + Acode
-- 0 coding experience → 6 projects in 3 months
-- Free tools only
-
-&gt; *"YouTube pays creators in ads. Ddott TV pays everyone in Emo Coins."*
+**Example active collabs:**
+- 🎵 Malayalam Indie Song — "Dubai Dreams" · 3/5 joined · +200 🪙
+- 😂 Short Comedy Film — "Termux Life" · +200 🪙
+- 📰 Dubai Tech News — Weekly Malayalam Show · +150 🪙
+- 📚 Malayalam Coding Tutorial Series · +300 🪙
+- 🎙️ Web3 & Crypto Podcast — Weekly · +100 🪙
+- 🎬 IND → DXB Documentary · +500 🪙
 
 ---
 
-## 📄 License
+### 🤖 AI Superpowers
+Built into the platform — no third-party apps needed:
 
-Built with ❤️ · IND → DXB → WORLD 🦋
+| Feature | Description | Status |
+|---|---|---|
+| 📰 AI News Reader | World news in Malayalam, Hindi, Arabic, English — AI voice reads live | LIVE |
+| 🌐 Auto Translation | Every video translated to your language with AI subtitles | 50+ LANG |
+| 🤖 AI Human Talk | 24/7 live AI support for work, life, or project questions | 24/7 |
+| 📚 AI Teacher Live | Real-time AI teaching — math, coding, language, science | FREE |
+| 🎙️ AI Podcasts | Auto-generated podcasts on any topic — tech, crypto, culture | NEW |
+| 🎵 AI Music Mixer | AI mixes and masters collab tracks — studio quality | BETA |
 
-© 2026 Ddott TV · Dwin Universe Engineering Network Layer v3.9
+---
+
+### 🪙 EMO COINS
+The native currency of the Ddott.TV ecosystem.
+
+**Earn by:**
+- ✅ Daily login (+1 coin · streak bonus)
+- ▶️ Watch 30 minutes of video (+5 coins)
+- 👍 Like 3 videos (+3 coins)
+- 🎬 Complete Proof of Watch quiz (+5 coins per video)
+- 🤝 Complete a community collab (+100–500 coins)
+- 🎬 Upload content (creator reward)
+
+**Spend / Use:**
+- 🪙 Tip creators directly from video player
+- 🏆 Leaderboard ranking (top coin earners featured)
+- 🔄 Convert to crypto via TheWall Web3 wallet
+
+**Conversion:**
+> EMO COINS only convert to crypto through **TheWall** — Ddott.TV's integrated Web3 wallet.
+> 1 EMO = $0.005 USD (current rate)
+> Conversion is direct — no middleman, no third-party exchange.
+
+**Wallet display:**
+- Total balance shown in header
+- Connected wallet address (0x...da08)
+- Level system (Starter → Pro → Legend)
+- Daily streak tracker
+
+---
+
+### 🦋 Emowall AI
+The 7-Brain Claude AI butterfly — integrated directly into Ddott.TV.
+
+- Claude AI + 6 other AI engines (Gemini, OpenAI, Perplexity, Kimi, Cursor, Copilot)
+- Answers questions about videos, community, content creation, Web3
+- Available as floating butterfly button across all pages
+- Full Emowall AI 2.0 app: `com.emobies.emowall` · [emowall-ai-2-0.vercel.app](https://emowall-ai-2-0.vercel.app)
+
+---
+
+### 🎬 Creator Studio
+- Upload videos with title, description, tags, thumbnail
+- Set Proof of Watch quiz question + answers at upload
+- **Spot Pay** — get paid per verified watch (Proof of Watch confirmation)
+- Script AI — AI writes your video script from a topic prompt
+- Analytics — views, likes, coins earned, watch time
+
+---
+
+### 💬 Messaging
+- Direct messages between users
+- Sticker pack — 🍕 🚀 🔥 🦋 💎 ⚡ 👑 ⭐ 🪙 💜
+- Voice messages
+- Community group chats per collab project
+
+---
+
+### 👤 Creator Channel
+- Profile page with avatar, bio, subscriber count
+- Video grid with play counts
+- Playlists
+- Follow / Unfollow
+- EMO COINS earned displayed publicly
+
+---
+
+## 🗄️ Database Schema (Supabase)
+
+### `videos`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| title | text | Video title |
+| views | int8 | Incremented on load |
+| trending_rank | int4 | Nullable — badge shows if set |
+| subscriber_count | int8 | Creator subscriber count |
+| created_at | timestamptz | Auto |
+
+### `comments`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| video_id | uuid | FK → videos.id |
+| user_id | uuid | FK → auth.users.id |
+| username | text | Cached at post time |
+| content | text | Comment body |
+| likes | int4 | Default 0 |
+| created_at | timestamptz | Auto |
+
+### `video_likes`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| video_id | uuid | FK → videos.id |
+| user_id | uuid | FK → auth.users.id |
+| created_at | timestamptz | Auto |
+
+> Unique constraint required:
+> ```sql
+> ALTER TABLE video_likes
+> ADD CONSTRAINT unique_video_like UNIQUE (video_id, user_id);
+> ```
+
+### `profiles`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | FK → auth.users.id |
+| username | text | Display name |
+| emo_coins | int8 | Current balance |
+| level | text | Starter / Pro / Legend |
+| streak | int4 | Daily login streak |
+
+### `video_quizzes`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| video_id | uuid | FK → videos.id |
+| question | text | Quiz question |
+| options | jsonb | Array of 3–4 options |
+| correct_index | int4 | Index of correct answer |
+| coin_reward | int4 | Default 5 |
+
+### `collabs`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| title | text | Collab name |
+| category | text | music / film / news etc |
+| roles | jsonb | Required roles array |
+| members | jsonb | Joined member IDs |
+| coin_reward | int4 | On completion |
+| status | text | open / active / complete |
+
+### `communities`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| name | text | Community name |
+| category | text | music / film / news etc |
+| member_count | int8 | Total members |
+| is_live | bool | Live indicator |
+
+---
+
+## ⚙️ Setup
+
+### 1. Clone
+```bash
+git clone https://github.com/EmoThewall05/Ddott.Tv.git
+cd Ddott.Tv
+. Configure Supabase
+Find the Supabase client init block and update:
+Js
+3. Run locally
+Bash
+4. Deploy
+Push to main — GitHub Pages auto-deploys from root.
+🧱 Tech Stack
+Layer
+Tech
+Frontend
+Vanilla HTML, CSS, JavaScript
+Backend / DB
+Supabase (Postgres + Auth + Storage)
+Web3
+TheWall — Alchemy + WalletConnect + Reown
+AI
+Claude (Anthropic) + Gemini + OpenAI + Perplexity
+Hosting
+GitHub Pages + Vercel
+Dev Environment
+Termux + Acode — Android mobile only
+Version Control
+Git (mobile)
+📁 Project Structure
+Code
+🗺️ Roadmap
+✅ Done
+[x] Video player V2 — neon UI, stickers, comments, likes
+[x] Real Supabase view count, comments, like system
+[x] Proof of Watch quiz → EMO COINS reward
+[x] Community Center UI — collabs, categories, AI superpowers
+[x] EMO Coins wallet — daily tasks, streak, level, conversion via TheWall
+[x] Home feed shell with live stream card
+[x] Emowall AI butterfly integration
+🔨 In Progress
+[ ] Video upload flow → Supabase storage + videos table insert
+[ ] Homepage feed — dynamic cards from Supabase
+[ ] Creator Studio — upload + quiz builder + script AI
+[ ] Auth page — sign in / sign up
+🔜 Next
+[ ] Creator channel page — profile, video grid, playlists
+[ ] Messaging — DM + stickers + voice
+[ ] EMO COINS live tipping (Supabase realtime)
+[ ] Collab system — join, roles, completion reward
+[ ] AI News Reader — Malayalam/Arabic live feed
+[ ] Search — videos, creators, communities
+[ ] Notifications — likes, comments, collab invites
+[ ] TheWall coin conversion live integration
+🔗 Dwin Universe
+Project
+Description
+Status
+📺 Ddott.TV
+Creator video platform
+Active
+🔗 TheWall
+5-chain Web3 wallet
+Live
+📱 Emowall AI 2.0
+Flutter child safety app
+In Development
+📱 Emobies
+Mobile repair platform
+Active
+👤 Author
+Dwin · Emobies05 / EmoThewall05
+Based in Dubai. Building on mobile. No laptop. No excuses.
+GitHub: @EmoThewall05
+TheWall: thewall-web3-iie7.vercel.app
+Emowall AI: emowall-ai-2-0.vercel.app
+📄 License
+MIT — build freely, credit kindly.
