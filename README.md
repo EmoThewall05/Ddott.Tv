@@ -302,8 +302,7 @@ Js
 Bash
 4. Deploy
 Push to main — GitHub Pages auto-deploys from root.
-
-
+------------------------------------------------------
 🧱 Tech Stack
 Layer
 Tech
@@ -321,8 +320,19 @@ Dev Environment
 Termux + Acode — Android mobile only
 Version Control
 Git (mobile)
+------------------------------------------------------
 📁 Project Structure
-Code
+Ddott.Tv/
+├── index.html                  # Home feed
+├── ddott-player-v2.html        # Video player (V2)
+├── community.html              # Community center
+├── coins.html                  # EMO Coins wallet + tasks
+├── studio.html                 # Creator studio (WIP)
+├── messaging.html              # Chat + stickers (WIP)
+├── channel.html                # Creator profile page (WIP)
+├── landing.html                # Public landing page (WIP)
+└── README.md
+------------------------------------------------------
 🗺️ Roadmap
 ✅ Done
 [x] Video player V2 — neon UI, stickers, comments, likes
@@ -346,6 +356,7 @@ Code
 [ ] Search — videos, creators, communities
 [ ] Notifications — likes, comments, collab invites
 [ ] TheWall coin conversion live integration
+======================================================
 🔗 Dwin Universe
 Project
 Description
@@ -360,15 +371,15 @@ Live
 Flutter child safety app
 In Development
 📱 Emobies
-Mobile repair platform
-Active
-👤 Author
+Mobile repair platform 
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=👤 Author
 Dwin · Emobies05 / EmoThewall05
 Based in Dubai. Building on mobile. No laptop. No excuses.
+
 GitHub: @EmoThewall05
 TheWall: thewall-web3-iie7.vercel.app
 Emowall AI: emowall-ai-2-0.vercel.app
+
 📄 License
 MIT — build freely, credit kindly.
 Code
-
