@@ -298,23 +298,31 @@ Push to main — GitHub Pages auto-deploys from root.
 
 🧱 Tech Stack
 
-                                                  Layer               Tech
+                                                  Layer              
+                                                Tech
 
-                                                  Frontend            Vanilla HTML, CSS, JavaScript
+                                                  Frontend           
+                                                 Vanilla HTML, CSS, JavaScript
 
-                                                  Backend / DBb       Supabase (Postgres                                + Auth + Storage)
+                                                  Backend / DBb      
+                                                  Supabase (Postgres                                + Auth + Storage)
                       
                    
-                                                 Web3                TheWall — Alchemy +                               WalletConnect + Reown
+                                                 Web3              
+                                                 TheWall — Alchemy +                               WalletConnect + Reown
                   
-                                                  AI                  Claude (Anthropic) + Gemini                       OpenAI + Perplexity +
+                                                  AI                 
+                                                  Claude (Anthropic) + Gemini                       OpenAI + Perplexity +
 
-                                                  Hosting            GitHub Pages + Vercel
+                                                  Hosting           
+                                                  GitHub Pages + Vercel
 
  
-                                                                                                    Dev Environment     Termux + Acode — Android                          mobile only                   
+                                                                                                    Dev Environment    
+                                                                                                    Termux + Acode — Android                          mobile only                   
                                                                      
-                                               Version Control    Git (mobile)
+                                               Version Control    
+                                               Git (mobile)
 
 
 📁 Project Structure
