@@ -996,13 +996,13 @@
     <div class="video-info">
       <h1>Building Web3 on Mobile — Full Stack Dev from a Phone 📱</h1>
       <div class="video-meta">
-        <div class="meta-chip">👁 128.4K views</div>
+        <div class="meta-chip" id="viewCount">👁 0 views</div>
         <div class="meta-chip">📅 2 hours ago</div>
-        <div class="meta-chip hot">🔥 Trending #3</div>
+        <div class="meta-chip hot" id="trendingBadge" style="display:none">🔥 Trending</div>
         <div class="meta-chip">⏱ 37:45</div>
       </div>
       <div class="action-btns">
-        <button class="act-btn primary">👍 24.1K</button>
+        <button class="act-btn primary" id="likeBtn" onclick="likeVideo()">👍 <span id="likeCount">0</span></button>
         <button class="act-btn">👎</button>
         <button class="act-btn">↗ Share</button>
         <button class="act-btn">+ Save</button>
@@ -1023,7 +1023,7 @@
       <div class="creator-avatar">🦋</div>
       <div>
         <div class="creator-name">Divin · Emobies05</div>
-        <div class="creator-subs">84.2K subscribers · Dwin Universe</div>
+        <div class="creator-subs"><span id="subCount">0</span> subscribers · Dwin Universe</div>
       </div>
     </div>
     <button class="follow-btn">FOLLOW</button>
@@ -1046,7 +1046,7 @@
 
   <!-- TABS -->
   <div class="tabs">
-    <div class="tab active" onclick="switchTab(this, 'comments')">💬 Comments (3.2K)</div>
+    <div class="tab active" onclick="switchTab(this, 'comments')">💬 Comments (<span id="commentCount">0</span>)</div>
     <div class="tab" onclick="switchTab(this, 'queue')">📺 Up Next</div>
     <div class="tab" onclick="switchTab(this, 'chat')">⚡ Live Chat</div>
   </div>
@@ -1371,10 +1371,20 @@ async function loadVideoData() {
 
 async function loadComments() {
   if (!videoId) return;
-  const { data } = await db.from('comments').select('*').eq('video_id', videoId).order('created_at', {ascending: false}).limit(20);
-  if (!data || !data.length) return;
+  const { data, count } = await db
+    .from('comments')
+    .select('*', { count: 'exact' })
+    .eq('video_id', videoId)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  const countEl = document.getElementById('commentCount');
+  if (countEl) countEl.textContent = count || 0;
   const panel = document.getElementById('comments-panel');
-  const realHtml = data.map(c => `
+  if (!data || !data.length) {
+    panel.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No comments yet. Be the first!</div>';
+    return;
+  }
+  panel.innerHTML = data.map(c => `
     <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
       <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#b44fff);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0;">${(c.username||'U')[0].toUpperCase()}</div>
       <div>
@@ -1383,7 +1393,6 @@ async function loadComments() {
         <div style="font-size:10px;color:rgba(232,244,255,0.3);margin-top:4px;">❤ ${c.likes||0}</div>
       </div>
     </div>`).join('');
-  panel.innerHTML = realHtml;
 }
 
 async function postComment() {
@@ -1402,10 +1411,12 @@ async function postComment() {
 async function likeVideo() {
   if (!videoId) return;
   const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
-  await db.from('video_likes').insert({ video_id: videoId, user_id: user.id });
-  const { count } = await db.from('video_likes').select('*', {count:'exact'}).eq('video_id', videoId);
-  document.querySelector('.like-count') && (document.querySelector('.like-count').textContent = count || 0);
+  if (!user) { alert('Sign in to like!'); return; }
+  const { error } = await db.from('video_likes').insert({ video_id: videoId, user_id: user.id });
+  if (error) return;
+  const { count } = await db
+    .from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
+  document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
 }
 
 // Hook comment submit
