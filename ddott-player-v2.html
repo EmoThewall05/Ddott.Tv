@@ -1365,8 +1365,11 @@ async function loadVideoData() {
   // Update views
   await db.from('videos').update({ views: (v.views||0) + 1 }).eq('id', videoId);
   // Update UI
-  document.querySelectorAll('.meta-chip')[0].textContent = `👁 ${(v.views||0)+1} views`;
-  document.querySelector('.video-title-main') && (document.querySelector('.video-title-main').textContent = v.title);
+  document.getElementById('viewCount').textContent = `👁 ${views} views`;
+  if (v.title) {
+    const titleEl = document.querySelector('h1');
+    if (titleEl) titleEl.textContent = v.title;
+  }
 }
 
 async function loadComments() {
