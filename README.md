@@ -304,6 +304,7 @@ Bash
 Push to main — GitHub Pages auto-deploys from root.
 ------------------------------------------------------
 🧱 Tech Stack
+
 Layer
 Tech
 Frontend
@@ -322,6 +323,7 @@ Version Control
 Git (mobile)
 ------------------------------------------------------
 📁 Project Structure
+
 Ddott.Tv/
 ├── index.html                  # Home feed
 ├── ddott-player-v2.html        # Video player (V2)
@@ -335,6 +337,7 @@ Ddott.Tv/
 ------------------------------------------------------
 🗺️ Roadmap
 ✅ Done
+
 [x] Video player V2 — neon UI, stickers, comments, likes
 [x] Real Supabase view count, comments, like system
 [x] Proof of Watch quiz → EMO COINS reward
@@ -357,6 +360,7 @@ Ddott.Tv/
 [ ] Notifications — likes, comments, collab invites
 [ ] TheWall coin conversion live integration
 ======================================================
+
 🔗 Dwin Universe
 Project
 Description
@@ -372,7 +376,9 @@ Flutter child safety app
 In Development
 📱 Emobies
 Mobile repair platform 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=👤 Author
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+👤 Author
 Dwin · Emobies05 / EmoThewall05
 Based in Dubai. Building on mobile. No laptop. No excuses.
 
