@@ -297,6 +297,7 @@ python3 -m http.server 8080
 Bash
 4. Deploy
 Push to main — GitHub Pages auto-deploys from root.
+
 🧱 Tech Stack
 Layer
 Tech
@@ -314,8 +315,10 @@ Dev Environment
 Termux + Acode — Android mobile only
 Version Control
 Git (mobile)
+
 📁 Project Structure
 Code
+
 🗺️ Roadmap
 ✅ Done
 [x] Video player V2 — neon UI, stickers, comments, likes
@@ -339,13 +342,16 @@ Code
 [ ] Search — videos, creators, communities
 [ ] Notifications — likes, comments, collab invites
 [ ] TheWall coin conversion live integration
+
 🔗 Dwin Universe
 Project
 Description
 Status
+
 📺 Ddott.TV
 Creator video platform
 Active
+
 🔗 TheWall
 5-chain Web3 wallet
 Live
@@ -355,6 +361,7 @@ In Development
 📱 Emobies
 Mobile repair platform
 Active
+
 👤 Author
 Dwin · Emobies05 / EmoThewall05
 Based in Dubai. Building on mobile. No laptop. No excuses.
