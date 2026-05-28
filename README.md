@@ -293,8 +293,6 @@ const db = supabase.createClient(
 python3 -m http.server 8080
 # Open: http://localhost:8080/ddott-player-v2.html?id=<video_id>
 ```
-3. Run locally
-Bash
 4. Deploy
 Push to main — GitHub Pages auto-deploys from root.
 
@@ -317,7 +315,16 @@ Version Control
 Git (mobile)
 
 📁 Project Structure
-Code
+Ddott.Tv/
+├── index.html                  # Home feed
+├── ddott-player-v2.html        # Video player (V2)
+├── community.html              # Community center
+├── coins.html                  # EMO Coins wallet + tasks
+├── studio.html                 # Creator studio (WIP)
+├── messaging.html              # Chat + stickers (WIP)
+├── channel.html                # Creator profile page (WIP)
+├── landing.html                # Public landing page (WIP)
+└── README.md
 
 🗺️ Roadmap
 ✅ Done
@@ -342,16 +349,14 @@ Code
 [ ] Search — videos, creators, communities
 [ ] Notifications — likes, comments, collab invites
 [ ] TheWall coin conversion live integration
-
+j
 🔗 Dwin Universe
 Project
 Description
 Status
-
 📺 Ddott.TV
 Creator video platform
 Active
-
 🔗 TheWall
 5-chain Web3 wallet
 Live
@@ -360,7 +365,6 @@ Flutter child safety app
 In Development
 📱 Emobies
 Mobile repair platform
-Active
 
 👤 Author
 Dwin · Emobies05 / EmoThewall05
@@ -370,3 +374,4 @@ TheWall: thewall-web3-iie7.vercel.app
 Emowall AI: emowall-ai-2-0.vercel.app
 📄 License
 MIT — build freely, credit kindly.
+Code
