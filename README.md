@@ -302,6 +302,8 @@ Js
 Bash
 4. Deploy
 Push to main — GitHub Pages auto-deploys from root.
+
+
 🧱 Tech Stack
 Layer
 Tech
