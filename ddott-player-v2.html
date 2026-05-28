@@ -1073,72 +1073,7 @@
       <textarea class="comment-input" placeholder="Add a comment... or drop a sticker 🍕" rows="1" id="commentInput"></textarea>
     </div>
 
-    <!-- COMMENTS -->
-    <div class="comment">
-      <div class="comment-avatar" style="background: linear-gradient(135deg,#ff00c8,#b400ff)">A</div>
-      <div class="comment-body">
-        <div class="comment-header">
-          <span class="comment-user">@alexcrypto</span>
-          <span class="comment-time">1h ago</span>
-        </div>
-        <div class="comment-text">Building a full Web3 wallet from a PHONE?! Absolute unit. That Alchemy integration looked clean 🔥🔥</div>
-        <div class="comment-actions">
-          <div class="ca-btn liked">❤ 412</div>
-          <div class="ca-btn">Reply</div>
-          <div class="ca-btn">🚀 Tip</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="comment">
-      <div class="comment-avatar" style="background: linear-gradient(135deg,#00f5ff,#0050ff)">S</div>
-      <div class="comment-body">
-        <div class="comment-header">
-          <span class="comment-user">@sophiaweb3</span>
-          <span class="comment-time">45m ago</span>
-        </div>
-        <div class="comment-text">Divin you're insane bro 😭 Termux + Acode + deploying to Vercel?? I can't even do this on my MacBook Pro 💀</div>
-        <div class="comment-actions">
-          <div class="ca-btn">❤ 287</div>
-          <div class="ca-btn">Reply</div>
-          <div class="ca-btn">🚀 Tip</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="comment">
-      <div class="comment-avatar" style="background: linear-gradient(135deg,#ffaa00,#ff5500)">R</div>
-      <div class="comment-body">
-        <div class="comment-header">
-          <span class="comment-user">@ryanbuilds</span>
-          <span class="comment-time">30m ago</span>
-        </div>
-        <div class="comment-text">🍕🍕🍕 this is the content I came for. The Emowall AI section was 🤯 — Claude Haiku for in-app AI is such a smart move</div>
-        <div class="comment-actions">
-          <div class="ca-btn">❤ 156</div>
-          <div class="ca-btn">Reply</div>
-          <div class="ca-btn">🚀 Tip</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="comment">
-      <div class="comment-avatar" style="background: linear-gradient(135deg,#00ff88,#00f5ff)">M</div>
-      <div class="comment-body">
-        <div class="comment-header">
-          <span class="comment-user">@miadev</span>
-          <span class="comment-time">12m ago</span>
-        </div>
-        <div class="comment-text">🚀🚀 dropped 50 Emo Coins just for this. Dubai to the world bro. The Dwin Universe is going to be massive fr 🦋</div>
-        <div class="comment-actions">
-          <div class="ca-btn">❤ 94</div>
-          <div class="ca-btn">Reply</div>
-          <div class="ca-btn">🚀 Tip</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+    
   <!-- QUEUE TAB -->
   <div id="queue-panel" style="display:none">
     <div class="section-label">Now Playing</div>
@@ -1283,8 +1218,10 @@
     const mins = Math.floor(dur / 60);
     const secs = Math.floor(dur % 60);
     const correctDur = mins + ' min ' + secs + ' sec';
-    const fakeDur1 = (mins + 1) + ' min ' + secs + ' sec';
-    const fakeDur2 = (mins > 0 ? mins - 1 : mins + 2) + ' min ' + secs + ' sec';
+    const fakeSecs1 = (secs + 15) % 60;
+    const fakeDur1 = (mins + 1) + ' min ' + fakeSecs1 + ' sec';
+    const fakeSecs2 = secs > 15 ? secs - 10 : secs + 20;
+    const fakeDur2 = (mins > 0 ? mins - 1 : mins + 2) + ' min ' + fakeSecs2 + ' sec';
 
     quizCorrect = { q1: correctDur };
 
@@ -1446,7 +1383,7 @@ async function loadComments() {
         <div style="font-size:10px;color:rgba(232,244,255,0.3);margin-top:4px;">❤ ${c.likes||0}</div>
       </div>
     </div>`).join('');
-  panel.innerHTML = realHtml + panel.innerHTML;
+  panel.innerHTML = realHtml;
 }
 
 async function postComment() {
