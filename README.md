@@ -302,25 +302,15 @@ Js
 Bash
 4. Deploy
 Push to main — GitHub Pages auto-deploys from root.
-------------------------------------------------------
-🧱 Tech Stack
+---------------------------------------------------
+    
+    Layer         Tech  
+    Frontend      Vanilla HTML, CSS, JavaScript  
+    Backend / DB  Supabase (Postgres + Auth + Storage)   
+    Web3           TheWall — Alchemy + WalletConnect + Reown
 
-Layer
-Tech
-Frontend
-Vanilla HTML, CSS, JavaScript
-Backend / DB
-Supabase (Postgres + Auth + Storage)
-Web3
-TheWall — Alchemy + WalletConnect + Reown
-AI
-Claude (Anthropic) + Gemini + OpenAI + Perplexity
-Hosting
-GitHub Pages + Vercel
-Dev Environment
-Termux + Acode — Android mobile only
-Version Control
-Git (mobile)
+         
+
 ------------------------------------------------------
 📁 Project Structure
 
@@ -359,7 +349,7 @@ Ddott.Tv/
 [ ] Search — videos, creators, communities
 [ ] Notifications — likes, comments, collab invites
 [ ] TheWall coin conversion live integration
-======================================================
+------------------------------------------------------
 
 🔗 Dwin Universe
 Project
@@ -375,8 +365,8 @@ Live
 Flutter child safety app
 In Development
 📱 Emobies
-Mobile repair platform 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Mobile repair platform
+------------------------------------------------------
 
 👤 Author
 Dwin · Emobies05 / EmoThewall05
