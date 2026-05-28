@@ -297,22 +297,25 @@ python3 -m http.server 8080
 Push to main — GitHub Pages auto-deploys from root.
 
 🧱 Tech Stack
-Layer
-Tech
-Frontend
-Vanilla HTML, CSS, JavaScript
-Backend / DB
-Supabase (Postgres + Auth + Storage)
-Web3
-TheWall — Alchemy + WalletConnect + Reown
-AI
-Claude (Anthropic) + Gemini + OpenAI + Perplexity
-Hosting
-GitHub Pages + Vercel
-Dev Environment
-Termux + Acode — Android mobile only
-Version Control
-Git (mobile)
+
+                                                  Layer               Tech
+
+                                                  Frontend            Vanilla HTML, CSS, JavaScript
+
+                                                  Backend / DBb       Supabase (Postgres                                + Auth + Storage)
+                      
+                   
+                                                 Web3                TheWall — Alchemy +                               WalletConnect + Reown
+                  
+                                                  AI                  Claude (Anthropic) + Gemini                       OpenAI + Perplexity +
+
+                                                  Hosting            GitHub Pages + Vercel
+
+ 
+                                                                                                    Dev Environment     Termux + Acode — Android                          mobile only                   
+                                                                     
+                                               Version Control    Git (mobile)
+
 
 📁 Project Structure
 Ddott.Tv/
