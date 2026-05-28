@@ -294,49 +294,33 @@ python3 -m http.server 8080
 # Open: http://localhost:8080/ddott-player-v2.html?id=<video_id>
 ```
 4. Deploy
+Push to main — GitHub Pages auto-deploys from root.Markdown
+2. Configure Supabase
+Find the Supabase client init block and update:
+Js
+3. Run locally
+Bash
+4. Deploy
 Push to main — GitHub Pages auto-deploys from root.
-
 🧱 Tech Stack
-
-                                                  Layer              
-                                                Tech
-
-                                                  Frontend           
-                                                 Vanilla HTML, CSS, JavaScript
-
-                                                  Backend / DBb      
-                                                  Supabase (Postgres                                + Auth + Storage)
-                      
-                   
-                                                 Web3              
-                                                 TheWall — Alchemy +                               WalletConnect + Reown
-                  
-                                                  AI                 
-                                                  Claude (Anthropic) + Gemini                       OpenAI + Perplexity +
-
-                                                  Hosting           
-                                                  GitHub Pages + Vercel
-
- 
-                                                                                                    Dev Environment    
-                                                                                                    Termux + Acode — Android                          mobile only                   
-                                                                     
-                                               Version Control    
-                                               Git (mobile)
-
-
+Layer
+Tech
+Frontend
+Vanilla HTML, CSS, JavaScript
+Backend / DB
+Supabase (Postgres + Auth + Storage)
+Web3
+TheWall — Alchemy + WalletConnect + Reown
+AI
+Claude (Anthropic) + Gemini + OpenAI + Perplexity
+Hosting
+GitHub Pages + Vercel
+Dev Environment
+Termux + Acode — Android mobile only
+Version Control
+Git (mobile)
 📁 Project Structure
-Ddott.Tv/
-├── index.html                  # Home feed
-├── ddott-player-v2.html        # Video player (V2)
-├── community.html              # Community center
-├── coins.html                  # EMO Coins wallet + tasks
-├── studio.html                 # Creator studio (WIP)
-├── messaging.html              # Chat + stickers (WIP)
-├── channel.html                # Creator profile page (WIP)
-├── landing.html                # Public landing page (WIP)
-└── README.md
-
+Code
 🗺️ Roadmap
 ✅ Done
 [x] Video player V2 — neon UI, stickers, comments, likes
@@ -360,7 +344,6 @@ Ddott.Tv/
 [ ] Search — videos, creators, communities
 [ ] Notifications — likes, comments, collab invites
 [ ] TheWall coin conversion live integration
-j
 🔗 Dwin Universe
 Project
 Description
@@ -376,7 +359,7 @@ Flutter child safety app
 In Development
 📱 Emobies
 Mobile repair platform
-
+Active
 👤 Author
 Dwin · Emobies05 / EmoThewall05
 Based in Dubai. Building on mobile. No laptop. No excuses.
@@ -386,3 +369,4 @@ Emowall AI: emowall-ai-2-0.vercel.app
 📄 License
 MIT — build freely, credit kindly.
 Code
+
