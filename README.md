@@ -279,9 +279,20 @@ The 7-Brain Claude AI butterfly — integrated directly into Ddott.TV.
 ```bash
 git clone https://github.com/EmoThewall05/Ddott.Tv.git
 cd Ddott.Tv
-. Configure Supabase
+. ### 2. Configure Supabase
 Find the Supabase client init block and update:
-Js
+```js
+const db = supabase.createClient(
+  'https://YOUR_PROJECT.supabase.co',
+  'YOUR_ANON_KEY'
+);
+```
+
+### 3. Run locally
+```bash
+python3 -m http.server 8080
+# Open: http://localhost:8080/ddott-player-v2.html?id=<video_id>
+```
 3. Run locally
 Bash
 4. Deploy
