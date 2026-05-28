@@ -1,11 +1,21 @@
-    # 📺 Ddott.TV
-    > **The Creator Platform built on mobile. No laptop. No excuses.**
+ # 📺 Ddott.TV
+   
+> **The Creator Platform built on mobile. No laptop. No excuses.**
+> 
     > Videos · Live · Community · AI · Web3 — all in one.
 
-    ![Platform](https://img.shields.io/badge/Platform-Web-cyan)
-    ![Stack](https://img.shields.io/badge/Stack-Supabase%20%2B%20Vanilla%20JS-purple)
-    ![Built on](https://img.shields.io/badge/Built%20on-Mobile%20%28Termux%20%2B%20Acode%29-green)
-    ![Status](https://img.shields.io/badge/Status-Active%20Development-orange)
+![Platform](https://img.shields.io/badge/Platform-Web-cyan)
+   
+    
+![Stack](https://img.shields.io/badge/Stack-Supabase%20%2B%20Vanilla%20JS-purple)
+    ![Built on]
+    
+(https://img.shields.io/badge/Built%20on-Mobile%20%28Termux%20%2B%20Acode%29-green)
+ 
+![Status](https://img.shields.io/badge/Status-Active%20Development-orange)
+
+    
+    
      ---
      ## 🌐 Live
 
