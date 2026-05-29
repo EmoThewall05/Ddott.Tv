@@ -296,22 +296,25 @@ const db = supabase.createClient(
     🧱 Tech Stack
 ------------------------------------------------- 
 
-Layer          -   Tech
+    Layer          -   Tech
 
-Frontend       -   Vanilla HTML,C S JavaScript
+    Frontend       -   Vanilla HTML,C S JavaScript
 
-Backend / DB   -  Supabase (Postgres + Auth +    Storage)
+    Backend / DB   -  Supabase (Postgres + Auth +    Storage)
 
-Web3           - TheWall — Alchemy WalletConnect + Reown
+    Web3           - TheWall — Alchemy WalletConnect + Reown
 
-AI             -  Claude (Anthropic) + Gemini + OpenAI + Perplexity
+    AI             -  Claude (Anthropic) + Gemini + OpenAI + Perplexity
 
-Hosting        -  GitHub Pages + Vercel
+    Hosting        -  GitHub Pages + Vercel
 
-Dev Environment-  Termux + Acode — Android mobile only
+    Dev Environment-  Termux + Acode — Android mobile only
 
-Version Control-  Git (mobile                     -------------------------------------------------   📁 Project Structure
- Ddott.Tv/
+    Version Control-  Git (mobile                 ------------------------------------------------- 
+
+    📁 Project Structure
+  
+    Ddott.Tv/
     ├── index.html                  # Home feed
     ├── ddott-player-v2.html        # Video player (V2)
     ├── community.html              # Community center
@@ -321,10 +324,11 @@ Version Control-  Git (mobile                     ------------------------------
     ├── channel.html                # Creator profile page (WIP)
     ├── landing.html                # Public landing page (WIP)
     └── README.md
---------------------------------------------------
-    🗺️ Roadmap
+    ----------------------------------------------
+   🗺️ Roadmap
     
-    ✅ Done
+   ✅ Done
+    
      [x] Video player V2 — neon UI, stickers, comments, likes
     
     [x] Real Supabase view count, comments, like system
@@ -369,37 +373,37 @@ Version Control-  Git (mobile                     ------------------------------
     
     [ ] TheWall coin conversion live integration   -----------------------------------------------    🔗 Dwin Universe
      Project
---------------------------------------------------
+    ---------------------------------------------
     Description
     Status
     
-    📺 🅓︎🅓︎🅞︎🅣︎🅣︎.🅣︎🅥︎
+   📺 🅓︎🅓︎🅞︎🅣︎🅣︎.🅣︎🅥︎
     
     Creator video platform
     Active
     
-    🔗 🅃🄷🄴🅆🄰🄻🄻-🅆🄴🄱3
+   🔗 🅃🄷🄴🅆🄰🄻🄻-🅆🄴🄱3
     
     5-chain Web3 wallet
     Live
     
-    📱 E̤M̤O̤W̤A̤L̤L̤.A̤I̤. 2̤.0̤
+   📱 E̤M̤O̤W̤A̤L̤L̤.A̤I̤. 2̤.0̤
     
     Flutter child safety app
     In Development
     
-    📱 🇪‌🇲‌🇴‌🇧‌🇮‌🇪‌🇸‌ 
+   📱 🇪‌🇲‌🇴‌🇧‌🇮‌🇪‌🇸‌ 
      Mobile repair platform
---------------------------------------------------
-    👤 Author
+     
+    ----------------------------------------------
+   👤 Author
 
-    Dwin · Emobies05 / EmoThewall05
+   Dwin · Emobies05 / EmoThewall05
     Based in Dubai. Building on mobile. No laptop. No excuses.
 
-    GitHub: @EmoThewall05
+   GitHub: @EmoThewall05
     TheWall: thewall-web3-iie7.vercel.app
     Emowall AI: emowall-ai-2-0.vercel.app
----------------------------------------------------
-    📄 License
+------------------------------------------------- 📄 License
     MIT — build freely, credit kindly.
     Code
