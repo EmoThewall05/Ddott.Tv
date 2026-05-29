@@ -27,7 +27,7 @@
 
 | Page | URL |
 |---|---|
-| Platform | ddott-tv.vercel.app/ddott-login.html |
+| Platform | http://ddott-tv.vercel.app/ddott-login.html |
 | Video Player | `ddott-player-v2.html?id=<video_id>` |
 | TheWall (Web3) | https://thewall-web3-iie7.vercel.app |
 
@@ -293,7 +293,9 @@ const db = supabase.createClient(
     # Open: http://localhost:8080/ddott-player-v2.html?id=<video_id>
 ```
 --------------------------------------------------
-    🧱 Tech Stack
+   
+   🧱 Tech Stack
+    
 ------------------------------------------------- 
 
     Layer          -   Tech
@@ -310,10 +312,10 @@ const db = supabase.createClient(
 
     Dev Environment-  Termux + Acode — Android mobile only
 
-    Version Control-  Git (mobile                 ------------------------------------------------- 
-
-    📁 Project Structure
-  
+    Version Control-  Git (mobile                 
+    
+------------------------------------------------- 
+ 📁 Project Structure
     Ddott.Tv/
     ├── index.html                  # Home feed
     ├── ddott-player-v2.html        # Video player (V2)
@@ -324,21 +326,21 @@ const db = supabase.createClient(
     ├── channel.html                # Creator profile page (WIP)
     ├── landing.html                # Public landing page (WIP)
     └── README.md
-    ----------------------------------------------
+     
+-------------------------------------------------
+   
    🗺️ Roadmap
     
    ✅ Done
+     [x] Video player V2 — neon UI, stickers,          comments, likes
+     [x] Real Supabase view count, comments, like      system
     
-     [x] Video player V2 — neon UI, stickers, comments, likes
+     [x] Proof of Watch quiz → EMO COINS reward
     
-    [x] Real Supabase view count, comments, like system
-    
-    [x] Proof of Watch quiz → EMO COINS reward
-    
-    [x] Community Center UI — collabs, 
+     [x] Community Center UI — collabs, 
      categories, AI superpowers
     
-    [x] EMO Coins wallet — daily tasks, streak, level, conversion via TheWall
+     [x] EMO Coins wallet — daily tasks, streak, level, conversion via TheWall
     
     [x] Home feed shell with live stream card
     
@@ -371,9 +373,14 @@ const db = supabase.createClient(
     [ ] Notifications — likes, comments, collab
     invites
     
-    [ ] TheWall coin conversion live integration   -----------------------------------------------    🔗 Dwin Universe
-     Project
+    [ ] TheWall coin conversion live integration
+    
     ---------------------------------------------
+  
+    🔗 Dwin Universe
+      Project
+    ---------------------------------------------
+   
     Description
     Status
     
@@ -393,17 +400,21 @@ const db = supabase.createClient(
     In Development
     
    📱 🇪‌🇲‌🇴‌🇧‌🇮‌🇪‌🇸‌ 
+   
      Mobile repair platform
-     
-    ----------------------------------------------
+    
+  
    👤 Author
-
-   Dwin · Emobies05 / EmoThewall05
-    Based in Dubai. Building on mobile. No laptop. No excuses.
-
+     
+      Dwin · Emobies05 / EmoThewall05
+      Based in Dubai. Building on mobile. No            laptop. No excuses.
+      
    GitHub: @EmoThewall05
-    TheWall: thewall-web3-iie7.vercel.app
-    Emowall AI: emowall-ai-2-0.vercel.app
-------------------------------------------------- 📄 License
-    MIT — build freely, credit kindly.
-    Code
+   TheWall: thewall-web3-iie7.vercel.app
+   Emowall AI: emowall-ai-2-0.vercel.app
+    
+------------------------------------------------- 
+
+📄 License
+   MIT — build freely, credit kindly.
+   Code
