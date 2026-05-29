@@ -1,4 +1,4 @@
-# 📺 Ddott.TV
+# 📺 🅓︎🅓︎🅞︎🅣︎🅣︎.🅣︎🅥︎
 
 > **The Creator Platform built on mobile. No laptop. No excuses.**
 > Videos · Live · Community · AI · Web3 — all in one.
