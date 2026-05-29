@@ -1249,10 +1249,15 @@
       btn.textContent = opt;
       btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;';
       btn.onclick = () => {
-        container.querySelectorAll('button').forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+        container.querySelectorAll('button').forEach(b => {
+          b.style.background = 'rgba(255,255,255,0.05)';
+          b.style.borderColor = 'rgba(255,255,255,0.1)';
+        });
         btn.style.background = 'rgba(0,245,255,0.15)';
         btn.style.borderColor = '#00f5ff';
         quizAnswers[qKey] = opt;
+        document.getElementById('quizResult').innerHTML = '';
+        document.getElementById('quizSubmit').disabled = false;
       };
       container.appendChild(btn);
     });
