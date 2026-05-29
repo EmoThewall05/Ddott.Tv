@@ -27,7 +27,7 @@
 
 | Page | URL |
 |---|---|
-| Platform | https://emothewwall05.github.io/Ddott.Tv |
+| Platform | ddott-tv.vercel.app/ddott-login.html |
 | Video Player | `ddott-player-v2.html?id=<video_id>` |
 | TheWall (Web3) | https://thewall-web3-iie7.vercel.app |
 
@@ -286,27 +286,32 @@ const db = supabase.createClient(
   'https://YOUR_PROJECT.supabase.co',
   'YOUR_ANON_KEY'
 );
-```
-     ### 3. Run locally
+``
+### 3. Run locally
     ```bash
     python3 -m http.server 8080
     # Open: http://localhost:8080/ddott-player-v2.html?id=<video_id>
 ```
-------------------------------------------------------
+--------------------------------------------------
     🧱 Tech Stack
------------------------------------------------------      Layer         - Tech  
-    Frontend       - Vanilla HTML, CSS, JavaScript  
-    Backend / DB   - Supabase (Postgres + Auth + Storage)   
-    Web3           -TheWall — Alchemy + WalletConnect + Reown
-    AI             - Claude (Anthropic) + Gemini + OpenAI + Perplexity
-    Hosting        -GitHub Pages + Vercel
-    Dev Environment-Termux + Acode — Android mobile only
-    Version Control-Git (mobile)
-------------------------------------------------------
+------------------------------------------------- 
 
-    📁 Project Structure
+Layer          -   Tech
 
-    Ddott.Tv/
+Frontend       -   Vanilla HTML,C S JavaScript
+
+Backend / DB   -  Supabase (Postgres + Auth +    Storage)
+
+Web3           - TheWall — Alchemy WalletConnect + Reown
+
+AI             -  Claude (Anthropic) + Gemini + OpenAI + Perplexity
+
+Hosting        -  GitHub Pages + Vercel
+
+Dev Environment-  Termux + Acode — Android mobile only
+
+Version Control-  Git (mobile                     -------------------------------------------------   📁 Project Structure
+ Ddott.Tv/
     ├── index.html                  # Home feed
     ├── ddott-player-v2.html        # Video player (V2)
     ├── community.html              # Community center
@@ -316,47 +321,76 @@ const db = supabase.createClient(
     ├── channel.html                # Creator profile page (WIP)
     ├── landing.html                # Public landing page (WIP)
     └── README.md
-------------------------------------------------------
+--------------------------------------------------
     🗺️ Roadmap
+    
     ✅ Done
-    [x] Video player V2 — neon UI, stickers, comments, likes
+     [x] Video player V2 — neon UI, stickers, comments, likes
+    
     [x] Real Supabase view count, comments, like system
+    
     [x] Proof of Watch quiz → EMO COINS reward
-    [x] Community Center UI — collabs, categories, AI superpowers
+    
+    [x] Community Center UI — collabs, 
+     categories, AI superpowers
+    
     [x] EMO Coins wallet — daily tasks, streak, level, conversion via TheWall
+    
     [x] Home feed shell with live stream card
+    
     [x] Emowall AI butterfly integration
+    
     🔨 In Progress
+    
     [ ] Video upload flow → Supabase storage + videos table insert
+    
     [ ] Homepage feed — dynamic cards from Supabase
+    
     [ ] Creator Studio — upload + quiz builder + script AI
+    
     [ ] Auth page — sign in / sign up
+   
     🔜 Next
+    
     [ ] Creator channel page — profile, video grid, playlists
+    
     [ ] Messaging — DM + stickers + voice
+    
     [ ] EMO COINS live tipping (Supabase realtime)
-    [ ] Collab system — join, roles, completion reward
+   
+    [ ] Collab system — join, roles, completion
+    reward
+    
     [ ] AI News Reader — Malayalam/Arabic live feed
     [ ] Search — videos, creators, communities
-    [ ] Notifications — likes, comments, collab invites
-    [ ] TheWall coin conversion live integration   
------------------------------------------------------     🔗 Dwin Universe
+    
+    [ ] Notifications — likes, comments, collab
+    invites
+    
+    [ ] TheWall coin conversion live integration   -----------------------------------------------    🔗 Dwin Universe
      Project
-------------------------------------------------------
+--------------------------------------------------
     Description
     Status
-    📺 Ddott.TV
+    
+    📺 🅓︎🅓︎🅞︎🅣︎🅣︎.🅣︎🅥︎
+    
     Creator video platform
     Active
-    🔗 TheWall
+    
+    🔗 🅃🄷🄴🅆🄰🄻🄻-🅆🄴🄱3
+    
     5-chain Web3 wallet
     Live
-    📱 Emowall AI 2.0
+    
+    📱 E̤M̤O̤W̤A̤L̤L̤.A̤I̤. 2̤.0̤
+    
     Flutter child safety app
     In Development
-    📱 Emobies
-    Mobile repair platform
-------------------------------------------------------
+    
+    📱 🇪‌🇲‌🇴‌🇧‌🇮‌🇪‌🇸‌ 
+     Mobile repair platform
+--------------------------------------------------
     👤 Author
 
     Dwin · Emobies05 / EmoThewall05
