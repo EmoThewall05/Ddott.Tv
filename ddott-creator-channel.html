@@ -612,19 +612,19 @@
     <!-- STATS -->
     <div class="stats-bar">
       <div class="stat-card">
-        <div class="stat-val">84.2K</div>
+        <div class="stat-val" id="statSubs">0</div>
         <div class="stat-label">Subscribers</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">312</div>
+        <div class="stat-val" id="statVideos">0</div>
         <div class="stat-label">Videos</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">4.8M</div>
+        <div class="stat-val" id="statViews">0</div>
         <div class="stat-label">Total Views</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">96%</div>
+        <div class="stat-val" id="statLikes">0%</div>
         <div class="stat-label">Like Rate</div>
       </div>
     </div>
@@ -671,7 +671,7 @@
         <div class="vc-info">
           <div class="vc-title">Building Ddott TV Player V2 LIVE 🔥</div>
           <div class="vc-meta">2 hrs ago</div>
-          <div class="vc-views">🔴 4.2K watching</div>
+          <div class="vc-views" id="liveViewers">🔴 0 watching</div>
         </div>
       </div>
 
@@ -947,6 +947,85 @@
     btn.textContent = subscribed ? '✓ SUBSCRIBED' : 'SUBSCRIBE';
     btn.classList.toggle('subscribed', subscribed);
   }
+</script>
+
+<script>
+async function loadChannelStats() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  // Profile + subscriber count
+  const { data: profile } = await db
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  // Video count + total views
+  const { data: videos } = await db
+    .from('videos')
+    .select('views, likes')
+    .eq('user_id', user.id);
+
+  const videoCount = videos ? videos.length : 0;
+  const totalViews = videos ? videos.reduce((a, b) => a + (b.views || 0), 0) : 0;
+  const totalLikes = videos ? videos.reduce((a, b) => a + (b.likes || 0), 0) : 0;
+  const likeRate = totalViews > 0 ? Math.round((totalLikes / totalViews) * 100) : 0;
+
+  // Subscriber count
+  const { count: subCount } = await db
+    .from('subscriptions')
+    .select('*', { count: 'exact', head: true })
+    .eq('creator_id', user.id);
+
+  // Update UI
+  document.getElementById('statSubs').textContent = (subCount || 0).toLocaleString();
+  document.getElementById('statVideos').textContent = videoCount.toLocaleString();
+  document.getElementById('statViews').textContent = totalViews >= 1000000
+    ? (totalViews / 1000000).toFixed(1) + 'M'
+    : totalViews >= 1000
+    ? (totalViews / 1000).toFixed(1) + 'K'
+    : totalViews;
+  document.getElementById('statLikes').textContent = likeRate + '%';
+
+  // Username + bio
+  if (profile?.username) {
+    const nameEl = document.querySelector('.channel-name');
+    if (nameEl) nameEl.textContent = profile.username;
+  }
+
+  // Load real videos
+  if (videos && videos.length > 0) {
+    await loadVideoGrid(user.id);
+  }
+}
+
+async function loadVideoGrid(userId) {
+  const { data: videos } = await db
+    .from('videos')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(12);
+
+  if (!videos || !videos.length) return;
+
+  const grid = document.querySelector('.videos-grid') || document.querySelector('.video-grid');
+  if (!grid) return;
+
+  grid.innerHTML = videos.map(v => `
+    <div class="video-card" onclick="window.parent.postMessage({type:'navigate',page:'player',videoId:'${v.id}'},'*')" style="cursor:pointer;">
+      <div class="vc-thumb" style="background:linear-gradient(135deg,#0a0a1a,#1a0a2e);aspect-ratio:16/9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px;">🎬</div>
+      <div class="vc-title" style="font-size:12px;font-weight:600;color:#fff;margin-top:6px;">${v.title || 'Untitled'}</div>
+      <div class="vc-views" style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;">
+        ${v.views >= 1000 ? (v.views/1000).toFixed(1)+'K' : v.views || 0} views
+      </div>
+    </div>`).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadChannelStats, 500);
+});
 </script>
 </body>
 </html>
