@@ -315,7 +315,8 @@ const db = supabase.createClient(
     Version Control-  Git (mobile                 
     
 ------------------------------------------------- 
- 📁 Project Structure
+ 
+    📁 Project Structure
     Ddott.Tv/
     ├── index.html                  # Home feed
     ├── ddott-player-v2.html        # Video player (V2)
@@ -329,9 +330,10 @@ const db = supabase.createClient(
      
 -------------------------------------------------
    
-   🗺️ Roadmap
+    🗺️ Roadmap
     
-   ✅ Done
+    ✅ Done
+  
      [x] Video player V2 — neon UI, stickers,          comments, likes
      [x] Real Supabase view count, comments, like      system
     
@@ -375,11 +377,11 @@ const db = supabase.createClient(
     
     [ ] TheWall coin conversion live integration
     
-    ---------------------------------------------
+   ---------------------------------------------
   
     🔗 Dwin Universe
       Project
-    ---------------------------------------------
+   ---------------------------------------------
    
     Description
     Status
