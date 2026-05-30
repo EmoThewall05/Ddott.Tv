@@ -1167,7 +1167,8 @@
   const videoTitle = params.get('title') || 'Ddott TV Video';
   const videoCreator = params.get('creator') || 'Unknown';
   const videoCategory = params.get('category') || 'General';
-  if (videoUrl) video.src = videoUrl;
+  // Only use url param if no id param (id takes priority via loadVideoData)
+  if (videoUrl && !params.get('id')) video.src = videoUrl;
 
   // Update title
   const titleEl = document.querySelector('.video-info h1');
