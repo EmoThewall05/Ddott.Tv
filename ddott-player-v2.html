@@ -1367,14 +1367,29 @@ async function loadVideoData() {
   if (!videoId) return;
   const { data: v } = await db.from('videos').select('*').eq('id', videoId).single();
   if (!v) return;
+
+  // Set video source
+  const video = document.getElementById('realVideo');
+  if (video && v.video_url) {
+    video.src = v.video_url;
+    video.load();
+  }
+
   // Update views
   await db.from('videos').update({ views: (v.views||0) + 1 }).eq('id', videoId);
+  const views = (v.views||0) + 1;
+
   // Update UI
   document.getElementById('viewCount').textContent = `👁 ${views} views`;
   if (v.title) {
     const titleEl = document.querySelector('h1');
     if (titleEl) titleEl.textContent = v.title;
   }
+
+  // Like count
+  const { count: likeCount } = await db
+    .from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
+  document.getElementById('likeCount').textContent = (likeCount || 0).toLocaleString();
 }
 
 async function loadComments() {
