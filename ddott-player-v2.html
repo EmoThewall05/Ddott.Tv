@@ -1368,19 +1368,14 @@ async function loadVideoData() {
   const { data: v } = await db.from('videos').select('*').eq('id', videoId).single();
   if (!v) return;
 
-  // Set video source
+  // Set video source — no login required
   const video = document.getElementById('realVideo');
   if (video && v.video_url) {
     video.src = v.video_url;
     video.load();
   }
 
-  // Update views
-  await db.from('videos').update({ views: (v.views||0) + 1 }).eq('id', videoId);
-  const views = (v.views||0) + 1;
-
-  // Update UI
-  document.getElementById('viewCount').textContent = `👁 ${views} views`;
+  // Update UI immediately
   if (v.title) {
     const titleEl = document.querySelector('h1');
     if (titleEl) titleEl.textContent = v.title;
@@ -1390,6 +1385,12 @@ async function loadVideoData() {
   const { count: likeCount } = await db
     .from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
   document.getElementById('likeCount').textContent = (likeCount || 0).toLocaleString();
+
+  // Update views — best effort (no login needed)
+  try {
+    await db.from('videos').update({ views: (v.views||0) + 1 }).eq('id', videoId);
+    document.getElementById('viewCount').textContent = `👁 ${(v.views||0)+1} views`;
+  } catch(e) {}
 }
 
 async function loadComments() {
