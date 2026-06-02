@@ -1380,7 +1380,7 @@ async function loadVideoData() {
       : v.video_url.endsWith('.webm') ? 'video/webm'
       : 'video/mp4';
     video.appendChild(source);
-    video.load();
+    video.load(); video.play().catch(()=>{});
   }
 
   // Update UI immediately
