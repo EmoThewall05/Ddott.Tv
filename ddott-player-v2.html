@@ -1454,12 +1454,10 @@ async function likeVideo() {
 }
 
 // Hook comment submit
-window.addEventListener('load', () => {
-  loadVideoData();
-  loadComments();
+loadVideoData();
+loadComments();
   const submitBtn = document.querySelector('.comment-submit');
   if (submitBtn) submitBtn.addEventListener('click', postComment);
   const likeBtn = document.querySelector('.like-btn');
   if (likeBtn) likeBtn.addEventListener('click', likeVideo);
-});
 </script>
