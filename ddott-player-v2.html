@@ -1454,7 +1454,7 @@ async function likeVideo() {
 }
 
 // Hook comment submit
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   loadVideoData();
   loadComments();
   const submitBtn = document.querySelector('.comment-submit');
