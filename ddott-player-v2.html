@@ -747,7 +747,7 @@
   const titleEl = document.getElementById('videoTitle');
   if (titleEl) titleEl.textContent = videoTitle;
 
-  javascript<function setVideoSource(src) { <  if (!src || !video) return;<  try { <    // Remove existing <source> children<    while (video.firstChild) video.removeChild(video.firstChild);<    video.src = src;<    video.load();<    video.muted = true;<    video.play().then(() => { <      video.muted = false;<    }).catch(e => console.warn('Autoplay blocked:', e));<  } catch (e) { <    console.error('Error setting video source:', e);<  }<}
+  javascript<const titleEl = document.getElementById('videoTitle');<if (titleEl) titleEl.textContent = videoTitle;<<function setVideoSource(src) { <  if (!src || !video) return;<  try { <    // Remove existing <source> children<    while (video.firstChild) video.removeChild(video.firstChild);<    video.src = src;<    video.load();<    video.muted = true;<    video.play().then(() => { <      video.muted = false;<    }).catch(e => console.warn('Autoplay blocked:', e));<  } catch (e) { <    console.error('Error setting video source:', e);<  }<}<<async function initVideo() {<  // your code here<}
 
   async function initVideo() {
     if (videoId && db) {
