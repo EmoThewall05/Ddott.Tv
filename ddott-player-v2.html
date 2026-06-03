@@ -1108,5 +1108,13 @@
   loadComments();
   loadLikes();
 </script>
-</body>
+
+<div id="dbg" style="position:fixed;bottom:80px;left:0;right:0;background:rgba(0,0,0,0.85);color:#00f5ff;font-size:11px;padding:8px;z-index:9999;max-height:150px;overflow-y:auto;font-family:monospace;"></div>
+<script>
+const _log=console.log,_err=console.error,_warn=console.warn;
+function dbg(m){const d=document.getElementById('dbg');if(d){d.innerHTML+=m+'<br>';d.scrollTop=d.scrollHeight;}}
+console.log=(...a)=>{_log(...a);dbg('LOG: '+a.join(' '));};
+console.warn=(...a)=>{_warn(...a);dbg('<span style=color:#ffd84d>WARN: '+a.join(' ')+'</span>');};
+console.error=(...a)=>{_err(...a);dbg('<span style=color:#ff4466>ERR: '+a.join(' ')+'</span>');};
+</script></body>
 </html>
