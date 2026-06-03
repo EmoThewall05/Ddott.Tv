@@ -712,7 +712,7 @@
     if (typeof supabase !== 'undefined') {
       db = supabase.createClient(
         window.SUPABASE_URL || 'https://your-project.supabase.co',
-        window.SUPABASE_KEY || 'your-anon-key'
+        window.SUPABASE_ANON_KEY || 'your-anon-key'
       );
     }
   } catch (e) {
