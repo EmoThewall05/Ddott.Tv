@@ -483,7 +483,7 @@
   <!-- VIDEO PLAYER -->
   <div class="video-container">
     <div class="video-wrap">
-      <video id="realVideo" preload="metadata" playsinline controlsList="nodownload">
+      <video id="realVideo" preload="metadata" playsinline controlsList="nodownload" crossorigin="anonymous">
         <source src="" type="video/mp4">
         Your browser does not support the video tag.
       </video>
@@ -747,13 +747,24 @@
   const titleEl = document.getElementById('videoTitle');
   if (titleEl) titleEl.textContent = videoTitle;
 
+  // Log for debugging
+  console.log('[DDOTT-TV] Player initialized');
+  console.log('[DDOTT-TV] Video URL:', videoUrl);
+  console.log('[DDOTT-TV] Video ID:', videoId);
+
   function setVideoSource(src) {
-    if (!src) return;
+    if (!src) {
+      console.warn('[DDOTT-TV] No video source provided');
+      return;
+    }
     
-    // Find or create the source element
+    console.log('[DDOTT-TV] Setting video source:', src);
+    
+    // Find the source element
     let sourceElement = video.querySelector('source[type="video/mp4"]');
     
     if (!sourceElement) {
+      console.log('[DDOTT-TV] Creating new source element');
       sourceElement = document.createElement('source');
       sourceElement.type = 'video/mp4';
       video.appendChild(sourceElement);
@@ -761,21 +772,49 @@
     
     // Set the source URL
     sourceElement.src = src;
+    console.log('[DDOTT-TV] Source element created/updated');
     
     // Reset and load video
     video.load();
+    console.log('[DDOTT-TV] Video.load() called');
+    
+    // Mute for autoplay
     video.muted = true;
     
-    video.play().then(() => {
-      video.muted = false;
-    }).catch(e => console.warn('Autoplay blocked:', e));
+    // Try to autoplay
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        console.log('[DDOTT-TV] Autoplay succeeded');
+        video.muted = false;
+      }).catch(e => {
+        console.warn('[DDOTT-TV] Autoplay blocked:', e.message);
+      });
+    }
   }
 
+  // Add error event listener
+  video.addEventListener('error', (e) => {
+    console.error('[DDOTT-TV] Video error:', e.target.error?.message);
+  });
+
+  video.addEventListener('loadstart', () => {
+    console.log('[DDOTT-TV] Video loadstart');
+  });
+
+  video.addEventListener('loadeddata', () => {
+    console.log('[DDOTT-TV] Video loadeddata');
+  });
+
   async function initVideo() {
+    console.log('[DDOTT-TV] initVideo() called');
+    
     if (videoId && db) {
       try {
+        console.log('[DDOTT-TV] Fetching from DB with ID:', videoId);
         const { data: v } = await db.from('videos').select('*').eq('id', videoId).single();
         if (v && v.video_url) {
+          console.log('[DDOTT-TV] Found video in DB:', v.video_url);
           setVideoSource(v.video_url);
           if (v.title) titleEl.textContent = v.title;
           if (v.views !== undefined) {
@@ -785,11 +824,15 @@
           return;
         }
       } catch (e) {
-        console.warn('DB video load failed:', e);
+        console.warn('[DDOTT-TV] DB video load failed:', e);
       }
     }
+    
     if (videoUrl) {
+      console.log('[DDOTT-TV] Loading video from URL param:', videoUrl);
       setVideoSource(videoUrl);
+    } else {
+      console.warn('[DDOTT-TV] No video URL or ID provided');
     }
   }
 
@@ -834,6 +877,7 @@
     const s = Math.floor(video.duration % 60);
     totalTimeEl.textContent = m + ':' + s.toString().padStart(2,'0');
     durationBadge.textContent = '⏱ ' + m + ':' + s.toString().padStart(2,'0');
+    console.log('[DDOTT-TV] Video metadata loaded - duration:', m + ':' + s.toString().padStart(2,'0'));
   });
 
   progressWrap.addEventListener('click', (e) => {
@@ -860,7 +904,7 @@
       } else {
         await video.requestPictureInPicture();
       }
-    } catch (e) { console.warn('PiP not supported'); }
+    } catch (e) { console.warn('[DDOTT-TV] PiP not supported'); }
   });
 
   const qualities = ['4K', '1080p', '720p', '480p'];
@@ -962,7 +1006,7 @@
         user_id: user.id, amount: amount, type: 'watch_complete',
         description: 'Video watch reward: ' + videoTitle
       });
-    } catch (e) { console.warn('Coin credit failed:', e); }
+    } catch (e) { console.warn('[DDOTT-TV] Coin credit failed:', e); }
   }
 
   async function loadComments() {
@@ -998,7 +1042,7 @@
           </div>
         </div>`).join('');
     } catch (e) {
-      console.warn('Comments load failed:', e);
+      console.warn('[DDOTT-TV] Comments load failed:', e);
       document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Failed to load comments.</div>';
     }
   }
@@ -1019,7 +1063,7 @@
       });
       inp.value = '';
       loadComments();
-    } catch (e) { console.warn('Post comment failed:', e); alert('Failed to post comment.'); }
+    } catch (e) { console.warn('[DDOTT-TV] Post comment failed:', e); alert('Failed to post comment.'); }
   }
 
   document.getElementById('commentSubmitBtn').addEventListener('click', postComment);
@@ -1035,16 +1079,16 @@
     if (panel === 'comments') loadComments();
   }
 
-  // Initialize
-  document.addEventListener('DOMContentLoaded', () => {
-    initVideo();
-    loadComments();
-  });
-  
-  // Fallback if DOM already loaded
+  // Initialize on DOM ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initVideo);
+    console.log('[DDOTT-TV] Waiting for DOM to load...');
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[DDOTT-TV] DOM loaded, calling initVideo()');
+      initVideo();
+      loadComments();
+    });
   } else {
+    console.log('[DDOTT-TV] DOM already loaded, calling initVideo() immediately');
     initVideo();
     loadComments();
   }
