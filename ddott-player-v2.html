@@ -498,7 +498,7 @@
           <div id="q1options" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
 
-        <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;letter-spacing:1px;transition:all 0.3s;">
+        <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:1px;">
           Submit & Earn Coins 🪙
         </button>
         <div id="quizResult" style="margin-top:12px;text-align:center;font-size:13px;"></div>
@@ -998,100 +998,24 @@
       if (!user) return;
       const { data: coins } = await db.from('emo_coins').select('*').eq('user_id', user.id).single();
       if (!coins) return;
-      await db.from('emo_coins').update({
-        balance: coins.balance + amount,
-        total_earned: (coins.total_earned || 0) + amount
-      }).eq('user_id', user.id);
-      await db.from('emo_transactions').insert({
-        user_id: user.id, amount: amount, type: 'watch_complete',
-        description: 'Video watch reward: ' + videoTitle
-      });
+      await db.from('emo_coins').update({ balance: coins.balance + amount }).eq('user_id', user.id);
     } catch (e) { console.warn('[DDOTT-TV] Coin credit failed:', e); }
   }
 
-  async function loadComments() {
-    if (!videoId) {
-      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No video ID. Comments unavailable.</div>';
-      return;
-    }
-    if (!db) {
-      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Database not connected. Comments unavailable.</div>';
-      return;
-    }
-    try {
-      const { data, count } = await db.from('comments').select('*', { count: 'exact' }).eq('video_id', videoId).order('created_at', { ascending: false }).limit(20);
-      document.getElementById('commentCount').textContent = count || 0;
-      const panel = document.getElementById('commentsList');
-      if (!data || !data.length) {
-        panel.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No comments yet. Be the first!</div>';
-        return;
-      }
-      panel.innerHTML = data.map(c => `
-        <div class="comment">
-          <div class="comment-avatar">${(c.username||'U')[0].toUpperCase()}</div>
-          <div class="comment-body">
-            <div class="comment-header">
-              <span class="comment-user">@${c.username||'user'}</span>
-              <span class="comment-time">${new Date(c.created_at).toLocaleDateString()}</span>
-            </div>
-            <div class="comment-text">${c.content}</div>
-            <div class="comment-actions">
-              <span class="ca-btn">❤ ${c.likes||0}</span>
-              <span class="ca-btn">Reply</span>
-            </div>
-          </div>
-        </div>`).join('');
-    } catch (e) {
-      console.warn('[DDOTT-TV] Comments load failed:', e);
-      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Failed to load comments.</div>';
-    }
-  }
-
-  async function postComment() {
-    if (!videoId || !db) return;
-    const inp = document.getElementById('commentInput');
-    const content = inp.value.trim();
-    if (!content) return;
-    try {
-      const { data: { user } } = await db.auth.getUser();
-      if (!user) { alert('Sign in to comment!'); return; }
-      const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
-      await db.from('comments').insert({
-        video_id: videoId, user_id: user.id,
-        username: profile?.username || user.email?.split('@')[0],
-        content
-      });
-      inp.value = '';
-      loadComments();
-    } catch (e) { console.warn('[DDOTT-TV] Post comment failed:', e); alert('Failed to post comment.'); }
-  }
-
-  document.getElementById('commentSubmitBtn').addEventListener('click', postComment);
-  document.getElementById('commentInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); postComment(); }
-  });
-
-  function switchTab(tabEl, panel) {
+  function switchTab(el, tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('[id$="-panel"]').forEach(p => p.style.display = 'none');
-    tabEl.classList.add('active');
-    document.getElementById(panel + '-panel').style.display = 'block';
-    if (panel === 'comments') loadComments();
+    el.classList.add('active');
+    document.getElementById('comments-panel').style.display = tab === 'comments' ? 'block' : 'none';
+    document.getElementById('queue-panel').style.display = tab === 'queue' ? 'block' : 'none';
+    document.getElementById('chat-panel').style.display = tab === 'chat' ? 'block' : 'none';
   }
 
-  // Initialize on DOM ready
-  if (document.readyState === 'loading') {
-    console.log('[DDOTT-TV] Waiting for DOM to load...');
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('[DDOTT-TV] DOM loaded, calling initVideo()');
-      initVideo();
-      loadComments();
-    });
-  } else {
-    console.log('[DDOTT-TV] DOM already loaded, calling initVideo() immediately');
+  // ============================
+  // INITIALIZE VIDEO ON PAGE LOAD
+  // ============================
+  window.addEventListener('DOMContentLoaded', () => {
     initVideo();
-    loadComments();
-  }
+  });
 </script>
 </body>
 </html>
