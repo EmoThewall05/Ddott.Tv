@@ -4,6 +4,7 @@
     { "source": "/", "destination": "/ddott-landing-v2.html" },
     { "source": "/home", "destination": "/ddott-home-v2.html" },
     { "source": "/login", "destination": "/ddott-login.html" },
+    { "source": "/player/:path*", "destination": "/ddott-player-v2.html" },
     { "source": "/player", "destination": "/ddott-player-v2.html" },
     { "source": "/studio", "destination": "/ddott-creator-studio.html" },
     { "source": "/community", "destination": "/ddott-community.html" },
