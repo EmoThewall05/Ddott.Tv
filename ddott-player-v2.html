@@ -1374,15 +1374,8 @@ async function loadVideoData() {
   // Set video source — no login required
   const video = document.getElementById('realVideo');
   if (video && v.video_url) {
-    video.innerHTML = '';
-    const source = document.createElement('source');
-    source.src = v.video_url;
-    source.type = v.video_url.endsWith('.mp4') ? 'video/mp4'
-      : v.video_url.endsWith('.mov') ? 'video/mp4'
-      : v.video_url.endsWith('.webm') ? 'video/webm'
-      : 'video/mp4';
-    video.appendChild(source);
-    video.load(); video.play().catch(()=>{});
+    video.src = v.video_url;
+    video.load();
   }
 
   // Update UI immediately
