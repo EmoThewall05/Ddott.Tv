@@ -498,7 +498,7 @@
           <div id="q1options" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
 
-        <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">
+        <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;letter-spacing:1px;transition:all 0.3s;">
           Submit & Earn Coins 🪙
         </button>
         <div id="quizResult" style="margin-top:12px;text-align:center;font-size:13px;"></div>
@@ -580,7 +580,7 @@
 
   <!-- DESCRIPTION -->
   <div class="desc-box">
-    Building an entire Web3 wallet from a phone — no laptop, no desktop. Just Termux, Acode, and sheer will. This is the full build session for TheWall — 5-chain crypto wallet powered by Alchemy + Claude AI. 🔥
+    Building an entire Web3 wallet from a phone — no laptop, no desktop. Just Termux, Acode, and sheer will. This is the full build session for TheWall — 5-chain crypto wallet powered by Alch[...]
     <br><br>
     <span class="desc-tag">#DwinUniverse</span>
     <span class="desc-tag">#TheWall</span>
@@ -747,7 +747,29 @@
   const titleEl = document.getElementById('videoTitle');
   if (titleEl) titleEl.textContent = videoTitle;
 
-  javascript<function setVideoSource(src) {<  if (!src) return;<  // Remove existing <source> children<  while (video.firstChild) video.removeChild(video.firstChild);<  video.src = src;<  video.load();<  video.muted = true;<  video.play().then(() => {<    video.muted = false;<  }).catch(e => console.warn('Autoplay blocked:', e));<}
+  function setVideoSource(src) {
+    if (!src) return;
+    
+    // Find or create the source element
+    let sourceElement = video.querySelector('source[type="video/mp4"]');
+    
+    if (!sourceElement) {
+      sourceElement = document.createElement('source');
+      sourceElement.type = 'video/mp4';
+      video.appendChild(sourceElement);
+    }
+    
+    // Set the source URL
+    sourceElement.src = src;
+    
+    // Reset and load video
+    video.load();
+    video.muted = true;
+    
+    video.play().then(() => {
+      video.muted = false;
+    }).catch(e => console.warn('Autoplay blocked:', e));
+  }
 
   async function initVideo() {
     if (videoId && db) {
@@ -884,7 +906,7 @@
     options.forEach(opt => {
       const btn = document.createElement('button');
       btn.textContent = opt;
-      btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;transition:all .2s;';
+      btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;transition:all 0.2s;';
       btn.onclick = () => {
         container.querySelectorAll('button').forEach(b => {
           b.style.background = 'rgba(255,255,255,0.05)';
@@ -1005,54 +1027,27 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); postComment(); }
   });
 
-  async function loadLikes() {
-    if (!videoId || !db) return;
-    try {
-      const { count } = await db.from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
-      document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
-    } catch (e) { console.warn('Likes load failed:', e); }
-  }
-
-  async function likeVideo() {
-    if (!videoId) return;
-    if (!db) { alert('Database not connected.'); return; }
-    try {
-      const { data: { user } } = await db.auth.getUser();
-      if (!user) { alert('Sign in to like!'); return; }
-      await db.from('video_likes').insert({ video_id: videoId, user_id: user.id });
-      const { count } = await db.from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
-      document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
-    } catch (e) { console.warn('Like failed:', e); }
-  }
-
-  document.getElementById('likeBtn').addEventListener('click', likeVideo);
-
-  function switchTab(el, tab) {
+  function switchTab(tabEl, panel) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    ['comments', 'queue', 'chat'].forEach(p => {
-      document.getElementById(p + '-panel').style.display = p === tab ? 'block' : 'none';
-    });
+    document.querySelectorAll('[id$="-panel"]').forEach(p => p.style.display = 'none');
+    tabEl.classList.add('active');
+    document.getElementById(panel + '-panel').style.display = 'block';
+    if (panel === 'comments') loadComments();
   }
 
-  document.querySelectorAll('.sticker').forEach(s => {
-    s.addEventListener('click', function() {
-      const inp = document.getElementById('commentInput');
-      inp.value += this.textContent + ' ';
-      inp.focus();
-      this.style.transform = 'scale(1.3)';
-      setTimeout(() => this.style.transform = '', 300);
-    });
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    initVideo();
+    loadComments();
   });
-
-  document.getElementById('commentInput').addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = this.scrollHeight + 'px';
-  });
-
-  initVideo();
-  loadComments();
-  loadLikes();
+  
+  // Fallback if DOM already loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initVideo);
+  } else {
+    initVideo();
+    loadComments();
+  }
 </script>
 </body>
 </html>
