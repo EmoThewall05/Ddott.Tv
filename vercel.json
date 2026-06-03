@@ -1,16 +1,48 @@
 {
   "rewrites": [
-    { "source": "/api/chat", "destination": "/api/chat.js" },
-    { "source": "/", "destination": "/ddott-landing-v2.html" },
-    { "source": "/home", "destination": "/ddott-home-v2.html" },
-    { "source": "/login", "destination": "/ddott-login.html" },
-    { "source": "/player/:path*", "destination": "/ddott-player-v2.html" },
-    { "source": "/player", "destination": "/ddott-player-v2.html" },
-    { "source": "/studio", "destination": "/ddott-creator-studio.html" },
-    { "source": "/community", "destination": "/ddott-community.html" },
-    { "source": "/coins", "destination": "/ddott-emo-coins.html" },
-    { "source": "/channel", "destination": "/ddott-creator-channel.html" },
-    { "source": "/chat", "destination": "/ddott-messaging.html" },
-    { "source": "/butterfly", "destination": "/ddott-ai-butterfly.html" }
+    {
+      "source": "/api/chat",
+      "destination": "/api/chat.js"
+    },
+    {
+      "source": "/",
+      "destination": "/ddott-landing-v2.html"
+    },
+    {
+      "source": "/home",
+      "destination": "/ddott-home-v2.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/ddott-login.html"
+    },
+    {
+      "source": "/player",
+      "destination": "/ddott-player-v2.html"
+    },
+    {
+      "source": "/studio",
+      "destination": "/ddott-creator-studio.html"
+    },
+    {
+      "source": "/community",
+      "destination": "/ddott-community.html"
+    },
+    {
+      "source": "/coins",
+      "destination": "/ddott-emo-coins.html"
+    },
+    {
+      "source": "/channel",
+      "destination": "/ddott-creator-channel.html"
+    },
+    {
+      "source": "/chat",
+      "destination": "/ddott-messaging.html"
+    },
+    {
+      "source": "/butterfly",
+      "destination": "/ddott-ai-butterfly.html"
+    }
   ]
 }
