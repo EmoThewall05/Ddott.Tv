@@ -498,16 +498,6 @@ document.querySelectorAll('.sub-btn').forEach(b=>{
   b.addEventListener('click',e=>{e.stopPropagation();b.classList.toggle('subbed');b.textContent=b.classList.contains('subbed')?'✓ Subscribed':'Subscribe';});
 });
 
-// Open player mock
-function openPlayer(){
-  const o=document.createElement('div');
-  o.style.cssText='position:fixed;inset:0;background:rgba(3,5,8,0.95);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;';
-  o.innerHTML=`
-    <div style="font-size:52px;filter:drop-shadow(0 0 20px rgba(0,229,255,0.5));">🦋</div>
-    <div style="font-family:Orbitron,sans-serif;font-size:14px;letter-spacing:3px;color:rgba(0,229,255,0.7);text-transform:uppercase;">Video Player Screen — Coming Soon</div>
-    <button onclick="this.parentElement.remove()" style="margin-top:8px;background:linear-gradient(135deg,#00e5ff,#b44fff);border:none;color:#000;font-family:Orbitron,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px 28px;cursor:pointer;">Close</button>`;
-  document.body.appendChild(o);
-}
 
 // AI
 function toggleAI(){document.getElementById('aiPanel').classList.toggle('open');}
