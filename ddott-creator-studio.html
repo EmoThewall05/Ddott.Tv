@@ -294,7 +294,7 @@ async function loadMyVideos() {
     return
   }
   list.innerHTML = data.map(v => `
-    <div class="video-card">
+    <div class="video-card" onclick="window.location.href=`/player?id=${v.id}`" style="cursor:pointer">
       <div class="video-thumb">🎥</div>
       <div class="video-info">
         <div class="video-title">${v.title}</div>
