@@ -123,48 +123,6 @@
     flex-direction: column; gap: 16px;
     background: linear-gradient(135deg, #000510 0%, #080020 50%, #000510 100%);
   }
-  .video-placeholder .scene {
-    position: absolute; inset: 0; overflow: hidden;
-  }
-  .scene-line {
-    position: absolute; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-    opacity: 0; animation: scanline 4s linear infinite;
-  }
-  .scene-line:nth-child(2) { animation-delay: 1.3s; }
-  .scene-line:nth-child(3) { animation-delay: 2.6s; }
-  @keyframes scanline {
-    0% { top: -2%; opacity: 0; }
-    5% { opacity: 0.6; }
-    95% { opacity: 0.6; }
-    100% { top: 102%; opacity: 0; }
-  }
-  .play-btn-big {
-    position: relative; z-index: 2;
-    width: 72px; height: 72px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    box-shadow: var(--glow-cyan), var(--glow-purple);
-    transition: all 0.3s;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { box-shadow: var(--glow-cyan), var(--glow-purple); transform: scale(1); }
-    50% { box-shadow: 0 0 40px #00f5ffaa, 0 0 80px #b400ffaa; transform: scale(1.05); }
-  }
-  .play-btn-big:hover { transform: scale(1.1) !important; }
-  .play-btn-big svg { margin-left: 4px; }
-  .video-title-overlay {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 40px 20px 20px;
-    background: linear-gradient(transparent, rgba(4,0,15,0.9));
-    z-index: 2;
-  }
-  .vtitle {
-    font-family: 'Orbitron', monospace; font-size: 14px;
-    color: var(--cyan); letter-spacing: 1px; text-shadow: var(--glow-cyan);
-  }
   .controls {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -285,180 +243,6 @@
     box-shadow: var(--glow-purple); transition: all 0.2s; font-weight: 700;
   }
   .tip-btn:hover { transform: scale(1.05); }
-  .creator-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 16px; background: var(--surface); border-radius: 12px;
-    border: 1px solid rgba(0,245,255,0.1); margin-bottom: 16px;
-  }
-  .creator-left { display: flex; align-items: center; gap: 12px; }
-  .creator-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; border: 2px solid var(--purple);
-    box-shadow: var(--glow-purple); flex-shrink: 0;
-  }
-  .creator-name { font-family: 'Orbitron', monospace; font-size: 13px; color: #fff; margin-bottom: 2px; }
-  .creator-subs { font-size: 12px; color: var(--muted); }
-  .follow-btn {
-    padding: 8px 18px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    border: none; color: var(--dark); font-family: 'Orbitron', monospace;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; box-shadow: var(--glow-cyan); transition: all 0.3s;
-  }
-  .follow-btn:hover { transform: scale(1.05); opacity: 0.9; }
-  .desc-box {
-    padding: 14px 16px; background: var(--surface); border-radius: 12px;
-    border: 1px solid rgba(180,0,255,0.1); margin-bottom: 20px;
-    font-size: 13px; line-height: 1.6; color: #a888cc;
-    cursor: pointer; transition: border-color 0.2s;
-  }
-  .desc-box:hover { border-color: rgba(180,0,255,0.3); }
-  .desc-tag { display: inline-block; color: var(--cyan); margin-right: 6px; font-size: 12px; }
-  .tabs {
-    display: flex; gap: 0; margin-bottom: 16px;
-    border-bottom: 1px solid rgba(0,245,255,0.1);
-  }
-  .tab {
-    padding: 10px 18px; font-family: 'Rajdhani', sans-serif;
-    font-size: 14px; font-weight: 600; color: var(--muted);
-    cursor: pointer; border-bottom: 2px solid transparent;
-    transition: all 0.2s; letter-spacing: 1px;
-  }
-  .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); text-shadow: 0 0 12px var(--cyan); }
-  .tab:hover:not(.active) { color: var(--text); }
-  .comment-input-row {
-    display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-start;
-  }
-  .comment-avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; border: 1px solid var(--purple); flex-shrink: 0;
-  }
-  .comment-input {
-    flex: 1; background: var(--surface);
-    border: 1px solid rgba(0,245,255,0.15); border-radius: 10px;
-    padding: 10px 14px; color: var(--text); font-family: 'Rajdhani', sans-serif;
-    font-size: 13px; resize: none; outline: none;
-    transition: border-color 0.2s; min-height: 40px;
-  }
-  .comment-input:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,245,255,0.1); }
-  .comment-input::placeholder { color: var(--muted); }
-  .comment-submit-btn {
-    padding: 10px 18px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    border: none; color: var(--dark); font-family: 'Orbitron', monospace;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; box-shadow: var(--glow-cyan); transition: all 0.3s;
-    align-self: flex-start;
-  }
-  .comment-submit-btn:hover { transform: scale(1.05); opacity: 0.9; }
-  .comment {
-    display: flex; gap: 10px; margin-bottom: 16px;
-    animation: fadeUp 0.4s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .comment-body { flex: 1; }
-  .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-  .comment-user { font-family: 'Orbitron', monospace; font-size: 11px; color: var(--cyan); }
-  .comment-time { font-size: 11px; color: var(--muted); }
-  .comment-text { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 6px; }
-  .comment-actions { display: flex; gap: 14px; }
-  .ca-btn { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
-  .ca-btn:hover { color: var(--cyan); }
-  .ca-btn.liked { color: var(--pink); }
-  .sticker-row {
-    display: flex; gap: 8px; margin-bottom: 14px;
-    overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
-  }
-  .sticker-row::-webkit-scrollbar { display: none; }
-  .sticker {
-    width: 44px; height: 44px; border-radius: 10px;
-    background: var(--surface2); border: 1px solid rgba(0,245,255,0.15);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-  }
-  .sticker:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); transform: scale(1.1); }
-  .section-label {
-    font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 2px;
-    color: var(--purple); margin-bottom: 14px; text-transform: uppercase;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .section-label::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, rgba(180,0,255,0.4), transparent);
-  }
-  .queue-card {
-    display: flex; gap: 10px; padding: 10px; border-radius: 10px;
-    background: var(--surface); border: 1px solid rgba(0,245,255,0.08);
-    margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
-  }
-  .queue-card:hover { border-color: rgba(0,245,255,0.25); background: var(--surface2); }
-  .queue-thumb {
-    width: 100px; height: 60px; border-radius: 8px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; position: relative; overflow: hidden;
-  }
-  .qt-bg { position: absolute; inset: 0; background: linear-gradient(135deg, var(--surface2), #200040); }
-  .qt-emoji { position: relative; z-index: 1; }
-  .qt-dur {
-    position: absolute; bottom: 4px; right: 4px;
-    font-family: 'Orbitron', monospace; font-size: 9px;
-    background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px;
-    color: var(--cyan); z-index: 1;
-  }
-  .queue-info { flex: 1; min-width: 0; }
-  .queue-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .queue-meta { font-size: 11px; color: var(--muted); }
-  .queue-card.playing {
-    border-color: var(--cyan);
-    background: linear-gradient(135deg, rgba(0,245,255,0.05), rgba(180,0,255,0.05));
-  }
-  .now-playing-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--cyan);
-    box-shadow: var(--glow-cyan); animation: blink 1s ease-in-out infinite;
-    flex-shrink: 0; margin-top: 6px;
-  }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  .butterfly-fab {
-    position: fixed; bottom: 24px; right: 20px;
-    width: 52px; height: 52px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; cursor: pointer;
-    box-shadow: var(--glow-purple), var(--glow-cyan);
-    z-index: 200; animation: float 3s ease-in-out infinite;
-    transition: transform 0.3s; border: 1px solid rgba(255,255,255,0.2);
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(-5deg); }
-    50% { transform: translateY(-8px) rotate(5deg); }
-  }
-  .butterfly-fab:hover { transform: scale(1.15) !important; }
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--darker); }
-  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
-  .neon-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
-    margin: 20px 0; opacity: 0.4;
-  }
-  .live-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 9px; background: rgba(255,0,80,0.15);
-    border: 1px solid rgba(255,0,80,0.5); border-radius: 4px;
-    font-family: 'Orbitron', monospace; font-size: 9px;
-    color: #ff0050; letter-spacing: 1px; font-weight: 700;
-  }
-  .live-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: #ff0050;
-    animation: blink 0.8s ease-in-out infinite;
-  }
   @media (max-width: 640px) {
     .info-section { grid-template-columns: 1fr; }
     .emo-tip { flex-direction: row; min-width: unset; width: 100%; }
@@ -469,7 +253,7 @@
 </head>
 <body>
 
-<nav>
+<nav style="display:none">
   <div class="logo">DDOTT<span>.</span>TV</div>
   <div class="nav-right">
     <div class="nav-icon">🔍</div>
@@ -487,22 +271,6 @@
         <source src="" type="video/mp4">
         Your browser does not support the video tag.
       </video>
-
-      <!-- QUIZ BOX -->
-      <div id="quizBox" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.92);z-index:50;border-radius:12px;padding:20px;overflow-y:auto;">
-        <div style="color:#00f5ff;font-family:'Orbitron',sans-serif;font-size:14px;margin-bottom:16px;">🎬 Proof of Watch</div>
-        <div style="color:#fff;font-size:13px;margin-bottom:20px;">Answer to earn your Emo Coins! ⏱️ <span id="quizTimer" style="color:#ffd84d;font-weight:bold;">60</span>s</div>
-
-        <div style="margin-bottom:16px;">
-          <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q1. How long was this video?</div>
-          <div id="q1options" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-
-        <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:1px;">
-          Submit & Earn Coins 🪙
-        </button>
-        <div id="quizResult" style="margin-top:12px;text-align:center;font-size:13px;"></div>
-      </div>
     </div>
 
     <!-- CONTROLS -->
@@ -531,7 +299,6 @@
         </div>
         <div class="time"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
         <div class="ctrl-right">
-          
           <div class="quality-badge" id="qualityBtn">4K</div>
           <button class="ctrl-btn" title="Picture in Picture" id="pipBtn">⧉</button>
           <button class="ctrl-btn" title="Fullscreen" id="fsBtn">⛶</button>
@@ -543,11 +310,10 @@
   <!-- VIDEO INFO -->
   <div class="info-section">
     <div class="video-info">
-      <h1 id="videoTitle">Building Web3 on Mobile — Full Stack Dev from a Phone 📱</h1>
+      <h1 id="videoTitle">Video Title</h1>
       <div class="video-meta">
         <div class="meta-chip" id="viewCount">👁 0 views</div>
         <div class="meta-chip">📅 2 hours ago</div>
-        <div class="meta-chip hot" id="trendingBadge" style="display:none">🔥 Trending</div>
         <div class="meta-chip" id="durationBadge">⏱ 0:00</div>
       </div>
       <div class="action-btns">
@@ -555,8 +321,6 @@
         <button class="act-btn">👎</button>
         <button class="act-btn">↗ Share</button>
         <button class="act-btn">+ Save</button>
-        <button class="act-btn">✂️ Clip</button>
-        <button class="act-btn">⋯</button>
       </div>
     </div>
     <div class="emo-tip">
@@ -566,159 +330,9 @@
     </div>
   </div>
 
-  <!-- CREATOR BAR -->
-  <div class="creator-bar">
-    <div class="creator-left">
-      <div class="creator-avatar">🦋</div>
-      <div>
-        <div class="creator-name">Divin · Emobies05</div>
-        <div class="creator-subs"><span id="subCount">0</span> subscribers · Dwin Universe</div>
-      </div>
-    </div>
-    <button class="follow-btn">FOLLOW</button>
-  </div>
-
-  <!-- DESCRIPTION -->
-  <div class="desc-box">
-    Building an entire Web3 wallet from a phone — no laptop, no desktop. Just Termux, Acode, and sheer will. This is the full build session for TheWall — 5-chain crypto wallet powered by Alch[...]
-    <br><br>
-    <span class="desc-tag">#DwinUniverse</span>
-    <span class="desc-tag">#TheWall</span>
-    <span class="desc-tag">#Web3</span>
-    <span class="desc-tag">#BuildInPublic</span>
-    <span class="desc-tag">#MobileDev</span>
-    <br><br>
-    <span style="color: var(--cyan); font-size:12px;">▼ Show more</span>
-  </div>
-
-  <div class="neon-divider"></div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab(this, 'comments')">💬 Comments (<span id="commentCount">0</span>)</div>
-    <div class="tab" onclick="switchTab(this, 'queue')">📺 Up Next</div>
-    <div class="tab" onclick="switchTab(this, 'chat')">⚡ Live Chat</div>
-  </div>
-
-  <!-- COMMENTS TAB -->
-  <div id="comments-panel">
-    <div class="sticker-row">
-      <div class="sticker" title="Pizza">🍕</div>
-      <div class="sticker" title="Rocket">🚀</div>
-      <div class="sticker" title="Fire">🔥</div>
-      <div class="sticker" title="Butterfly">🦋</div>
-      <div class="sticker" title="Diamond">💎</div>
-      <div class="sticker" title="Lightning">⚡</div>
-      <div class="sticker" title="Crown">👑</div>
-      <div class="sticker" title="Star">⭐</div>
-      <div class="sticker" title="Coin">🪙</div>
-      <div class="sticker" title="Heart">💜</div>
-    </div>
-
-    <div class="comment-input-row">
-      <div class="comment-avatar">D</div>
-      <textarea class="comment-input" placeholder="Add a comment... or drop a sticker 🍕" rows="1" id="commentInput"></textarea>
-      <button class="comment-submit-btn" id="commentSubmitBtn">POST</button>
-    </div>
-
-    <div id="commentsList">
-      <div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Loading comments...</div>
-    </div>
-  </div>
-
-  <!-- QUEUE TAB -->
-  <div id="queue-panel" style="display:none">
-    <div class="section-label">Now Playing</div>
-    <div class="queue-card playing">
-      <div class="queue-thumb">
-        <div class="qt-bg"></div>
-        <div class="qt-emoji">📱</div>
-        <div class="qt-dur">37:45</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Building Web3 on Mobile — Full Stack Dev</div>
-        <div class="queue-meta">Emobies05 · 128K views</div>
-      </div>
-      <div class="now-playing-dot"></div>
-    </div>
-
-    <div class="section-label" style="margin-top:16px">Up Next</div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#000820,#200040)"></div>
-        <div class="qt-emoji">🔗</div>
-        <div class="qt-dur">28:12</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">TheWall — 5 Chain Wallet Deep Dive</div>
-        <div class="queue-meta">Emobies05 · 84K views</div>
-      </div>
-    </div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#001020,#002040)"></div>
-        <div class="qt-emoji">🦋</div>
-        <div class="qt-dur">19:33</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Emowall AI — 7 Brain Architecture Explained</div>
-        <div class="queue-meta">Emobies05 · 52K views</div>
-      </div>
-    </div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#100020,#300040)"></div>
-        <div class="qt-emoji">🪙</div>
-        <div class="qt-dur">14:08</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Emo Coins — Tokenomics & Creator Economy</div>
-        <div class="queue-meta">Emobies05 · 38K views</div>
-      </div>
-    </div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#050015,#150030)"></div>
-        <div class="qt-emoji">🚀</div>
-        <div class="qt-dur">22:50</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Ddott TV — Building a Streaming Platform</div>
-        <div class="queue-meta">Emobies05 · 61K views</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- LIVE CHAT TAB -->
-  <div id="chat-panel" style="display:none">
-    <div style="padding: 24px; text-align: center; color: var(--muted);">
-      <div style="font-size: 40px; margin-bottom: 12px;">⚡</div>
-      <div style="font-family:'Orbitron',monospace; font-size:12px; color: var(--cyan); margin-bottom: 8px;">LIVE CHAT</div>
-      <div style="font-size: 13px;">Live chat will appear here during streams.<br>Coming in Messaging V1 🦋</div>
-    </div>
-  </div>
-
 </div>
 
-<!-- BUTTERFLY AI FAB -->
-<div class="butterfly-fab" title="Emowall AI">🦋</div>
-
 <script>
-  // ============================
-  // SUPABASE SETUP (SAFE FALLBACK)
-  // ============================
-  let db = null;
-  try {
-    if (typeof supabase !== 'undefined') {
-      db = supabase.createClient(
-        window.SUPABASE_URL || 'https://your-project.supabase.co',
-        window.SUPABASE_ANON_KEY || 'your-anon-key'
-      );
-    }
-  } catch (e) {
-    console.warn('Supabase not available:', e);
-  }
-
   // ============================
   // VIDEO PLAYER LOGIC
   // ============================
@@ -742,29 +356,27 @@
   const videoUrl = urlParams.get('url') || '';
   const videoId = urlParams.get('id') || '';
   const videoTitle = urlParams.get('title') || 'Ddott TV Video';
-  const videoCreator = urlParams.get('creator') || 'Unknown';
 
   const titleEl = document.getElementById('videoTitle');
   if (titleEl) titleEl.textContent = videoTitle;
 
-  // Log for debugging
-  console.log('[DDOTT-TV] Player initialized');
-  console.log('[DDOTT-TV] Video URL:', videoUrl);
-  console.log('[DDOTT-TV] Video ID:', videoId);
+  console.log('[DDOTT-TV-PLAYER] Initialized');
+  console.log('[DDOTT-TV-PLAYER] Video URL:', videoUrl);
+  console.log('[DDOTT-TV-PLAYER] Video ID:', videoId);
 
   function setVideoSource(src) {
     if (!src) {
-      console.warn('[DDOTT-TV] No video source provided');
+      console.warn('[DDOTT-TV-PLAYER] No video source provided');
       return;
     }
     
-    console.log('[DDOTT-TV] Setting video source:', src);
+    console.log('[DDOTT-TV-PLAYER] Setting video source:', src);
     
     // Find the source element
     let sourceElement = video.querySelector('source[type="video/mp4"]');
     
     if (!sourceElement) {
-      console.log('[DDOTT-TV] Creating new source element');
+      console.log('[DDOTT-TV-PLAYER] Creating new source element');
       sourceElement = document.createElement('source');
       sourceElement.type = 'video/mp4';
       video.appendChild(sourceElement);
@@ -772,11 +384,11 @@
     
     // Set the source URL
     sourceElement.src = src;
-    console.log('[DDOTT-TV] Source element created/updated');
+    console.log('[DDOTT-TV-PLAYER] Source element set:', src);
     
     // Reset and load video
     video.load();
-    console.log('[DDOTT-TV] Video.load() called');
+    console.log('[DDOTT-TV-PLAYER] Video.load() called');
     
     // Mute for autoplay
     video.muted = true;
@@ -785,54 +397,53 @@
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        console.log('[DDOTT-TV] Autoplay succeeded');
+        console.log('[DDOTT-TV-PLAYER] Autoplay succeeded, unmuting');
         video.muted = false;
       }).catch(e => {
-        console.warn('[DDOTT-TV] Autoplay blocked:', e.message);
+        console.warn('[DDOTT-TV-PLAYER] Autoplay blocked:', e.message);
       });
     }
   }
 
-  // Add error event listener
+  // Add event listeners
   video.addEventListener('error', (e) => {
-    console.error('[DDOTT-TV] Video error:', e.target.error?.message);
+    console.error('[DDOTT-TV-PLAYER] Video error:', e.target.error?.message);
   });
 
   video.addEventListener('loadstart', () => {
-    console.log('[DDOTT-TV] Video loadstart');
+    console.log('[DDOTT-TV-PLAYER] Video loadstart');
   });
 
   video.addEventListener('loadeddata', () => {
-    console.log('[DDOTT-TV] Video loadeddata');
+    console.log('[DDOTT-TV-PLAYER] Video loadeddata');
   });
 
   async function initVideo() {
-    console.log('[DDOTT-TV] initVideo() called');
+    console.log('[DDOTT-TV-PLAYER] initVideo() called with ID:', videoId, 'URL:', videoUrl);
     
-    if (videoId && db) {
+    if (videoId) {
       try {
-        console.log('[DDOTT-TV] Fetching from DB with ID:', videoId);
-        const { data: v } = await db.from('videos').select('*').eq('id', videoId).single();
-        if (v && v.video_url) {
-          console.log('[DDOTT-TV] Found video in DB:', v.video_url);
-          setVideoSource(v.video_url);
-          if (v.title) titleEl.textContent = v.title;
-          if (v.views !== undefined) {
-            document.getElementById('viewCount').textContent = '👁 ' + ((v.views+1)).toLocaleString() + ' views';
-            try { await db.from('videos').update({ views: v.views + 1 }).eq('id', videoId); } catch(e){}
+        console.log('[DDOTT-TV-PLAYER] Fetching from DB with ID:', videoId);
+        // Try to load from Supabase if available
+        if (typeof db !== 'undefined' && db) {
+          const { data: v, error } = await db.from('videos').select('*').eq('id', videoId).single();
+          if (v && v.video_url) {
+            console.log('[DDOTT-TV-PLAYER] Found video in DB:', v.video_url);
+            setVideoSource(v.video_url);
+            if (v.title) titleEl.textContent = v.title;
+            return;
           }
-          return;
         }
       } catch (e) {
-        console.warn('[DDOTT-TV] DB video load failed:', e);
+        console.warn('[DDOTT-TV-PLAYER] DB video load failed:', e);
       }
     }
     
     if (videoUrl) {
-      console.log('[DDOTT-TV] Loading video from URL param:', videoUrl);
+      console.log('[DDOTT-TV-PLAYER] Loading video from URL param');
       setVideoSource(videoUrl);
     } else {
-      console.warn('[DDOTT-TV] No video URL or ID provided');
+      console.warn('[DDOTT-TV-PLAYER] No video URL or ID provided');
     }
   }
 
@@ -877,7 +488,7 @@
     const s = Math.floor(video.duration % 60);
     totalTimeEl.textContent = m + ':' + s.toString().padStart(2,'0');
     durationBadge.textContent = '⏱ ' + m + ':' + s.toString().padStart(2,'0');
-    console.log('[DDOTT-TV] Video metadata loaded - duration:', m + ':' + s.toString().padStart(2,'0'));
+    console.log('[DDOTT-TV-PLAYER] Video metadata loaded - duration:', m + ':' + s.toString().padStart(2,'0'));
   });
 
   progressWrap.addEventListener('click', (e) => {
@@ -904,7 +515,7 @@
       } else {
         await video.requestPictureInPicture();
       }
-    } catch (e) { console.warn('[DDOTT-TV] PiP not supported'); }
+    } catch (e) { console.warn('[DDOTT-TV-PLAYER] PiP not supported'); }
   });
 
   const qualities = ['4K', '1080p', '720p', '480p'];
@@ -914,108 +525,21 @@
     qualityBtn.textContent = qualities[qi];
   });
 
-  let quizAnswers = {};
-  let quizCorrect = {};
-  let quizTimerInt;
-
-  video.addEventListener('ended', () => { showQuiz(); });
-
-  function showQuiz() {
-    const dur = video.duration || 0;
-    const mins = Math.floor(dur / 60);
-    const secs = Math.floor(dur % 60);
-    const correctDur = mins + ' min ' + secs + ' sec';
-    const fakeSecs1 = (secs + 15) % 60;
-    const fakeDur1 = (mins + 1) + ' min ' + fakeSecs1 + ' sec';
-    const fakeSecs2 = secs > 15 ? secs - 10 : secs + 20;
-    const fakeDur2 = (mins > 0 ? mins - 1 : mins + 2) + ' min ' + fakeSecs2 + ' sec';
-
-    quizCorrect = { q1: correctDur };
-    renderOptions('q1options', [correctDur, fakeDur1, fakeDur2].sort(() => Math.random() - 0.5), 'q1');
-
-    document.getElementById('quizBox').style.display = 'block';
-
-    let t = 60;
-    document.getElementById('quizTimer').textContent = t;
-    quizTimerInt = setInterval(() => {
-      t--;
-      document.getElementById('quizTimer').textContent = t;
-      if (t <= 0) { clearInterval(quizTimerInt); autoFailQuiz(); }
-    }, 1000);
-  }
-
-  function renderOptions(containerId, options, qKey) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.textContent = opt;
-      btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;transition:all 0.2s;';
-      btn.onclick = () => {
-        container.querySelectorAll('button').forEach(b => {
-          b.style.background = 'rgba(255,255,255,0.05)';
-          b.style.borderColor = 'rgba(255,255,255,0.1)';
-        });
-        btn.style.background = 'rgba(0,245,255,0.15)';
-        btn.style.borderColor = '#00f5ff';
-        quizAnswers[qKey] = opt;
-        document.getElementById('quizResult').innerHTML = '';
-      };
-      container.appendChild(btn);
-    });
-  }
-
-  function submitQuiz() {
-    clearInterval(quizTimerInt);
-    let correct = 0;
-    if (quizAnswers.q1 === quizCorrect.q1) correct++;
-
-    const resultEl = document.getElementById('quizResult');
-    if (correct >= 1) {
-      const coinsEarned = 5;
-      resultEl.innerHTML = '✅ Correct! +' + coinsEarned + ' Emo Coins earned! 🪙';
-      resultEl.style.color = '#00f5ff';
-      creditCoins(coinsEarned);
-    } else {
-      resultEl.innerHTML = '❌ Wrong answer! Watch the video again to earn coins. 👀';
-      resultEl.style.color = '#ff4466';
-    }
-    document.getElementById('quizSubmit').disabled = true;
-    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; document.getElementById('quizSubmit').disabled = false; }, 3000);
-  }
-
-  function autoFailQuiz() {
-    document.getElementById('quizResult').innerHTML = '⏱️ Time up! No coins this time.';
-    document.getElementById('quizResult').style.color = '#ff4466';
-    document.getElementById('quizSubmit').disabled = true;
-    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; document.getElementById('quizSubmit').disabled = false; }, 2000);
-  }
-
-  async function creditCoins(amount) {
-    if (!db) return;
-    try {
-      const { data: { user } } = await db.auth.getUser();
-      if (!user) return;
-      const { data: coins } = await db.from('emo_coins').select('*').eq('user_id', user.id).single();
-      if (!coins) return;
-      await db.from('emo_coins').update({ balance: coins.balance + amount }).eq('user_id', user.id);
-    } catch (e) { console.warn('[DDOTT-TV] Coin credit failed:', e); }
-  }
-
-  function switchTab(el, tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('comments-panel').style.display = tab === 'comments' ? 'block' : 'none';
-    document.getElementById('queue-panel').style.display = tab === 'queue' ? 'block' : 'none';
-    document.getElementById('chat-panel').style.display = tab === 'chat' ? 'block' : 'none';
-  }
-
   // ============================
-  // INITIALIZE VIDEO ON PAGE LOAD
+  // INITIALIZE ON PAGE LOAD
   // ============================
   window.addEventListener('DOMContentLoaded', () => {
+    console.log('[DDOTT-TV-PLAYER] DOMContentLoaded fired, calling initVideo');
     initVideo();
   });
+
+  // Also try immediately in case DOMContentLoaded already fired
+  if (document.readyState === 'loading') {
+    console.log('[DDOTT-TV-PLAYER] Document still loading');
+  } else {
+    console.log('[DDOTT-TV-PLAYER] Document already loaded, calling initVideo immediately');
+    setTimeout(() => initVideo(), 100);
+  }
 </script>
 </body>
 </html>
