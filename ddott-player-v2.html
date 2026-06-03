@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+html = '''<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,9 +21,7 @@
     --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff44;
     --glow-pink: 0 0 20px #ff00c888, 0 0 40px #ff00c844;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     background: var(--darker);
     color: var(--text);
@@ -30,8 +29,6 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-
-  /* Animated background grid */
   body::before {
     content: '';
     position: fixed;
@@ -44,12 +41,10 @@
     z-index: 0;
     animation: gridShift 20s linear infinite;
   }
-
   @keyframes gridShift {
     0% { transform: translateY(0); }
     100% { transform: translateY(40px); }
   }
-
   body::after {
     content: '';
     position: fixed;
@@ -59,8 +54,6 @@
     pointer-events: none;
     z-index: 0;
   }
-
-  /* NAV */
   nav {
     position: sticky;
     top: 0;
@@ -73,7 +66,6 @@
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(0,245,255,0.15);
   }
-
   .logo {
     font-family: 'Orbitron', monospace;
     font-size: 18px;
@@ -83,157 +75,97 @@
     -webkit-text-fill-color: transparent;
     letter-spacing: 2px;
   }
-
-  .logo span {
-    color: var(--pink);
-    -webkit-text-fill-color: var(--pink);
-  }
-
-  .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
+  .logo span { color: var(--pink); -webkit-text-fill-color: var(--pink); }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
   .nav-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid rgba(0,245,255,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid rgba(0,245,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; transition: all 0.3s;
   }
-
-  .nav-icon:hover {
-    border-color: var(--cyan);
-    box-shadow: var(--glow-cyan);
-  }
-
+  .nav-icon:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
   .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+    width: 36px; height: 36px; border-radius: 50%;
     background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    border: 2px solid var(--cyan);
-    box-shadow: var(--glow-cyan);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    border: 2px solid var(--cyan); box-shadow: var(--glow-cyan);
   }
-
-  /* MAIN LAYOUT */
   .main {
-    position: relative;
-    z-index: 1;
-    max-width: 1200px;
-    margin: 0 auto;
+    position: relative; z-index: 1;
+    max-width: 1200px; margin: 0 auto;
     padding: 20px 16px 40px;
   }
-
-  /* VIDEO CONTAINER */
   .video-container {
-    position: relative;
-    width: 100%;
-    border-radius: 16px;
-    overflow: hidden;
+    position: relative; width: 100%;
+    border-radius: 16px; overflow: hidden;
     background: #000;
     border: 1px solid rgba(0,245,255,0.2);
     box-shadow: 0 0 60px rgba(0,245,255,0.1), 0 0 120px rgba(180,0,255,0.08);
     margin-bottom: 20px;
   }
-
   .video-wrap {
     position: relative;
     padding-top: 56.25%;
     background: linear-gradient(135deg, #000510, #0a0020);
   }
-
-  /* Fake video content */
-  .video-placeholder {
+  #realVideo {
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    background: #000;
+    object-fit: contain;
+  }
+  .video-placeholder {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
     background: linear-gradient(135deg, #000510 0%, #080020 50%, #000510 100%);
   }
-
   .video-placeholder .scene {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
+    position: absolute; inset: 0; overflow: hidden;
   }
-
   .scene-line {
-    position: absolute;
-    left: 0; right: 0;
-    height: 1px;
+    position: absolute; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-    opacity: 0;
-    animation: scanline 4s linear infinite;
+    opacity: 0; animation: scanline 4s linear infinite;
   }
-
   .scene-line:nth-child(2) { animation-delay: 1.3s; }
   .scene-line:nth-child(3) { animation-delay: 2.6s; }
-
   @keyframes scanline {
     0% { top: -2%; opacity: 0; }
     5% { opacity: 0.6; }
     95% { opacity: 0.6; }
     100% { top: 102%; opacity: 0; }
   }
-
   .play-btn-big {
-    position: relative;
-    z-index: 2;
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
+    position: relative; z-index: 2;
+    width: 72px; height: 72px; border-radius: 50%;
     background: linear-gradient(135deg, var(--cyan), var(--purple));
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     cursor: pointer;
     box-shadow: var(--glow-cyan), var(--glow-purple);
     transition: all 0.3s;
     animation: pulse 2s ease-in-out infinite;
   }
-
   @keyframes pulse {
     0%, 100% { box-shadow: var(--glow-cyan), var(--glow-purple); transform: scale(1); }
     50% { box-shadow: 0 0 40px #00f5ffaa, 0 0 80px #b400ffaa; transform: scale(1.05); }
   }
-
   .play-btn-big:hover { transform: scale(1.1) !important; }
   .play-btn-big svg { margin-left: 4px; }
-
   .video-title-overlay {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
+    position: absolute; bottom: 0; left: 0; right: 0;
     padding: 40px 20px 20px;
     background: linear-gradient(transparent, rgba(4,0,15,0.9));
     z-index: 2;
   }
-
   .vtitle {
-    font-family: 'Orbitron', monospace;
-    font-size: 14px;
-    color: var(--cyan);
-    letter-spacing: 1px;
-    text-shadow: var(--glow-cyan);
+    font-family: 'Orbitron', monospace; font-size: 14px;
+    color: var(--cyan); letter-spacing: 1px; text-shadow: var(--glow-cyan);
   }
-
-  /* CONTROLS */
   .controls {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -241,668 +173,293 @@
     background: linear-gradient(transparent, rgba(4,0,15,0.95));
     z-index: 10;
   }
-
   .progress-wrap {
-    position: relative;
-    height: 4px;
+    position: relative; height: 4px;
     background: rgba(255,255,255,0.1);
-    border-radius: 4px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    overflow: visible;
+    border-radius: 4px; margin-bottom: 10px;
+    cursor: pointer; overflow: visible;
   }
-
   .progress-fill {
-    height: 100%;
-    width: 38%;
+    height: 100%; width: 0%;
     background: linear-gradient(90deg, var(--cyan), var(--purple));
-    border-radius: 4px;
-    box-shadow: var(--glow-cyan);
-    position: relative;
-    transition: width 0.1s;
+    border-radius: 4px; box-shadow: var(--glow-cyan);
+    position: relative; transition: width 0.1s;
   }
-
   .progress-thumb {
-    position: absolute;
-    right: -6px;
-    top: 50%;
+    position: absolute; right: -6px; top: 50%;
     transform: translateY(-50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--cyan);
-    box-shadow: var(--glow-cyan);
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--cyan); box-shadow: var(--glow-cyan);
     transition: transform 0.2s;
   }
-
   .progress-wrap:hover .progress-thumb { transform: translateY(-50%) scale(1.4); }
-
-  /* Chapter markers */
   .chapter-dot {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--purple);
-    box-shadow: var(--glow-purple);
-    cursor: pointer;
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--purple); box-shadow: var(--glow-purple); cursor: pointer;
   }
-
-  .ctrl-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
+  .ctrl-row { display: flex; align-items: center; gap: 12px; }
   .ctrl-btn {
-    background: none;
-    border: none;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 18px;
-    padding: 4px;
-    line-height: 1;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
+    background: none; border: none; color: var(--text);
+    cursor: pointer; font-size: 18px; padding: 4px;
+    line-height: 1; transition: all 0.2s;
+    display: flex; align-items: center;
   }
-
   .ctrl-btn:hover { color: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan)); }
-
   .time {
-    font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    white-space: nowrap;
+    font-family: 'Orbitron', monospace; font-size: 11px;
+    color: var(--muted); letter-spacing: 1px; white-space: nowrap;
   }
-
   .time span { color: var(--cyan); }
-
-  .vol-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
+  .vol-wrap { display: flex; align-items: center; gap: 8px; }
   .vol-slider {
-    width: 70px;
-    height: 3px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 3px;
-    position: relative;
-    cursor: pointer;
+    width: 70px; height: 3px;
+    background: rgba(255,255,255,0.1); border-radius: 3px;
+    position: relative; cursor: pointer;
   }
-
-  .vol-fill {
-    height: 100%;
-    width: 75%;
-    background: linear-gradient(90deg, var(--purple), var(--cyan));
-    border-radius: 3px;
-  }
-
+  .vol-fill { height: 100%; width: 75%; background: linear-gradient(90deg, var(--purple), var(--cyan)); border-radius: 3px; }
   .ctrl-right {
     margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex; align-items: center; gap: 10px;
   }
-
   .quality-badge {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 3px 7px;
-    border-radius: 4px;
-    border: 1px solid var(--cyan);
-    color: var(--cyan);
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.2s;
+    font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700;
+    padding: 3px 7px; border-radius: 4px;
+    border: 1px solid var(--cyan); color: var(--cyan);
+    letter-spacing: 1px; cursor: pointer; transition: all 0.2s;
   }
-
   .quality-badge:hover {
-    background: var(--cyan);
-    color: var(--dark);
-    box-shadow: var(--glow-cyan);
+    background: var(--cyan); color: var(--dark); box-shadow: var(--glow-cyan);
   }
-
-  /* INFO SECTION */
   .info-section {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 16px;
-    align-items: start;
-    margin-bottom: 20px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 16px; align-items: start; margin-bottom: 20px;
   }
-
   .video-info h1 {
-    font-family: 'Orbitron', monospace;
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 8px;
-    line-height: 1.3;
+    font-family: 'Orbitron', monospace; font-size: 18px;
+    font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.3;
   }
-
   .video-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap; margin-bottom: 12px;
   }
-
-  .meta-chip {
-    font-size: 12px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
+  .meta-chip { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
   .meta-chip.hot { color: var(--pink); }
-
-  .action-btns {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
+  .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
   .act-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 8px;
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 8px;
     border: 1px solid rgba(0,245,255,0.2);
-    background: var(--surface);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+    background: var(--surface); color: var(--text);
+    font-family: 'Rajdhani', sans-serif; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
     letter-spacing: 0.5px;
   }
-
-  .act-btn:hover {
-    border-color: var(--cyan);
-    color: var(--cyan);
-    box-shadow: var(--glow-cyan);
-  }
-
+  .act-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--glow-cyan); }
   .act-btn.primary {
     background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(180,0,255,0.15));
-    border-color: var(--purple);
-    color: var(--cyan);
+    border-color: var(--purple); color: var(--cyan);
   }
-
   .act-btn.primary:hover {
     background: linear-gradient(135deg, var(--cyan), var(--purple));
-    color: var(--dark);
-    border-color: transparent;
+    color: var(--dark); border-color: transparent;
   }
-
-  /* EMO COINS */
   .emo-tip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 16px;
-    background: var(--surface);
-    border-radius: 12px;
-    border: 1px solid rgba(180,0,255,0.3);
-    min-width: 120px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 16px; background: var(--surface); border-radius: 12px;
+    border: 1px solid rgba(180,0,255,0.3); min-width: 120px;
   }
-
   .emo-coins-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    color: var(--purple);
-    letter-spacing: 2px;
+    font-family: 'Orbitron', monospace; font-size: 9px;
+    color: var(--purple); letter-spacing: 2px;
   }
-
   .emo-coin-val {
-    font-family: 'Orbitron', monospace;
-    font-size: 22px;
-    font-weight: 900;
+    font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900;
     background: linear-gradient(90deg, var(--purple), var(--pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-
   .tip-btn {
-    padding: 6px 14px;
-    border-radius: 6px;
+    padding: 6px 14px; border-radius: 6px;
     background: linear-gradient(135deg, var(--purple), var(--pink));
-    border: none;
-    color: #fff;
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    box-shadow: var(--glow-purple);
-    transition: all 0.2s;
-    font-weight: 700;
+    border: none; color: #fff; font-family: 'Orbitron', monospace;
+    font-size: 9px; letter-spacing: 1px; cursor: pointer;
+    box-shadow: var(--glow-purple); transition: all 0.2s; font-weight: 700;
   }
-
   .tip-btn:hover { transform: scale(1.05); }
-
-  /* CREATOR + DESCRIPTION */
   .creator-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    background: var(--surface);
-    border-radius: 12px;
-    border: 1px solid rgba(0,245,255,0.1);
-    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; background: var(--surface); border-radius: 12px;
+    border: 1px solid rgba(0,245,255,0.1); margin-bottom: 16px;
   }
-
-  .creator-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
+  .creator-left { display: flex; align-items: center; gap: 12px; }
   .creator-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
+    width: 44px; height: 44px; border-radius: 50%;
     background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    border: 2px solid var(--purple);
-    box-shadow: var(--glow-purple);
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; border: 2px solid var(--purple);
+    box-shadow: var(--glow-purple); flex-shrink: 0;
   }
-
-  .creator-name {
-    font-family: 'Orbitron', monospace;
-    font-size: 13px;
-    color: #fff;
-    margin-bottom: 2px;
-  }
-
-  .creator-subs {
-    font-size: 12px;
-    color: var(--muted);
-  }
-
+  .creator-name { font-family: 'Orbitron', monospace; font-size: 13px; color: #fff; margin-bottom: 2px; }
+  .creator-subs { font-size: 12px; color: var(--muted); }
   .follow-btn {
-    padding: 8px 18px;
-    border-radius: 8px;
+    padding: 8px 18px; border-radius: 8px;
     background: linear-gradient(135deg, var(--cyan), var(--purple));
-    border: none;
-    color: var(--dark);
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    box-shadow: var(--glow-cyan);
-    transition: all 0.3s;
+    border: none; color: var(--dark); font-family: 'Orbitron', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; box-shadow: var(--glow-cyan); transition: all 0.3s;
   }
-
   .follow-btn:hover { transform: scale(1.05); opacity: 0.9; }
-
-  /* DESCRIPTION */
   .desc-box {
-    padding: 14px 16px;
-    background: var(--surface);
-    border-radius: 12px;
-    border: 1px solid rgba(180,0,255,0.1);
-    margin-bottom: 20px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #a888cc;
-    cursor: pointer;
-    transition: border-color 0.2s;
+    padding: 14px 16px; background: var(--surface); border-radius: 12px;
+    border: 1px solid rgba(180,0,255,0.1); margin-bottom: 20px;
+    font-size: 13px; line-height: 1.6; color: #a888cc;
+    cursor: pointer; transition: border-color 0.2s;
   }
-
   .desc-box:hover { border-color: rgba(180,0,255,0.3); }
-
-  .desc-tag {
-    display: inline-block;
-    color: var(--cyan);
-    margin-right: 6px;
-    font-size: 12px;
-  }
-
-  /* TABS */
+  .desc-tag { display: inline-block; color: var(--cyan); margin-right: 6px; font-size: 12px; }
   .tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 16px;
+    display: flex; gap: 0; margin-bottom: 16px;
     border-bottom: 1px solid rgba(0,245,255,0.1);
   }
-
   .tab {
-    padding: 10px 18px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    letter-spacing: 1px;
+    padding: 10px 18px; font-family: 'Rajdhani', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.2s; letter-spacing: 1px;
   }
-
-  .tab.active {
-    color: var(--cyan);
-    border-bottom-color: var(--cyan);
-    text-shadow: 0 0 12px var(--cyan);
-  }
-
+  .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); text-shadow: 0 0 12px var(--cyan); }
   .tab:hover:not(.active) { color: var(--text); }
-
-  /* COMMENTS */
   .comment-input-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    align-items: flex-start;
+    display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-start;
   }
-
   .comment-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
+    width: 34px; height: 34px; border-radius: 50%;
     background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    border: 1px solid var(--purple);
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; border: 1px solid var(--purple); flex-shrink: 0;
   }
-
   .comment-input {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid rgba(0,245,255,0.15);
-    border-radius: 10px;
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 13px;
-    resize: none;
-    outline: none;
-    transition: border-color 0.2s;
-    min-height: 40px;
+    flex: 1; background: var(--surface);
+    border: 1px solid rgba(0,245,255,0.15); border-radius: 10px;
+    padding: 10px 14px; color: var(--text); font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; resize: none; outline: none;
+    transition: border-color 0.2s; min-height: 40px;
   }
-
   .comment-input:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,245,255,0.1); }
   .comment-input::placeholder { color: var(--muted); }
-
-  /* COMMENT CARDS */
+  .comment-submit-btn {
+    padding: 10px 18px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none; color: var(--dark); font-family: 'Orbitron', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; box-shadow: var(--glow-cyan); transition: all 0.3s;
+    align-self: flex-start;
+  }
+  .comment-submit-btn:hover { transform: scale(1.05); opacity: 0.9; }
   .comment {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    display: flex; gap: 10px; margin-bottom: 16px;
     animation: fadeUp 0.4s ease both;
   }
-
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   .comment-body { flex: 1; }
-
-  .comment-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-
-  .comment-user {
-    font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    color: var(--cyan);
-  }
-
+  .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .comment-user { font-family: 'Orbitron', monospace; font-size: 11px; color: var(--cyan); }
   .comment-time { font-size: 11px; color: var(--muted); }
-
-  .comment-text {
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.5;
-    margin-bottom: 6px;
-  }
-
-  .comment-actions {
-    display: flex;
-    gap: 14px;
-  }
-
-  .ca-btn {
-    font-size: 12px;
-    color: var(--muted);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: color 0.2s;
-  }
-
+  .comment-text { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 6px; }
+  .comment-actions { display: flex; gap: 14px; }
+  .ca-btn { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
   .ca-btn:hover { color: var(--cyan); }
   .ca-btn.liked { color: var(--pink); }
-
-  /* STICKERS */
   .sticker-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: none;
+    display: flex; gap: 8px; margin-bottom: 14px;
+    overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
   }
-
   .sticker-row::-webkit-scrollbar { display: none; }
-
   .sticker {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    background: var(--surface2);
-    border: 1px solid rgba(0,245,255,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid rgba(0,245,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
   }
-
-  .sticker:hover {
-    border-color: var(--cyan);
-    box-shadow: var(--glow-cyan);
-    transform: scale(1.1);
-  }
-
-  /* QUEUE / NEXT UP */
+  .sticker:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); transform: scale(1.1); }
   .section-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--purple);
-    margin-bottom: 14px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 2px;
+    color: var(--purple); margin-bottom: 14px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
   }
-
   .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
+    content: ''; flex: 1; height: 1px;
     background: linear-gradient(90deg, rgba(180,0,255,0.4), transparent);
   }
-
   .queue-card {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    background: var(--surface);
-    border: 1px solid rgba(0,245,255,0.08);
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
+    display: flex; gap: 10px; padding: 10px; border-radius: 10px;
+    background: var(--surface); border: 1px solid rgba(0,245,255,0.08);
+    margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
   }
-
-  .queue-card:hover {
-    border-color: rgba(0,245,255,0.25);
-    background: var(--surface2);
-  }
-
+  .queue-card:hover { border-color: rgba(0,245,255,0.25); background: var(--surface2); }
   .queue-thumb {
-    width: 100px;
-    height: 60px;
-    border-radius: 8px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    position: relative;
-    overflow: hidden;
+    width: 100px; height: 60px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; position: relative; overflow: hidden;
   }
-
-  .qt-bg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--surface2), #200040);
-  }
-
+  .qt-bg { position: absolute; inset: 0; background: linear-gradient(135deg, var(--surface2), #200040); }
   .qt-emoji { position: relative; z-index: 1; }
-
   .qt-dur {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    background: rgba(0,0,0,0.8);
-    padding: 2px 5px;
-    border-radius: 3px;
-    color: var(--cyan);
-    z-index: 1;
+    position: absolute; bottom: 4px; right: 4px;
+    font-family: 'Orbitron', monospace; font-size: 9px;
+    background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px;
+    color: var(--cyan); z-index: 1;
   }
-
   .queue-info { flex: 1; min-width: 0; }
-
-  .queue-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
+  .queue-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .queue-meta { font-size: 11px; color: var(--muted); }
-
   .queue-card.playing {
     border-color: var(--cyan);
     background: linear-gradient(135deg, rgba(0,245,255,0.05), rgba(180,0,255,0.05));
   }
-
   .now-playing-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--cyan);
-    box-shadow: var(--glow-cyan);
-    animation: blink 1s ease-in-out infinite;
-    flex-shrink: 0;
-    margin-top: 6px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--cyan);
+    box-shadow: var(--glow-cyan); animation: blink 1s ease-in-out infinite;
+    flex-shrink: 0; margin-top: 6px;
   }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  /* BUTTERFLY AI */
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   .butterfly-fab {
-    position: fixed;
-    bottom: 24px;
-    right: 20px;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
+    position: fixed; bottom: 24px; right: 20px;
+    width: 52px; height: 52px; border-radius: 50%;
     background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; cursor: pointer;
     box-shadow: var(--glow-purple), var(--glow-cyan);
-    z-index: 200;
-    animation: float 3s ease-in-out infinite;
-    transition: transform 0.3s;
-    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 200; animation: float 3s ease-in-out infinite;
+    transition: transform 0.3s; border: 1px solid rgba(255,255,255,0.2);
   }
-
   @keyframes float {
     0%, 100% { transform: translateY(0) rotate(-5deg); }
     50% { transform: translateY(-8px) rotate(5deg); }
   }
-
   .butterfly-fab:hover { transform: scale(1.15) !important; }
-
-  /* SCROLLBAR */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--darker); }
   ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
-
-  /* NEON DIVIDER */
   .neon-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
-    margin: 20px 0;
-    opacity: 0.4;
+    margin: 20px 0; opacity: 0.4;
   }
-
-  /* LIVE BADGE */
   .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 9px;
-    background: rgba(255,0,80,0.15);
-    border: 1px solid rgba(255,0,80,0.5);
-    border-radius: 4px;
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    color: #ff0050;
-    letter-spacing: 1px;
-    font-weight: 700;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; background: rgba(255,0,80,0.15);
+    border: 1px solid rgba(255,0,80,0.5); border-radius: 4px;
+    font-family: 'Orbitron', monospace; font-size: 9px;
+    color: #ff0050; letter-spacing: 1px; font-weight: 700;
   }
-
   .live-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #ff0050;
+    width: 6px; height: 6px; border-radius: 50%; background: #ff0050;
     animation: blink 0.8s ease-in-out infinite;
   }
-
-  /* RESPONSIVE */
   @media (max-width: 640px) {
     .info-section { grid-template-columns: 1fr; }
     .emo-tip { flex-direction: row; min-width: unset; width: 100%; }
@@ -913,7 +470,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="logo">DDOTT<span>.</span>TV</div>
   <div class="nav-right">
@@ -923,14 +479,14 @@
   </div>
 </nav>
 
-<!-- MAIN -->
 <div class="main">
 
   <!-- VIDEO PLAYER -->
   <div class="video-container">
     <div class="video-wrap">
-      <video id="realVideo" style="width:100%;border-radius:12px;background:#000;max-height:320px;" controls controlsList="nodownload">
+      <video id="realVideo" preload="metadata" playsinline controlsList="nodownload">
         <source src="" type="video/mp4">
+        Your browser does not support the video tag.
       </video>
 
       <!-- QUIZ BOX -->
@@ -941,14 +497,6 @@
         <div style="margin-bottom:16px;">
           <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q1. How long was this video?</div>
           <div id="q1options" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-
-        <div style="margin-bottom:16px;">
-
-        </div>
-
-        <div style="margin-bottom:20px;">
-
         </div>
 
         <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">
@@ -972,22 +520,22 @@
         <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </button>
-        <button class="ctrl-btn" title="Skip -10s">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8zm-1.1 11H10v-3.26L9 13.26V12.4l1.8-.6h.1V16zm3.28-1.07c0 .43-.06.79-.17 1.07a1.2 1.2 0 01-.46.62c-.19.13-.43.2-.71.2s-.51-.07-.7-.2a1.22 1.22 0 01-.46-.62c-.11-.28-.17-.64-.17-1.07v-.48c0-.44.06-.8.17-1.07a1.2 1.2 0 01.46-.62c.19-.13.43-.2.71-.2s.51.07.71.2c.19.13.35.34.46.62.11.27.17.63.17 1.07v.48zm-.85-.58c0-.26-.02-.47-.07-.63a.53.53 0 00-.2-.33.55.55 0 00-.63 0 .54.54 0 00-.2.33c-.05.16-.07.37-.07.63v.67c0 .26.02.48.07.64a.54.54 0 00.2.34.55.55 0 00.63 0 .54.54 0 00.2-.34c.05-.16.07-.38.07-.64v-.67z"/></svg>
+        <button class="ctrl-btn" id="skipBackBtn" title="Skip -10s">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
         </button>
-        <button class="ctrl-btn" title="Skip +10s">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8zm-1.1 11H10v-3.26L9 13.26V12.4l1.8-.6h.1V16zm3.28-1.07c0 .43-.06.79-.17 1.07a1.2 1.2 0 01-.46.62c-.19.13-.43.2-.71.2s-.51-.07-.7-.2a1.22 1.22 0 01-.46-.62c-.11-.28-.17-.64-.17-1.07v-.48c0-.44.06-.8.17-1.07a1.2 1.2 0 01.46-.62c.19-.13.43-.2.71-.2s.51.07.71.2c.19.13.35.34.46.62.11.27.17.63.17 1.07v.48zm-.85-.58c0-.26-.02-.47-.07-.63a.53.53 0 00-.2-.33.55.55 0 00-.63 0 .54.54 0 00-.2.33c-.05.16-.07.37-.07.63v.67c0 .26.02.48.07.64a.54.54 0 00.2.34.55.55 0 00.63 0 .54.54 0 00.2-.34c.05-.16.07-.38.07-.64v-.67z"/></svg>
+        <button class="ctrl-btn" id="skipFwdBtn" title="Skip +10s">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
         </button>
         <div class="vol-wrap">
-          <button class="ctrl-btn">🔊</button>
-          <div class="vol-slider"><div class="vol-fill" id="volFill"></div></div>
+          <button class="ctrl-btn" id="muteBtn">🔊</button>
+          <div class="vol-slider" id="volSlider"><div class="vol-fill" id="volFill"></div></div>
         </div>
-        <div class="time"><span id="currentTime">14:22</span> / 37:45</div>
+        <div class="time"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
         <div class="ctrl-right">
           <div class="live-badge"><div class="live-dot"></div>LIVE</div>
           <div class="quality-badge" id="qualityBtn">4K</div>
-          <button class="ctrl-btn" title="Picture in Picture">⧉</button>
-          <button class="ctrl-btn" title="Fullscreen">⛶</button>
+          <button class="ctrl-btn" title="Picture in Picture" id="pipBtn">⧉</button>
+          <button class="ctrl-btn" title="Fullscreen" id="fsBtn">⛶</button>
         </div>
       </div>
     </div>
@@ -996,15 +544,15 @@
   <!-- VIDEO INFO -->
   <div class="info-section">
     <div class="video-info">
-      <h1>Building Web3 on Mobile — Full Stack Dev from a Phone 📱</h1>
+      <h1 id="videoTitle">Building Web3 on Mobile — Full Stack Dev from a Phone 📱</h1>
       <div class="video-meta">
         <div class="meta-chip" id="viewCount">👁 0 views</div>
         <div class="meta-chip">📅 2 hours ago</div>
         <div class="meta-chip hot" id="trendingBadge" style="display:none">🔥 Trending</div>
-        <div class="meta-chip">⏱ 37:45</div>
+        <div class="meta-chip" id="durationBadge">⏱ 0:00</div>
       </div>
       <div class="action-btns">
-        <button class="act-btn primary" id="likeBtn" onclick="likeVideo()">👍 <span id="likeCount">0</span></button>
+        <button class="act-btn primary" id="likeBtn">👍 <span id="likeCount">0</span></button>
         <button class="act-btn">👎</button>
         <button class="act-btn">↗ Share</button>
         <button class="act-btn">+ Save</button>
@@ -1055,7 +603,6 @@
 
   <!-- COMMENTS TAB -->
   <div id="comments-panel">
-    <!-- STICKERS -->
     <div class="sticker-row">
       <div class="sticker" title="Pizza">🍕</div>
       <div class="sticker" title="Rocket">🚀</div>
@@ -1069,17 +616,20 @@
       <div class="sticker" title="Heart">💜</div>
     </div>
 
-    <!-- COMMENT INPUT -->
     <div class="comment-input-row">
       <div class="comment-avatar">D</div>
       <textarea class="comment-input" placeholder="Add a comment... or drop a sticker 🍕" rows="1" id="commentInput"></textarea>
+      <button class="comment-submit-btn" id="commentSubmitBtn">POST</button>
     </div>
 
-    
+    <div id="commentsList">
+      <div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Loading comments...</div>
+    </div>
+  </div>
+
   <!-- QUEUE TAB -->
   <div id="queue-panel" style="display:none">
     <div class="section-label">Now Playing</div>
-
     <div class="queue-card playing">
       <div class="queue-thumb">
         <div class="qt-bg"></div>
@@ -1094,7 +644,6 @@
     </div>
 
     <div class="section-label" style="margin-top:16px">Up Next</div>
-
     <div class="queue-card">
       <div class="queue-thumb">
         <div class="qt-bg" style="background: linear-gradient(135deg,#000820,#200040)"></div>
@@ -1106,7 +655,6 @@
         <div class="queue-meta">Emobies05 · 84K views</div>
       </div>
     </div>
-
     <div class="queue-card">
       <div class="queue-thumb">
         <div class="qt-bg" style="background: linear-gradient(135deg,#001020,#002040)"></div>
@@ -1118,7 +666,6 @@
         <div class="queue-meta">Emobies05 · 52K views</div>
       </div>
     </div>
-
     <div class="queue-card">
       <div class="queue-thumb">
         <div class="qt-bg" style="background: linear-gradient(135deg,#100020,#300040)"></div>
@@ -1130,7 +677,6 @@
         <div class="queue-meta">Emobies05 · 38K views</div>
       </div>
     </div>
-
     <div class="queue-card">
       <div class="queue-thumb">
         <div class="qt-bg" style="background: linear-gradient(135deg,#050015,#150030)"></div>
@@ -1159,62 +705,163 @@
 <div class="butterfly-fab" title="Emowall AI">🦋</div>
 
 <script>
-  // Real video element
+  // ============================
+  // SUPABASE SETUP (SAFE FALLBACK)
+  // ============================
+  let db = null;
+  try {
+    if (typeof supabase !== 'undefined') {
+      db = supabase.createClient(
+        window.SUPABASE_URL || 'https://your-project.supabase.co',
+        window.SUPABASE_KEY || 'your-anon-key'
+      );
+    }
+  } catch (e) {
+    console.warn('Supabase not available:', e);
+  }
+
+  // ============================
+  // VIDEO PLAYER LOGIC
+  // ============================
   const video = document.getElementById('realVideo');
   const playPauseBtn = document.getElementById('playPauseBtn');
+  const skipBackBtn = document.getElementById('skipBackBtn');
+  const skipFwdBtn = document.getElementById('skipFwdBtn');
+  const muteBtn = document.getElementById('muteBtn');
+  const volSlider = document.getElementById('volSlider');
+  const volFill = document.getElementById('volFill');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const currentTimeEl = document.getElementById('currentTime');
+  const totalTimeEl = document.getElementById('totalTime');
+  const durationBadge = document.getElementById('durationBadge');
+  const qualityBtn = document.getElementById('qualityBtn');
+  const fsBtn = document.getElementById('fsBtn');
+  const pipBtn = document.getElementById('pipBtn');
 
-  // Load video from URL params
-  const params = new URLSearchParams(window.location.search);
-  const videoUrl = params.get('url') || '';
-  const videoTitle = params.get('title') || 'Ddott TV Video';
-  const videoCreator = params.get('creator') || 'Unknown';
-  const videoCategory = params.get('category') || 'General';
-  // Only use url param if no id param (id takes priority via loadVideoData)
-  if (videoUrl && !params.get('id')) video.src = videoUrl;
+  const urlParams = new URLSearchParams(window.location.search);
+  const videoUrl = urlParams.get('url') || '';
+  const videoId = urlParams.get('id') || '';
+  const videoTitle = urlParams.get('title') || 'Ddott TV Video';
+  const videoCreator = urlParams.get('creator') || 'Unknown';
 
-  // Update title
-  const titleEl = document.querySelector('.video-info h1');
+  const titleEl = document.getElementById('videoTitle');
   if (titleEl) titleEl.textContent = videoTitle;
 
-  // Play/Pause
+  function setVideoSource(src) {
+    if (!src) return;
+    video.src = src;
+    video.load();
+    video.muted = true;
+    video.play().then(() => {
+      video.muted = false;
+    }).catch(() => {});
+  }
+
+  async function initVideo() {
+    if (videoId && db) {
+      try {
+        const { data: v } = await db.from('videos').select('*').eq('id', videoId).single();
+        if (v && v.video_url) {
+          setVideoSource(v.video_url);
+          if (v.title) titleEl.textContent = v.title;
+          if (v.views !== undefined) {
+            document.getElementById('viewCount').textContent = '👁 ' + ((v.views+1)).toLocaleString() + ' views';
+            try { await db.from('videos').update({ views: v.views + 1 }).eq('id', videoId); } catch(e){}
+          }
+          return;
+        }
+      } catch (e) {
+        console.warn('DB video load failed:', e);
+      }
+    }
+    if (videoUrl) {
+      setVideoSource(videoUrl);
+    }
+  }
+
   playPauseBtn.addEventListener('click', () => {
-    if (video.paused) { video.play(); } else { video.pause(); }
+    if (video.paused) video.play(); else video.pause();
   });
 
   video.addEventListener('play', () => {
-    playPauseBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+    playPauseBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
   });
-
   video.addEventListener('pause', () => {
-    playPauseBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+    playPauseBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   });
 
-  // Progress bar sync
+  skipBackBtn.addEventListener('click', () => { video.currentTime = Math.max(0, video.currentTime - 10); });
+  skipFwdBtn.addEventListener('click', () => { video.currentTime = Math.min(video.duration || 0, video.currentTime + 10); });
+
+  muteBtn.addEventListener('click', () => {
+    video.muted = !video.muted;
+    muteBtn.textContent = video.muted ? '🔇' : '🔊';
+  });
+
+  volSlider.addEventListener('click', (e) => {
+    const rect = volSlider.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    video.volume = pct / 100;
+    volFill.style.width = pct + '%';
+  });
+
   video.addEventListener('timeupdate', () => {
     if (!video.duration) return;
     const pct = (video.currentTime / video.duration) * 100;
-    document.getElementById('progressFill').style.width = pct + '%';
+    progressFill.style.width = pct + '%';
     const m = Math.floor(video.currentTime / 60);
     const s = Math.floor(video.currentTime % 60);
-    document.getElementById('currentTime').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    currentTimeEl.textContent = m + ':' + s.toString().padStart(2,'0');
   });
 
-  // Progress click seek
-  document.getElementById('progressWrap').addEventListener('click', function(e) {
+  video.addEventListener('loadedmetadata', () => {
     if (!video.duration) return;
-    const rect = this.getBoundingClientRect();
+    const m = Math.floor(video.duration / 60);
+    const s = Math.floor(video.duration % 60);
+    totalTimeEl.textContent = m + ':' + s.toString().padStart(2,'0');
+    durationBadge.textContent = '⏱ ' + m + ':' + s.toString().padStart(2,'0');
+  });
+
+  progressWrap.addEventListener('click', (e) => {
+    if (!video.duration) return;
+    const rect = progressWrap.getBoundingClientRect();
     video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
   });
 
-  // VIDEO END — show quiz
-  video.addEventListener('ended', () => {
-    showQuiz();
+  fsBtn.addEventListener('click', () => {
+    const container = document.querySelector('.video-container');
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else if (container.requestFullscreen) {
+      container.requestFullscreen();
+    } else if (video.requestFullscreen) {
+      video.requestFullscreen();
+    }
   });
 
-  // QUIZ SYSTEM
+  pipBtn.addEventListener('click', async () => {
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+      } else {
+        await video.requestPictureInPicture();
+      }
+    } catch (e) { console.warn('PiP not supported'); }
+  });
+
+  const qualities = ['4K', '1080p', '720p', '480p'];
+  let qi = 0;
+  qualityBtn.addEventListener('click', () => {
+    qi = (qi + 1) % qualities.length;
+    qualityBtn.textContent = qualities[qi];
+  });
+
   let quizAnswers = {};
   let quizCorrect = {};
   let quizTimerInt;
+
+  video.addEventListener('ended', () => { showQuiz(); });
 
   function showQuiz() {
     const dur = video.duration || 0;
@@ -1227,16 +874,12 @@
     const fakeDur2 = (mins > 0 ? mins - 1 : mins + 2) + ' min ' + fakeSecs2 + ' sec';
 
     quizCorrect = { q1: correctDur };
-
-    // Q1 options
     renderOptions('q1options', [correctDur, fakeDur1, fakeDur2].sort(() => Math.random() - 0.5), 'q1');
-
-
 
     document.getElementById('quizBox').style.display = 'block';
 
-    // 60 second timer
     let t = 60;
+    document.getElementById('quizTimer').textContent = t;
     quizTimerInt = setInterval(() => {
       t--;
       document.getElementById('quizTimer').textContent = t;
@@ -1250,7 +893,7 @@
     options.forEach(opt => {
       const btn = document.createElement('button');
       btn.textContent = opt;
-      btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;';
+      btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;transition:all .2s;';
       btn.onclick = () => {
         container.querySelectorAll('button').forEach(b => {
           b.style.background = 'rgba(255,255,255,0.05)';
@@ -1260,80 +903,139 @@
         btn.style.borderColor = '#00f5ff';
         quizAnswers[qKey] = opt;
         document.getElementById('quizResult').innerHTML = '';
-        document.getElementById('quizSubmit').disabled = false;
       };
       container.appendChild(btn);
     });
   }
 
-  async function submitQuiz() {
+  function submitQuiz() {
     clearInterval(quizTimerInt);
     let correct = 0;
     if (quizAnswers.q1 === quizCorrect.q1) correct++;
 
     const resultEl = document.getElementById('quizResult');
-
     if (correct >= 1) {
       const coinsEarned = 5;
       resultEl.innerHTML = '✅ Correct! +' + coinsEarned + ' Emo Coins earned! 🪙';
       resultEl.style.color = '#00f5ff';
-      await creditCoins(coinsEarned);
+      creditCoins(coinsEarned);
     } else {
       resultEl.innerHTML = '❌ Wrong answer! Watch the video again to earn coins. 👀';
       resultEl.style.color = '#ff4466';
     }
-
     document.getElementById('quizSubmit').disabled = true;
-    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; }, 3000);
+    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; document.getElementById('quizSubmit').disabled = false; }, 3000);
   }
 
   function autoFailQuiz() {
     document.getElementById('quizResult').innerHTML = '⏱️ Time up! No coins this time.';
     document.getElementById('quizResult').style.color = '#ff4466';
     document.getElementById('quizSubmit').disabled = true;
-    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; }, 2000);
+    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; document.getElementById('quizSubmit').disabled = false; }, 2000);
   }
 
   async function creditCoins(amount) {
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) return;
-    const { data: coins } = await db.from('emo_coins').select('*').eq('user_id', user.id).single();
-    if (!coins) return;
-    await db.from('emo_coins').update({
-      balance: coins.balance + amount,
-      total_earned: (coins.total_earned || 0) + amount
-    }).eq('user_id', user.id);
-    await db.from('emo_transactions').insert({
-      user_id: user.id,
-      amount: amount,
-      type: 'watch_complete',
-      description: 'Video watch reward: ' + videoTitle
-    });
+    if (!db) return;
+    try {
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) return;
+      const { data: coins } = await db.from('emo_coins').select('*').eq('user_id', user.id).single();
+      if (!coins) return;
+      await db.from('emo_coins').update({
+        balance: coins.balance + amount,
+        total_earned: (coins.total_earned || 0) + amount
+      }).eq('user_id', user.id);
+      await db.from('emo_transactions').insert({
+        user_id: user.id, amount: amount, type: 'watch_complete',
+        description: 'Video watch reward: ' + videoTitle
+      });
+    } catch (e) { console.warn('Coin credit failed:', e); }
   }
 
-  // Progress click
-  document.getElementById('progressWrap').addEventListener('click', function(e) {
-    const rect = this.getBoundingClientRect();
-    progress = ((e.clientX - rect.left) / rect.width) * 100;
-    document.getElementById('progressFill').style.width = progress + '%';
+  async function loadComments() {
+    if (!videoId) {
+      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No video ID. Comments unavailable.</div>';
+      return;
+    }
+    if (!db) {
+      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Database not connected. Comments unavailable.</div>';
+      return;
+    }
+    try {
+      const { data, count } = await db.from('comments').select('*', { count: 'exact' }).eq('video_id', videoId).order('created_at', { ascending: false }).limit(20);
+      document.getElementById('commentCount').textContent = count || 0;
+      const panel = document.getElementById('commentsList');
+      if (!data || !data.length) {
+        panel.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No comments yet. Be the first!</div>';
+        return;
+      }
+      panel.innerHTML = data.map(c => `
+        <div class="comment">
+          <div class="comment-avatar">${(c.username||'U')[0].toUpperCase()}</div>
+          <div class="comment-body">
+            <div class="comment-header">
+              <span class="comment-user">@${c.username||'user'}</span>
+              <span class="comment-time">${new Date(c.created_at).toLocaleDateString()}</span>
+            </div>
+            <div class="comment-text">${c.content}</div>
+            <div class="comment-actions">
+              <span class="ca-btn">❤ ${c.likes||0}</span>
+              <span class="ca-btn">Reply</span>
+            </div>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      console.warn('Comments load failed:', e);
+      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Failed to load comments.</div>';
+    }
+  }
+
+  async function postComment() {
+    if (!videoId || !db) return;
+    const inp = document.getElementById('commentInput');
+    const content = inp.value.trim();
+    if (!content) return;
+    try {
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) { alert('Sign in to comment!'); return; }
+      const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
+      await db.from('comments').insert({
+        video_id: videoId, user_id: user.id,
+        username: profile?.username || user.email?.split('@')[0],
+        content
+      });
+      inp.value = '';
+      loadComments();
+    } catch (e) { console.warn('Post comment failed:', e); alert('Failed to post comment.'); }
+  }
+
+  document.getElementById('commentSubmitBtn').addEventListener('click', postComment);
+  document.getElementById('commentInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); postComment(); }
   });
 
-  // Volume
-  document.querySelector('.vol-slider').addEventListener('click', function(e) {
-    const rect = this.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-    document.getElementById('volFill').style.width = pct + '%';
-  });
+  async function loadLikes() {
+    if (!videoId || !db) return;
+    try {
+      const { count } = await db.from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
+      document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
+    } catch (e) { console.warn('Likes load failed:', e); }
+  }
 
-  // Quality toggle
-  const qualities = ['4K', '1080p', '720p', '480p'];
-  let qi = 0;
-  document.getElementById('qualityBtn').addEventListener('click', function() {
-    qi = (qi + 1) % qualities.length;
-    this.textContent = qualities[qi];
-  });
+  async function likeVideo() {
+    if (!videoId) return;
+    if (!db) { alert('Database not connected.'); return; }
+    try {
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) { alert('Sign in to like!'); return; }
+      await db.from('video_likes').insert({ video_id: videoId, user_id: user.id });
+      const { count } = await db.from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
+      document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
+    } catch (e) { console.warn('Like failed:', e); }
+  }
 
-  // Tabs
+  document.getElementById('likeBtn').addEventListener('click', likeVideo);
+
   function switchTab(el, tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
@@ -1342,7 +1044,6 @@
     });
   }
 
-  // Stickers
   document.querySelectorAll('.sticker').forEach(s => {
     s.addEventListener('click', function() {
       const inp = document.getElementById('commentInput');
@@ -1353,104 +1054,19 @@
     });
   });
 
-  // Comment input auto-resize
   document.getElementById('commentInput').addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = this.scrollHeight + 'px';
   });
+
+  initVideo();
+  loadComments();
+  loadLikes();
 </script>
 </body>
-</html>
-<script>
-// Real player data
-const urlParams = new URLSearchParams(window.location.search);
-const videoId = urlParams.get('id');
+</html>'''
 
-async function loadVideoData() {
-  if (!videoId) return;
-  const { data: v } = await db.from('videos').select('*').eq('id', videoId).single();
-  if (!v) return;
+with open('/mnt/agents/output/ddott-player-v2-fixed.html', 'w', encoding='utf-8') as f:
+    f.write(html)
 
-  // Set video source — no login required
-  const video = document.getElementById('realVideo');
-  if (video && v.video_url) {
-    video.src = v.video_url;
-    video.load();
-  }
-
-  // Update UI immediately
-  if (v.title) {
-    const titleEl = document.querySelector('h1');
-    if (titleEl) titleEl.textContent = v.title;
-  }
-
-  // Like count
-  const { count: likeCount } = await db
-    .from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
-  document.getElementById('likeCount').textContent = (likeCount || 0).toLocaleString();
-
-  // Update views — best effort (no login needed)
-  try {
-    await db.from('videos').update({ views: (v.views||0) + 1 }).eq('id', videoId);
-    document.getElementById('viewCount').textContent = `👁 ${(v.views||0)+1} views`;
-  } catch(e) {}
-}
-
-async function loadComments() {
-  if (!videoId) return;
-  const { data, count } = await db
-    .from('comments')
-    .select('*', { count: 'exact' })
-    .eq('video_id', videoId)
-    .order('created_at', { ascending: false })
-    .limit(20);
-  const countEl = document.getElementById('commentCount');
-  if (countEl) countEl.textContent = count || 0;
-  const panel = document.getElementById('comments-panel');
-  if (!data || !data.length) {
-    panel.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No comments yet. Be the first!</div>';
-    return;
-  }
-  panel.innerHTML = data.map(c => `
-    <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#b44fff);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0;">${(c.username||'U')[0].toUpperCase()}</div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">@${c.username||'user'}</div>
-        <div style="font-size:12px;color:rgba(232,244,255,0.7);">${c.content}</div>
-        <div style="font-size:10px;color:rgba(232,244,255,0.3);margin-top:4px;">❤ ${c.likes||0}</div>
-      </div>
-    </div>`).join('');
-}
-
-async function postComment() {
-  if (!videoId) return;
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
-  const inp = document.getElementById('commentInput');
-  const content = inp.value.trim();
-  if (!content) return;
-  const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
-  await db.from('comments').insert({ video_id: videoId, user_id: user.id, username: profile?.username || user.email?.split('@')[0], content });
-  inp.value = '';
-  loadComments();
-}
-
-async function likeVideo() {
-  if (!videoId) return;
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) { alert('Sign in to like!'); return; }
-  const { error } = await db.from('video_likes').insert({ video_id: videoId, user_id: user.id });
-  if (error) return;
-  const { count } = await db
-    .from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
-  document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
-}
-
-// Hook comment submit
-loadVideoData();
-loadComments();
-  const submitBtn = document.querySelector('.comment-submit');
-  if (submitBtn) submitBtn.addEventListener('click', postComment);
-  const likeBtn = document.querySelector('.like-btn');
-  if (likeBtn) likeBtn.addEventListener('click', likeVideo);
-</script>
+print("Saved clean fixed version")
