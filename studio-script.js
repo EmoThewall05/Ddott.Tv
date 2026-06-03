@@ -1,6 +1,6 @@
 // Real publish to Supabase with video upload
 async function publishVideo() {
-  const title = document.getElementById('vidTitle').value.trim();
+  const title = document.getElementById('videoTitle').value.trim();
   if (!title) { showToast('⚠️ ADD A TITLE FIRST!'); return; }
 
   const user = await getUser();
@@ -64,7 +64,7 @@ async function publishVideo() {
   }
 
   setTimeout(() => {
-    document.getElementById('vidTitle').value = '';
+    document.getElementById('videoTitle').value = '';
     document.querySelector('.form-textarea').value = '';
     document.getElementById('uploadProgress').classList.remove('show');
     fileInput.value = '';

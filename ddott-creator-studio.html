@@ -181,7 +181,7 @@ function handleFileSelect(input) {
   document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB'
   document.getElementById('filePreview').style.display = 'flex'
   document.getElementById('uploadZone').classList.add('success')
-  document.getElementById('videoTitle').value = file.name.replace(/\.[^/.]+$/, '')
+
 }
 
 function addTag(e) {
