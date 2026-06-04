@@ -24,7 +24,7 @@ async function publishVideo() {
   try {
     videoUrl = await uploadToCloudinary(file);
   } catch (err) {
-    showToast('❌ UPLOAD ERROR: ' + err.message);
+    showToast('❌ ' + (err.message || 'Upload failed'));
     return;
   }
 

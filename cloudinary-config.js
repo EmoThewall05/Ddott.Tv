@@ -12,7 +12,9 @@ async function uploadToCloudinary(file) {
     { method: 'POST', body: formData }
   );
 
+  if (!response.ok) throw new Error('HTTP ' + response.status);
   const data = await response.json();
   if (data.error) throw new Error(data.error.message);
+  if (!data.secure_url) throw new Error('No URL returned');
   return data.secure_url;
 }
