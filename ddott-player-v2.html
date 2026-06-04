@@ -464,6 +464,19 @@
     .emo-tip { flex-direction: row; min-width: unset; width: 100%; }
   }
 </style>
+<style id="iframe-hide" style="display:none">
+  /* Hide nav when in iframe */
+</style>
+<script>
+  if (window.self !== window.top) {
+    // Running inside iframe — hide nav
+    document.addEventListener('DOMContentLoaded', () => {
+      const nav = document.querySelector('nav');
+      if (nav) nav.style.display = 'none';
+      document.querySelector('.main').style.paddingTop = '8px';
+    });
+  }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/supabase-config.js"></script>
 </head>
