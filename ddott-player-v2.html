@@ -1120,23 +1120,26 @@
   // ============================
   // INIT
   // ============================
-  // DIRECT VIDEO LOAD
+  // SMART VIDEO LOAD
   (function() {
-    try {
-      const v = document.getElementById('realVideo');
-      const params = new URLSearchParams(window.location.search);
-      const uid = params.get('url');
-      const vid = params.get('id');
-      if (uid) {
-        v.src = decodeURIComponent(uid);
-      } else if (!vid) {
-        // fallback
-        v.src = 'https://havmduragglvstlxrgag.supabase.co/storage/v1/object/public/videos/e039d71c-7342-4dfa-887c-4bc9a54fda08/1780507523154.mp4';
-      }
-      if (v.src) v.load();
-    } catch(e) {}
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get('url');
+    const vid = params.get('id');
+    const v = document.getElementById('realVideo');
+    if (uid) {
+      v.src = decodeURIComponent(uid);
+      v.load();
+    } else if (vid && window.db) {
+      initVideo();
+    } else if (vid) {
+      // db not ready yet, wait 500ms
+      setTimeout(initVideo, 500);
+    } else {
+      // no params, load fallback
+      v.src = 'https://havmduragglvstlxrgag.supabase.co/storage/v1/object/public/videos/e039d71c-7342-4dfa-887c-4bc9a54fda08/1780507523154.mp4';
+      v.load();
+    }
   })();
-  initVideo();
   loadComments();
   loadLikes();
 </script>
