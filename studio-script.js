@@ -87,3 +87,18 @@ function showTab(tab, el) {
   const active = document.getElementById(tabs[tab]);
   if (active) active.style.display = 'block';
 }
+
+function showToast(msg) {
+  let toast = document.getElementById('ddott-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'ddott-toast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a0030;border:1px solid #00f5ff;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:9999;text-align:center;min-width:200px;box-shadow:0 0 20px #00f5ff44;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  toast.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>toast.style.display='none',300); }, 3000);
+}
