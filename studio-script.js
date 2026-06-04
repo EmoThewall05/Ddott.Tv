@@ -70,3 +70,13 @@ async function publishVideo() {
     fileInput.value = '';
   }, 2000);
 }
+
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  selectedFile = file;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+  document.getElementById('filePreview').style.display = 'flex';
+  document.getElementById('uploadZone').classList.add('success');
+}
