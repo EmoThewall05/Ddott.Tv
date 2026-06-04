@@ -770,6 +770,14 @@
   }
 
   async function initVideo() {
+    // Show tap-to-play overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'tapOverlay';
+    overlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:20;cursor:pointer;border-radius:12px;';
+    overlay.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#00f5ff,#b400ff);display:flex;align-items:center;justify-content:center;font-size:30px;">▶</div>';
+    document.querySelector('.video-wrap').appendChild(overlay);
+    overlay.addEventListener('click', () => { overlay.remove(); video.play(); });
+  
     // Priority 1: load by video ID from Supabase
     if (videoId && db) {
       try {
