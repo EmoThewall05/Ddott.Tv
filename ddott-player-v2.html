@@ -702,6 +702,14 @@
 <div class="butterfly-fab" title="Emowall AI">🦋</div>
 
 <script>
+  // EARLY TEST
+  document.addEventListener('DOMContentLoaded', () => {
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff0050;color:#fff;font-size:14px;padding:8px;z-index:99999;text-align:center;';
+    t.textContent = 'JS RUNNING';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  });
   // ============================
   // SUPABASE SETUP — FIX: use SUPABASE_ANON_KEY (not SUPABASE_KEY)
   // ============================
