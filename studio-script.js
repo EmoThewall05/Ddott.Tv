@@ -12,8 +12,8 @@ async function publishVideo() {
   const file = fileInput?.files[0];
   if (!file) { showToast('⚠️ SELECT A VIDEO FILE!'); return; }
 
-  const description = document.querySelector('.form-textarea').value.trim();
-  const category = document.querySelector('.form-select').value;
+  const description = document.getElementById('videoDesc').value.trim();
+  const category = document.getElementById('videoCategory').value;
   const tags = [...document.querySelectorAll('.tag-chip')]
     .map(t => t.textContent.replace('✕','').trim());
 
