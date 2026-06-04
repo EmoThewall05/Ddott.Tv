@@ -60,8 +60,8 @@ async function publishVideo() {
 
   setTimeout(() => {
     document.getElementById('videoTitle').value = '';
-    document.querySelector('.form-textarea').value = '';
-    document.getElementById('uploadProgress').classList.remove('show');
+    document.getElementById('videoDesc').value = '';
+    
     fileInput.value = '';
   }, 2000);
 }
