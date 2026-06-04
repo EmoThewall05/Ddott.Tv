@@ -1,3 +1,4 @@
+let selectedFile = null;
 // Real publish to Supabase with video upload
 async function publishVideo() {
   const title = document.getElementById('videoTitle').value.trim();
