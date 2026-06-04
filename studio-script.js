@@ -18,13 +18,15 @@ async function publishVideo() {
     .map(t => t.textContent.replace('✕','').trim());
 
   showToast('🚀 UPLOADING TO CLOUDINARY...');
+  console.log('Starting Cloudinary upload, file size:', file.size);
 
   // Upload to Cloudinary
   let videoUrl;
   try {
     videoUrl = await uploadToCloudinary(file);
   } catch (err) {
-    showToast('❌ ' + (err.message || 'Upload failed'));
+    console.error('Cloudinary error:', err);
+    showToast('❌ CLOUDINARY: ' + (err.message || 'Upload failed'));
     return;
   }
 
@@ -46,7 +48,8 @@ async function publishVideo() {
   const { error } = await db.from('videos').insert(insertData);
 
   if (error) {
-    showToast('❌ ERROR: ' + error.message);
+    console.error('DB insert error:', error);
+    showToast('❌ DB: ' + error.message);
     return;
   }
 
