@@ -1,4 +1,4 @@
-const CACHE = 'ddott-tv-v1';
+const CACHE = 'ddott-tv-v5';
 const FILES = [
   '/ddott-tv-app.html',
   '/ddott-home-v2.html',
