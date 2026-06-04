@@ -1120,26 +1120,52 @@
   // ============================
   // INIT
   // ============================
-  // SMART VIDEO LOAD
-  (function() {
+  window.db = db;
+
+  async function smartLoad() {
     const params = new URLSearchParams(window.location.search);
     const uid = params.get('url');
     const vid = params.get('id');
     const v = document.getElementById('realVideo');
+
+    v.addEventListener('error', () => {
+      const code = v.error ? v.error.code : '?';
+      const msg = v.error ? v.error.message : 'unknown';
+      console.error('Video error code:' + code + ' msg:' + msg);
+    });
+
     if (uid) {
+      console.log('Loading from URL param:', uid);
       v.src = decodeURIComponent(uid);
       v.load();
-    } else if (vid && window.db) {
-      initVideo();
-    } else if (vid) {
-      // db not ready yet, wait 500ms
-      setTimeout(initVideo, 500);
-    } else {
-      // no params, load fallback
-      v.src = 'https://havmduragglvstlxrgag.supabase.co/storage/v1/object/public/videos/e039d71c-7342-4dfa-887c-4bc9a54fda08/1780507523154.mp4';
-      v.load();
+      return;
     }
-  })();
+
+    if (vid) {
+      if (db) {
+        await initVideo();
+      } else {
+        let waited = 0;
+        const check = setInterval(async () => {
+          waited += 200;
+          if (db) {
+            clearInterval(check);
+            await initVideo();
+          } else if (waited > 3000) {
+            clearInterval(check);
+            console.warn('DB timeout — no video loaded');
+          }
+        }, 200);
+      }
+      return;
+    }
+
+    console.log('No params — loading fallback video');
+    v.src = 'https://havmduragglvstlxrgag.supabase.co/storage/v1/object/public/videos/e039d71c-7342-4dfa-887c-4bc9a54fda08/1780507523154.mp4';
+    v.load();
+  }
+
+  smartLoad();
   loadComments();
   loadLikes();
 </script>
