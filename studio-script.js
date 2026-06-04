@@ -31,8 +31,7 @@ async function publishVideo() {
   showToast('💾 SAVING...');
 
   // Save to videos table
-  const { error } = await db.from('videos').insert({
-    user_id: user.id,
+  const insertData = {
     title: title,
     description: description,
     category: category,
@@ -41,7 +40,10 @@ async function publishVideo() {
     views: 0,
     likes: 0,
     emo_coins_earned: 0
-  });
+  };
+  if (user && user.id) insertData.user_id = user.id;
+
+  const { error } = await db.from('videos').insert(insertData);
 
   if (error) {
     showToast('❌ ERROR: ' + error.message);
