@@ -84,7 +84,11 @@ function handleFileSelect(input) {
 function showTab(tab, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('uploadTab').style.display = tab === 'upload' ? 'block' : 'none';
-  document.getElementById('myVideosTab').style.display = tab === 'myVideos' ? 'block' : 'none';
-  document.getElementById('spotPayTab').style.display = tab === 'spotPay' ? 'block' : 'none';
+  const tabs = {upload:'uploadTab', myVideos:'myVideosTab', spotPay:'spotPayTab'};
+  Object.values(tabs).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const active = document.getElementById(tabs[tab]);
+  if (active) active.style.display = 'block';
 }
