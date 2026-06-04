@@ -1120,16 +1120,21 @@
   // ============================
   // INIT
   // ============================
-  // DIRECT VIDEO LOAD - bypass all async
+  // DIRECT VIDEO LOAD
   (function() {
     try {
       const v = document.getElementById('realVideo');
-      v.src = 'https://havmduragglvstlxrgag.supabase.co/storage/v1/object/public/videos/e039d71c-7342-4dfa-887c-4bc9a54fda08/1780507523154.mp4';
-      v.load();
-      console.log('Video src set directly:', v.src);
-    } catch(e) {
-      console.error('Direct load failed:', e);
-    }
+      const params = new URLSearchParams(window.location.search);
+      const uid = params.get('url');
+      const vid = params.get('id');
+      if (uid) {
+        v.src = decodeURIComponent(uid);
+      } else if (!vid) {
+        // fallback
+        v.src = 'https://havmduragglvstlxrgag.supabase.co/storage/v1/object/public/videos/e039d71c-7342-4dfa-887c-4bc9a54fda08/1780507523154.mp4';
+      }
+      if (v.src) v.load();
+    } catch(e) {}
   })();
   initVideo();
   loadComments();
