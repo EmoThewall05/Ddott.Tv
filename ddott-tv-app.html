@@ -259,6 +259,11 @@
 
   function nav(page, params){
     if(!pages[page]) return;
+    // Open studio and login as full page to allow file upload
+    if(page === 'studio' || page === 'login') {
+      window.location.href = pages[page];
+      return;
+    }
     flash(); current = page;
     document.getElementById('homeScreen').style.display = 'none';
     const w = document.getElementById('iframeWrapper');
