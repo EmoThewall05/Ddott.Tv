@@ -326,82 +326,13 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="cat">Comedy</div>
   </div>
 
-  <!-- Featured -->
-  <div class="sec-hd"><h2>Featured</h2><a href="#">View all →</a></div>
-  <div class="featured" style="margin-bottom:28px;">
-    <div class="feat-thumb" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="thumb-vis" style="background:linear-gradient(135deg,#030d1a,#0a0a2e,#1a0330)">🌌</div>
-      <div class="thumb-grad"></div>
-      <div class="play-ov"><div class="play-circle">▶</div></div>
-      <div class="thumb-dur">18:42</div>
-      <div class="earn-badge">+12 🪙</div>
-      <div class="spot-badge">⚡ SPOT PAYMENT</div>
-    </div>
-    <div class="feat-info" style="display:flex;flex-direction:column;">
-      <span class="feat-cat">Crypto</span>
-      <div class="feat-title">The Future of Web3 — How Blockchain is Rewriting Finance in 2025</div>
-      <div class="feat-desc">A deep dive into DeFi, NFT markets, and what the next wave of crypto adoption means for everyday users. Creator receives instant Spot Payment.</div>
-      <div class="ch-row">
-        <div class="ch-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">CW</div>
-        <div><div class="ch-name">CryptoWave</div><div class="ch-subs">148K subscribers</div></div>
-        <button class="sub-btn subbed">✓ Subscribed</button>
-      </div>
-      <div class="stats-r">
-        <div><div class="stat-v">2.4M</div><div class="stat-l">Views</div></div>
-        <div><div class="stat-v">84K</div><div class="stat-l">Likes</div></div>
-        <div><div class="stat-v" style="color:var(--gold)">+12</div><div class="stat-l" style="color:rgba(255,216,77,0.5)">Coins</div></div>
-      </div>
-    </div>
-  </div>
+  <!-- Real Videos from Supabase -->
+  <div class="sec-hd"><h2>Latest Videos</h2><a href="#">View all →</a></div>
+  <div class="vgrid" id="video-grid" style="margin-bottom:28px;"></div>
+  <div class="sec-hd"><h2>For You</h2><a onclick="loadVideos()">Refresh →</a></div>
+  <div class="vgrid" id="foryou-grid" style="margin-bottom:28px;"></div>
 
-  <!-- Trending Now -->
-  <div class="sec-hd"><h2>Trending Now</h2><a href="#">See more →</a></div>
-  <div class="vgrid" id="video-grid" style="margin-bottom:28px;">
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Midnight Frequencies','VibesMaker','Music')">
-      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#0a0015,#1a0030)">🎵</div><div class="vc-dur">4:22</div><div class="vc-earn">+3🪙</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--green))">VM</div><div class="vc-title">Midnight Frequencies — Lo-fi Beats for Late Night Sessions</div></div><div class="vc-bot"><span class="vc-ch">VibesMaker</span><span class="vc-views">👁 892K</span></div></div>
-    </div>
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-live"><span class="ldot"></span>LIVE</div><div class="vc-inner" style="background:linear-gradient(135deg,#001510,#003020)">🎮</div><div class="vc-earn">+8🪙</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">NK</div><div class="vc-title">LIVE: Building a Game From Scratch in 24 Hours Challenge</div></div><div class="vc-bot"><span class="vc-ch">NeonKreator</span><span class="vc-views">👁 12.4K live</span></div></div>
-    </div>
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#150a00,#301500)">🎨</div><div class="vc-dur">22:15</div><div class="vc-earn">+15🪙</div><div class="vc-spot">⚡SPOT</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,#ffd84d,#ff8c00)">AS</div><div class="vc-title">Digital Painting Masterclass: Character Design Sketch to Finish</div></div><div class="vc-bot"><span class="vc-ch">ArtStudio88</span><span class="vc-views">👁 340K</span></div></div>
-    </div>
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#0a000f,#1a0030)">📊</div><div class="vc-dur">31:08</div><div class="vc-earn">+20🪙</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--magenta),var(--purple))">LX</div><div class="vc-title">How I Made $10K in Emo Coins This Month — Full Strategy</div></div><div class="vc-bot"><span class="vc-ch">LuxeCinema</span><span class="vc-views">👁 1.1M</span></div></div>
-    </div>
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#001515,#003030)">🔬</div><div class="vc-dur">14:55</div><div class="vc-earn">+10🪙</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--green))">SV</div><div class="vc-title">Quantum Computing & Crypto Security — 2025 Breakdown</div></div><div class="vc-bot"><span class="vc-ch">ScienceVault</span><span class="vc-views">👁 567K</span></div></div>
-    </div>
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#0f000a,#2a0020)">🎤</div><div class="vc-dur">8:30</div><div class="vc-earn">+5🪙</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--magenta),#ff8c00)">MR</div><div class="vc-title">Studio Session Vlog — Recording My First EP Zero Budget</div></div><div class="vc-bot"><span class="vc-ch">MusicRealm</span><span class="vc-views">👁 223K</span></div></div>
-    </div>
-  </div>
-
-  <!-- For You -->
-  <div class="sec-hd"><h2>For You</h2><a href="#">Refresh →</a></div>
-  <div class="vgrid">
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#001020,#002040)">💹</div><div class="vc-dur">27:44</div><div class="vc-earn">+18🪙</div><div class="vc-spot">⚡SPOT</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">CW</div><div class="vc-title">Emo Coin Strategy: Maximise Daily Earnings on Ddott TV</div></div><div class="vc-bot"><span class="vc-ch">CryptoWave</span><span class="vc-views">👁 780K</span></div></div>
-    </div>
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-inner" style="background:linear-gradient(135deg,#150010,#300030)">🎭</div><div class="vc-dur">11:20</div><div class="vc-earn">+7🪙</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,#ffd84d,#ff8c00)">AS</div><div class="vc-title">3D Motion Graphics — Blender for Complete Beginners 2025</div></div><div class="vc-bot"><span class="vc-ch">ArtStudio88</span><span class="vc-views">👁 419K</span></div></div>
-    </div>
-    <div class="vcard" onclick="openPlayer('https://www.w3schools.com/html/mov_bbb.mp4','Ddott TV Video','Emobies05','General')">
-      <div class="vc-thumb"><div class="vc-live"><span class="ldot"></span>LIVE</div><div class="vc-inner" style="background:linear-gradient(135deg,#050010,#100025)">🎸</div><div class="vc-earn">+6🪙</div></div>
-      <div class="vc-info"><div class="vc-top"><div class="vc-av" style="background:linear-gradient(135deg,var(--magenta),#ff8c00)">MR</div><div class="vc-title">LIVE: Sunday Acoustic Session — Requests Welcome</div></div><div class="vc-bot"><span class="vc-ch">MusicRealm</span><span class="vc-views">👁 3.2K live</span></div></div>
-    </div>
-  </div>
-</main>
-
-<!-- RIGHT PANEL -->
+<!-- RIGHT PANEL --><!-- RIGHT PANEL -->
 <aside class="rpanel">
   <div class="rp-tabs">
     <div class="rp-tab active" id="rt-coins" onclick="rTab('coins')">Coins</div>
