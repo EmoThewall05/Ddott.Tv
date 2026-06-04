@@ -557,4 +557,235 @@ async function loadHomeCoins() {
   } catch(e) { console.log(e); }
 }
 document.addEventListener('DOMContentLoaded', loadHomeCoins);
+</script>  <!-- Real Videos -->
+  <div class="sec-hd"><h2>Latest Videos</h2><a href="#">View all →</a></div>
+  <div class="vgrid" id="video-grid" style="margin-bottom:28px;">
+    <div style="color:#666;text-align:center;padding:30px;grid-column:1/-1;">Loading...</div>
+  </div>
+
+<!-- RIGHT PANEL --><!-- RIGHT PANEL -->
+<aside class="rpanel">
+  <div class="rp-tabs">
+    <div class="rp-tab active" id="rt-coins" onclick="rTab('coins')">Coins</div>
+    <div class="rp-tab" id="rt-trending" onclick="rTab('trending')">Trending</div>
+    <div class="rp-tab" id="rt-missions" onclick="rTab('missions')">Missions</div>
+  </div>
+
+  <!-- COINS -->
+  <div class="rp-body" id="rp-coins">
+    <div class="wallet-mini">
+      <div class="wm-addr">0x...8ea3</div>
+      <div class="wm-name">MY DDOTT WALLET</div>
+      <div class="wm-lbl">Total Emo Coins</div>
+      <div class="wm-amt" id="wallet-coins">0</div>
+      <div class="wm-streak"><span class="streak-pill">🔥 Day 7</span><span style="font-size:10px;color:var(--dimmer)">+1 coin today</span></div>
+      <div class="wm-prog"><div class="wm-prog-fill"></div></div>
+      <div class="wm-prog-lbl"><span>247 / 500</span><span>68%</span></div>
+      <button class="convert-btn">🔗 Convert via TheWall</button>
+    </div>
+    <div class="rp-lbl" style="margin-bottom:10px;">Today's Earnings</div>
+    <div class="mission"><span class="m-ico">📅</span><div class="m-info"><div class="m-name">Daily Login</div><div class="m-prog">Claimed</div></div><span class="m-rew">+1</span><div class="m-check done">✓</div></div>
+    <div class="mission"><span class="m-ico">▶️</span><div class="m-info"><div class="m-name">Watch 30 min</div><div class="m-prog">18 / 30 min</div></div><span class="m-rew">+5</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">👍</span><div class="m-info"><div class="m-name">Like 3 videos</div><div class="m-prog">1 / 3</div></div><span class="m-rew">+3</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">💬</span><div class="m-info"><div class="m-name">Leave a comment</div><div class="m-prog">Not done</div></div><span class="m-rew">+2</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">📤</span><div class="m-info"><div class="m-name">Share a video</div><div class="m-prog">Not done</div></div><span class="m-rew">+2</span><div class="m-check"></div></div>
+  </div>
+
+  <!-- TRENDING -->
+  <div class="rp-body" id="rp-trending" style="display:none;">
+    <div class="rp-lbl" style="margin-bottom:12px;">Trending Videos</div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#0a0015,#1a0030)">🎵</div><div class="trend-info"><div class="trend-title">Midnight Frequencies Lo-fi Beats</div><div class="trend-meta">892K · +3🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#0a000f,#1a0030)">📊</div><div class="trend-info"><div class="trend-title">How I Made $10K in Emo Coins</div><div class="trend-meta">1.1M · +20🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#001515,#003030)">🔬</div><div class="trend-info"><div class="trend-title">Quantum Computing & Crypto Security</div><div class="trend-meta">567K · +10🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#150010,#300030)">🎭</div><div class="trend-info"><div class="trend-title">Blender for Beginners 2025</div><div class="trend-meta">419K · +7🪙</div></div></div>
+    <div class="trend-item"><div class="trend-thumb" style="background:linear-gradient(135deg,#001020,#002040)">💹</div><div class="trend-info"><div class="trend-title">Emo Coin Strategy Guide</div><div class="trend-meta">780K · +18🪙</div></div></div>
+  </div>
+
+  <!-- MISSIONS -->
+  <div class="rp-body" id="rp-missions" style="display:none;">
+    <div class="rp-lbl">Daily Missions</div>
+    <div class="mission"><span class="m-ico">📅</span><div class="m-info"><div class="m-name">Daily Login</div><div class="m-prog">Claimed</div></div><span class="m-rew">+1</span><div class="m-check done">✓</div></div>
+    <div class="mission"><span class="m-ico">▶️</span><div class="m-info"><div class="m-name">Watch 30 min</div><div class="m-prog">18 / 30</div></div><span class="m-rew">+5</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">📤</span><div class="m-info"><div class="m-name">Share a video</div><div class="m-prog">Not done</div></div><span class="m-rew">+2</span><div class="m-check"></div></div>
+    <div style="height:12px;"></div>
+    <div class="rp-lbl">Weekly Missions</div>
+    <div class="mission"><span class="m-ico">🎬</span><div class="m-info"><div class="m-name">Upload a video</div><div class="m-prog">0 / 1</div></div><span class="m-rew">+50</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">👥</span><div class="m-info"><div class="m-name">Get 10 subscribers</div><div class="m-prog">6 / 10</div></div><span class="m-rew">+30</span><div class="m-check"></div></div>
+    <div class="mission"><span class="m-ico">🔥</span><div class="m-info"><div class="m-name">7-day streak</div><div class="m-prog">7 / 7</div></div><span class="m-rew">+20</span><div class="m-check done">✓</div></div>
+  </div>
+</aside>
+</div>
+
+<!-- BUTTERFLY FAB -->
+<div class="bfab" onclick="toggleAI()">🦋</div>
+
+<!-- AI PANEL -->
+<div class="aipanel" id="aiPanel">
+  <div class="ai-head">
+    <span style="font-size:20px;">🦋</span>
+    <div><div class="ai-name">Butterfly AI</div><div class="ai-sub">Powered by Emo Key · Dwin Universe</div></div>
+    <button class="ai-x" onclick="toggleAI()">×</button>
+  </div>
+  <div class="ai-msgs" id="aiMsgs">
+    <div class="ai-msg bot">Hey Divin! 👋 I'm your Butterfly AI across the Dwin Universe. I can recommend videos, help with Emo Coins, guide your TheWall conversion, or answer anything about Ddott TV!</div>
+  </div>
+  <div class="ai-chips-row">
+    <div class="ai-chip" onclick="sendSug('Recommend videos for me')">🎬 Recommend</div>
+    <div class="ai-chip" onclick="sendSug('How earn more coins?')">🪙 Earn tips</div>
+    <div class="ai-chip" onclick="sendSug('Convert to TheWall')">🔗 Convert</div>
+    <div class="ai-chip" onclick="sendSug('What is Spot Payment?')">⚡ Spot Pay</div>
+  </div>
+  <div class="ai-in-row">
+    <input class="ai-input" id="aiInp" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendAI()">
+    <button class="ai-send" onclick="sendAI()">➤</button>
+  </div>
+</div>
+
+<script>
+// Right panel tabs
+function rTab(t){
+  ['coins','trending','missions'].forEach(x=>{
+    document.getElementById('rp-'+x).style.display=x===t?'block':'none';
+    document.getElementById('rt-'+x).classList.toggle('active',x===t);
+  });
+}
+
+// Category chips
+document.querySelectorAll('.cat').forEach(c=>{
+  c.addEventListener('click',()=>{document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));c.classList.add('active');});
+});
+
+// Sub btn
+document.querySelectorAll('.sub-btn').forEach(b=>{
+  b.addEventListener('click',e=>{e.stopPropagation();b.classList.toggle('subbed');b.textContent=b.classList.contains('subbed')?'✓ Subscribed':'Subscribe';});
+});
+
+
+// AI
+function toggleAI(){document.getElementById('aiPanel').classList.toggle('open');}
+const replies=[
+  "Based on your watch history, check out CryptoWave's Emo Coin strategy video — earn 18 coins! 🪙",
+  "You're at 247 coins — just 253 away from your first TheWall conversion. Keep watching! 🔥",
+  "Spot Payment lets fans pay creators instantly via Web3 wallet — no middlemen! ⚡",
+  "Your Day 7 streak bonus just kicked in! Log in tomorrow to keep the streak alive 🔥",
+];
+let ri=0;
+function sendAI(){
+  const inp=document.getElementById('aiInp');
+  const msg=inp.value.trim();if(!msg)return;
+  addAIMsg(msg,'user');inp.value='';
+  const msgs=document.getElementById('aiMsgs');
+  const t=document.createElement('div');t.className='ai-msg bot';t.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(t);msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{t.remove();addAIMsg(replies[ri%replies.length],'bot');ri++;},1100);
+}
+function sendSug(txt){document.getElementById('aiInp').value=txt;sendAI();}
+function addAIMsg(txt,type){
+  const msgs=document.getElementById('aiMsgs');
+  const d=document.createElement('div');d.className=`ai-msg ${type}`;d.textContent=txt;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+</script>
+<script src="home-script.js"></script>
+<script>
+function openPlayer(url, title, creator, category, id) {
+  const params = {
+    url: url || 'https://www.w3schools.com/html/mov_bbb.mp4', id: id || '',
+    title: title || 'Ddott TV',
+    creator: creator || 'Unknown',
+    category: category || 'General'
+  };
+  const qs = new URLSearchParams(params).toString();
+  if (window.parent && window.parent.nav) {
+    window.parent.nav('player', params);
+  } else {
+    window.location.href = '/player?' + qs;
+  }
+}
+</script>
+</body>
+</html>
+<script>
+// Real videos patch - inject after page loads
+document.addEventListener('DOMContentLoaded', async () => {
+  const s = window.supabase.createClient('https://havmduragglvstlxrgag.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q')
+  const {data} = await s.from('videos').select('*').order('created_at',{ascending:false}).limit(20)
+  if(!data||!data.length) return
+  const grid = document.querySelector('.video-grid') || document.querySelector('.videos') || document.querySelector('.feed') || document.querySelector('.content')
+  if(!grid) return
+  const html = data.map(v=>`
+    <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden;margin-bottom:12px;">
+      <div onclick="openPlayer('${v.video_url}','${v.title}','${v.user_id}','${v.category}','${v.id}')" style="width:100%;height:180px;background:#000;cursor:pointer;position:relative;"><video src="${v.video_url}" style="width:100%;height:180px;object-fit:cover;" preload="metadata"></video><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;">▶️</div></div>
+      <div style="padding:12px;">
+        <div style="font-weight:bold;margin-bottom:4px;">${v.title}</div>
+        <div style="color:#666;font-size:0.8rem;">${v.category} · 👁 ${v.views||0} · 👍 ${v.likes||0}</div>
+      </div>
+    </div>`).join('')
+  const realSection = document.createElement('div')
+  realSection.style.cssText = 'padding:15px;'
+  realSection.innerHTML = '<div style="color:#00f5ff;font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">🔴 LIVE VIDEOS</div>' + html
+  grid.prepend(realSection)
+})
+</script>
+<style>
+@media (max-width: 900px) {
+  :root { --sidebar: 0px; }
+  .sidebar { display: none !important; }
+  .rpanel { display: none !important; }
+  .app-body { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+  .main { padding: 12px; overflow-y: unset; width: 100%; }
+  .featured { grid-template-columns: 1fr; }
+  .feat-thumb { height: 220px; }
+  .feat-info { padding: 14px; }
+  .vgrid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .topbar { padding: 0 10px; gap: 6px; }
+  .upload-btn span { display: none; }
+  .search-wrap { max-width: 200px; }
+  .cats { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .cats::-webkit-scrollbar { display: none; }
+}
+</style>
+<script>
+async function loadRealVideos() {
+  try {
+    const { data } = await db.from('videos').select('*').order('created_at',{ascending:false}).limit(10);
+    if (!data || !data.length) return;
+    const grid = document.getElementById('video-grid');
+    if (!grid) return;
+    const realHtml = data.map(v => `
+      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','Creator','${v.category}','${v.id}')">
+        <div class="vc-thumb">
+          <video src="${v.video_url}" style="width:100%;height:100%;object-fit:cover;" preload="none"></video>
+          <div class="vc-earn">+5🪙</div>
+        </div>
+        <div class="vc-info">
+          <div class="vc-top">
+            <div class="vc-av" style="background:linear-gradient(135deg,var(--cyan),var(--purple))">D</div>
+            <div class="vc-title">${v.title}</div>
+          </div>
+          <div class="vc-bot">
+            <span class="vc-ch">${v.category}</span>
+            <span class="vc-views">👁 ${v.views||0}</span>
+          </div>
+        </div>
+      </div>`).join('');
+    grid.innerHTML = realHtml + grid.innerHTML;
+  } catch(e) { console.log(e); }
+}
+document.addEventListener('DOMContentLoaded', loadRealVideos);
+</script>
+<script>
+async function loadHomeCoins() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    const { data } = await db.from('profiles').select('emo_coins').eq('id', user.id).single();
+    if (data) {
+      document.getElementById('coin-amt').textContent = data.emo_coins || 0;
+      const avatar = document.getElementById('user-avatar');
+      if (avatar) avatar.textContent = (user.email||'D')[0].toUpperCase();
+    }
+  } catch(e) { console.log(e); }
+}
+document.addEventListener('DOMContentLoaded', loadHomeCoins);
 </script>
