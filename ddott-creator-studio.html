@@ -326,5 +326,29 @@ zone.addEventListener('drop', e => {
   }
 })
 </script>
-</body>
+
+<script>
+window.onerror = function(msg, src, line) {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:#fff;padding:8px;font-size:11px;z-index:9999;';
+  d.textContent = 'ERROR: ' + msg + ' (line ' + line + ')';
+  document.body.appendChild(d);
+};
+document.addEventListener('DOMContentLoaded', function() {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:green;color:#fff;padding:8px;font-size:11px;z-index:9999;';
+  d.textContent = 'DB: ' + (window.db ? 'connected' : 'NULL') + ' | User: checking...';
+  document.body.appendChild(d);
+  setTimeout(async () => {
+    try {
+      const { data: { user } } = await window.db.auth.getUser();
+      d.textContent = 'DB: OK | User: ' + (user ? user.email : 'NOT LOGGED IN');
+      d.style.background = user ? 'green' : 'orange';
+    } catch(e) {
+      d.textContent = 'DB ERROR: ' + e.message;
+      d.style.background = 'red';
+    }
+  }, 500);
+});
+</script></body>
 </html>
