@@ -17,22 +17,16 @@ async function publishVideo() {
   const tags = [...document.querySelectorAll('.tag-chip')]
     .map(t => t.textContent.replace('✕','').trim());
 
-  showToast('🚀 UPLOADING VIDEO...');
+  showToast('🚀 UPLOADING TO CLOUDINARY...');
 
-  // Upload to Supabase Storage
-  const fileName = `${user.id}/${Date.now()}_${file.name}`;
-  const { data: uploadData, error: uploadError } = await db.storage
-    .from('videos')
-    .upload(fileName, file, { contentType: file.type });
-
-  if (uploadError) {
-    showToast('❌ UPLOAD ERROR: ' + uploadError.message);
+  // Upload to Cloudinary
+  let videoUrl;
+  try {
+    videoUrl = await uploadToCloudinary(file);
+  } catch (err) {
+    showToast('❌ UPLOAD ERROR: ' + err.message);
     return;
   }
-
-  // Get public URL
-  const { data: urlData } = db.storage.from('videos').getPublicUrl(fileName);
-  const videoUrl = urlData.publicUrl;
 
   showToast('💾 SAVING...');
 
