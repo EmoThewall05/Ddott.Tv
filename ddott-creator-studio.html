@@ -164,3 +164,54 @@ select option { background: #0d0d0d; }
 
 
 </html>
+<script>
+let selectedFile = null;
+
+function handleFileSelect(input) {
+  selectedFile = input.files[0];
+  if (!selectedFile) return;
+  const zone = document.getElementById('uploadZone');
+  zone.innerHTML = `<div class="upload-icon">✅</div><div class="upload-title">${selectedFile.name}</div><div class="upload-sub">${(selectedFile.size/1024/1024).toFixed(1)} MB selected</div>`;
+  zone.classList.add('success');
+}
+
+async function publishVideo() {
+  if (!selectedFile) { alert('Please select a video first!'); return; }
+  const title = document.getElementById('videoTitle').value.trim();
+  if (!title) { alert('Please add a title!'); return; }
+
+  const btn = document.getElementById('publishBtn');
+  btn.textContent = '⏳ Uploading...';
+  btn.disabled = true;
+
+  try {
+    // Upload to Cloudinary
+    const videoUrl = await uploadToCloudinary(selectedFile);
+
+    // Save to Supabase
+    const { data: { user } } = await db.auth.getUser();
+    const { error } = await db.from('videos').insert({
+      title: title,
+      description: document.getElementById('videoDesc').value,
+      category: document.getElementById('videoCategory').value,
+      video_url: videoUrl,
+      user_id: user?.id || null,
+      created_at: new Date().toISOString()
+    });
+
+    if (error) throw error;
+
+    btn.textContent = '🎉 Published!';
+    setTimeout(() => {
+      btn.textContent = '🚀 Publish Video';
+      btn.disabled = false;
+    }, 3000);
+
+  } catch (err) {
+    console.error(err);
+    alert('Upload failed: ' + err.message);
+    btn.textContent = '🚀 Publish Video';
+    btn.disabled = false;
+  }
+}
+</script>
