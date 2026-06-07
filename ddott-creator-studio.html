@@ -72,13 +72,13 @@ select option { background: #0d0d0d; }
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('upload', this)">📤 Upload</div>
-  <div class="tab" onclick="showTab('myVideos', this)">🎬 My Videos</div>
+  <div class="tab" onclick="showTab('upload', this)">📤 Upload</div>
+  <div class="tab active" onclick="showTab('myVideos', this)">🎬 My Videos</div>
   <div class="tab" onclick="showTab('spotPay', this)">💰 Spot Pay</div>
 </div>
 
 <!-- Upload Tab -->
-<div id="uploadTab" class="content">
+<div id="uploadTab" class="content" style="display:none">
   <div class="status-msg" id="statusMsg"></div>
 
   <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
@@ -142,7 +142,7 @@ select option { background: #0d0d0d; }
 </div>
 
 <!-- My Videos Tab -->
-<div id="myvideosTab" class="content" style="display:none">
+<div id="myvideosTab" class="content">
   <div class="section-title">MY VIDEOS</div>
   <div class="my-videos" id="myVideosList">
     <div style="color:#666; text-align:center; padding:30px;">Loading...</div>
@@ -161,6 +161,9 @@ select option { background: #0d0d0d; }
 </div>
 <script>
 let selectedFile = null;
+
+// Auto-load My Videos on page load
+window.addEventListener("DOMContentLoaded", () => { loadMyVideos(); });
 
 function showTab(tab, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
