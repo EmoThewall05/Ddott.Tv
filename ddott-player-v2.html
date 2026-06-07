@@ -479,7 +479,7 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/supabase-config.js"></script>
-</head>
+<script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script><script>new VConsole();</script></head>
 <body>
 
 <nav>
@@ -496,7 +496,7 @@
   <!-- VIDEO PLAYER -->
   <div class="video-container">
     <div class="video-wrap">
-      <video id="realVideo" preload="auto" playsinline controls style="position:absolute;inset:0;width:100%;height:100%;background:#000;" >
+      <video id="realVideo" preload="auto" playsinline style="position:absolute;inset:0;width:100%;height:100%;background:#000;" >
         Your browser does not support the video tag.
       </video>
 
@@ -758,7 +758,10 @@
   const pipBtn = document.getElementById('pipBtn');
 
   const urlParams = new URLSearchParams(window.location.search);
-  const videoUrl = urlParams.get('url') || 'https://havmduragglvstlxrgag.supabase.co/storage/v1/object/public/videos/e039d71c-7342-4dfa-887c-4bc9a54fda08/1780507523154.mp4';
+  const videoUrl = urlParams.get('url') || new URLSearchParams(window.location.hash.slice(1)).get('url') || '';
+  console.log('🎬 DEBUG videoUrl:', videoUrl);
+  console.log('🎬 DEBUG search:', window.location.search);
+  console.log('🎬 DEBUG href:', window.location.href);
   const videoId = urlParams.get('id') || '';
   const videoTitle = urlParams.get('title') || 'Ddott TV Video';
   const videoCreator = urlParams.get('creator') || 'Unknown';
@@ -819,7 +822,9 @@
     }
     // Priority 2: use ?url= param directly
     if (videoUrl) {
-      setVideoSource(decodeURIComponent(videoUrl));
+      const decoded = decodeURIComponent(videoUrl);
+      const finalUrl = decoded.startsWith('http') ? decoded : 'https://res.cloudinary.com/dggip9tpp/video/upload/' + decoded;
+      setVideoSource(finalUrl);
       return;
     }
     console.warn('No video source found. Pass ?id=<video_id> or ?url=<video_url>');
