@@ -554,7 +554,7 @@
   <!-- VIDEO INFO -->
   <div class="info-section">
     <div class="video-info">
-      <h1 id="videoTitle">Building Web3 on Mobile — Full Stack Dev from a Phone 📱</h1>
+      <h1 id="videoTitle"></h1>
       <div class="video-meta">
         <div class="meta-chip" id="viewCount">👁 0 views</div>
         <div class="meta-chip">📅 2 hours ago</div>
@@ -1153,10 +1153,12 @@
     });
 
     if (uid) {
-      console.log('Loading from URL param:', uid);
-      v.src = decodeURIComponent(uid);
+      const decoded = decodeURIComponent(uid);
+      const finalUrl = decoded.startsWith('http') ? decoded : 'https://res.cloudinary.com/dggip9tpp/video/upload/' + decoded;
+      console.log('Loading from URL param:', finalUrl);
+      v.src = finalUrl;
       v.load();
-      v.play().catch(() => {});
+      v.play().catch(e => console.warn('Autoplay blocked:', e));
       return;
     }
 
