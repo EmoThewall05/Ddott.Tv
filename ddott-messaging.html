@@ -9,49 +9,120 @@
 <script src="auth.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
-.header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #1a1a1a; }
+body { background: #000; color: #fff; font-family: 'Segoe UI', system-ui, sans-serif; padding-bottom: 80px; overflow-x: hidden; }
+
+/* Header */
+.header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 50; }
 .logo { font-size: 1rem; font-weight: bold; background: linear-gradient(90deg, #00f5ff, #bf00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.search-bar { margin: 12px 15px; background: #0d0d0d; border: 1px solid #222; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; color: #666; }
+
+/* Search */
+.search-bar { margin: 12px 15px; background: #0d0d0d; border: 1px solid #222; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; color: #666; transition: border-color 0.2s; }
+.search-bar:focus-within { border-color: #00f5ff; }
 .search-bar input { background: none; border: none; outline: none; color: #fff; width: 100%; font-size: 0.95rem; }
-.tabs { display: flex; padding: 0 15px; gap: 5px; margin-bottom: 5px; }
-.tab { padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; color: #666; }
-.tab.active { color: #00f5ff; border-bottom: 2px solid #00f5ff; }
+
+/* Tabs */
+.tabs { display: flex; padding: 0 15px; gap: 5px; margin-bottom: 5px; border-bottom: 1px solid #0d0d0d; }
+.tab { padding: 10px 18px; border-radius: 20px 20px 0 0; font-size: 0.85rem; cursor: pointer; color: #666; border-bottom: 2px solid transparent; transition: all 0.2s; }
+.tab.active { color: #00f5ff; border-bottom-color: #00f5ff; }
+
+/* Chat List */
 .chat-list { padding: 0 15px; }
-.chat-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #0d0d0d; cursor: pointer; }
-.avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; flex-shrink: 0; position: relative; }
-.online-dot { position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; background: #00ff88; border-radius: 50%; border: 2px solid #000; }
+.chat-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #0d0d0d; cursor: pointer; transition: background 0.2s; }
+.chat-item:hover { background: rgba(0,245,255,0.03); margin: 0 -15px; padding-left: 15px; padding-right: 15px; }
+.chat-item:active { background: rgba(0,245,255,0.05); }
+.avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; flex-shrink: 0; position: relative; user-select: none; }
+.online-dot { position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; background: #00ff88; border-radius: 50%; border: 2px solid #000; display: none; }
+.online-dot.visible { display: block; }
 .chat-info { flex: 1; min-width: 0; }
 .chat-name { font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
-.creator-badge { background: #ff6b35; color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; }
+.creator-badge { background: #ff6b35; color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px; }
 .chat-preview { color: #666; font-size: 0.82rem; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chat-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.chat-preview .you-prefix { color: #00f5ff; font-weight: 500; }
+.chat-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
 .chat-time { color: #555; font-size: 0.75rem; }
-.unread-badge { background: #00f5ff; color: #000; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; }
-.new-chat-btn { position: fixed; bottom: 90px; right: 20px; width: 52px; height: 52px; background: linear-gradient(135deg, #00f5ff, #bf00ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 20px rgba(0,245,255,0.3); }
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0a0a; border-top: 1px solid #1a1a1a; display: flex; padding: 10px 0; }
-.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #666; font-size: 0.65rem; cursor: pointer; text-decoration: none; }
+.unread-badge { background: #00f5ff; color: #000; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; min-width: 20px; text-align: center; }
+
+/* New Chat FAB */
+.new-chat-btn { position: fixed; bottom: 90px; right: 20px; width: 52px; height: 52px; background: linear-gradient(135deg, #00f5ff, #bf00ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 20px rgba(0,245,255,0.3); z-index: 40; transition: transform 0.2s; }
+.new-chat-btn:hover { transform: scale(1.1); }
+.new-chat-btn:active { transform: scale(0.95); }
+
+/* Bottom Nav */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); border-top: 1px solid #1a1a1a; display: flex; padding: 10px 0; z-index: 50; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #666; font-size: 0.65rem; cursor: pointer; text-decoration: none; transition: color 0.2s; }
+.nav-item:hover { color: #aaa; }
 .nav-item.active { color: #00f5ff; }
 .nav-icon { font-size: 1.3rem; }
 
 /* Chat Window */
-.chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 100; flex-direction: column; }
+.chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 100; flex-direction: column; animation: slideIn 0.25s ease; }
 .chat-window.open { display: flex; }
-.chat-header { padding: 16px 20px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 12px; }
-.back-btn { font-size: 1.3rem; cursor: pointer; color: #00f5ff; }
-.chat-header-info { flex: 1; }
-.chat-header-name { font-weight: bold; }
-.chat-header-status { color: #00ff88; font-size: 0.75rem; }
-.messages-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-.msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 0.9rem; line-height: 1.4; }
-.msg-bubble.sent { background: linear-gradient(135deg, #00f5ff22, #bf00ff22); border: 1px solid #00f5ff33; align-self: flex-end; border-bottom-right-radius: 4px; }
-.msg-bubble.received { background: #0d0d0d; border: 1px solid #1a1a1a; align-self: flex-start; border-bottom-left-radius: 4px; }
-.msg-time { font-size: 0.7rem; color: #555; margin-top: 4px; }
-.msg-input-bar { padding: 12px 15px; border-top: 1px solid #1a1a1a; display: flex; align-items: center; gap: 10px; }
-.msg-input { flex: 1; background: #0d0d0d; border: 1px solid #222; border-radius: 24px; padding: 12px 18px; color: #fff; font-size: 0.9rem; outline: none; }
-.send-btn { width: 44px; height: 44px; background: linear-gradient(135deg, #00f5ff, #bf00ff); border-radius: 50%; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.empty-state { text-align: center; padding: 40px 20px; color: #444; }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+.chat-header { padding: 14px 20px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); }
+.back-btn { font-size: 1.4rem; cursor: pointer; color: #00f5ff; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.2s; }
+.back-btn:hover { background: rgba(0,245,255,0.1); }
+.chat-header-info { flex: 1; min-width: 0; }
+.chat-header-name { font-weight: bold; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-header-status { font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
+.chat-header-status.online { color: #00ff88; }
+.chat-header-status.offline { color: #555; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; }
+.status-dot.online { background: #00ff88; }
+.status-dot.offline { background: #555; }
+
+.messages-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 4px; scroll-behavior: smooth; }
+.msg-wrapper { display: flex; flex-direction: column; max-width: 75%; animation: msgPop 0.2s ease; }
+.msg-wrapper.sent { align-self: flex-end; }
+.msg-wrapper.received { align-self: flex-start; }
+@keyframes msgPop { from { opacity: 0; transform: translateY(8px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.msg-bubble { padding: 10px 14px; border-radius: 16px; font-size: 0.9rem; line-height: 1.4; word-break: break-word; }
+.msg-bubble.sent { background: linear-gradient(135deg, #00f5ff22, #bf00ff22); border: 1px solid #00f5ff33; border-bottom-right-radius: 4px; }
+.msg-bubble.received { background: #0d0d0d; border: 1px solid #1a1a1a; border-bottom-left-radius: 4px; }
+.msg-time { font-size: 0.7rem; color: #555; margin-top: 3px; padding: 0 4px; }
+.msg-wrapper.sent .msg-time { text-align: right; }
+.msg-wrapper.received .msg-time { text-align: left; }
+
+.msg-input-bar { padding: 12px 15px; border-top: 1px solid #1a1a1a; display: flex; align-items: center; gap: 10px; background: #000; }
+.msg-input { flex: 1; background: #0d0d0d; border: 1px solid #222; border-radius: 24px; padding: 12px 18px; color: #fff; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+.msg-input:focus { border-color: #00f5ff; }
+.send-btn { width: 44px; height: 44px; background: linear-gradient(135deg, #00f5ff, #bf00ff); border-radius: 50%; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, opacity 0.2s; flex-shrink: 0; }
+.send-btn:hover { transform: scale(1.1); }
+.send-btn:active { transform: scale(0.95); }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Empty States */
+.empty-state { text-align: center; padding: 60px 20px; color: #444; }
+.empty-state-icon { font-size: 2.5rem; margin-bottom: 16px; opacity: 0.6; }
+.empty-state-title { font-size: 1rem; color: #666; margin-bottom: 6px; }
+.empty-state-sub { font-size: 0.8rem; color: #333; }
+
+/* Typing indicator */
+.typing-indicator { display: none; align-self: flex-start; padding: 10px 14px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 16px; border-bottom-left-radius: 4px; margin-bottom: 4px; }
+.typing-indicator.visible { display: flex; }
+.typing-dots { display: flex; gap: 4px; align-items: center; }
+.typing-dots span { width: 6px; height: 6px; background: #555; border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out both; }
+.typing-dots span:nth-child(1) { animation-delay: 0s; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+/* Loading skeleton */
+.skeleton { background: linear-gradient(90deg, #0d0d0d 25%, #1a1a1a 50%, #0d0d0d 75%); background-size: 200% 100%; animation: skeletonLoad 1.5s infinite; border-radius: 8px; }
+@keyframes skeletonLoad { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.chat-skeleton { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #0d0d0d; }
+.skeleton-avatar { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; }
+.skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+.skeleton-line { height: 12px; border-radius: 6px; }
+.skeleton-line.short { width: 60%; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #333; }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -62,213 +133,540 @@ body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; paddi
 
 <div class="search-bar">
   <span>🔍</span>
-  <input type="text" placeholder="Search messages..." id="searchInput" oninput="filterChats()">
+  <input type="text" placeholder="Search conversations..." id="searchInput" oninput="onSearchInput()">
 </div>
 
 <div class="tabs">
-  <div class="tab active">All</div>
-  <div class="tab">Creators</div>
-  <div class="tab">Fans</div>
+  <div class="tab active" data-filter="all" onclick="switchTab(this)">All</div>
+  <div class="tab" data-filter="creators" onclick="switchTab(this)">Creators</div>
+  <div class="tab" data-filter="fans" onclick="switchTab(this)">Fans</div>
 </div>
 
 <div class="chat-list" id="chatList">
-  <div class="empty-state">Loading conversations...</div>
+  <!-- Skeleton loading -->
+  <div class="chat-skeleton"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line" style="width:40%"></div><div class="skeleton skeleton-line short"></div></div></div>
+  <div class="chat-skeleton"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line" style="width:55%"></div><div class="skeleton skeleton-line short"></div></div></div>
+  <div class="chat-skeleton"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line" style="width:35%"></div><div class="skeleton skeleton-line short"></div></div></div>
 </div>
 
-<div class="new-chat-btn" onclick="showNewChat()">✏️</div>
+<div class="new-chat-btn" onclick="showNewChat()" title="New message">✏️</div>
 
 <!-- Chat Window -->
 <div class="chat-window" id="chatWindow">
   <div class="chat-header">
     <span class="back-btn" onclick="closeChat()">←</span>
-    <div class="avatar" id="chatAvatar" style="background:#1a1a2e; width:36px; height:36px; font-size:0.9rem;"></div>
+    <div class="avatar" id="chatAvatar" style="background:#1a1a2e; width:40px; height:40px; font-size:1rem;"></div>
     <div class="chat-header-info">
       <div class="chat-header-name" id="chatName"></div>
-      <div class="chat-header-status">● Online</div>
+      <div class="chat-header-status offline" id="chatStatus">
+        <span class="status-dot offline"></span>
+        <span id="chatStatusText">Offline</span>
+      </div>
     </div>
   </div>
-  <div class="messages-container" id="messagesContainer"></div>
+  <div class="messages-container" id="messagesContainer">
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
   <div class="msg-input-bar">
-    <input class="msg-input" id="msgInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
-    <button class="send-btn" onclick="sendMessage()">➤</button>
+    <input class="msg-input" id="msgInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()" autocomplete="off">
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
   </div>
 </div>
 
-
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a href="ddott-home.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span>Home</span>
+  </a>
+  <a href="ddott-explore.html" class="nav-item">
+    <span class="nav-icon">🔍</span>
+    <span>Explore</span>
+  </a>
+  <a href="ddott-upload.html" class="nav-item">
+    <span class="nav-icon">➕</span>
+    <span>Create</span>
+  </a>
+  <a href="ddott-messages.html" class="nav-item active">
+    <span class="nav-icon">💬</span>
+    <span>Messages</span>
+  </a>
+  <a href="ddott-profile.html" class="nav-item">
+    <span class="nav-icon">👤</span>
+    <span>Profile</span>
+  </a>
+</div>
 
 <script>
+/* ─── State ─── */
 let currentUser = null
 let currentChatUser = null
 let realtimeChannel = null
-let allChats = []
+let allChats = []        // { otherId, username, lastMsg, unreadCount, isCreator }
+let activeFilter = 'all' // 'all' | 'creators' | 'fans'
+let searchQuery = ''
+let searchDebounce = null
+const MSG_PAGE_SIZE = 50
 
 const COLORS = ['#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffd93d','#6c5ce7','#fd79a8','#00b894']
 
+/* ─── Security ─── */
+function escapeHtml(str) {
+  if (str == null) return ''
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+/* ─── Helpers ─── */
 function getColor(str) {
   let hash = 0
-  for (let c of (str||'')) hash = c.charCodeAt(0) + ((hash << 5) - hash)
+  for (let c of String(str || '')) hash = c.charCodeAt(0) + ((hash << 5) - hash)
   return COLORS[Math.abs(hash) % COLORS.length]
 }
 
+function timeAgo(dateStr) {
+  const d = new Date(dateStr)
+  const now = new Date()
+  const diff = Math.floor((now - d) / 1000)
+  if (diff < 60) return 'now'
+  if (diff < 3600) return Math.floor(diff / 60) + 'm'
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h'
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd'
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' })
+}
+
+/* ─── Init ─── */
 async function init() {
-  const { data: { user } } = await db.auth.getUser()
-  if (!user) { window.location.href = 'ddott-login.html'; return }
-  currentUser = user
-  loadConversations()
+  try {
+    const { data: { user } } = await db.auth.getUser()
+    if (!user) { window.location.href = 'ddott-login.html'; return }
+    currentUser = user
+    await loadConversations()
+  } catch (err) {
+    console.error('Init failed:', err)
+    showEmptyState('⚠️', 'Failed to load', 'Please refresh and try again.')
+  }
 }
+init().catch(console.error)
 
+/* ─── Load Conversations ─── */
 async function loadConversations() {
-  const { data } = await db.from('messages')
-    .select('*')
-    .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
-    .order('created_at', { ascending: false })
+  try {
+    const { data: msgs, error } = await db.from('messages')
+      .select('id, sender_id, receiver_id, content, created_at, read_at')
+      .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
+      .order('created_at', { ascending: false })
+      .limit(200)
 
-  if (!data || data.length === 0) {
-    document.getElementById('chatList').innerHTML = `
-      <div class="empty-state">
-        <div style="font-size:2rem; margin-bottom:10px;">💬</div>
-        <div>No messages yet</div>
-        <div style="font-size:0.8rem; margin-top:5px; color:#333;">Tap ✏️ to start a conversation</div>
-      </div>`
-    return
-  }
+    if (error) throw error
 
-  const seen = new Set()
-  const convos = []
-  for (const msg of data) {
-    const otherId = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id
-    if (!seen.has(otherId)) {
-      seen.add(otherId)
-      convos.push({ otherId, lastMsg: msg })
+    if (!msgs || msgs.length === 0) {
+      allChats = []
+      showEmptyState('💬', 'No messages yet', 'Tap ✏️ to start a conversation')
+      return
     }
-  }
 
-  allChats = convos
-  renderChatList(convos)
+    // Build conversation map
+    const convoMap = new Map()
+    for (const msg of msgs) {
+      const otherId = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id
+      if (!convoMap.has(otherId)) {
+        convoMap.set(otherId, {
+          otherId,
+          lastMsg: msg,
+          unreadCount: 0
+        })
+      }
+      // Count unread (received and no read_at)
+      if (msg.sender_id !== currentUser.id && !msg.read_at) {
+        convoMap.get(otherId).unreadCount++
+      }
+    }
+
+    const convos = Array.from(convoMap.values())
+
+    // Fetch profiles
+    const profileIds = convos.map(c => c.otherId)
+    const { data: profiles, error: pErr } = await db.from('profiles')
+      .select('id, username, display_name, is_creator, last_seen')
+      .in('id', profileIds)
+
+    if (pErr) console.warn('Profile fetch error:', pErr)
+
+    const profileMap = {}
+    for (const p of (profiles || [])) profileMap[p.id] = p
+
+    // Enrich convos
+    allChats = convos.map(c => {
+      const p = profileMap[c.otherId] || {}
+      return {
+        ...c,
+        username: p.username || 'User',
+        displayName: p.display_name || p.username || 'User',
+        isCreator: !!p.is_creator,
+        lastSeen: p.last_seen
+      }
+    })
+
+    renderChatList()
+  } catch (err) {
+    console.error('loadConversations error:', err)
+    showEmptyState('⚠️', 'Error loading chats', 'Check your connection and try again.')
+  }
 }
 
-async function renderChatList(convos) {
+/* ─── Render Chat List ─── */
+function renderChatList() {
   const list = document.getElementById('chatList')
-  if (convos.length === 0) {
-    list.innerHTML = '<div class="empty-state">No conversations found</div>'
+
+  let filtered = allChats
+
+  // Tab filter
+  if (activeFilter === 'creators') filtered = filtered.filter(c => c.isCreator)
+  else if (activeFilter === 'fans') filtered = filtered.filter(c => !c.isCreator)
+
+  // Search filter (by username or display name)
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase()
+    filtered = filtered.filter(c =>
+      (c.username || '').toLowerCase().includes(q) ||
+      (c.displayName || '').toLowerCase().includes(q)
+    )
+  }
+
+  if (filtered.length === 0) {
+    if (searchQuery) {
+      showEmptyState('🔍', 'No results', 'Try a different search term')
+    } else if (activeFilter !== 'all') {
+      showEmptyState('📭', 'No conversations', `No ${activeFilter} conversations yet`)
+    } else {
+      showEmptyState('💬', 'No messages yet', 'Tap ✏️ to start a conversation')
+    }
     return
   }
 
-  const profileIds = convos.map(c => c.otherId)
-  const { data: profiles } = await db.from('profiles').select('*').in('id', profileIds)
-  const profileMap = {}
-  for (const p of (profiles || [])) profileMap[p.id] = p
-
-  list.innerHTML = convos.map(c => {
-    const p = profileMap[c.otherId] || {}
-    const name = p.username || 'User'
-    const initial = name[0].toUpperCase()
-    const color = getColor(name)
+  list.innerHTML = filtered.map(c => {
+    const name = escapeHtml(c.displayName || c.username)
+    const initial = (c.displayName || c.username || 'U')[0].toUpperCase()
+    const color = getColor(c.username)
     const isSent = c.lastMsg.sender_id === currentUser.id
-    const preview = (isSent ? 'You: ' : '') + (c.lastMsg.content || '').slice(0, 40)
-    const time = new Date(c.lastMsg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    const preview = escapeHtml((c.lastMsg.content || '').slice(0, 45))
+    const time = timeAgo(c.lastMsg.created_at)
+    const unread = c.unreadCount > 0 ? `<div class="unread-badge">${c.unreadCount > 99 ? '99+' : c.unreadCount}</div>` : ''
+    const creatorBadge = c.isCreator ? '<span class="creator-badge">CREATOR</span>' : ''
+    const isOnline = isUserOnline(c.lastSeen)
+
     return `
-      <div class="chat-item" onclick="openChat('${c.otherId}', '${name}')">
+      <div class="chat-item" onclick="openChat('${escapeHtml(c.otherId)}', '${escapeHtml(c.username)}', '${escapeHtml(c.displayName || c.username)}')">
         <div class="avatar" style="background:${color}">
-          ${initial}
-          <div class="online-dot"></div>
+          ${escapeHtml(initial)}
+          <div class="online-dot ${isOnline ? 'visible' : ''}"></div>
         </div>
         <div class="chat-info">
-          <div class="chat-name">@${name}</div>
-          <div class="chat-preview">${preview}</div>
+          <div class="chat-name">@${name}${creatorBadge}</div>
+          <div class="chat-preview">${isSent ? '<span class="you-prefix">You:</span> ' : ''}${preview || 'No message'}</div>
         </div>
         <div class="chat-meta">
           <div class="chat-time">${time}</div>
+          ${unread}
         </div>
       </div>`
   }).join('')
 }
 
-async function openChat(userId, username) {
-  currentChatUser = { id: userId, username }
-  document.getElementById('chatName').textContent = '@' + username
-  document.getElementById('chatAvatar').textContent = username[0].toUpperCase()
-  document.getElementById('chatAvatar').style.background = getColor(username)
-  document.getElementById('chatWindow').classList.add('open')
-  await loadMessages()
-  subscribeRealtime()
+function isUserOnline(lastSeen) {
+  if (!lastSeen) return false
+  const last = new Date(lastSeen).getTime()
+  return (Date.now() - last) < 120000 // 2 minutes
 }
 
+function showEmptyState(icon, title, sub) {
+  document.getElementById('chatList').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-state-icon">${escapeHtml(icon)}</div>
+      <div class="empty-state-title">${escapeHtml(title)}</div>
+      <div class="empty-state-sub">${escapeHtml(sub)}</div>
+    </div>`
+}
+
+/* ─── Tab Switch ─── */
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  activeFilter = el.dataset.filter || 'all'
+  renderChatList()
+}
+
+/* ─── Search ─── */
+function onSearchInput() {
+  const val = document.getElementById('searchInput').value.trim()
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(() => {
+    searchQuery = val
+    renderChatList()
+  }, 250)
+}
+
+/* ─── Open Chat ─── */
+async function openChat(userId, username, displayName) {
+  currentChatUser = { id: userId, username, displayName: displayName || username }
+
+  document.getElementById('chatName').textContent = '@' + escapeHtml(currentChatUser.displayName || currentChatUser.username)
+  const avatar = document.getElementById('chatAvatar')
+  avatar.textContent = (currentChatUser.displayName || currentChatUser.username)[0].toUpperCase()
+  avatar.style.background = getColor(currentChatUser.username)
+
+  // Update online status in header
+  const chatData = allChats.find(c => c.otherId === userId)
+  const isOnline = chatData ? isUserOnline(chatData.lastSeen) : false
+  updateChatHeaderStatus(isOnline)
+
+  document.getElementById('chatWindow').classList.add('open')
+  document.getElementById('msgInput').focus()
+
+  await loadMessages()
+  subscribeRealtime()
+
+  // Mark messages as read
+  await markAsRead(userId)
+}
+
+function updateChatHeaderStatus(online) {
+  const statusEl = document.getElementById('chatStatus')
+  const dotEl = statusEl.querySelector('.status-dot')
+  const textEl = document.getElementById('chatStatusText')
+  if (online) {
+    statusEl.className = 'chat-header-status online'
+    dotEl.className = 'status-dot online'
+    textEl.textContent = 'Online'
+  } else {
+    statusEl.className = 'chat-header-status offline'
+    dotEl.className = 'status-dot offline'
+    textEl.textContent = 'Offline'
+  }
+}
+
+/* ─── Close Chat ─── */
 function closeChat() {
   document.getElementById('chatWindow').classList.remove('open')
-  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null }
+  if (realtimeChannel) {
+    db.removeChannel(realtimeChannel)
+    realtimeChannel = null
+  }
+  currentChatUser = null
+  // Refresh list to update unread counts
   loadConversations()
 }
 
+/* ─── Load Messages ─── */
 async function loadMessages() {
   const container = document.getElementById('messagesContainer')
-  container.innerHTML = '<div style="color:#444; text-align:center; padding:20px;">Loading...</div>'
+  container.innerHTML = '<div style="color:#444; text-align:center; padding:40px;">Loading messages...</div>'
 
-  const { data } = await db.from('messages')
-    .select('*')
-    .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentChatUser.id}),and(sender_id.eq.${currentChatUser.id},receiver_id.eq.${currentUser.id})`)
-    .order('created_at', { ascending: true })
+  try {
+    const { data: msgs, error } = await db.from('messages')
+      .select('id, sender_id, receiver_id, content, created_at')
+      .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentChatUser.id}),and(sender_id.eq.${currentChatUser.id},receiver_id.eq.${currentUser.id})`)
+      .order('created_at', { ascending: true })
+      .limit(MSG_PAGE_SIZE)
 
-  renderMessages(data || [])
+    if (error) throw error
+    renderMessages(msgs || [])
+  } catch (err) {
+    console.error('loadMessages error:', err)
+    container.innerHTML = '<div style="color:#444; text-align:center; padding:40px;">Failed to load messages</div>'
+  }
 }
 
 function renderMessages(msgs) {
   const container = document.getElementById('messagesContainer')
-  if (msgs.length === 0) {
-    container.innerHTML = '<div style="color:#444; text-align:center; padding:40px;">Say hello! 👋</div>'
+  if (!msgs || msgs.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:40px 20px;">
+        <div class="empty-state-icon">👋</div>
+        <div class="empty-state-title">Say hello!</div>
+      </div>`
     return
   }
+
   container.innerHTML = msgs.map(m => {
     const isSent = m.sender_id === currentUser.id
-    const time = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     return `
-      <div>
-        <div class="msg-bubble ${isSent ? 'sent' : 'received'}">${m.content}</div>
-        <div class="msg-time" style="text-align:${isSent ? 'right' : 'left'}">${time}</div>
+      <div class="msg-wrapper ${isSent ? 'sent' : 'received'}">
+        <div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHtml(m.content)}</div>
+        <div class="msg-time">${time}</div>
       </div>`
   }).join('')
+
+  // Scroll to bottom
   container.scrollTop = container.scrollHeight
 }
 
+/* ─── Send Message ─── */
 async function sendMessage() {
   const input = document.getElementById('msgInput')
+  const sendBtn = document.getElementById('sendBtn')
   const content = input.value.trim()
   if (!content || !currentChatUser) return
+
   input.value = ''
+  sendBtn.disabled = true
 
-  await db.from('messages').insert({
-    sender_id: currentUser.id,
-    receiver_id: currentChatUser.id,
-    content
-  })
-  await loadMessages()
-}
+  // Optimistic append
+  const container = document.getElementById('messagesContainer')
+  const tempId = 'temp-' + Date.now()
+  const now = new Date()
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
-function subscribeRealtime() {
-  if (realtimeChannel) db.removeChannel(realtimeChannel)
-  realtimeChannel = db.channel('messages-realtime')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
-      loadMessages()
+  const optimisticHTML = `
+    <div class="msg-wrapper sent" id="${tempId}">
+      <div class="msg-bubble sent">${escapeHtml(content)}</div>
+      <div class="msg-time">${timeStr}</div>
+    </div>`
+
+  // Remove empty state if present
+  if (container.querySelector('.empty-state')) container.innerHTML = ''
+  container.insertAdjacentHTML('beforeend', optimisticHTML)
+  container.scrollTop = container.scrollHeight
+
+  try {
+    const { error } = await db.from('messages').insert({
+      sender_id: currentUser.id,
+      receiver_id: currentChatUser.id,
+      content: content
     })
-    .subscribe()
+
+    if (error) throw error
+
+    // Remove optimistic and reload to get real ID
+    const tempEl = document.getElementById(tempId)
+    if (tempEl) tempEl.remove()
+    await loadMessages()
+
+  } catch (err) {
+    console.error('sendMessage error:', err)
+    const tempEl = document.getElementById(tempId)
+    if (tempEl) {
+      tempEl.querySelector('.msg-bubble').style.borderColor = '#ff4444'
+      tempEl.querySelector('.msg-bubble').style.opacity = '0.6'
+    }
+    alert('Failed to send message. Please try again.')
+  } finally {
+    sendBtn.disabled = false
+    input.focus()
+  }
 }
 
-function filterChats() {
-  const q = document.getElementById('searchInput').value.toLowerCase()
-  if (!q) { renderChatList(allChats); return }
-  const filtered = allChats.filter(c => c.otherId.toLowerCase().includes(q))
-  renderChatList(filtered)
+/* ─── Mark as Read ─── */
+async function markAsRead(senderId) {
+  try {
+    await db.from('messages')
+      .update({ read_at: new Date().toISOString() })
+      .eq('sender_id', senderId)
+      .eq('receiver_id', currentUser.id)
+      .is('read_at', null)
+  } catch (err) {
+    console.error('markAsRead error:', err)
+  }
 }
 
+/* ─── Realtime ─── */
+function subscribeRealtime() {
+  if (realtimeChannel) {
+    db.removeChannel(realtimeChannel)
+    realtimeChannel = null
+  }
+
+  if (!currentChatUser) return
+
+  realtimeChannel = db.channel('chat:' + currentChatUser.id)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: `or(and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentChatUser.id}),and(sender_id.eq.${currentChatUser.id},receiver_id.eq.${currentUser.id}))`
+    }, (payload) => {
+      const msg = payload.new
+      // Only append if it's from the other user (ours is already optimistic)
+      if (msg.sender_id === currentChatUser.id) {
+        appendMessage(msg)
+      }
+    })
+    .subscribe((status) => {
+      console.log('Realtime status:', status)
+    })
+}
+
+function appendMessage(msg) {
+  const container = document.getElementById('messagesContainer')
+  const isSent = msg.sender_id === currentUser.id
+  const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+  // Remove empty state
+  const empty = container.querySelector('.empty-state')
+  if (empty) empty.remove()
+
+  const html = `
+    <div class="msg-wrapper ${isSent ? 'sent' : 'received'}">
+      <div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHtml(msg.content)}</div>
+      <div class="msg-time">${time}</div>
+    </div>`
+
+  container.insertAdjacentHTML('beforeend', html)
+  container.scrollTop = container.scrollHeight
+}
+
+/* ─── New Chat ─── */
 async function showNewChat() {
   const username = prompt('Enter username to message:')
-  if (!username) return
-  const { data } = await db.from('profiles').select('*').eq('username', username).single()
-  if (!data) { alert('User not found'); return }
-  openChat(data.id, data.username)
+  if (!username || !username.trim()) return
+
+  try {
+    const { data, error } = await db.from('profiles')
+      .select('id, username, display_name, is_creator, last_seen')
+      .eq('username', username.trim())
+      .single()
+
+    if (error || !data) {
+      alert('User not found: @' + username.trim())
+      return
+    }
+
+    // Add to allChats if not present
+    const existing = allChats.find(c => c.otherId === data.id)
+    if (!existing) {
+      allChats.unshift({
+        otherId: data.id,
+        username: data.username,
+        displayName: data.display_name || data.username,
+        isCreator: !!data.is_creator,
+        lastSeen: data.last_seen,
+        lastMsg: { content: '', created_at: new Date().toISOString() },
+        unreadCount: 0
+      })
+      renderChatList()
+    }
+
+    openChat(data.id, data.username, data.display_name || data.username)
+  } catch (err) {
+    console.error('showNewChat error:', err)
+    alert('Error finding user. Please try again.')
+  }
 }
 
-init()
+/* ─── Keyboard handling ─── */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('chatWindow').classList.contains('open')) {
+    closeChat()
+  }
+})
 </script>
 </body>
 </html>
