@@ -474,11 +474,10 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/supabase-config.js"></script>
-<base target="_blank">
 </head>
 <body>
 
-<nav>
+<<nav>
   <div class="logo">DDOTT<span>.</span>TV</div>
   <div class="nav-right">
     <div class="nav-icon">&#128269;</div>
@@ -723,7 +722,7 @@
   // ============================
   let db = null;
   let dbReady = false;
-
+  
   function initSupabase() {
     try {
       if (typeof supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
@@ -806,10 +805,10 @@
     }
     console.log('Loading video:', src);
     showStatus('loading', 'Loading video...', false);
-
+    
     // Clear existing sources
     while (video.firstChild) video.removeChild(video.firstChild);
-
+    
     // Set src directly
     video.src = src;
     video.load();
@@ -843,7 +842,7 @@
       const loaded = await loadVideoFromDB();
       if (loaded) return;
     }
-
+    
     // Priority 2: use ?url= param directly
     if (videoUrl) {
       const decoded = decodeURIComponent(videoUrl);
@@ -851,7 +850,7 @@
       setVideoSource(finalUrl);
       return;
     }
-
+    
     // Priority 3: fallback demo video (public test video)
     console.log('No params - loading fallback demo video');
     setVideoSource('https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4');
@@ -899,12 +898,12 @@
     // Remove any existing tap overlays first
     const existing = document.getElementById('tapOverlay');
     if (existing) existing.remove();
-
+    
     const overlay = document.createElement('div');
     overlay.id = 'tapOverlay';
     overlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:20;cursor:pointer;border-radius:12px;';
     overlay.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#00f5ff,#b400ff);display:flex;align-items:center;justify-content:center;font-size:30px;">&#9654;</div>';
-
+    
     overlay.addEventListener('click', () => {
       overlay.remove();
       video.play().catch(e => {
@@ -918,7 +917,7 @@
         });
       });
     });
-
+    
     document.getElementById('videoWrap').appendChild(overlay);
     return overlay;
   }
@@ -1233,19 +1232,19 @@
     console.log('DEBUG videoId:', videoId);
     console.log('DEBUG search:', window.location.search);
     console.log('DEBUG href:', window.location.href);
-
+    
     // Create single tap overlay
     createTapOverlay();
-
+    
     // Setup retry button
     retryBtn.addEventListener('click', () => {
       showStatus('loading', 'Retrying...', false);
       initVideo();
     });
-
+    
     // Load video
     await initVideo();
-
+    
     // Load comments and likes
     loadComments();
     loadLikes();
@@ -1255,7 +1254,7 @@
   // INIT
   // ============================
   window.db = db;
-
+  
   document.addEventListener('DOMContentLoaded', () => {
     smartLoad();
   });
