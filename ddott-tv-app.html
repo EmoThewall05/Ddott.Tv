@@ -124,7 +124,33 @@
   .tab-badge { position:absolute; top:3px; right:calc(50% - 20px); width:15px; height:15px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--pink)); display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; }
   .flash-overlay { position:fixed; inset:0; z-index:150; background:var(--darker); opacity:0; pointer-events:none; transition:opacity 0.12s ease; }
   .flash-overlay.on { opacity:0.4; }
+
+  /* Video Feed */
+  .video-feed { padding:0 16px; margin-top:12px; display:flex; flex-direction:column; gap:12px; }
+  .video-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; overflow:hidden; cursor:pointer; transition:transform 0.15s; }
+  .video-card:active { transform:scale(0.97); }
+  .vc-thumb { background:linear-gradient(135deg,#0a0a1a,#1a0a2e); aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:48px; position:relative; }
+  .vc-dur { position:absolute; bottom:6px; right:6px; font-family:'Orbitron',monospace; font-size:9px; background:rgba(0,0,0,0.85); padding:2px 6px; border-radius:4px; color:var(--cyan); }
+  .vc-info { padding:10px 12px; }
+  .vc-title { font-size:13px; font-weight:700; color:#fff; margin-bottom:4px; line-height:1.3; }
+  .vc-meta { font-size:11px; color:rgba(255,255,255,0.4); display:flex; gap:12px; }
+  .vc-live { position:absolute; top:6px; left:6px; display:flex; align-items:center; gap:4px; padding:3px 7px; border-radius:4px; background:rgba(255,0,80,0.9); font-family:'Orbitron',monospace; font-size:8px; color:#fff; letter-spacing:1px; font-weight:700; }
+  .vc-live-dot { width:4px; height:4px; border-radius:50%; background:#fff; animation:blink 0.8s infinite; }
+
+  /* Empty State */
+  .empty-feed { text-align:center; padding:40px 20px; color:var(--muted); }
+  .empty-feed-icon { font-size:2.5rem; margin-bottom:12px; opacity:0.5; }
+  .empty-feed-title { font-size:14px; margin-bottom:4px; color:var(--text); }
+  .empty-feed-sub { font-size:11px; }
+
+  /* Skeleton */
+  .skeleton { background:linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%); background-size:200% 100%; animation:skeletonLoad 1.5s infinite; border-radius:8px; }
+  @keyframes skeletonLoad { 0% { background-position:200% 0 } 100% { background-position:-200% 0 } }
+  .vc-skeleton { aspect-ratio:16/9; }
+  .vc-info-skeleton { height:12px; margin-top:8px; width:70%; }
+  .vc-meta-skeleton { height:10px; margin-top:6px; width:50%; }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -132,19 +158,19 @@
 
 <div class="top-nav">
   <div class="logo" onclick="goHome()">DDOTT<em>.</em>TV</div>
-  <div class="nav-search"><span style="color:var(--muted)">🔍</span><input type="text" placeholder="Search..."></div>
-  <div class="nav-coins" onclick="nav('coins')"><span>🪙</span><div class="coins-val" id="navCoins">...</div></div>
-  <div class="nav-notif" onclick="nav('messages')">🔔<div class="notif-dot"></div></div>
-  <div class="nav-avatar" onclick="nav('channel')">D</div>
+  <div class="nav-search"><span style="color:var(--muted)">🔍</span><input type="text" id="searchInput" placeholder="Search..." oninput="onSearch()"></div>
+  <div class="nav-coins" onclick="nav('coins')"><span>🪙</span><div class="coins-val" id="navCoins">—</div></div>
+  <div class="nav-notif" onclick="nav('messages')">🔔<div class="notif-dot" id="notifDot" style="display:none"></div></div>
+  <div class="nav-avatar" id="navAvatar" onclick="nav('channel')">D</div>
 </div>
 
 <div class="frame-area">
 
   <div class="home-screen" id="homeScreen">
     <div class="hero">
-      <div class="hero-greet" id="heroGreet">Good evening 👋</div>
-      <div class="hero-name" id="heroName">Dwin Universe</div>
-      <div class="hero-sub" id="heroSub">Loading...</div>
+      <div class="hero-greet" id="heroGreet">—</div>
+      <div class="hero-name" id="heroName">—</div>
+      <div class="hero-sub" id="heroSub">—</div>
     </div>
 
     <div class="live-banner" id="liveBanner" onclick="nav('player')" style="display:none">
@@ -152,21 +178,27 @@
         <div style="font-size:32px;flex-shrink:0">📱</div>
         <div style="flex:1">
           <div class="lb-live-tag"><div class="lb-dot"></div>LIVE NOW</div>
-          <div class="lb-title" id="liveTitle">Loading...</div>
-          <div class="lb-meta" id="liveMeta"></div>
+          <div class="lb-title" id="liveTitle">—</div>
+          <div class="lb-meta" id="liveMeta">—</div>
         </div>
         <button class="lb-btn">WATCH</button>
       </div>
     </div>
 
-    <div id="videoFeed" style="padding:0 16px;margin-top:12px;display:flex;flex-direction:column;gap:12px;"></div>
+    <!-- Video Feed -->
+    <div class="video-feed" id="videoFeed">
+      <!-- Skeleton loading -->
+      <div class="video-card skeleton"><div class="vc-thumb vc-skeleton"></div><div class="vc-info"><div class="vc-info-skeleton skeleton"></div><div class="vc-meta-skeleton skeleton"></div></div></div>
+      <div class="video-card skeleton"><div class="vc-thumb vc-skeleton"></div><div class="vc-info"><div class="vc-info-skeleton skeleton"></div><div class="vc-meta-skeleton skeleton"></div></div></div>
+      <div class="video-card skeleton"><div class="vc-thumb vc-skeleton"></div><div class="vc-info"><div class="vc-info-skeleton skeleton"></div><div class="vc-meta-skeleton skeleton"></div></div></div>
+    </div>
 
     <div class="stats-strip">
-      <div class="stat-pill"><div class="sp-val" style="color:var(--cyan)" id="statViews">...</div><div class="sp-lbl">Views</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--gold)" id="statCoins">...</div><div class="sp-lbl">Coins</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--green)" id="statToday">...</div><div class="sp-lbl">Today</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--pink)">96%</div><div class="sp-lbl">Likes</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--purple)" id="statVideos">...</div><div class="sp-lbl">Videos</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--cyan)" id="statViews">—</div><div class="sp-lbl">Views</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--gold)" id="statCoins">—</div><div class="sp-lbl">Coins</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--green)" id="statToday">—</div><div class="sp-lbl">Today</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--pink)" id="statLikeRate">—</div><div class="sp-lbl">Likes</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--purple)" id="statVideos">—</div><div class="sp-lbl">Videos</div></div>
     </div>
 
     <div class="neon-div"></div>
@@ -174,7 +206,7 @@
 
     <div class="pages-grid">
       <div class="page-card" onclick="nav('home')" style="border-color:rgba(0,245,255,0.15)">
-        <div class="pc-badge b-live">LIVE</div>
+        <div class="pc-badge b-live" id="homeLiveBadge" style="display:none">LIVE</div>
         <div class="pc-icon">🏠</div><div class="pc-title">Home Feed</div><div class="pc-desc">Videos, trending & live streams</div>
       </div>
       <div class="page-card" onclick="nav('player')" style="border-color:rgba(180,0,255,0.15)">
@@ -185,8 +217,8 @@
         <div class="pc-icon">👤</div><div class="pc-title">Creator Channel</div><div class="pc-desc">Profile, videos & playlists</div>
       </div>
       <div class="page-card" onclick="nav('messages')" style="border-color:rgba(255,0,200,0.12)">
-        <div class="pc-badge b-msg">5</div>
-        <div class="pc-icon">💬</div><div class="pc-title">Messaging</div><div class="pc-desc">Chat, stickers 🍕🚀 & voice</div>
+        <div class="pc-badge b-msg" id="msgBadge" style="display:none">0</div>
+        <div class="pc-icon">💬</div><div class="pc-title">Messaging</div><div class="pc-desc">Chat, stickers & voice</div>
       </div>
       <div class="page-card" onclick="nav('coins')" style="border-color:rgba(255,215,0,0.12)">
         <div class="pc-icon">🪙</div><div class="pc-title">Emo Coins</div><div class="pc-desc">Earn, convert & leaderboard</div>
@@ -235,176 +267,319 @@
 </div>
 
 <script>
-  const pages = {
-    home:'ddott-home-v2.html', feed:'ddott-home-v2.html', community:'ddott-community.html', player:'ddott-player-v2.html',
-    channel:'ddott-creator-channel.html', messages:'ddott-messaging.html',
-    coins:'ddott-emo-coins.html', ai:'ddott-ai-butterfly.html',
-    studio:'/studio', landing:'ddott-landing-v2.html'
-  };
-  const tabMap = { home:'t-feed', player:'t-feed', channel:'t-home', messages:'t-messages', coins:'t-coins', ai:'t-home', studio:'t-studio', landing:'t-home' };
+/* ============================================================
+   DDOTT.TV HOME — Full Production Code
+   No mock data. All dynamic from Supabase.
+   ============================================================ */
 
-  // Inject into iframe to hide its own nav & tab bar
-  const HIDE_CSS = `<style id="__sf__">
-    nav, .top-nav, .tab-bar, .studio-tabs + * > nav { display:none!important; }
-    body { padding-top:0!important; margin-top:0!important; }
-    .studio-tabs { top:0!important; position:sticky; }
-    .butterfly-fab { bottom:12px!important; }
-    .mode-bar { top:0!important; }
-  </style>`;
+const pages = {
+  home: 'ddott-home-v2.html',
+  feed: 'ddott-feed.html',
+  community: 'ddott-community.html',
+  player: 'ddott-player-v2.html',
+  channel: 'ddott-creator-channel.html',
+  messages: 'ddott-messages.html',
+  coins: 'ddott-emo-coins.html',
+  ai: 'ddott-ai-butterfly.html',
+  studio: 'ddott-studio.html',
+  landing: 'ddott-landing-v2.html'
+};
 
-  let current = null;
+const tabMap = {
+  home: 't-home', feed: 't-feed', community: 't-community',
+  coins: 't-coins', studio: 't-studio', player: 't-feed',
+  channel: 't-home', messages: 't-home', ai: 't-home', landing: 't-home'
+};
 
-  function flash(cb){ const f=document.getElementById('flash'); f.classList.add('on'); setTimeout(()=>{f.classList.remove('on');if(cb)cb();},120); }
-  function setTab(id){ document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active')); if(id) document.getElementById(id)?.classList.add('active'); }
+const HIDE_CSS = `<style id="__sf__">
+  nav, .top-nav, .tab-bar, .studio-tabs + * > nav, .bottom-nav { display:none!important; }
+  body { padding-top:0!important; margin-top:0!important; padding-bottom:0!important; }
+  .studio-tabs { top:0!important; position:sticky; }
+  .butterfly-fab { bottom:12px!important; }
+  .mode-bar { top:0!important; }
+</style>`;
 
-  function nav(page, params){
-    if(!pages[page]) return;
-    // Open studio and login as full page to allow file upload
-    if(page === 'studio' || page === 'login') {
-      window.location.href = pages[page];
-      return;
-    }
-    flash(); current = page;
-    document.getElementById('homeScreen').style.display = 'none';
-    const w = document.getElementById('iframeWrapper');
-    w.classList.add('show');
-    document.getElementById('pageLoader').style.display = 'flex';
-    const f = document.getElementById('pageFrame');
-    f.classList.remove('loaded');
-    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
-    f.src = pages[page] + qs;
-    setTab(tabMap[page]||null);
-    document.getElementById('t-home').classList.remove('active');
-  }
+let current = null;
+let currentUser = null;
+let searchDebounce = null;
 
-  function onFrameLoad(){
-    const f = document.getElementById('pageFrame');
-    try {
-      const doc = f.contentDocument || f.contentWindow.document;
-      if(doc && !doc.getElementById('__sf__')) {
-        doc.head.insertAdjacentHTML('beforeend', HIDE_CSS);
-      }
-    } catch(e){}
-    setTimeout(()=>{
-      document.getElementById('pageLoader').style.display='none';
-      f.classList.add('loaded');
-    },250);
-  }
-
-  function goHome(){
-    flash(); current=null;
-    document.getElementById('homeScreen').style.display='';
-    document.getElementById('iframeWrapper').classList.remove('show');
-    document.getElementById('pageFrame').src='';
-    setTab('t-home');
-  }
-
-  document.querySelector('.logo').addEventListener('click',()=>{ if(current) goHome(); });
-</script>
-<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").then(()=>console.log("SW registered")).catch(e=>console.log(e));}</script>
-<script>
-async function loadRealStats() {
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
-
-  // Get user profile
-  const { data: profile } = await db
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  // Get emo coins
-  const { data: coins } = await db
-    .from('emo_coins')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
-
-  // Get platform stats
-  const { count: userCount } = await db
-    .from('profiles')
-    .select('*', { count: 'exact', head: true });
-
-  const { count: videoCount } = await db
-    .from('videos')
-    .select('*', { count: 'exact', head: true });
-
-  // Get today earned
-  const today = new Date().toISOString().split('T')[0];
-  const { data: todayTx } = await db
-    .from('emo_transactions')
-    .select('amount')
-    .eq('user_id', user.id)
-    .gte('created_at', today);
-  const todayEarned = todayTx ? todayTx.reduce((a,b) => a + b.amount, 0) : 0;
-
-  // Hour greeting
-  const hr = new Date().getHours();
-  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-  const name = profile?.username || user.email.split('@')[0];
-
-  // Update UI
-  const streak = coins?.streak_days || 0;
-  const balance = coins?.balance || 0;
-
-  document.getElementById('heroGreet').textContent = greet + ', ' + name + ' 👋';
-  document.getElementById('heroSub').innerHTML = 'Dubai 🇦🇪 · <b>' + userCount + ' members</b> · Day ' + streak + ' 🔥';
-  document.getElementById('navCoins').textContent = balance.toLocaleString();
-  document.getElementById('statCoins').textContent = balance + '🪙';
-  document.getElementById('statToday').textContent = '+' + todayEarned;
-  document.getElementById('statVideos').textContent = videoCount || 0;
-  document.getElementById('statViews').textContent = '0';
+/* ─── Security ─── */
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(loadRealStats, 800);
-});
-</script>
+function fmtNum(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
+}
 
-<script>
+function timeAgo(dateStr) {
+  if (!dateStr) return 'recently';
+  const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h';
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd';
+  return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+/* ─── Navigation ─── */
+function flash(cb) {
+  const f = document.getElementById('flash');
+  f.classList.add('on');
+  setTimeout(() => { f.classList.remove('on'); if (cb) cb(); }, 120);
+}
+
+function setTab(id) {
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  if (id) document.getElementById(id)?.classList.add('active');
+}
+
+function nav(page, params) {
+  if (!pages[page]) return;
+  if (page === 'studio') {
+    window.location.href = pages[page];
+    return;
+  }
+  flash();
+  current = page;
+  document.getElementById('homeScreen').style.display = 'none';
+  const w = document.getElementById('iframeWrapper');
+  w.classList.add('show');
+  document.getElementById('pageLoader').style.display = 'flex';
+  const f = document.getElementById('pageFrame');
+  f.classList.remove('loaded');
+  const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+  f.src = pages[page] + qs;
+  setTab(tabMap[page] || null);
+  document.getElementById('t-home').classList.remove('active');
+}
+
+function onFrameLoad() {
+  const f = document.getElementById('pageFrame');
+  try {
+    const doc = f.contentDocument || f.contentWindow.document;
+    if (doc && !doc.getElementById('__sf__')) {
+      doc.head.insertAdjacentHTML('beforeend', HIDE_CSS);
+    }
+  } catch (e) {}
+  setTimeout(() => {
+    document.getElementById('pageLoader').style.display = 'none';
+    f.classList.add('loaded');
+  }, 250);
+}
+
+function goHome() {
+  flash();
+  current = null;
+  document.getElementById('homeScreen').style.display = '';
+  document.getElementById('iframeWrapper').classList.remove('show');
+  document.getElementById('pageFrame').src = '';
+  setTab('t-home');
+}
+
+/* ─── Search ─── */
+function onSearch() {
+  const val = document.getElementById('searchInput').value.trim();
+  if (searchDebounce) clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    if (val) searchVideos(val);
+  }, 400);
+}
+
+async function searchVideos(q) {
+  try {
+    const { data } = await db.from('videos')
+      .select('*, profiles:user_id(username)')
+      .ilike('title', '%' + q + '%')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    renderVideoFeed(data || []);
+  } catch (err) {
+    console.error('Search error:', err);
+  }
+}
+
+/* ─── Load User Data ─── */
+async function loadUserData() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    currentUser = user;
+
+    // Profile
+    const { data: profile } = await db.from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    // Update avatar
+    const avatarEl = document.getElementById('navAvatar');
+    if (profile?.avatar_url) {
+      avatarEl.style.backgroundImage = `url(${profile.avatar_url})`;
+      avatarEl.style.backgroundSize = 'cover';
+      avatarEl.textContent = '';
+    } else {
+      const initial = (profile?.display_name || profile?.username || 'U')[0].toUpperCase();
+      avatarEl.textContent = initial;
+    }
+
+    // Greeting
+    const hr = new Date().getHours();
+    const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+    const name = profile?.display_name || profile?.username || user.email?.split('@')[0] || 'User';
+    document.getElementById('heroGreet').textContent = `${greet}, ${name} 👋`;
+    document.getElementById('heroName').textContent = profile?.display_name || name;
+
+    // Member count
+    const { count: memberCount } = await db.from('profiles')
+      .select('*', { count: 'exact', head: true });
+    document.getElementById('heroSub').innerHTML = `Dubai 🇦🇪 · <b>${fmtNum(memberCount || 0)} members</b>`;
+
+    // Emo coins
+    const { data: coins } = await db.from('emo_transactions')
+      .select('amount')
+      .eq('user_id', user.id);
+    const balance = coins ? coins.reduce((a, b) => a + b.amount, 0) : 0;
+    document.getElementById('navCoins').textContent = fmtNum(balance);
+    document.getElementById('statCoins').textContent = fmtNum(balance) + '🪙';
+
+    // Today's earnings
+    const today = new Date().toISOString().split('T')[0];
+    const { data: todayTx } = await db.from('emo_transactions')
+      .select('amount')
+      .eq('user_id', user.id)
+      .gte('created_at', today);
+    const todayEarned = todayTx ? todayTx.reduce((a, b) => a + b.amount, 0) : 0;
+    document.getElementById('statToday').textContent = '+' + fmtNum(todayEarned);
+
+    // Stats
+    const { count: videoCount } = await db.from('videos')
+      .select('*', { count: 'exact', head: true });
+    document.getElementById('statVideos').textContent = fmtNum(videoCount || 0);
+
+    // User's total views
+    const { data: userVideos } = await db.from('videos')
+      .select('views, likes')
+      .eq('user_id', user.id);
+    const totalViews = userVideos ? userVideos.reduce((a, b) => a + (b.views || 0), 0) : 0;
+    const totalLikes = userVideos ? userVideos.reduce((a, b) => a + (b.likes || 0), 0) : 0;
+    const likeRate = totalViews > 0 ? Math.round((totalLikes / totalViews) * 100) : 0;
+    document.getElementById('statViews').textContent = fmtNum(totalViews);
+    document.getElementById('statLikeRate').textContent = likeRate + '%';
+
+    // Unread messages
+    const { count: unreadCount } = await db.from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('receiver_id', user.id)
+      .is('read_at', null);
+    if (unreadCount > 0) {
+      document.getElementById('msgBadge').textContent = unreadCount > 99 ? '99+' : unreadCount;
+      document.getElementById('msgBadge').style.display = 'block';
+      document.getElementById('notifDot').style.display = 'block';
+    }
+
+  } catch (err) {
+    console.error('loadUserData error:', err);
+  }
+}
+
+/* ─── Load Video Feed ─── */
 async function loadVideoFeed() {
-  const { data: videos } = await db
-    .from('videos')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(20);
+  try {
+    const { data: videos, error } = await db.from('videos')
+      .select('*, profiles:user_id(username, display_name)')
+      .order('created_at', { ascending: false })
+      .limit(20);
 
-  if (!videos || !videos.length) return;
+    if (error) throw error;
+    renderVideoFeed(videos || []);
 
+    // Check for live videos
+    const liveVideo = videos?.find(v => v.is_live);
+    if (liveVideo) {
+      document.getElementById('liveBanner').style.display = 'block';
+      document.getElementById('liveTitle').textContent = liveVideo.title || 'Live Stream';
+      document.getElementById('liveMeta').textContent = `${liveVideo.profiles?.username || 'Creator'} · ${fmtNum(liveVideo.views || 0)} watching`;
+      document.getElementById('homeLiveBadge').style.display = 'block';
+    }
+
+  } catch (err) {
+    console.error('loadVideoFeed error:', err);
+    showEmptyFeed('⚠️', 'Failed to load', 'Check your connection and try again');
+  }
+}
+
+function renderVideoFeed(videos) {
   const feed = document.getElementById('videoFeed');
-  if (!feed) return;
+  if (!videos || videos.length === 0) {
+    showEmptyFeed('📺', 'No videos yet', 'Be the first to upload!');
+    return;
+  }
 
-  feed.innerHTML = videos.map(v => `
-    <div onclick="navToVideo('${v.id}','${v.video_url}','${v.title}')" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;cursor:pointer;">
-      <div style="background:linear-gradient(135deg,#0a0a1a,#1a0a2e);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:48px;">
-        🎬
-      </div>
-      <div style="padding:10px 12px;">
-        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">${v.title || 'Untitled'}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);display:flex;gap:12px;">
-          <span>👁 ${v.views >= 1000 ? (v.views/1000).toFixed(1)+'K' : v.views || 0}</span>
-          <span>👍 ${v.likes || 0}</span>
-          <span>📅 ${new Date(v.created_at).toLocaleDateString()}</span>
+  feed.innerHTML = videos.map(v => {
+    const creator = v.profiles || {};
+    const isLive = v.is_live;
+    const duration = v.duration ? formatDuration(v.duration) : '';
+    return `
+      <div class="video-card" onclick="navToVideo('${escapeHtml(v.id)}','${escapeHtml(v.video_url || '')}','${escapeHtml(v.title || 'Untitled')}')">
+        <div class="vc-thumb">
+          🎬
+          ${isLive ? '<div class="vc-live"><div class="vc-live-dot"></div>LIVE</div>' : ''}
+          ${duration ? `<div class="vc-dur">${duration}</div>` : ''}
         </div>
-      </div>
-    </div>`).join('');
+        <div class="vc-info">
+          <div class="vc-title">${escapeHtml(v.title || 'Untitled')}</div>
+          <div class="vc-meta">
+            <span>👁 ${fmtNum(v.views || 0)}</span>
+            <span>👍 ${fmtNum(v.likes || 0)}</span>
+            <span>${timeAgo(v.created_at)}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function formatDuration(sec) {
+  if (!sec) return '';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function showEmptyFeed(icon, title, sub) {
+  document.getElementById('videoFeed').innerHTML = `
+    <div class="empty-feed">
+      <div class="empty-feed-icon">${escapeHtml(icon)}</div>
+      <div class="empty-feed-title">${escapeHtml(title)}</div>
+      <div class="empty-feed-sub">${escapeHtml(sub)}</div>
+    </div>`;
 }
 
 function navToVideo(videoId, videoUrl, videoTitle) {
-  const frame = document.getElementById('pageFrame');
-  const wrapper = document.getElementById('iframeWrapper');
-  let src = 'ddott-player-v2.html?id=' + videoId;
-  if (videoUrl) src += '&url=' + encodeURIComponent(videoUrl);
-  if (videoTitle) src += '&title=' + encodeURIComponent(videoTitle);
-  frame.src = src;
-  wrapper.classList.add('show');
-  document.getElementById('homeScreen').style.display = 'none';
+  const params = { id: videoId };
+  if (videoUrl) params.url = videoUrl;
+  if (videoTitle) params.title = videoTitle;
+  nav('player', params);
 }
 
+/* ─── Init ─── */
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(loadVideoFeed, 1000);
+  setTimeout(() => {
+    loadUserData();
+    loadVideoFeed();
+  }, 300);
 });
+
+/* ─── Service Worker ─── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log('SW registered'))
+    .catch(e => console.log('SW error:', e));
+}
 </script>
 </body>
 </html>
