@@ -755,13 +755,52 @@ function populateFromUrl() {
     if (likes) document.getElementById('likeCount').textContent = likes;
 }
 
-// ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
-    populateFromUrl();
-    loadVideo();
-});
+  // ============================
+  // SMART LOAD (Fixed - no double overlays)
+  // ============================
+  async function smartLoad() {
+    console.log('DEBUG videoUrl:', videoUrl);
+    console.log('DEBUG videoId:', videoId);
+    console.log('DEBUG search:', window.location.search);
+    console.log('DEBUG href:', window.location.href);
+    
+    // Create single tap overlay
+    createTapOverlay();
+    
+    // Setup retry button
+    retryBtn.addEventListener('click', () => {
+      showStatus('loading', 'Retrying...', false);
+      initVideo();
+    });
+    
+    // Load video
+    await initVideo();
+    
+    // Load comments and likes
+    loadComments();
+    loadLikes();
+  }
 
-window.ddottPlayer = { loadVideo, video };
+  // ============================
+  // INIT
+  // ============================
+  window.db = db;
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!dbReady) {
+      let attempts = 0;
+      const waitForDB = setInterval(() => {
+        attempts++;
+        initSupabase();
+        if (dbReady || attempts > 20) {
+          clearInterval(waitForDB);
+          smartLoad();
+        }
+      }, 100);
+    } else {
+      smartLoad();
+    }
+  });
 </script>
 </body>
 </html>
