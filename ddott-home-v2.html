@@ -459,7 +459,7 @@ function addAIMsg(txt,type){
 <script>
 function openPlayer(url, title, creator, category, id) {
   const params = {
-    url: url || 'https://www.w3schools.com/html/mov_bbb.mp4', id: id || '',
+    url: url || 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', id: id || '',
     title: title || 'Ddott TV',
     creator: creator || 'Unknown',
     category: category || 'General'
@@ -468,7 +468,7 @@ function openPlayer(url, title, creator, category, id) {
   if (window.parent && window.parent.nav) {
     window.parent.nav('player', params);
   } else {
-    window.location.href = '/player?' + qs;
+    window.location.href = '/ddott-player-v2?' + qs;
   }
 }
 </script>
@@ -641,7 +641,7 @@ function addAIMsg(txt,type){
 <script>
 function openPlayer(url, title, creator, category, id) {
   const params = {
-    url: url || 'https://www.w3schools.com/html/mov_bbb.mp4', id: id || '',
+    url: url || 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', id: id || '',
     title: title || 'Ddott TV',
     creator: creator || 'Unknown',
     category: category || 'General'
@@ -650,7 +650,7 @@ function openPlayer(url, title, creator, category, id) {
   if (window.parent && window.parent.nav) {
     window.parent.nav('player', params);
   } else {
-    window.location.href = '/player?' + qs;
+    window.location.href = '/ddott-player-v2?' + qs;
   }
 }
 </script>
