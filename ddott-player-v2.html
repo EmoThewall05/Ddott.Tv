@@ -1,1264 +1,881 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Ddott TV — Player V2</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --cyan: #00f5ff;
-    --purple: #b400ff;
-    --pink: #ff00c8;
-    --dark: #04000f;
-    --darker: #020008;
-    --surface: #0a0020;
-    --surface2: #110030;
-    --text: #e8d5ff;
-    --muted: #6b4d8a;
-    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff44;
-    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff44;
-    --glow-pink: 0 0 20px #ff00c888, 0 0 40px #ff00c844;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--darker);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    -webkit-tap-highlight-color: transparent;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-    animation: gridShift 20s linear infinite;
-  }
-  @keyframes gridShift {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(40px); }
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse at 20% 50%, rgba(180,0,255,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 50%, rgba(0,245,255,0.06) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 24px;
-    background: rgba(4,0,15,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0,245,255,0.15);
-  }
-  .logo {
-    font-family: 'Orbitron', monospace;
-    font-size: 18px;
-    font-weight: 900;
-    background: linear-gradient(90deg, var(--cyan), var(--purple));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 2px;
-  }
-  .logo span { color: var(--pink); -webkit-text-fill-color: var(--pink); }
-  .nav-right { display: flex; align-items: center; gap: 16px; }
-  .nav-icon {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--surface2); border: 1px solid rgba(0,245,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 16px; transition: all 0.3s;
-  }
-  .nav-icon:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
-  .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; cursor: pointer;
-    border: 2px solid var(--cyan); box-shadow: var(--glow-cyan);
-  }
-  .main {
-    position: relative; z-index: 1;
-    max-width: 1200px; margin: 0 auto;
-    padding: 20px 16px 40px;
-  }
-  .video-container {
-    position: relative; width: 100%;
-    border-radius: 16px; overflow: hidden;
-    background: #000;
-    border: 1px solid rgba(0,245,255,0.2);
-    box-shadow: 0 0 60px rgba(0,245,255,0.1), 0 0 120px rgba(180,0,255,0.08);
-    margin-bottom: 20px;
-  }
-  .video-wrap {
-    position: relative;
-    padding-top: 56.25%;
-    background: linear-gradient(135deg, #000510, #0a0020);
-  }
-  #realVideo {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-    background: #000;
-    object-fit: contain;
-    display: block;
-  }
-  .controls {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    padding: 12px 16px 14px;
-    background: linear-gradient(transparent, rgba(4,0,15,0.95));
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .video-container:hover .controls,
-  .video-container.show-controls .controls {
-    opacity: 1;
-  }
-  .progress-wrap {
-    position: relative; height: 4px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 4px; margin-bottom: 10px;
-    cursor: pointer; overflow: visible;
-  }
-  .progress-fill {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, var(--cyan), var(--purple));
-    border-radius: 4px; box-shadow: var(--glow-cyan);
-    position: relative; transition: width 0.1s;
-  }
-  .progress-thumb {
-    position: absolute; right: -6px; top: 50%;
-    transform: translateY(-50%);
-    width: 12px; height: 12px; border-radius: 50%;
-    background: var(--cyan); box-shadow: var(--glow-cyan);
-    transition: transform 0.2s;
-  }
-  .progress-wrap:hover .progress-thumb { transform: translateY(-50%) scale(1.4); }
-  .chapter-dot {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--purple); box-shadow: var(--glow-purple); cursor: pointer;
-  }
-  .ctrl-row { display: flex; align-items: center; gap: 12px; }
-  .ctrl-btn {
-    background: none; border: none; color: var(--text);
-    cursor: pointer; font-size: 18px; padding: 4px;
-    line-height: 1; transition: all 0.2s;
-    display: flex; align-items: center;
-  }
-  .ctrl-btn:hover { color: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan)); }
-  .time {
-    font-family: 'Orbitron', monospace; font-size: 11px;
-    color: var(--muted); letter-spacing: 1px; white-space: nowrap;
-  }
-  .time span { color: var(--cyan); }
-  .vol-wrap { display: flex; align-items: center; gap: 8px; }
-  .vol-slider {
-    width: 70px; height: 3px;
-    background: rgba(255,255,255,0.1); border-radius: 3px;
-    position: relative; cursor: pointer;
-  }
-  .vol-fill { height: 100%; width: 75%; background: linear-gradient(90deg, var(--purple), var(--cyan)); border-radius: 3px; }
-  .ctrl-right {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .quality-badge {
-    font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700;
-    padding: 3px 7px; border-radius: 4px;
-    border: 1px solid var(--cyan); color: var(--cyan);
-    letter-spacing: 1px; cursor: pointer; transition: all 0.2s;
-  }
-  .quality-badge:hover {
-    background: var(--cyan); color: var(--dark); box-shadow: var(--glow-cyan);
-  }
-  .info-section {
-    display: grid; grid-template-columns: 1fr auto;
-    gap: 16px; align-items: start; margin-bottom: 20px;
-  }
-  .video-info h1 {
-    font-family: 'Orbitron', monospace; font-size: 18px;
-    font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.3;
-  }
-  .video-meta {
-    display: flex; align-items: center; gap: 12px;
-    flex-wrap: wrap; margin-bottom: 12px;
-  }
-  .meta-chip { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
-  .meta-chip.hot { color: var(--pink); }
-  .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-  .act-btn {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 14px; border-radius: 8px;
-    border: 1px solid rgba(0,245,255,0.2);
-    background: var(--surface); color: var(--text);
-    font-family: 'Rajdhani', sans-serif; font-size: 13px;
-    font-weight: 600; cursor: pointer; transition: all 0.2s;
-    letter-spacing: 0.5px;
-  }
-  .act-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--glow-cyan); }
-  .act-btn.primary {
-    background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(180,0,255,0.15));
-    border-color: var(--purple); color: var(--cyan);
-  }
-  .act-btn.primary:hover {
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    color: var(--dark); border-color: transparent;
-  }
-  .emo-tip {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    padding: 16px; background: var(--surface); border-radius: 12px;
-    border: 1px solid rgba(180,0,255,0.3); min-width: 120px;
-  }
-  .emo-coins-label {
-    font-family: 'Orbitron', monospace; font-size: 9px;
-    color: var(--purple); letter-spacing: 2px;
-  }
-  .emo-coin-val {
-    font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900;
-    background: linear-gradient(90deg, var(--purple), var(--pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .tip-btn {
-    padding: 6px 14px; border-radius: 6px;
-    background: linear-gradient(135deg, var(--purple), var(--pink));
-    border: none; color: #fff; font-family: 'Orbitron', monospace;
-    font-size: 9px; letter-spacing: 1px; cursor: pointer;
-    box-shadow: var(--glow-purple); transition: all 0.2s; font-weight: 700;
-  }
-  .tip-btn:hover { transform: scale(1.05); }
-  .creator-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 16px; background: var(--surface); border-radius: 12px;
-    border: 1px solid rgba(0,245,255,0.1); margin-bottom: 16px;
-  }
-  .creator-left { display: flex; align-items: center; gap: 12px; }
-  .creator-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; border: 2px solid var(--purple);
-    box-shadow: var(--glow-purple); flex-shrink: 0;
-  }
-  .creator-name { font-family: 'Orbitron', monospace; font-size: 13px; color: #fff; margin-bottom: 2px; }
-  .creator-subs { font-size: 12px; color: var(--muted); }
-  .follow-btn {
-    padding: 8px 18px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    border: none; color: var(--dark); font-family: 'Orbitron', monospace;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; box-shadow: var(--glow-cyan); transition: all 0.3s;
-  }
-  .follow-btn:hover { transform: scale(1.05); opacity: 0.9; }
-  .desc-box {
-    padding: 14px 16px; background: var(--surface); border-radius: 12px;
-    border: 1px solid rgba(180,0,255,0.1); margin-bottom: 20px;
-    font-size: 13px; line-height: 1.6; color: #a888cc;
-    cursor: pointer; transition: border-color 0.2s;
-  }
-  .desc-box:hover { border-color: rgba(180,0,255,0.3); }
-  .desc-tag { display: inline-block; color: var(--cyan); margin-right: 6px; font-size: 12px; }
-  .tabs {
-    display: flex; gap: 0; margin-bottom: 16px;
-    border-bottom: 1px solid rgba(0,245,255,0.1);
-  }
-  .tab {
-    padding: 10px 18px; font-family: 'Rajdhani', sans-serif;
-    font-size: 14px; font-weight: 600; color: var(--muted);
-    cursor: pointer; border-bottom: 2px solid transparent;
-    transition: all 0.2s; letter-spacing: 1px;
-  }
-  .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); text-shadow: 0 0 12px var(--cyan); }
-  .tab:hover:not(.active) { color: var(--text); }
-  .comment-input-row {
-    display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-start;
-  }
-  .comment-avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; border: 1px solid var(--purple); flex-shrink: 0;
-  }
-  .comment-input {
-    flex: 1; background: var(--surface);
-    border: 1px solid rgba(0,245,255,0.15); border-radius: 10px;
-    padding: 10px 14px; color: var(--text); font-family: 'Rajdhani', sans-serif;
-    font-size: 13px; resize: none; outline: none;
-    transition: border-color 0.2s; min-height: 40px;
-  }
-  .comment-input:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,245,255,0.1); }
-  .comment-input::placeholder { color: var(--muted); }
-  .comment-submit-btn {
-    padding: 10px 18px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    border: none; color: var(--dark); font-family: 'Orbitron', monospace;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; box-shadow: var(--glow-cyan); transition: all 0.3s;
-    align-self: flex-start;
-  }
-  .comment-submit-btn:hover { transform: scale(1.05); opacity: 0.9; }
-  .comment {
-    display: flex; gap: 10px; margin-bottom: 16px;
-    animation: fadeUp 0.4s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .comment-body { flex: 1; }
-  .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-  .comment-user { font-family: 'Orbitron', monospace; font-size: 11px; color: var(--cyan); }
-  .comment-time { font-size: 11px; color: var(--muted); }
-  .comment-text { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 6px; }
-  .comment-actions { display: flex; gap: 14px; }
-  .ca-btn { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
-  .ca-btn:hover { color: var(--cyan); }
-  .ca-btn.liked { color: var(--pink); }
-  .sticker-row {
-    display: flex; gap: 8px; margin-bottom: 14px;
-    overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
-  }
-  .sticker-row::-webkit-scrollbar { display: none; }
-  .sticker {
-    width: 44px; height: 44px; border-radius: 10px;
-    background: var(--surface2); border: 1px solid rgba(0,245,255,0.15);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-  }
-  .sticker:hover { border-color: var(--cyan); box-shadow: var(--glow-cyan); transform: scale(1.1); }
-  .section-label {
-    font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 2px;
-    color: var(--purple); margin-bottom: 14px; text-transform: uppercase;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .section-label::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, rgba(180,0,255,0.4), transparent);
-  }
-  .queue-card {
-    display: flex; gap: 10px; padding: 10px; border-radius: 10px;
-    background: var(--surface); border: 1px solid rgba(0,245,255,0.08);
-    margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
-  }
-  .queue-card:hover { border-color: rgba(0,245,255,0.25); background: var(--surface2); }
-  .queue-thumb {
-    width: 100px; height: 60px; border-radius: 8px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; position: relative; overflow: hidden;
-  }
-  .qt-bg { position: absolute; inset: 0; background: linear-gradient(135deg, var(--surface2), #200040); }
-  .qt-emoji { position: relative; z-index: 1; }
-  .qt-dur {
-    position: absolute; bottom: 4px; right: 4px;
-    font-family: 'Orbitron', monospace; font-size: 9px;
-    background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px;
-    color: var(--cyan); z-index: 1;
-  }
-  .queue-info { flex: 1; min-width: 0; }
-  .queue-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .queue-meta { font-size: 11px; color: var(--muted); }
-  .queue-card.playing {
-    border-color: var(--cyan);
-    background: linear-gradient(135deg, rgba(0,245,255,0.05), rgba(180,0,255,0.05));
-  }
-  .now-playing-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--cyan);
-    box-shadow: var(--glow-cyan); animation: blink 1s ease-in-out infinite;
-    flex-shrink: 0; margin-top: 6px;
-  }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  .butterfly-fab {
-    position: fixed; bottom: 24px; right: 20px;
-    width: 52px; height: 52px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; cursor: pointer;
-    box-shadow: var(--glow-purple), var(--glow-cyan);
-    z-index: 200; animation: float 3s ease-in-out infinite;
-    transition: transform 0.3s; border: 1px solid rgba(255,255,255,0.2);
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(-5deg); }
-    50% { transform: translateY(-8px) rotate(5deg); }
-  }
-  .butterfly-fab:hover { transform: scale(1.15) !important; }
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--darker); }
-  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
-  .neon-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
-    margin: 20px 0; opacity: 0.4;
-  }
-  .live-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 9px; background: rgba(255,0,80,0.15);
-    border: 1px solid rgba(255,0,80,0.5); border-radius: 4px;
-    font-family: 'Orbitron', monospace; font-size: 9px;
-    color: #ff0050; letter-spacing: 1px; font-weight: 700;
-  }
-  .live-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: #ff0050;
-    animation: blink 0.8s ease-in-out infinite;
-  }
-  /* Loading & Error States */
-  .video-status-overlay {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 12px;
-    background: rgba(0,0,0,0.85);
-    z-index: 25; border-radius: 12px;
-    transition: opacity 0.3s;
-  }
-  .video-status-overlay.hidden { opacity: 0; pointer-events: none; }
-  .spinner {
-    width: 48px; height: 48px;
-    border: 3px solid rgba(0,245,255,0.2);
-    border-top-color: var(--cyan);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .status-text {
-    font-family: 'Orbitron', monospace;
-    font-size: 12px; color: var(--cyan);
-    letter-spacing: 1px;
-  }
-  .status-error {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 13px; color: #ff4466;
-    text-align: center; padding: 0 20px;
-    max-width: 80%;
-  }
-  .retry-btn {
-    padding: 8px 20px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    border: none; color: var(--dark); font-family: 'Orbitron', monospace;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; box-shadow: var(--glow-cyan);
-    transition: all 0.3s; margin-top: 8px;
-  }
-  .retry-btn:hover { transform: scale(1.05); }
-  @media (max-width: 640px) {
-    .info-section { grid-template-columns: 1fr; }
-    .emo-tip { flex-direction: row; min-width: unset; width: 100%; }
-    .controls { opacity: 1; }
-  }
-</style>
-<script>
-  if (window.self !== window.top) {
-    document.addEventListener('DOMContentLoaded', () => {
-      const nav = document.querySelector('nav');
-      if (nav) nav.style.display = 'none';
-      document.querySelector('.main').style.paddingTop = '8px';
-    });
-  }
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/supabase-config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ddott TV — Player V2</title>
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-purple: #b300ff;
+            --dark-bg: #0a0a0f;
+            --card-bg: rgba(20, 20, 35, 0.85);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--dark-bg);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== VIDEO PLAYER SECTION ===== */
+        .player-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.7);
+            z-index: 10;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(0, 243, 255, 0.2);
+            border-top-color: var(--neon-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            color: var(--neon-cyan);
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Tap to Play Overlay (for autoplay blocked) */
+        .tap-overlay {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            z-index: 9;
+            cursor: pointer;
+        }
+
+        .tap-overlay.visible { display: flex; }
+
+        .tap-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        /* Controls Bar */
+        .controls-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .player-container:hover .controls-bar,
+        .player-container.touched .controls-bar {
+            opacity: 1;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0.9;
+        }
+
+        .ctrl-btn:active { opacity: 0.6; }
+
+        .time-display {
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
+            color: rgba(255,255,255,0.9);
+            min-width: 80px;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--neon-cyan);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .quality-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* ===== VIDEO INFO SECTION ===== */
+        .info-section {
+            padding: 16px;
+        }
+
+        .video-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .video-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .meta-dot { width: 3px; height: 3px; background: rgba(255,255,255,0.4); border-radius: 50%; }
+
+        /* Action Buttons */
+        .actions-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .action-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            border: none;
+            font-weight: 600;
+        }
+
+        /* EMO Coins Bar */
+        .coins-bar {
+            background: linear-gradient(135deg, rgba(179, 0, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border: 1px solid rgba(179, 0, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .coins-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--neon-pink);
+            font-weight: 700;
+        }
+
+        .coins-value {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tip-btn {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Creator Card */
+        .creator-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .creator-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .creator-info { flex: 1; }
+
+        .creator-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .creator-handle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .follow-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Description */
+        .description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 12px;
+        }
+
+        .hashtags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .hashtag {
+            color: var(--neon-cyan);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .show-more {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        /* Comments */
+        .section-header {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .comment-box {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .comment-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .comment-input::placeholder { color: rgba(255,255,255,0.4); }
+
+        /* Up Next / Live Chat Tabs */
+        .tabs-row {
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 16px;
+        }
+
+        .tab {
+            padding: 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+
+        .tab.active {
+            color: #fff;
+            border-bottom-color: var(--neon-cyan);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            text-decoration: none;
+            padding: 4px 12px;
+        }
+
+        .nav-item.active { color: var(--neon-cyan); }
+
+        .nav-icon { font-size: 20px; }
+
+        .safe-bottom { height: 70px; }
+
+        /* Error State */
+        .error-state {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.8);
+            z-index: 11;
+        }
+
+        .error-state.visible { display: flex; }
+
+        .error-text {
+            color: #ff4444;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .retry-btn {
+            background: var(--neon-cyan);
+            border: none;
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+<base target="_blank">
 </head>
 <body>
 
-<<nav>
-  <div class="logo">DDOTT<span>.</span>TV</div>
-  <div class="nav-right">
-    <div class="nav-icon">&#128269;</div>
-    <div class="nav-icon">&#128276;</div>
-    <div class="avatar">D</div>
-  </div>
-</nav>
+    <!-- VIDEO PLAYER -->
+    <div class="player-container" id="playerContainer">
+        <video id="mainVideo" playsinline webkit-playsinline preload="metadata">
+            Your browser does not support the video tag.
+        </video>
 
-<div class="main">
-
-  <!-- VIDEO PLAYER -->
-  <div class="video-container" id="videoContainer">
-    <div class="video-wrap" id="videoWrap">
-      <video id="realVideo" preload="auto" playsinline webkit-playsinline style="position:absolute;inset:0;width:100%;height:100%;background:#000;" >
-        Your browser does not support the video tag.
-      </video>
-
-      <!-- Status Overlay (Loading / Error / Tap to Play) -->
-      <div id="statusOverlay" class="video-status-overlay">
-        <div class="spinner" id="statusSpinner"></div>
-        <div class="status-text" id="statusText">Loading video...</div>
-        <button class="retry-btn" id="retryBtn" style="display:none;">Retry</button>
-      </div>
-
-      <!-- QUIZ BOX -->
-      <div id="quizBox" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.92);z-index:50;border-radius:12px;padding:20px;overflow-y:auto;">
-        <div style="color:#00f5ff;font-family:'Orbitron',sans-serif;font-size:14px;margin-bottom:16px;">&#127916; Proof of Watch</div>
-        <div style="color:#fff;font-size:13px;margin-bottom:20px;">Answer to earn your Emo Coins! &#9201; <span id="quizTimer" style="color:#ffd84d;font-weight:bold;">60</span>s</div>
-
-        <div style="margin-bottom:16px;">
-          <div style="color:#aaa;font-size:11px;margin-bottom:8px;">Q1. How long was this video?</div>
-          <div id="q1options" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Loading video...</div>
         </div>
 
-        <button id="quizSubmit" onclick="submitQuiz()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b44aff);border:none;border-radius:10px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">
-          Submit & Earn Coins &#129689;
-        </button>
-        <div id="quizResult" style="margin-top:12px;text-align:center;font-size:13px;"></div>
-      </div>
-    </div>
-
-    <!-- CONTROLS -->
-    <div class="controls">
-      <div class="progress-wrap" id="progressWrap">
-        <div class="progress-fill" id="progressFill">
-          <div class="progress-thumb"></div>
+        <!-- Tap to Play Overlay -->
+        <div class="tap-overlay" id="tapOverlay">
+            <div class="tap-icon">▶</div>
         </div>
-        <div class="chapter-dot" style="left:25%"></div>
-        <div class="chapter-dot" style="left:60%"></div>
-        <div class="chapter-dot" style="left:82%"></div>
-      </div>
-      <div class="ctrl-row">
-        <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button class="ctrl-btn" id="skipBackBtn" title="Skip -10s">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
-        </button>
-        <button class="ctrl-btn" id="skipFwdBtn" title="Skip +10s">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-        </button>
-        <div class="vol-wrap">
-          <button class="ctrl-btn" id="muteBtn">&#128266;</button>
-          <div class="vol-slider" id="volSlider"><div class="vol-fill" id="volFill"></div></div>
+
+        <!-- Error State -->
+        <div class="error-state" id="errorState">
+            <div class="error-text" id="errorText">Video failed to load</div>
+            <button class="retry-btn" onclick="loadVideo()">Retry</button>
         </div>
-        <div class="time"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
-        <div class="ctrl-right">
-          <div class="quality-badge" id="qualityBtn">4K</div>
-          <button class="ctrl-btn" title="Picture in Picture" id="pipBtn">&#11010;</button>
-          <button class="ctrl-btn" title="Fullscreen" id="fsBtn">&#9206;</button>
+
+        <!-- Controls -->
+        <div class="controls-bar" id="controlsBar">
+            <button class="ctrl-btn" id="playBtn">▶</button>
+            <button class="ctrl-btn">⏮</button>
+            <button class="ctrl-btn">⏭</button>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+            <button class="ctrl-btn">🔊</button>
+            <span class="quality-badge">4K</span>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIDEO INFO -->
-  <div class="info-section">
-    <div class="video-info">
-      <h1 id="videoTitle">Ddott TV Video</h1>
-      <div class="video-meta">
-        <div class="meta-chip" id="viewCount">&#128065; 0 views</div>
-        <div class="meta-chip">&#128197; 2 hours ago</div>
-        <div class="meta-chip hot" id="trendingBadge" style="display:none">&#128293; Trending</div>
-        <div class="meta-chip" id="durationBadge">&#9201; 0:00</div>
-      </div>
-      <div class="action-btns">
-        <button class="act-btn primary" id="likeBtn">&#128077; <span id="likeCount">0</span></button>
-        <button class="act-btn">&#128078;</button>
-        <button class="act-btn">&#8599; Share</button>
-        <button class="act-btn">+ Save</button>
-        <button class="act-btn">&#9986; Clip</button>
-        <button class="act-btn">&#8942;</button>
-      </div>
-    </div>
-    <div class="emo-tip">
-      <div class="emo-coins-label">EMO COINS</div>
-      <div class="emo-coin-val">&#129689; 450</div>
-      <button class="tip-btn">TIP CREATOR</button>
-    </div>
-  </div>
-
-  <!-- CREATOR BAR -->
-  <div class="creator-bar">
-    <div class="creator-left">
-      <div class="creator-avatar">&#129419;</div>
-      <div>
-        <div class="creator-name">Divin &#183; Emobies05</div>
-        <div class="creator-subs"><span id="subCount">0</span> subscribers &#183; Dwin Universe</div>
-      </div>
-    </div>
-    <button class="follow-btn">FOLLOW</button>
-  </div>
-
-  <!-- DESCRIPTION -->
-  <div class="desc-box">
-    Building an entire Web3 wallet from a phone &#8212; no laptop, no desktop. Just Termux, Acode, and sheer will. This is the full build session for TheWall &#8212; 5-chain crypto wallet powered by Alchemy + Claude AI. &#128293;
-    <br><br>
-    <span class="desc-tag">#DwinUniverse</span>
-    <span class="desc-tag">#TheWall</span>
-    <span class="desc-tag">#Web3</span>
-    <span class="desc-tag">#BuildInPublic</span>
-    <span class="desc-tag">#MobileDev</span>
-    <br><br>
-    <span style="color: var(--cyan); font-size:12px;">&#9660; Show more</span>
-  </div>
-
-  <div class="neon-divider"></div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab(this, 'comments')">&#128172; Comments (<span id="commentCount">0</span>)</div>
-    <div class="tab" onclick="switchTab(this, 'queue')">&#128250; Up Next</div>
-    <div class="tab" onclick="switchTab(this, 'chat')">&#9889; Live Chat</div>
-  </div>
-
-  <!-- COMMENTS TAB -->
-  <div id="comments-panel">
-    <div class="sticker-row">
-      <div class="sticker" title="Pizza">&#127829;</div>
-      <div class="sticker" title="Rocket">&#128640;</div>
-      <div class="sticker" title="Fire">&#128293;</div>
-      <div class="sticker" title="Butterfly">&#129419;</div>
-      <div class="sticker" title="Diamond">&#128142;</div>
-      <div class="sticker" title="Lightning">&#9889;</div>
-      <div class="sticker" title="Crown">&#128081;</div>
-      <div class="sticker" title="Star">&#11088;</div>
-      <div class="sticker" title="Coin">&#129689;</div>
-      <div class="sticker" title="Heart">&#128156;</div>
     </div>
 
-    <div class="comment-input-row">
-      <div class="comment-avatar">D</div>
-      <textarea class="comment-input" placeholder="Add a comment... or drop a sticker &#127829;" rows="1" id="commentInput"></textarea>
-      <button class="comment-submit-btn" id="commentSubmitBtn">POST</button>
+    <!-- INFO SECTION -->
+    <div class="info-section">
+        <h1 class="video-title" id="videoTitle">Ddott TV Video</h1>
+
+        <div class="video-meta">
+            <span id="viewCount">0 views</span>
+            <span class="meta-dot"></span>
+            <span id="uploadTime">2 hours ago</span>
+            <span class="meta-dot"></span>
+            <span id="videoDuration">0:00</span>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-row">
+            <button class="action-btn primary" id="likeBtn">👍 <span id="likeCount">0</span></button>
+            <button class="action-btn">👎</button>
+            <button class="action-btn">↗ Share</button>
+            <button class="action-btn">+ Save</button>
+            <button class="action-btn">✂ Clip</button>
+        </div>
+
+        <!-- EMO Coins -->
+        <div class="coins-bar">
+            <div>
+                <div class="coins-label">EMO COINS</div>
+                <div class="coins-value">🪙 450</div>
+            </div>
+            <button class="tip-btn">TIP CREATOR</button>
+        </div>
+
+        <!-- Creator -->
+        <div class="creator-card">
+            <div class="creator-avatar">🦋</div>
+            <div class="creator-info">
+                <div class="creator-name" id="creatorName">Divin</div>
+                <div class="creator-handle" id="creatorHandle">Emobies05 · 0 subscribers · Dwin Universe</div>
+            </div>
+            <button class="follow-btn">FOLLOW</button>
+        </div>
+
+        <!-- Description -->
+        <div class="description" id="videoDescription">
+            Building an entire Web3 wallet from a phone — no laptop, no desktop. Just Termux, Acode, and sheer will. This is the full build session for TheWall — 5-chain crypto wallet powered by Alchemy + Claude AI. 🔥
+        </div>
+
+        <div class="hashtags" id="hashtags">
+            <span class="hashtag">#DwinUniverse</span>
+            <span class="hashtag">#TheWall</span>
+            <span class="hashtag">#Web3</span>
+            <span class="hashtag">#BuildInPublic</span>
+            <span class="hashtag">#MobileDev</span>
+        </div>
+
+        <div class="show-more">▼ Show more</div>
+
+        <!-- Comments -->
+        <div class="section-header">💬 Comments (<span id="commentCount">0</span>)</div>
+        <div class="comment-box">
+            <input type="text" class="comment-input" placeholder="Add a comment...">
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-row">
+            <div class="tab active">📺 Up Next</div>
+            <div class="tab">⚡ Live Chat</div>
+        </div>
     </div>
 
-    <div id="commentsList">
-      <div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Loading comments...</div>
-    </div>
-  </div>
+    <div class="safe-bottom"></div>
 
-  <!-- QUEUE TAB -->
-  <div id="queue-panel" style="display:none">
-    <div class="section-label">Now Playing</div>
-    <div class="queue-card playing">
-      <div class="queue-thumb">
-        <div class="qt-bg"></div>
-        <div class="qt-emoji">&#128241;</div>
-        <div class="qt-dur">37:45</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Building Web3 on Mobile &#8212; Full Stack Dev</div>
-        <div class="queue-meta">Emobies05 &#183; 128K views</div>
-      </div>
-      <div class="now-playing-dot"></div>
-    </div>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="ddott-home-v2.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>HOME</span>
+        </a>
+        <a href="ddott-feed.html" class="nav-item">
+            <span class="nav-icon">📺</span>
+            <span>FEED</span>
+        </a>
+        <a href="ddott-community.html" class="nav-item">
+            <span class="nav-icon">🌐</span>
+            <span>COMMUNITY</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🪙</span>
+            <span>COINS</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🎬</span>
+            <span>STUDIO</span>
+        </a>
+    </nav>
 
-    <div class="section-label" style="margin-top:16px">Up Next</div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#000820,#200040)"></div>
-        <div class="qt-emoji">&#128279;</div>
-        <div class="qt-dur">28:12</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">TheWall &#8212; 5 Chain Wallet Deep Dive</div>
-        <div class="queue-meta">Emobies05 &#183; 84K views</div>
-      </div>
-    </div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#001020,#002040)"></div>
-        <div class="qt-emoji">&#129419;</div>
-        <div class="qt-dur">19:33</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Emowall AI &#8212; 7 Brain Architecture Explained</div>
-        <div class="queue-meta">Emobies05 &#183; 52K views</div>
-      </div>
-    </div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#100020,#300040)"></div>
-        <div class="qt-emoji">&#129689;</div>
-        <div class="qt-dur">14:08</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Emo Coins &#8212; Tokenomics & Creator Economy</div>
-        <div class="queue-meta">Emobies05 &#183; 38K views</div>
-      </div>
-    </div>
-    <div class="queue-card">
-      <div class="queue-thumb">
-        <div class="qt-bg" style="background: linear-gradient(135deg,#050015,#150030)"></div>
-        <div class="qt-emoji">&#128640;</div>
-        <div class="qt-dur">22:50</div>
-      </div>
-      <div class="queue-info">
-        <div class="queue-title">Ddott TV &#8212; Building a Streaming Platform</div>
-        <div class="queue-meta">Emobies05 &#183; 61K views</div>
-      </div>
-    </div>
-  </div>
+    <script>
+        // ============================================
+        // DDOTT TV PLAYER V2 — FIXED VIDEO LOADER
+        // ============================================
 
-  <!-- LIVE CHAT TAB -->
-  <div id="chat-panel" style="display:none">
-    <div style="padding: 24px; text-align: center; color: var(--muted);">
-      <div style="font-size: 40px; margin-bottom: 12px;">&#9889;</div>
-      <div style="font-family:'Orbitron',monospace; font-size:12px; color: var(--cyan); margin-bottom: 8px;">LIVE CHAT</div>
-      <div style="font-size: 13px;">Live chat will appear here during streams.<br>Coming in Messaging V1 &#129419;</div>
-    </div>
-  </div>
+        const FALLBACK_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
 
-</div>
+        const video = document.getElementById('mainVideo');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+        const tapOverlay = document.getElementById('tapOverlay');
+        const errorState = document.getElementById('errorState');
+        const errorText = document.getElementById('errorText');
+        const playBtn = document.getElementById('playBtn');
+        const progressFill = document.getElementById('progressFill');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const playerContainer = document.getElementById('playerContainer');
 
-<!-- BUTTERFLY AI FAB -->
-<div class="butterfly-fab" title="Emowall AI">&#129419;</div>
+        let isPlaying = false;
+        let currentVideoUrl = '';
 
-<script>
-  // ============================
-  // SUPABASE SETUP
-  // ============================
-  let db = null;
-  let dbReady = false;
-  
-  function initSupabase() {
-    try {
-      if (typeof supabase !== 'undefined' && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-        db = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-        dbReady = true;
-        console.log('Supabase connected');
-        return true;
-      } else {
-        console.warn('Supabase config missing');
-        return false;
-      }
-    } catch (e) {
-      console.warn('Supabase init failed:', e);
-      return false;
-    }
-  }
+        // ===== URL PARAMETER PARSER =====
+        function getVideoUrl() {
+            const params = new URLSearchParams(window.location.search);
 
-  // Try immediately, and also after DOM ready
-  initSupabase();
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!dbReady) initSupabase();
-  });
+            // 1. Direct ?url= parameter (highest priority)
+            const directUrl = params.get('url');
+            if (directUrl && directUrl.trim() !== '' && directUrl !== 'undefined' && directUrl !== 'null') {
+                try {
+                    return decodeURIComponent(directUrl);
+                } catch(e) {
+                    console.warn('URL decode failed, using raw:', directUrl);
+                    return directUrl;
+                }
+            }
 
-  // ============================
-  // VIDEO PLAYER LOGIC
-  // ============================
-  const video = document.getElementById('realVideo');
-  const playPauseBtn = document.getElementById('playPauseBtn');
-  const skipBackBtn = document.getElementById('skipBackBtn');
-  const skipFwdBtn = document.getElementById('skipFwdBtn');
-  const muteBtn = document.getElementById('muteBtn');
-  const volSlider = document.getElementById('volSlider');
-  const volFill = document.getElementById('volFill');
-  const progressWrap = document.getElementById('progressWrap');
-  const progressFill = document.getElementById('progressFill');
-  const currentTimeEl = document.getElementById('currentTime');
-  const totalTimeEl = document.getElementById('totalTime');
-  const durationBadge = document.getElementById('durationBadge');
-  const qualityBtn = document.getElementById('qualityBtn');
-  const fsBtn = document.getElementById('fsBtn');
-  const pipBtn = document.getElementById('pipBtn');
-  const statusOverlay = document.getElementById('statusOverlay');
-  const statusSpinner = document.getElementById('statusSpinner');
-  const statusText = document.getElementById('statusText');
-  const retryBtn = document.getElementById('retryBtn');
-  const videoContainer = document.getElementById('videoContainer');
+            // 2. ?id= parameter — resolve via lookup
+            const videoId = params.get('id');
+            if (videoId && videoId.trim() !== '') {
+                const resolved = resolveVideoById(videoId);
+                if (resolved) return resolved;
+            }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const videoUrl = urlParams.get('url') || new URLSearchParams(window.location.hash.slice(1)).get('url') || '';
-  const videoId = urlParams.get('id') || '';
-  const videoTitle = urlParams.get('title') || 'Ddott TV Video';
-  const videoCreator = urlParams.get('creator') || 'Unknown';
+            // 3. ?v= parameter (YouTube-style alias)
+            const v = params.get('v');
+            if (v && v.trim() !== '') {
+                const resolved = resolveVideoById(v);
+                if (resolved) return resolved;
+            }
 
-  const titleEl = document.getElementById('videoTitle');
-  if (titleEl) titleEl.textContent = videoTitle;
-
-  // ============================
-  // STATUS OVERLAY HELPERS
-  // ============================
-  function showStatus(type, message, showRetry) {
-    statusOverlay.classList.remove('hidden');
-    statusSpinner.style.display = type === 'loading' ? 'block' : 'none';
-    statusText.textContent = message;
-    statusText.className = type === 'error' ? 'status-error' : 'status-text';
-    retryBtn.style.display = showRetry ? 'block' : 'none';
-  }
-
-  function hideStatus() {
-    statusOverlay.classList.add('hidden');
-  }
-
-  // ============================
-  // VIDEO SOURCE SETUP
-  // ============================
-  function setVideoSource(src) {
-    if (!src) {
-      console.warn('setVideoSource: no src provided');
-      showStatus('error', 'No video source provided', false);
-      return;
-    }
-    console.log('Loading video:', src);
-    showStatus('loading', 'Loading video...', false);
-    
-    // Clear existing sources
-    while (video.firstChild) video.removeChild(video.firstChild);
-    
-    // Set src directly
-    video.src = src;
-    video.load();
-  }
-
-  async function loadVideoFromDB() {
-    if (!videoId || !db) {
-      return false;
-    }
-    try {
-      const { data: v, error } = await db.from('videos').select('*').eq('id', videoId).single();
-      if (error) throw error;
-      if (v && v.video_url) {
-        setVideoSource(v.video_url);
-        if (v.title && titleEl) titleEl.textContent = v.title;
-        if (v.views !== undefined) {
-          document.getElementById('viewCount').textContent = '&#128065; ' + (v.views + 1).toLocaleString() + ' views';
-          try { await db.from('videos').update({ views: v.views + 1 }).eq('id', videoId); } catch(e){}
+            // 4. Fallback
+            console.log('⚠️ No video param found, using fallback');
+            return FALLBACK_VIDEO;
         }
-        return true;
-      }
-    } catch (e) {
-      console.warn('DB video load failed:', e);
-    }
-    return false;
-  }
 
-  async function initVideo() {
-    // Priority 1: load by video ID from Supabase
-    if (videoId) {
-      const loaded = await loadVideoFromDB();
-      if (loaded) return;
-    }
-    
-    // Priority 2: use ?url= param directly
-    if (videoUrl) {
-      const decoded = decodeURIComponent(videoUrl);
-      const finalUrl = decoded.startsWith('http') ? decoded : 'https://res.cloudinary.com/dggip9tpp/video/upload/' + decoded;
-      setVideoSource(finalUrl);
-      return;
-    }
-    
-    // Priority 3: fallback demo video (public test video)
-    console.log('No params - loading fallback demo video');
-    setVideoSource('https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4');
-  }
+        // ===== VIDEO DATABASE / LOOKUP =====
+        // Add your video IDs and URLs here, or fetch from API
+        const VIDEO_DB = {
+            // Example entries — replace with your actual video mappings
+            'vid_001': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+            'vid_002': 'https://www.w3schools.com/html/mov_bbb.mp4',
+            'demo': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        };
 
-  // ============================
-  // VIDEO EVENT HANDLERS
-  // ============================
-  video.addEventListener('canplay', () => {
-    hideStatus();
-    console.log('Video can play');
-  });
+        function resolveVideoById(id) {
+            // Check local database first
+            if (VIDEO_DB[id]) {
+                return VIDEO_DB[id];
+            }
 
-  video.addEventListener('loadedmetadata', () => {
-    if (!video.duration) return;
-    const m = Math.floor(video.duration / 60);
-    const s = Math.floor(video.duration % 60);
-    totalTimeEl.textContent = m + ':' + s.toString().padStart(2, '0');
-    durationBadge.textContent = '&#9201; ' + m + ':' + s.toString().padStart(2, '0');
-  });
+            // Try localStorage (if you store videos there from home page)
+            try {
+                const stored = localStorage.getItem('ddott_videos');
+                if (stored) {
+                    const videos = JSON.parse(stored);
+                    if (videos[id] && videos[id].url) {
+                        return videos[id].url;
+                    }
+                }
+            } catch(e) { /* ignore */ }
 
-  video.addEventListener('error', (e) => {
-    const code = video.error ? video.error.code : '?';
-    const msg = video.error ? video.error.message : 'unknown';
-    console.error('Video error code:', code, 'msg:', msg);
-    showStatus('error', 'Failed to load video. Error: ' + msg, true);
-  });
+            // If ID looks like a URL itself, use it
+            if (id.startsWith('http://') || id.startsWith('https://')) {
+                return id;
+            }
 
-  video.addEventListener('waiting', () => {
-    showStatus('loading', 'Buffering...', false);
-  });
+            return null;
+        }
 
-  video.addEventListener('playing', () => {
-    hideStatus();
-  });
+        // ===== LOAD VIDEO =====
+        function loadVideo() {
+            errorState.classList.remove('visible');
+            loadingOverlay.classList.remove('hidden');
+            loadingText.textContent = 'Loading video...';
 
-  video.addEventListener('stalled', () => {
-    showStatus('loading', 'Connection stalled...', false);
-  });
+            currentVideoUrl = getVideoUrl();
+            console.log('🎬 Loading video URL:', currentVideoUrl);
 
-  // ============================
-  // TAP TO PLAY OVERLAY (Single overlay only)
-  // ============================
-  function createTapOverlay() {
-    // Remove any existing tap overlays first
-    const existing = document.getElementById('tapOverlay');
-    if (existing) existing.remove();
-    
-    const overlay = document.createElement('div');
-    overlay.id = 'tapOverlay';
-    overlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:20;cursor:pointer;border-radius:12px;';
-    overlay.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#00f5ff,#b400ff);display:flex;align-items:center;justify-content:center;font-size:30px;">&#9654;</div>';
-    
-    overlay.addEventListener('click', () => {
-      overlay.remove();
-      video.play().catch(e => {
-        console.warn('Play blocked:', e);
-        // If autoplay blocked, show muted play
-        video.muted = true;
-        video.play().then(() => {
-          video.muted = false;
-        }).catch(() => {
-          showStatus('error', 'Tap play button to start', false);
+            if (!currentVideoUrl || currentVideoUrl === 'undefined') {
+                console.error('❌ Invalid video URL, using fallback');
+                currentVideoUrl = FALLBACK_VIDEO;
+            }
+
+            // Reset video element
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+
+            // Set new source
+            video.src = currentVideoUrl;
+            video.load();
+
+            // Try autoplay
+            attemptPlay();
+        }
+
+        // ===== PLAYBACK ATTEMPT =====
+        async function attemptPlay() {
+            try {
+                await video.play();
+                isPlaying = true;
+                playBtn.textContent = '⏸';
+                tapOverlay.classList.remove('visible');
+                console.log('✅ Autoplay successful');
+            } catch (err) {
+                console.log('⚠️ Autoplay blocked:', err.name);
+                isPlaying = false;
+                playBtn.textContent = '▶';
+
+                // Show tap overlay on mobile
+                if (err.name === 'NotAllowedError') {
+                    tapOverlay.classList.add('visible');
+                }
+            }
+        }
+
+        // ===== EVENT LISTENERS =====
+
+        // Video loaded successfully
+        video.addEventListener('loadeddata', () => {
+            console.log('✅ Video loaded');
+            loadingOverlay.classList.add('hidden');
+            errorState.classList.remove('visible');
+
+            // Update duration display
+            const duration = formatTime(video.duration || 0);
+            document.getElementById('videoDuration').textContent = duration;
+            updateTimeDisplay();
         });
-      });
-    });
-    
-    document.getElementById('videoWrap').appendChild(overlay);
-    return overlay;
-  }
 
-  // ============================
-  // PLAYER CONTROLS
-  // ============================
-  playPauseBtn.addEventListener('click', () => {
-    if (video.paused) video.play(); else video.pause();
-  });
-
-  video.addEventListener('play', () => {
-    playPauseBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-  });
-  video.addEventListener('pause', () => {
-    playPauseBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-  });
-
-  skipBackBtn.addEventListener('click', () => { video.currentTime = Math.max(0, video.currentTime - 10); });
-  skipFwdBtn.addEventListener('click', () => { video.currentTime = Math.min(video.duration || 0, video.currentTime + 10); });
-
-  muteBtn.addEventListener('click', () => {
-    video.muted = !video.muted;
-    muteBtn.textContent = video.muted ? '&#128263;' : '&#128266;';
-  });
-
-  volSlider.addEventListener('click', (e) => {
-    const rect = volSlider.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-    video.volume = pct / 100;
-    volFill.style.width = pct + '%';
-  });
-
-  video.addEventListener('timeupdate', () => {
-    if (!video.duration) return;
-    const pct = (video.currentTime / video.duration) * 100;
-    progressFill.style.width = pct + '%';
-    const m = Math.floor(video.currentTime / 60);
-    const s = Math.floor(video.currentTime % 60);
-    currentTimeEl.textContent = m + ':' + s.toString().padStart(2, '0');
-  });
-
-  progressWrap.addEventListener('click', (e) => {
-    if (!video.duration) return;
-    const rect = progressWrap.getBoundingClientRect();
-    video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
-  });
-
-  fsBtn.addEventListener('click', () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else if (videoContainer.requestFullscreen) {
-      videoContainer.requestFullscreen();
-    } else if (video.requestFullscreen) {
-      video.requestFullscreen();
-    }
-  });
-
-  pipBtn.addEventListener('click', async () => {
-    try {
-      if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture();
-      } else {
-        await video.requestPictureInPicture();
-      }
-    } catch (e) { console.warn('PiP not supported:', e); }
-  });
-
-  const qualities = ['4K', '1080p', '720p', '480p'];
-  let qi = 0;
-  qualityBtn.addEventListener('click', () => {
-    qi = (qi + 1) % qualities.length;
-    qualityBtn.textContent = qualities[qi];
-  });
-
-  // Touch support for mobile controls
-  let touchTimeout;
-  videoContainer.addEventListener('touchstart', () => {
-    videoContainer.classList.add('show-controls');
-    clearTimeout(touchTimeout);
-    touchTimeout = setTimeout(() => {
-      videoContainer.classList.remove('show-controls');
-    }, 3000);
-  });
-
-  // ============================
-  // PROOF OF WATCH QUIZ
-  // ============================
-  let quizAnswers = {};
-  let quizCorrect = {};
-  let quizTimerInt;
-
-  video.addEventListener('ended', () => { showQuiz(); });
-
-  function showQuiz() {
-    const dur = video.duration || 0;
-    const mins = Math.floor(dur / 60);
-    const secs = Math.floor(dur % 60);
-    const correctDur = mins + ' min ' + secs + ' sec';
-    const fakeSecs1 = (secs + 15) % 60;
-    const fakeDur1 = (mins + 1) + ' min ' + fakeSecs1 + ' sec';
-    const fakeSecs2 = secs > 15 ? secs - 10 : secs + 20;
-    const fakeDur2 = (mins > 0 ? mins - 1 : mins + 2) + ' min ' + fakeSecs2 + ' sec';
-
-    quizCorrect = { q1: correctDur };
-    quizAnswers = {};
-    renderOptions('q1options', [correctDur, fakeDur1, fakeDur2].sort(() => Math.random() - 0.5), 'q1');
-
-    document.getElementById('quizBox').style.display = 'block';
-    document.getElementById('quizSubmit').disabled = false;
-    document.getElementById('quizResult').innerHTML = '';
-
-    let t = 60;
-    document.getElementById('quizTimer').textContent = t;
-    clearInterval(quizTimerInt);
-    quizTimerInt = setInterval(() => {
-      t--;
-      document.getElementById('quizTimer').textContent = t;
-      if (t <= 0) { clearInterval(quizTimerInt); autoFailQuiz(); }
-    }, 1000);
-  }
-
-  function renderOptions(containerId, options, qKey) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.textContent = opt;
-      btn.style.cssText = 'padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;text-align:left;transition:all .2s;';
-      btn.onclick = () => {
-        container.querySelectorAll('button').forEach(b => {
-          b.style.background = 'rgba(255,255,255,0.05)';
-          b.style.borderColor = 'rgba(255,255,255,0.1)';
+        // Video can play through
+        video.addEventListener('canplaythrough', () => {
+            loadingOverlay.classList.add('hidden');
         });
-        btn.style.background = 'rgba(0,245,255,0.15)';
-        btn.style.borderColor = '#00f5ff';
-        quizAnswers[qKey] = opt;
-        document.getElementById('quizResult').innerHTML = '';
-      };
-      container.appendChild(btn);
-    });
-  }
 
-  function submitQuiz() {
-    clearInterval(quizTimerInt);
-    if (!quizAnswers.q1) {
-      document.getElementById('quizResult').innerHTML = '&#9888; Please select an answer first!';
-      document.getElementById('quizResult').style.color = '#ffd84d';
-      return;
-    }
-    const correct = quizAnswers.q1 === quizCorrect.q1 ? 1 : 0;
-    const resultEl = document.getElementById('quizResult');
-    if (correct >= 1) {
-      const coinsEarned = 5;
-      resultEl.innerHTML = '&#9989; Correct! +' + coinsEarned + ' Emo Coins earned! &#129689;';
-      resultEl.style.color = '#00f5ff';
-      creditCoins(coinsEarned);
-    } else {
-      resultEl.innerHTML = '&#10060; Wrong answer! Watch the video again to earn coins. &#128064;';
-      resultEl.style.color = '#ff4466';
-    }
-    document.getElementById('quizSubmit').disabled = true;
-    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; document.getElementById('quizSubmit').disabled = false; }, 3000);
-  }
+        // Video error
+        video.addEventListener('error', (e) => {
+            console.error('❌ Video error:', video.error);
+            loadingOverlay.classList.add('hidden');
 
-  function autoFailQuiz() {
-    document.getElementById('quizResult').innerHTML = '&#9201; Time up! No coins this time.';
-    document.getElementById('quizResult').style.color = '#ff4466';
-    document.getElementById('quizSubmit').disabled = true;
-    setTimeout(() => { document.getElementById('quizBox').style.display = 'none'; document.getElementById('quizSubmit').disabled = false; }, 2000);
-  }
+            const errorMsg = video.error ? 
+                `Error ${video.error.code}: ${video.error.message || 'Unknown'}` : 
+                'Video failed to load';
 
-  async function creditCoins(amount) {
-    if (!db) return;
-    try {
-      const { data: { user } } = await db.auth.getUser();
-      if (!user) return;
-      const { data: coins } = await db.from('emo_coins').select('*').eq('user_id', user.id).single();
-      if (!coins) return;
-      await db.from('emo_coins').update({
-        balance: coins.balance + amount,
-        total_earned: (coins.total_earned || 0) + amount
-      }).eq('user_id', user.id);
-      await db.from('emo_transactions').insert({
-        user_id: user.id, amount: amount, type: 'watch_complete',
-        description: 'Video watch reward: ' + videoTitle
-      });
-    } catch (e) { console.warn('Coin credit failed:', e); }
-  }
+            errorText.textContent = errorMsg;
+            errorState.classList.add('visible');
 
-  // ============================
-  // COMMENTS
-  // ============================
-  async function loadComments() {
-    if (!videoId) {
-      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No video ID. Comments unavailable.</div>';
-      return;
-    }
-    if (!db) {
-      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Database not connected.</div>';
-      return;
-    }
-    try {
-      const { data, count } = await db.from('comments').select('*', { count: 'exact' }).eq('video_id', videoId).order('created_at', { ascending: false }).limit(20);
-      document.getElementById('commentCount').textContent = count || 0;
-      const panel = document.getElementById('commentsList');
-      if (!data || !data.length) {
-        panel.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">No comments yet. Be the first!</div>';
-        return;
-      }
-      panel.innerHTML = data.map(c => `
-        <div class="comment">
-          <div class="comment-avatar">${(c.username || 'U')[0].toUpperCase()}</div>
-          <div class="comment-body">
-            <div class="comment-header">
-              <span class="comment-user">@${c.username || 'user'}</span>
-              <span class="comment-time">${new Date(c.created_at).toLocaleDateString()}</span>
-            </div>
-            <div class="comment-text">${c.content}</div>
-            <div class="comment-actions">
-              <span class="ca-btn">&#10084; ${c.likes || 0}</span>
-              <span class="ca-btn">Reply</span>
-            </div>
-          </div>
-        </div>`).join('');
-    } catch (e) {
-      console.warn('Comments load failed:', e);
-      document.getElementById('commentsList').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(232,244,255,0.3);font-size:13px;">Failed to load comments.</div>';
-    }
-  }
+            // Auto-retry with fallback if not already fallback
+            if (currentVideoUrl !== FALLBACK_VIDEO) {
+                console.log('🔄 Auto-retrying with fallback...');
+                setTimeout(() => {
+                    currentVideoUrl = FALLBACK_VIDEO;
+                    video.src = FALLBACK_VIDEO;
+                    video.load();
+                    attemptPlay();
+                    errorState.classList.remove('visible');
+                    loadingOverlay.classList.remove('hidden');
+                }, 1500);
+            }
+        });
 
-  async function postComment() {
-    if (!videoId || !db) return;
-    const inp = document.getElementById('commentInput');
-    const content = inp.value.trim();
-    if (!content) return;
-    try {
-      const { data: { user } } = await db.auth.getUser();
-      if (!user) { alert('Sign in to comment!'); return; }
-      const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
-      await db.from('comments').insert({
-        video_id: videoId, user_id: user.id,
-        username: profile?.username || user.email?.split('@')[0],
-        content
-      });
-      inp.value = '';
-      loadComments();
-    } catch (e) { console.warn('Post comment failed:', e); alert('Failed to post comment.'); }
-  }
+        // Time update
+        video.addEventListener('timeupdate', () => {
+            updateTimeDisplay();
+            updateProgress();
+        });
 
-  document.getElementById('commentSubmitBtn').addEventListener('click', postComment);
-  document.getElementById('commentInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); postComment(); }
-  });
+        // Video ended
+        video.addEventListener('ended', () => {
+            isPlaying = false;
+            playBtn.textContent = '▶';
+        });
 
-  // ============================
-  // LIKES
-  // ============================
-  async function loadLikes() {
-    if (!videoId || !db) return;
-    try {
-      const { count } = await db.from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
-      document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
-    } catch (e) { console.warn('Likes load failed:', e); }
-  }
+        // Play/Pause toggle
+        playBtn.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+                isPlaying = true;
+                playBtn.textContent = '⏸';
+                tapOverlay.classList.remove('visible');
+            } else {
+                video.pause();
+                isPlaying = false;
+                playBtn.textContent = '▶';
+            }
+        });
 
-  async function likeVideo() {
-    if (!videoId) return;
-    if (!db) { alert('Database not connected.'); return; }
-    try {
-      const { data: { user } } = await db.auth.getUser();
-      if (!user) { alert('Sign in to like!'); return; }
-      await db.from('video_likes').insert({ video_id: videoId, user_id: user.id });
-      const { count } = await db.from('video_likes').select('*', { count: 'exact' }).eq('video_id', videoId);
-      document.getElementById('likeCount').textContent = (count || 0).toLocaleString();
-    } catch (e) { console.warn('Like failed:', e); }
-  }
+        // Tap overlay click
+        tapOverlay.addEventListener('click', () => {
+            video.play();
+            isPlaying = true;
+            playBtn.textContent = '⏸';
+            tapOverlay.classList.remove('visible');
+        });
 
-  document.getElementById('likeBtn').addEventListener('click', likeVideo);
+        // Player container click (toggle controls)
+        playerContainer.addEventListener('click', (e) => {
+            if (e.target === playerContainer || e.target === video || e.target === tapOverlay) {
+                playerContainer.classList.toggle('touched');
+            }
+        });
 
-  // ============================
-  // TABS & STICKERS
-  // ============================
-  function switchTab(el, tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    ['comments', 'queue', 'chat'].forEach(p => {
-      document.getElementById(p + '-panel').style.display = p === tab ? 'block' : 'none';
-    });
-  }
+        // Progress bar click
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            video.currentTime = pos * video.duration;
+        });
 
-  document.querySelectorAll('.sticker').forEach(s => {
-    s.addEventListener('click', function() {
-      const inp = document.getElementById('commentInput');
-      inp.value += this.textContent + ' ';
-      inp.focus();
-      this.style.transform = 'scale(1.3)';
-      setTimeout(() => this.style.transform = '', 300);
-    });
-  });
+        // ===== HELPERS =====
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
 
-  document.getElementById('commentInput').addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = this.scrollHeight + 'px';
-  });
+        function updateTimeDisplay() {
+            const current = formatTime(video.currentTime || 0);
+            const duration = formatTime(video.duration || 0);
+            timeDisplay.textContent = `${current} / ${duration}`;
+        }
 
-  // ============================
-  // SMART LOAD (Fixed - no double overlays)
-  // ============================
-  async function smartLoad() {
-    console.log('DEBUG videoUrl:', videoUrl);
-    console.log('DEBUG videoId:', videoId);
-    console.log('DEBUG search:', window.location.search);
-    console.log('DEBUG href:', window.location.href);
-    
-    // Create single tap overlay
-    createTapOverlay();
-    
-    // Setup retry button
-    retryBtn.addEventListener('click', () => {
-      showStatus('loading', 'Retrying...', false);
-      initVideo();
-    });
-    
-    // Load video
-    await initVideo();
-    
-    // Load comments and likes
-    loadComments();
-    loadLikes();
-  }
+        function updateProgress() {
+            if (video.duration) {
+                const pct = (video.currentTime / video.duration) * 100;
+                progressFill.style.width = pct + '%';
+            }
+        }
 
-  // ============================
-  // INIT
-  // ============================
-  window.db = db;
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    smartLoad();
-  });
-</script>
+        // ===== URL PARAM TO UI =====
+        function populateFromUrl() {
+            const params = new URLSearchParams(window.location.search);
 
+            const title = params.get('title');
+            if (title) {
+                document.getElementById('videoTitle').textContent = decodeURIComponent(title);
+            }
+
+            const creator = params.get('creator');
+            if (creator) {
+                document.getElementById('creatorName').textContent = decodeURIComponent(creator);
+            }
+
+            const desc = params.get('desc');
+            if (desc) {
+                document.getElementById('videoDescription').textContent = decodeURIComponent(desc);
+            }
+
+            const views = params.get('views');
+            if (views) {
+                document.getElementById('viewCount').textContent = views + ' views';
+            }
+
+            const likes = params.get('likes');
+            if (likes) {
+                document.getElementById('likeCount').textContent = likes;
+            }
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            populateFromUrl();
+            loadVideo();
+        });
+
+        // Expose for debugging
+        window.ddottPlayer = { loadVideo, getVideoUrl, video };
+    </script>
 </body>
 </html>
