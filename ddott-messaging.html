@@ -77,8 +77,8 @@ body { background: #000; color: #fff; font-family: 'Segoe UI', system-ui, sans-s
 .msg-wrapper.received { align-self: flex-start; }
 @keyframes msgPop { from { opacity: 0; transform: translateY(8px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 .msg-bubble { padding: 10px 14px; border-radius: 16px; font-size: 0.9rem; line-height: 1.4; word-break: break-word; }
-.msg-bubble.sent { background: linear-gradient(135deg, #00f5ff22, #bf00ff22); border: 1px solid #00f5ff33; border-bottom-right-radius: 4px; }
-.msg-bubble.received { background: #0d0d0d; border: 1px solid #1a1a1a; border-bottom-left-radius: 4px; }
+.msg-bubble.sent { background: linear-gradient(135deg, #00f5ff22, #bf00ff22); border: 1px solid #00f5ff33; align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg-bubble.received { background: #0d0d0d; border: 1px solid #1a1a1a; align-self: flex-start; border-bottom-left-radius: 4px; }
 .msg-time { font-size: 0.7rem; color: #555; margin-top: 3px; padding: 0 4px; }
 .msg-wrapper.sent .msg-time { text-align: right; }
 .msg-wrapper.received .msg-time { text-align: left; }
@@ -200,19 +200,27 @@ body { background: #000; color: #fff; font-family: 'Segoe UI', system-ui, sans-s
 </div>
 
 <script>
+/* ============================================================
+   DDOTT.TV MESSAGES — Full Production Code
+   Supabase backend with real-time chat, XSS protection,
+   online status, unread counts, and tab filtering.
+   ============================================================ */
+
 /* ─── State ─── */
 let currentUser = null
 let currentChatUser = null
 let realtimeChannel = null
-let allChats = []        // { otherId, username, lastMsg, unreadCount, isCreator }
+let allChats = []        // { otherId, username, displayName, lastMsg, unreadCount, isCreator, lastSeen }
 let activeFilter = 'all' // 'all' | 'creators' | 'fans'
 let searchQuery = ''
 let searchDebounce = null
+let lastSeenInterval = null
 const MSG_PAGE_SIZE = 50
+const ONLINE_THRESHOLD_MS = 120000 // 2 minutes
 
 const COLORS = ['#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffd93d','#6c5ce7','#fd79a8','#00b894']
 
-/* ─── Security ─── */
+/* ─── Security: XSS Escape ─── */
 function escapeHtml(str) {
   if (str == null) return ''
   return String(str)
@@ -241,18 +249,46 @@ function timeAgo(dateStr) {
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' })
 }
 
+function isUserOnline(lastSeen) {
+  if (!lastSeen) return false
+  const last = new Date(lastSeen).getTime()
+  return (Date.now() - last) < ONLINE_THRESHOLD_MS
+}
+
 /* ─── Init ─── */
 async function init() {
   try {
     const { data: { user } } = await db.auth.getUser()
     if (!user) { window.location.href = 'ddott-login.html'; return }
     currentUser = user
+
+    // Ping last_seen immediately
+    await pingLastSeen()
+
+    // Heartbeat every 30 seconds
+    lastSeenInterval = setInterval(pingLastSeen, 30000)
+
+    // Ping on visibility change
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) pingLastSeen()
+    })
+
     await loadConversations()
   } catch (err) {
     console.error('Init failed:', err)
     showEmptyState('⚠️', 'Failed to load', 'Please refresh and try again.')
   }
 }
+
+async function pingLastSeen() {
+  if (!currentUser) return
+  try {
+    await db.rpc('update_last_seen', { user_id: currentUser.id })
+  } catch (err) {
+    // Silently fail — not critical
+  }
+}
+
 init().catch(console.error)
 
 /* ─── Load Conversations ─── */
@@ -378,12 +414,6 @@ function renderChatList() {
         </div>
       </div>`
   }).join('')
-}
-
-function isUserOnline(lastSeen) {
-  if (!lastSeen) return false
-  const last = new Date(lastSeen).getTime()
-  return (Date.now() - last) < 120000 // 2 minutes
 }
 
 function showEmptyState(icon, title, sub) {
@@ -666,6 +696,12 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && document.getElementById('chatWindow').classList.contains('open')) {
     closeChat()
   }
+})
+
+/* ─── Cleanup on page unload ─── */
+window.addEventListener('beforeunload', () => {
+  if (lastSeenInterval) clearInterval(lastSeenInterval)
+  if (realtimeChannel) db.removeChannel(realtimeChannel)
 })
 </script>
 </body>
