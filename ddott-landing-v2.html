@@ -22,6 +22,8 @@
   --gold: #ffd84d;
   --border-c: rgba(0,229,255,0.15);
   --border-p: rgba(180,79,255,0.15);
+  --red: #ff0050;
+  --red2: rgba(255,0,80,0.15);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -93,8 +95,6 @@ nav{
   background:radial-gradient(ellipse,rgba(180,79,255,0.1) 0%,transparent 70%);
   pointer-events:none;
 }
-
-/* Butterfly hero */
 .hero-butterfly{
   font-size:80px;
   display:block;margin-bottom:24px;
@@ -108,7 +108,6 @@ nav{
   50%{transform:translateY(-6px) rotate(-1deg) scale(0.98);}
   75%{transform:translateY(-16px) rotate(4deg) scale(1.03);}
 }
-
 .hero-eyebrow{
   position:relative;z-index:1;
   font-family:'Space Mono',monospace;
@@ -118,7 +117,6 @@ nav{
 }
 .hero-eyebrow::before,.hero-eyebrow::after{content:'';display:block;width:40px;height:1px;background:linear-gradient(to right,transparent,var(--cyan));}
 .hero-eyebrow::after{background:linear-gradient(to left,transparent,var(--cyan));}
-
 .hero-title{
   position:relative;z-index:1;
   font-family:'Orbitron',sans-serif;
@@ -141,21 +139,18 @@ nav{
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   display:block;
 }
-
 .hero-sub{
   position:relative;z-index:1;
   font-family:'Orbitron',sans-serif;
   font-size:14px;font-weight:600;letter-spacing:4px;text-transform:uppercase;
   color:var(--dim);margin-top:12px;margin-bottom:32px;
 }
-
 .hero-desc{
   position:relative;z-index:1;
   max-width:560px;font-size:16px;line-height:1.8;
   color:var(--dim);font-weight:300;margin-bottom:48px;
 }
 .hero-desc strong{color:var(--white);font-weight:600;}
-
 .hero-btns{position:relative;z-index:1;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:64px;}
 .btn-primary{
   font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
@@ -172,8 +167,6 @@ nav{
   transition:background .2s,transform .2s;text-decoration:none;display:inline-block;
 }
 .btn-outline:hover{background:var(--cyan2);transform:translateY(-2px);}
-
-/* Stats */
 .hero-stats{
   position:relative;z-index:1;
   display:flex;gap:48px;justify-content:center;flex-wrap:wrap;
@@ -251,8 +244,6 @@ section{padding:120px 48px;position:relative;z-index:1;}
 .feat-icon{font-size:32px;margin-bottom:20px;}
 .feat-card h3{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px;letter-spacing:.5px;}
 .feat-card p{font-size:14px;line-height:1.7;color:var(--dim);font-weight:300;}
-
-/* Spot payment visual */
 .spot-visual{background:var(--bg3);border:1px solid var(--border-c);padding:24px;}
 .spot-row{
   display:flex;align-items:center;justify-content:space-between;
@@ -276,8 +267,6 @@ section{padding:120px 48px;position:relative;z-index:1;}
 .emocoin{background:var(--bg);}
 .ec-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
 .ec-visual{position:relative;height:420px;display:flex;align-items:center;justify-content:center;}
-
-/* Wallet card */
 .wallet-card{
   width:280px;
   background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(180,79,255,0.08));
@@ -290,8 +279,6 @@ section{padding:120px 48px;position:relative;z-index:1;}
 .wc-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dimmer);margin-bottom:6px;}
 .wc-amount{font-family:'Orbitron',sans-serif;font-size:36px;font-weight:900;color:var(--white);letter-spacing:-1px;}
 .wc-butterfly{position:absolute;right:16px;top:16px;font-size:32px;opacity:0.6;animation:butterfly-float 4s ease-in-out infinite;}
-
-/* Orbit rings */
 .orbit{position:absolute;border-radius:50%;border:1px solid;animation:spin linear infinite;}
 .o1{width:320px;height:320px;border-color:rgba(0,229,255,0.1);animation-duration:10s;}
 .o2{width:380px;height:380px;border-color:rgba(180,79,255,0.08);animation-duration:15s;animation-direction:reverse;}
@@ -299,7 +286,6 @@ section{padding:120px 48px;position:relative;z-index:1;}
 .orbit-dot{position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;box-shadow:0 0 12px currentColor;}
 .o1 .orbit-dot{background:var(--cyan);color:var(--cyan);}
 .o2 .orbit-dot{background:var(--purple);color:var(--purple);}
-
 .ec-list{list-style:none;display:flex;flex-direction:column;gap:14px;}
 .ec-item{
   display:flex;align-items:center;gap:16px;
@@ -314,6 +300,97 @@ section{padding:120px 48px;position:relative;z-index:1;}
   text-shadow:0 0 12px rgba(0,229,255,0.5);
 }
 .ec-desc{font-size:13px;color:var(--dim);font-weight:300;}
+
+/* SAFETY SYSTEM */
+.safety{background:var(--bg2);}
+.safety-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:60px;background:var(--border-c);}
+.safety-card{
+  background:var(--bg2);padding:48px 40px;
+  position:relative;overflow:hidden;transition:background .3s;
+}
+.safety-card:hover{background:var(--bg3);}
+.safety-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--red),var(--purple));
+  transform:scaleX(0);transform-origin:left;transition:transform .4s;
+}
+.safety-card:hover::before{transform:scaleX(1);}
+.safety-icon{font-size:36px;margin-bottom:20px;display:block;}
+.safety-card h3{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;margin-bottom:14px;color:var(--white);}
+.safety-card p{font-size:13px;line-height:1.8;color:var(--dim);font-weight:300;margin-bottom:10px;}
+.safety-card ul{list-style:none;margin-top:12px;}
+.safety-card li{font-size:12px;color:var(--dim);padding:6px 0;border-bottom:1px solid rgba(0,229,255,0.06);display:flex;align-items:center;gap:8px;}
+.safety-card li::before{content:'›';color:var(--red);font-weight:700;font-size:14px;}
+.sos-live{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:4px;
+  background:var(--red2);border:1px solid rgba(255,0,80,0.4);
+  font-family:'Orbitron',sans-serif;font-size:9px;color:var(--red);letter-spacing:1px;margin-top:8px;
+}
+.sos-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink .8s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* EDUCATION */
+.education{background:var(--bg);}
+.edu-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.edu-visual{
+  position:relative;
+  background:linear-gradient(135deg,rgba(0,229,255,0.05),rgba(180,79,255,0.05));
+  border:1px solid var(--border-c);padding:40px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+}
+.edu-teacher{font-size:48px;animation:butterfly-float 4s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(0,229,255,0.4));}
+.edu-greeting{
+  font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:var(--cyan);letter-spacing:2px;text-align:center;
+}
+.edu-subtitle{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);text-align:center;letter-spacing:1px;}
+.edu-features{display:flex;flex-direction:column;gap:12px;margin-top:20px;width:100%;}
+.edu-feat{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;background:var(--bg3);border:1px solid var(--border-c);
+  transition:border-color .2s;
+}
+.edu-feat:hover{border-color:var(--purple);}
+.edu-feat-icon{font-size:20px;}
+.edu-feat-text{font-size:12px;color:var(--dim);font-weight:300;}
+.edu-feat-text strong{color:var(--white);font-weight:600;}
+
+/* PIPELINE */
+.pipeline{background:var(--bg2);}
+.pipeline-wrap{position:relative;margin-top:60px;}
+.pipeline-line{
+  position:absolute;left:50%;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,var(--cyan),var(--purple),var(--magenta));
+  transform:translateX(-50%);
+}
+.pipeline-item{
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:60px;position:relative;}
+.pipeline-item:nth-child(even) .pipeline-content{grid-column:1;}
+.pipeline-item:nth-child(even) .pipeline-visual{grid-column:2;}
+.pipeline-item:nth-child(odd) .pipeline-content{grid-column:2;}
+.pipeline-item:nth-child(odd) .pipeline-visual{grid-column:1;}
+.pipeline-dot{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:16px;height:16px;border-radius:50%;background:var(--bg2);
+  border:2px solid var(--cyan);box-shadow:0 0 12px var(--cyan);z-index:2;
+}
+.pipeline-visual{
+  background:var(--bg3);border:1px solid var(--border-c);padding:32px;
+  display:flex;align-items:center;justify-content:center;min-height:180px;
+}
+.pipeline-visual-inner{font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.pipeline-phase{
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:8px;
+}
+.pipeline-title{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;margin-bottom:12px;color:var(--white);}
+.pipeline-desc{font-size:14px;line-height:1.7;color:var(--dim);font-weight:300;}
+.pipeline-status{
+  display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+  padding:4px 12px;border-radius:4px;background:rgba(0,229,255,0.08);border:1px solid var(--border-c);
+  font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:1px;
+}
 
 /* COMMUNITY CINEMA */
 .cinema{background:var(--bg2);}
@@ -388,6 +465,78 @@ section{padding:120px 48px;position:relative;z-index:1;}
 .eco-card:nth-child(4) .eco-tag{color:var(--gold);}
 .eco-desc{font-size:13px;line-height:1.6;color:var(--dim);font-weight:300;}
 
+/* CREATOR PROFILE */
+.creator-section{background:var(--bg);}
+.creator-banner{
+  position:relative;height:200px;overflow:hidden;
+  background:linear-gradient(135deg,#000510 0%,#0a0030 40%,#1a0040 70%,#000820 100%);
+  border-radius:12px;margin-bottom:-50px;
+}
+.creator-banner-fx{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 30% 60%,rgba(0,229,255,0.15) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 40%,rgba(180,79,255,0.2) 0%,transparent 50%),
+    radial-gradient(ellipse at 60% 80%,rgba(255,45,155,0.1) 0%,transparent 40%);
+  animation:bannerPulse 6s ease-in-out infinite alternate;
+}
+@keyframes bannerPulse{from{opacity:0.7;}to{opacity:1;}}
+.creator-banner-text{
+  position:absolute;bottom:16px;right:20px;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;
+  color:rgba(0,229,255,0.4);text-transform:uppercase;
+}
+.creator-profile-wrap{
+  position:relative;z-index:2;
+  display:flex;gap:24px;align-items:flex-end;padding:0 20px;
+}
+.creator-pfp{
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  font-size:40px;border:3px solid var(--bg);flex-shrink:0;
+  box-shadow:0 0 20px rgba(0,229,255,0.2),0 0 40px rgba(180,79,255,0.1);
+}
+.creator-info-flex{flex:1;min-width:0;padding-bottom:8px;}
+.creator-name-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.creator-name{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--white);}
+.creator-handle{font-size:13px;color:var(--dim);margin-bottom:8px;}
+.creator-handle span{color:var(--cyan);}
+.creator-bio{font-size:13px;color:var(--dim);line-height:1.6;max-width:500px;}
+.creator-actions{display:flex;gap:10px;align-items:center;}
+.sub-btn{
+  padding:10px 24px;border-radius:8px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border:none;color:var(--bg);
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;
+  cursor:none;transition:all .3s;
+}
+.sub-btn:hover{transform:scale(1.05);}
+.creator-stats-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  margin-top:40px;
+}
+.creator-stat-card{
+  padding:16px 12px;background:var(--bg2);border-radius:10px;
+  border:1px solid var(--border-c);text-align:center;transition:all .2s;
+}
+.creator-stat-card:hover{border-color:rgba(0,229,255,0.3);}
+.creator-stat-val{
+  font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:4px;
+}
+.creator-stat-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dimmer);}
+.creator-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;}
+.creator-tag{
+  padding:5px 12px;border-radius:20px;
+  background:rgba(0,229,255,0.06);border:1px solid var(--border-c);
+  font-size:11px;color:var(--cyan);font-family:'Space Mono',monospace;letter-spacing:1px;
+  transition:all .2s;
+}
+.creator-tag:hover{background:rgba(0,229,255,0.12);box-shadow:0 0 12px rgba(0,229,255,0.1);}
+
 /* CTA */
 .cta-section{
   padding:120px 48px;
@@ -430,7 +579,7 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
   .steps-grid{grid-template-columns:1fr 1fr;}
   .feat-grid{grid-template-columns:1fr;}
   .feat-card.wide{grid-column:span 1;grid-template-columns:1fr;}
-  .ec-inner,.cinema-inner{grid-template-columns:1fr;}
+  .ec-inner,.cinema-inner,.edu-inner{grid-template-columns:1fr;}
   .ec-visual{height:280px;}
   .modes-grid{grid-template-columns:1fr;}
   .eco-grid{grid-template-columns:1fr 1fr;}
@@ -438,8 +587,15 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
   .footer-links{flex-direction:column;gap:32px;}
   .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
   .hero-stats{gap:24px;}
+  .safety-grid{grid-template-columns:1fr;}
+  .pipeline-item{grid-template-columns:1fr !important;gap:24px;}
+  .pipeline-item .pipeline-content,.pipeline-item .pipeline-visual{grid-column:1 !important;}
+  .pipeline-line,.pipeline-dot{display:none;}
+  .creator-profile-wrap{flex-direction:column;align-items:flex-start;}
+  .creator-stats-bar{grid-template-columns:repeat(2,1fr);}
 }
 </style>
+<base target="_blank">
 </head>
 <body>
 <div class="cur" id="cur"></div>
@@ -453,8 +609,10 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
   </div>
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
-    <li><a href="#earn">Earn</a></li>
+    <li><a href="#safety">Safety</a></li>
+    <li><a href="#education">Learn</a></li>
     <li><a href="#cinema">Cinema</a></li>
+    <li><a href="#pipeline">Vision</a></li>
     <li><a href="#ecosystem">Ecosystem</a></li>
   </ul>
   <button class="nav-cta">Join Waitlist</button>
@@ -477,7 +635,7 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
   <div class="hero-sub">Your Community, Your Cinema</div>
 
   <p class="hero-desc">
-    Our community-owned ecosystem — upload and start making <strong>spot payments</strong>, in open-commission proceeds for creators. <strong>Emo AI integrated</strong> across every screen.
+    Our community-owned ecosystem — upload and start making <strong>spot payments</strong>, in open-commission proceeds for creators. <strong>Emo AI integrated</strong> across every screen. From Dubai to every village on Earth.
   </p>
 
   <div class="hero-btns">
@@ -515,6 +673,8 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
     <div class="tick-item"><span>📺</span> 100+ Offline Screens</div><div class="tick-dot"></div>
     <div class="tick-item"><span>🔗</span> 5 Chain Wallet</div><div class="tick-dot"></div>
     <div class="tick-item"><span>🎭</span> Script Verification</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🛡</span> SOS Safety Gate</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>📚</span> Hey Students Learning</div><div class="tick-dot"></div>
     <div class="tick-item"><span>⚡</span> Spot Payments Live</div><div class="tick-dot"></div>
     <div class="tick-item"><span>🦋</span> Emo AI Integrated</div><div class="tick-dot"></div>
     <div class="tick-item"><span>🎬</span> Community Governed</div><div class="tick-dot"></div>
@@ -522,6 +682,8 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
     <div class="tick-item"><span>📺</span> 100+ Offline Screens</div><div class="tick-dot"></div>
     <div class="tick-item"><span>🔗</span> 5 Chain Wallet</div><div class="tick-dot"></div>
     <div class="tick-item"><span>🎭</span> Script Verification</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>🛡</span> SOS Safety Gate</div><div class="tick-dot"></div>
+    <div class="tick-item"><span>📚</span> Hey Students Learning</div><div class="tick-dot"></div>
   </div>
 </div>
 
@@ -529,7 +691,7 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
 <section class="hiw" id="features">
   <div class="s-label">How It Works</div>
   <h2 class="s-title">Four Steps to <span class="c">Earning</span></h2>
-  <p class="s-sub">Upload, watch, earn Emo Coins — convert via TheWall to crypto and real money. We'll guide you every step.</p>
+  <p class="s-sub">Upload, watch, earn Emo Coins — convert via TheWall to crypto and real money. We guide you every step.</p>
   <div class="steps-grid">
     <div class="step fade-up">
       <div class="step-n">01</div>
@@ -547,7 +709,7 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
       <div class="step-n">03</div>
       <div class="step-icon">🪙</div>
       <h3>Stack Emo Coins</h3>
-      <p>Coins stack in your Ddott Wallet. Subscribe to creators, tip them, or hold until you're ready to convert.</p>
+      <p>Coins stack in your Ddott Wallet. Subscribe to creators, tip them, or hold until you are ready to convert.</p>
     </div>
     <div class="step fade-up" style="transition-delay:.3s">
       <div class="step-n">04</div>
@@ -632,7 +794,7 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
     <div class="fade-up">
       <div class="s-label">Emo Coin Economy</div>
       <h2 class="s-title">Real Value.<br><span class="c">Real Rewards.</span></h2>
-      <p class="s-sub" style="margin-bottom:32px;">Every interaction earns coins. Every coin converts to real money via TheWall. We'll show you exactly how — step by step.</p>
+      <p class="s-sub" style="margin-bottom:32px;">Every interaction earns coins. Every coin converts to real money via TheWall. We show you exactly how — step by step.</p>
       <ul class="ec-list">
         <li class="ec-item"><span class="ec-badge">+1</span><span class="ec-desc">Daily login streak — automatic every day</span></li>
         <li class="ec-item"><span class="ec-badge">+⏱</span><span class="ec-desc">Watch time rewards — earn as you watch</span></li>
@@ -644,13 +806,100 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
   </div>
 </section>
 
+<!-- SAFETY SYSTEM -->
+<section class="safety" id="safety">
+  <div class="s-label">Safety System</div>
+  <h2 class="s-title">Emowall SOS & <span class="c">Child Protection</span></h2>
+  <p class="s-sub">Safety is not a feature. It is the foundation. Emowall AI 2.0 powers a real-time emergency protocol integrated directly into Ddott TV's network.</p>
+  <div class="safety-grid">
+    <div class="safety-card fade-up">
+      <span class="safety-icon">🛡</span>
+      <h3>SOS Live Streaming Gate</h3>
+      <p>When an SOS trigger activates on a connected device, the system requires encrypted app-approval via the Emowall companion app. After parental biometric or PIN clearance, an encrypted live stream routes directly to Ddott.TV's network.</p>
+      <div class="sos-live"><div class="sos-dot"></div>LIVE PROTOCOL</div>
+    </div>
+    <div class="safety-card fade-up" style="transition-delay:.1s">
+      <span class="safety-icon">🔐</span>
+      <h3>Encrypted Approval Chain</h3>
+      <p>Multi-layer encryption at every step. Parental biometric or PIN clearance required before any stream goes live. No bypass. No backdoors. Verified by design.</p>
+      <ul>
+        <li>Device-level SOS trigger detection</li>
+        <li>Companion app encrypted handshake</li>
+        <li>Biometric / PIN parental clearance</li>
+        <li>Encrypted stream routing to Ddott TV</li>
+      </ul>
+    </div>
+    <div class="safety-card fade-up" style="transition-delay:.2s">
+      <span class="safety-icon">🤖</span>
+      <h3>Background AI Shield</h3>
+      <p>Continuous AI monitoring filters malicious inputs, bot commands, and injection attempts before they reach the network. Exact location data remains confidential — accessible to legal authorities only.</p>
+      <ul>
+        <li>Real-time malicious input filtering</li>
+        <li>Bot command detection & blocking</li>
+        <li>Injection attempt prevention</li>
+        <li>Confidential location encryption</li>
+      </ul>
+    </div>
+    <div class="safety-card fade-up" style="transition-delay:.3s">
+      <span class="safety-icon">🌐</span>
+      <h3>Decentralized Crowd Support</h3>
+      <p>Community-powered rescue coordination. When SOS is active, decentralized crowd-support aids real-time rescue efforts without exposing sensitive victim data. The network helps, anonymously.</p>
+      <ul>
+        <li>Anonymous crowd-support routing</li>
+        <li>Rescue coordination aid</li>
+        <li>Zero data exposure to public</li>
+        <li>Legal authority integration ready</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION LAYER -->
+<section class="education" id="education">
+  <div class="edu-inner">
+    <div class="fade-up">
+      <div class="s-label">Education Layer</div>
+      <h2 class="s-title">"Hey Students" <span class="c">Learning Node</span></h2>
+      <p class="s-sub" style="margin-bottom:24px;">Free Decentralized Global Learning. Inspired by the warmth of a real classroom teacher greeting students. A zero-cost platform bridging knowledge gaps for students and technical learners worldwide.</p>
+      <p class="s-sub">Connects TheWall's 5-chain crypto wallet backend to Community AI Teacher nodes. Students explore cryptographic ledger math, functional programming, and algorithmic architecture — no fees, no limits. Learning checkpoints unlock ecosystem utility tokens.</p>
+    </div>
+    <div class="edu-visual fade-up" style="transition-delay:.15s">
+      <div class="edu-teacher">👨‍🏫</div>
+      <div class="edu-greeting">"Hey Students, Good Morning!"</div>
+      <div class="edu-subtitle">Free · Decentralized · Global</div>
+      <div class="edu-features">
+        <div class="edu-feat">
+          <span class="edu-feat-icon">🔗</span>
+          <span class="edu-feat-text"><strong>TheWall Backend</strong> — 5-chain wallet integration</span>
+        </div>
+        <div class="edu-feat">
+          <span class="edu-feat-icon">🧠</span>
+          <span class="edu-feat-text"><strong>AI Teacher Nodes</strong> — Community-powered instruction</span>
+        </div>
+        <div class="edu-feat">
+          <span class="edu-feat-icon">📐</span>
+          <span class="edu-feat-text"><strong>Ledger Math</strong> — Cryptographic architecture</span>
+        </div>
+        <div class="edu-feat">
+          <span class="edu-feat-icon">💻</span>
+          <span class="edu-feat-text"><strong>Functional Programming</strong> — Algorithmic thinking</span>
+        </div>
+        <div class="edu-feat">
+          <span class="edu-feat-icon">🪙</span>
+          <span class="edu-feat-text"><strong>Checkpoint Tokens</strong> — Learn & earn utility tokens</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- COMMUNITY CINEMA -->
 <section class="cinema" id="cinema">
   <div class="cinema-inner">
     <div class="fade-up">
       <div class="s-label">Community Cinema</div>
       <h2 class="s-title">Beyond the <span class="c">Screen</span></h2>
-      <p class="s-sub" style="margin-bottom:24px;">Ddott TV isn't just online. We bring community cinema to villages, towns, and cities — offline screens where communities gather to watch Ddott Originals together. Spot Payments work offline too.</p>
+      <p class="s-sub" style="margin-bottom:24px;">Ddott TV is not just online. We bring community cinema to villages, towns, and cities — offline screens where communities gather to watch Ddott Originals together. Spot Payments work offline too.</p>
       <p class="s-sub">"Your Community, Your Cinema" — everywhere, for everyone.</p>
     </div>
     <div class="cinema-visual fade-up" style="transition-delay:.15s">
@@ -660,7 +909,6 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
         <div class="cinema-badge">⚡ Spot Payment</div>
       </div>
       <div class="cinema-audience">
-        <!-- 30 audience dots -->
         <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
         <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
         <div class="aud-dot"></div><div class="aud-dot"></div><div class="aud-dot"></div>
@@ -734,6 +982,136 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
   </div>
 </section>
 
+<!-- CREATOR PROFILE -->
+<section class="creator-section">
+  <div class="s-label">Creator Channel</div>
+  <h2 class="s-title">Your Channel. <span class="c">Your Empire.</span></h2>
+  <p class="s-sub" style="margin-bottom:40px;">Every creator gets a verified channel, real-time stats, Emo Coin earnings, and direct fan tipping — all from a single profile.</p>
+
+  <div class="creator-banner">
+    <div class="creator-banner-fx"></div>
+    <div class="creator-banner-text">DWIN UNIVERSE · DUBAI 🇦🇪</div>
+  </div>
+
+  <div class="creator-profile-wrap">
+    <div class="creator-pfp">🦋</div>
+    <div class="creator-info-flex">
+      <div class="creator-name-row">
+        <div class="creator-name">Emobies05</div>
+      </div>
+      <div class="creator-handle">@divin · <span>Dwin Universe</span> · Dubai 🇦🇪</div>
+      <div class="creator-bio">Self-taught dev building entire ecosystems from a phone 📱 — TheWall Web3 wallet, Emowall AI, Emobies repair platform & Ddott TV. Termux + Acode + sheer will. 🔥</div>
+      <div class="creator-tags">
+        <span class="creator-tag">#Web3</span>
+        <span class="creator-tag">#MobileDev</span>
+        <span class="creator-tag">#BuildInPublic</span>
+        <span class="creator-tag">#AI</span>
+        <span class="creator-tag">#DwinUniverse</span>
+        <span class="creator-tag">#Termux</span>
+      </div>
+    </div>
+    <div class="creator-actions">
+      <button class="sub-btn">SUBSCRIBE</button>
+    </div>
+  </div>
+
+  <div class="creator-stats-bar">
+    <div class="creator-stat-card">
+      <div class="creator-stat-val" id="statSubs">—</div>
+      <div class="creator-stat-label">Subscribers</div>
+    </div>
+    <div class="creator-stat-card">
+      <div class="creator-stat-val" id="statVideos">—</div>
+      <div class="creator-stat-label">Videos</div>
+    </div>
+    <div class="creator-stat-card">
+      <div class="creator-stat-val" id="statViews">—</div>
+      <div class="creator-stat-label">Total Views</div>
+    </div>
+    <div class="creator-stat-card">
+      <div class="creator-stat-val" id="statLikes">—</div>
+      <div class="creator-stat-label">Like Rate</div>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE VISION -->
+<section class="pipeline" id="pipeline">
+  <div class="s-label">Pipeline Vision</div>
+  <h2 class="s-title">Building the <span class="c">Future</span></h2>
+  <p class="s-sub">From Dubai to the world. Our roadmap is public, transparent, and community-driven.</p>
+
+  <div class="pipeline-wrap">
+    <div class="pipeline-line"></div>
+
+    <div class="pipeline-item fade-up">
+      <div class="pipeline-visual">
+        <div class="pipeline-visual-inner">01</div>
+      </div>
+      <div class="pipeline-dot"></div>
+      <div class="pipeline-content">
+        <div class="pipeline-phase">Completed</div>
+        <div class="pipeline-title">Emowall App Verification</div>
+        <div class="pipeline-desc">SOS approval process complete. Ddott TV live SOS routing module functional. Data validation filter system built-in and pre-configured at system level.</div>
+        <div class="pipeline-status">✓ LIVE</div>
+      </div>
+    </div>
+
+    <div class="pipeline-item fade-up">
+      <div class="pipeline-content">
+        <div class="pipeline-phase">Completed</div>
+        <div class="pipeline-title">TheWall 5-Chain Wallet</div>
+        <div class="pipeline-desc">ETH, SOL, MON, ARB, BTC support active. Web3 wallet backend connected to Community AI Teacher nodes. Perfect PWA score achieved.</div>
+        <div class="pipeline-status">✓ LIVE</div>
+      </div>
+      <div class="pipeline-dot"></div>
+      <div class="pipeline-visual">
+        <div class="pipeline-visual-inner">02</div>
+      </div>
+    </div>
+
+    <div class="pipeline-item fade-up">
+      <div class="pipeline-visual">
+        <div class="pipeline-visual-inner">03</div>
+      </div>
+      <div class="pipeline-dot"></div>
+      <div class="pipeline-content">
+        <div class="pipeline-phase">Active</div>
+        <div class="pipeline-title">Ddott TV Platform Launch</div>
+        <div class="pipeline-desc">Video upload, streaming, Spot Payments, and Creator Studio dashboard. Script verification pipeline active. 100+ offline cinema screens planned.</div>
+        <div class="pipeline-status">● BUILDING</div>
+      </div>
+    </div>
+
+    <div class="pipeline-item fade-up">
+      <div class="pipeline-content">
+        <div class="pipeline-phase">Next</div>
+        <div class="pipeline-title">"Hey Students" Global Node</div>
+        <div class="pipeline-desc">Free decentralized learning network. AI Teacher nodes powered by Emowall. Learning checkpoints unlock ecosystem utility tokens. No fees. No limits.</div>
+        <div class="pipeline-status">○ NEXT</div>
+      </div>
+      <div class="pipeline-dot"></div>
+      <div class="pipeline-visual">
+        <div class="pipeline-visual-inner">04</div>
+      </div>
+    </div>
+
+    <div class="pipeline-item fade-up">
+      <div class="pipeline-visual">
+        <div class="pipeline-visual-inner">05</div>
+      </div>
+      <div class="pipeline-dot"></div>
+      <div class="pipeline-content">
+        <div class="pipeline-phase">Vision</div>
+        <div class="pipeline-title">Community Cinema Worldwide</div>
+        <div class="pipeline-desc">Offline screens in every village, town, and city. Ddott Originals screened locally with global Spot Payment support. Your community, your cinema — everywhere.</div>
+        <div class="pipeline-status">○ VISION</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="cta-section">
   <span class="cta-butterfly">🦋</span>
@@ -775,6 +1153,15 @@ footer{background:var(--bg);border-top:1px solid var(--border-c);padding:60px 48
         </ul>
       </div>
       <div class="footer-col">
+        <h4>Safety & Learn</h4>
+        <ul>
+          <li><a href="#">SOS Safety Gate</a></li>
+          <li><a href="#">Child Protection</a></li>
+          <li><a href="#">Hey Students</a></li>
+          <li><a href="#">AI Teacher Nodes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
         <h4>Company</h4>
         <ul>
           <li><a href="#">About</a></li>
@@ -798,7 +1185,7 @@ const ring = document.getElementById('curRing');
 let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
 (function animRing(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
-document.querySelectorAll('a,button,.feat-card,.step,.mode-card,.eco-card,.spot-row').forEach(el=>{
+document.querySelectorAll('a,button,.feat-card,.step,.mode-card,.eco-card,.spot-row,.safety-card,.edu-feat,.creator-stat-card,.pipeline-visual').forEach(el=>{
   el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';ring.style.width='48px';ring.style.height='48px';});
   el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';ring.style.width='32px';ring.style.height='32px';});
 });
@@ -817,11 +1204,6 @@ document.querySelectorAll('.feat-card').forEach(card=>{
 // Scroll fade
 const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:0.1});
 document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
-
-// Cat chips interactive
-document.querySelectorAll('.cat-chip').forEach(c=>{
-  c.addEventListener('click',()=>{document.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');});
-});
 </script>
 </body>
 </html>
