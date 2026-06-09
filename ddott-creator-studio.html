@@ -288,8 +288,8 @@ async function loadMyVideos() {
     console.log('Supabase not available, using sample data:', err.message);
   }
 
-  // Fallback: Show sample videos
-  renderVideos(SAMPLE_VIDEOS);
+  // No DB connection — show empty state
+  renderVideos([]);
 }
 
 function renderVideos(videos) {
@@ -444,7 +444,7 @@ async function publishVideo() {
       btn.disabled = false;
       document.getElementById('successCard').classList.remove('show');
       statusMsg.style.display = 'none';
-      showTab('myvideos', document.querySelectorAll('.tab')[1]);
+      showTab('myVideos', document.querySelectorAll('.tab')[1]);
     }, 2000);
 
   } catch (err) {
@@ -470,7 +470,7 @@ async function publishVideo() {
     <span class="nav-icon">🌐</span>
     <span>COMMUNITY</span>
   </a>
-  <a href="#" class="nav-item">
+  <a href="ddott-emo-coins.html" class="nav-item">
     <span class="nav-icon">🪙</span>
     <span>COINS</span>
   </a>
