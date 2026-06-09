@@ -125,6 +125,8 @@
   .flash-overlay { position:fixed; inset:0; z-index:150; background:var(--darker); opacity:0; pointer-events:none; transition:opacity 0.12s ease; }
   .flash-overlay.on { opacity:0.4; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 </head>
 <body>
 
@@ -239,7 +241,7 @@
 
 <script>
   const pages = {
-    home:'ddott-home-v2.html', feed:'ddott-home-v2.html', community:'ddott-community.html', player:'ddott-player-v2.html',
+    home:'ddott-home-v2.html', feed:'ddott-home-v2.html', community:'ddott-community.html', player:'ddott-player-v3.html',
     channel:'ddott-creator-channel.html', messages:'ddott-messaging.html',
     coins:'ddott-emo-coins.html', ai:'ddott-ai-butterfly.html',
     studio:'/studio', landing:'ddott-landing-v2.html'
