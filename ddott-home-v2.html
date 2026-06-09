@@ -478,13 +478,13 @@ function openPlayer(url, title, creator, category, id) {
 // Real videos patch - inject after page loads
 document.addEventListener('DOMContentLoaded', async () => {
   const s = window.supabase.createClient('https://havmduragglvstlxrgag.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q')
-  const {data} = await s.from('videos').select('*').order('created_at',{ascending:false}).limit(20)
+  const {data} = await s.from('videos').select('*, profiles(display_name, username, avatar_url)').order('created_at',{ascending:false}).limit(20)
   if(!data||!data.length) return
   const grid = document.querySelector('.video-grid') || document.querySelector('.videos') || document.querySelector('.feed') || document.querySelector('.content')
   if(!grid) return
   const html = data.map(v=>`
     <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden;margin-bottom:12px;">
-      <div onclick="openPlayer('${v.video_url}','${v.title}','${v.user_id}','${v.category}','${v.id}')" style="width:100%;height:180px;background:#000;cursor:pointer;position:relative;"><video src="${v.video_url}" style="width:100%;height:180px;object-fit:cover;" preload="metadata"></video><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;">▶️</div></div>
+      <div onclick="openPlayer('${v.video_url}','${v.title}','${v.profiles?.display_name || v.profiles?.username || "Creator"}','${v.category}','${v.id}')" style="width:100%;height:180px;background:#000;cursor:pointer;position:relative;"><video src="${v.video_url}" style="width:100%;height:180px;object-fit:cover;" preload="metadata"></video><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;">▶️</div></div>
       <div style="padding:12px;">
         <div style="font-weight:bold;margin-bottom:4px;">${v.title}</div>
         <div style="color:#666;font-size:0.8rem;">${v.category} · 👁 ${v.views||0} · 👍 ${v.likes||0}</div>
@@ -517,12 +517,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 <script>
 async function loadRealVideos() {
   try {
-    const { data } = await db.from('videos').select('*').order('created_at',{ascending:false}).limit(10);
+    const { data } = await db.from('videos').select('*, profiles(display_name, username, avatar_url)').order('created_at',{ascending:false}).limit(10);
     if (!data || !data.length) return;
     const grid = document.getElementById('video-grid');
     if (!grid) return;
     const realHtml = data.map(v => `
-      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','Creator','${v.category}','${v.id}')">
+      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','${v.profiles?.display_name || v.profiles?.username || "Creator"}','${v.category}','${v.id}')">
         <div class="vc-thumb">
           <video src="${v.video_url}" style="width:100%;height:100%;object-fit:cover;" preload="none"></video>
           <div class="vc-earn">+5🪙</div>
@@ -660,13 +660,13 @@ function openPlayer(url, title, creator, category, id) {
 // Real videos patch - inject after page loads
 document.addEventListener('DOMContentLoaded', async () => {
   const s = window.supabase.createClient('https://havmduragglvstlxrgag.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q')
-  const {data} = await s.from('videos').select('*').order('created_at',{ascending:false}).limit(20)
+  const {data} = await s.from('videos').select('*, profiles(display_name, username, avatar_url)').order('created_at',{ascending:false}).limit(20)
   if(!data||!data.length) return
   const grid = document.querySelector('.video-grid') || document.querySelector('.videos') || document.querySelector('.feed') || document.querySelector('.content')
   if(!grid) return
   const html = data.map(v=>`
     <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden;margin-bottom:12px;">
-      <div onclick="openPlayer('${v.video_url}','${v.title}','${v.user_id}','${v.category}','${v.id}')" style="width:100%;height:180px;background:#000;cursor:pointer;position:relative;"><video src="${v.video_url}" style="width:100%;height:180px;object-fit:cover;" preload="metadata"></video><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;">▶️</div></div>
+      <div onclick="openPlayer('${v.video_url}','${v.title}','${v.profiles?.display_name || v.profiles?.username || "Creator"}','${v.category}','${v.id}')" style="width:100%;height:180px;background:#000;cursor:pointer;position:relative;"><video src="${v.video_url}" style="width:100%;height:180px;object-fit:cover;" preload="metadata"></video><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;">▶️</div></div>
       <div style="padding:12px;">
         <div style="font-weight:bold;margin-bottom:4px;">${v.title}</div>
         <div style="color:#666;font-size:0.8rem;">${v.category} · 👁 ${v.views||0} · 👍 ${v.likes||0}</div>
@@ -699,12 +699,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 <script>
 async function loadRealVideos() {
   try {
-    const { data } = await db.from('videos').select('*').order('created_at',{ascending:false}).limit(10);
+    const { data } = await db.from('videos').select('*, profiles(display_name, username, avatar_url)').order('created_at',{ascending:false}).limit(10);
     if (!data || !data.length) return;
     const grid = document.getElementById('video-grid');
     if (!grid) return;
     const realHtml = data.map(v => `
-      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','Creator','${v.category}','${v.id}')">
+      <div class="vcard" onclick="openPlayer('${v.video_url}','${v.title}','${v.profiles?.display_name || v.profiles?.username || "Creator"}','${v.category}','${v.id}')">
         <div class="vc-thumb">
           <video src="${v.video_url}" style="width:100%;height:100%;object-fit:cover;" preload="none"></video>
           <div class="vc-earn">+5🪙</div>

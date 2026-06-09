@@ -699,6 +699,10 @@
             video.load();
 
             // Set new source
+            // Fix Cloudinary URL for mobile compatibility
+            if (currentVideoUrl && currentVideoUrl.includes('cloudinary.com') && currentVideoUrl.includes('/upload/') && !currentVideoUrl.includes('f_mp4')) {
+                currentVideoUrl = currentVideoUrl.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
+            }
             video.src = currentVideoUrl;
             video.load();
 
