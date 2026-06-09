@@ -1,14 +1,18 @@
-const CACHE = 'ddott-tv-v5';
+const CACHE = 'ddott-tv-v6';
 const FILES = [
-  '/ddott-tv-app.html',
+  '/',
+  '/index.html',
   '/ddott-home-v2.html',
   '/ddott-player-v2.html',
+  '/ddott-shorts.html',
   '/ddott-creator-channel.html',
   '/ddott-messaging.html',
   '/ddott-emo-coins.html',
   '/ddott-ai-butterfly.html',
   '/ddott-creator-studio.html',
-  '/ddott-landing-v2.html'
+  '/ddott-landing-v2.html',
+  '/supabase-config.js',
+  '/auth.js'
 ];
 
 self.addEventListener('install', e => {
