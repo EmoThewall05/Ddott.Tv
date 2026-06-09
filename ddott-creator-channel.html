@@ -540,7 +540,7 @@
 </head>
 <body>
 
-<<nav>
+<nav>
   <div class="logo">DDOTT<span>.</span>TV</div>
   <div class="nav-right">
     <div class="nav-icon">🔍</div>
@@ -816,13 +816,52 @@
    *  Example: pass a creatorId and fetch from your DB.
    */
   async function loadChannel(creatorId) {
-    // Replace with your real DB client
-    // const { data: profile } = await db.from('profiles').select('*').eq('id', creatorId).single();
-    // const { data: videos } = await db.from('videos').select('*').eq('user_id', creatorId).order('created_at',{ascending:false});
-    // etc.
+    if (typeof db === 'undefined') return;
 
-    // --- Stub: call your API here and pass results to the renderers above ---
-    console.log('Load channel:', creatorId);
+    // Load profile
+    const { data: profile } = await db.from('profiles')
+      .select('*').eq('id', creatorId).single();
+
+    if (profile) {
+      document.getElementById('creatorName').textContent = profile.username || profile.full_name || 'Creator';
+      document.getElementById('creatorHandle').innerHTML = `@<span>${profile.username || ''}</span>`;
+      document.getElementById('creatorBio').textContent = profile.bio || '';
+      document.getElementById('statSubs').textContent = fmtNum(profile.subscribers || 0);
+      document.getElementById('statViews').textContent = fmtNum(profile.total_views || 0);
+      document.getElementById('emoCoins').textContent = fmtNum(profile.emo_coins || 0);
+      if (profile.is_verified) document.getElementById('verifiedBadge').style.display = 'flex';
+      document.getElementById('bannerText').textContent = profile.username || '';
+      renderAbout({
+        bio: profile.bio,
+        location: profile.location,
+        joined: profile.created_at ? new Date(profile.created_at).toLocaleDateString() : null,
+        emo_coins: profile.emo_coins
+      });
+    }
+
+    // Load videos
+    const { data: videos } = await db.from('videos')
+      .select('*').eq('user_id', creatorId)
+      .order('created_at', { ascending: false });
+
+    if (videos) {
+      document.getElementById('statVideos').textContent = fmtNum(videos.length);
+      renderVideos(videos);
+      if (videos[0]) {
+        document.getElementById('latestContainer').innerHTML = `
+          <div class="featured-card" onclick="playVideo('${videos[0].id}')">
+            <div class="fc-thumb">
+              <div class="fc-thumb-inner">🎬</div>
+              <div class="fc-overlay"></div>
+              <div class="fc-badge">LATEST</div>
+            </div>
+            <div class="fc-info">
+              <div class="fc-title">${escapeHtml(videos[0].title || 'Untitled')}</div>
+              <div class="fc-meta"><span>${fmtNum(videos[0].views || 0)} views</span><span>${timeAgo(videos[0].created_at)}</span></div>
+            </div>
+          </div>`;
+      }
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
