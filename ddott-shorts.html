@@ -2,211 +2,1125 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Ddott.TV Shorts — Watch, Create, Earn.">
 <title>Ddott.TV — Shorts</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="auth.js"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;background:#000;font-family:'Exo 2',sans-serif;color:#fff;}
-.app{position:relative;width:100%;height:100vh;max-width:480px;margin:0 auto;overflow:hidden;}
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
 
-/* TOPBAR */
-.topbar{position:absolute;top:0;left:0;right:0;z-index:50;padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent);}
-.logo{font-size:20px;font-weight:900;background:linear-gradient(135deg,#00e5ff,#b44fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.tabs{display:flex;gap:16px;}
-.tab{font-size:13px;color:rgba(255,255,255,0.5);cursor:pointer;padding-bottom:2px;}
-.tab.active{color:#fff;border-bottom:2px solid #b44fff;}
-.coins-badge{background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:20px;padding:4px 10px;font-size:12px;color:#ffd700;display:flex;align-items:center;gap:4px;}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* FEED */
-.feed{width:100%;height:100vh;overflow:hidden;position:relative;}
-.video-card{position:absolute;inset:0;display:flex;align-items:flex-end;cursor:pointer;transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);}
-.video-card.prev{transform:translateY(-100%);}
-.video-card.active{transform:translateY(0);}
-.video-card.next{transform:translateY(100%);}
-.video-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0010,#12002a);display:flex;align-items:center;justify-content:center;}
-.video-bg video{width:100%;height:100%;object-fit:cover;}
-.play-btn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(255,255,255,0.3);}
+:root {
+  --g1: #0a0010;
+  --g2: #12002a;
+  --cosmic1: #7c3aed;
+  --cosmic2: #db2777;
+  --cosmic3: #0ea5e9;
+  --cosmic4: #f59e0b;
+  --gold: #ffd700;
+  --text: #f0e8ff;
+  --muted: #9b8bb4;
+  --surface: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.1);
+}
 
-/* RIGHT ACTIONS */
-.actions{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:10;}
-.action-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
-.action-icon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.2);}
-.action-icon.liked{background:rgba(255,45,155,0.3);border-color:#ff2d9b;}
-.action-count{font-size:11px;color:rgba(255,255,255,0.8);}
+html, body {
+  height: 100%;
+  background: var(--g1);
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* BOTTOM INFO */
-.info{position:absolute;bottom:70px;left:12px;right:70px;z-index:10;}
-.username{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
-.follow-btn{font-size:11px;border:1px solid #fff;border-radius:12px;padding:2px 10px;cursor:pointer;}
-.caption{font-size:13px;line-height:1.4;margin-bottom:6px;color:rgba(255,255,255,0.9);}
-.hashtags{font-size:12px;color:#00e5ff;}
-.swipe-hint{text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;}
+/* ── App Shell ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 100%;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
 
-/* BOTTOM NAV */
-.bottomnav{position:absolute;bottom:0;left:0;right:0;height:60px;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-around;border-top:1px solid rgba(255,255,255,0.1);z-index:50;}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:rgba(255,255,255,0.4);font-size:10px;}
-.nav-item.active{color:#b44fff;}
-.nav-item span{font-size:20px;}
-.nav-plus{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#b44fff);display:flex;align-items:center;justify-content:center;font-size:24px;color:#000;font-weight:900;}
+/* ── Top Bar ── */
+.topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  padding: max(16px, env(safe-area-inset-top)) 20px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(10,0,16,0.95) 0%, transparent 100%);
+}
 
-/* LOADING */
-.loading{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:12px;}
-.loading-text{color:rgba(255,255,255,0.5);font-size:14px;}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #a78bfa, #f472b6, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.tabs { display: flex; gap: 18px; font-size: 14px; font-weight: 500; }
+.tab {
+  color: var(--muted);
+  cursor: pointer;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.tab.active { color: white; border-bottom-color: #a78bfa; }
+
+.emo-coins {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* ── Category Filter ── */
+.cat-bar {
+  position: absolute;
+  top: 60px;
+  left: 0; right: 0;
+  z-index: 45;
+  padding: 8px 16px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+.cat-bar::-webkit-scrollbar { display: none; }
+
+.cat-pill {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
+  white-space: nowrap;
+}
+.cat-pill.active {
+  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(219,39,119,0.2));
+  border-color: rgba(167,139,250,0.5);
+  color: white;
+  box-shadow: 0 0 12px rgba(124,58,237,0.2);
+}
+
+/* ── Feed ── */
+.feed {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin-top: 100px; /* space for topbar + categories */
+}
+
+.video-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.video-card.prev { transform: translateY(-100%); }
+.video-card.active { transform: translateY(0); z-index: 10; }
+.video-card.next { transform: translateY(100%); z-index: 5; }
+
+.video-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, var(--g1) 0%, var(--g2) 50%, #0d0020 100%);
+  overflow: hidden;
+}
+
+.video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-glow {
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 40px rgba(167,139,250,0.3);
+  transition: transform 0.2s;
+}
+.play-glow:active { transform: scale(0.92); }
+
+.video-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,0,16,0.95) 0%, rgba(10,0,16,0.5) 35%, transparent 65%);
+  pointer-events: none;
+}
+
+/* ── Info Panel ── */
+.info-panel {
+  position: relative;
+  z-index: 10;
+  padding: 0 16px 110px 16px;
+  width: calc(100% - 70px);
+}
+
+.creator-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.avatar::before {
+  content: ''; position: absolute; inset: -2px; border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.avatar-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: linear-gradient(135deg, #1e1040, #2d1060);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.creator-name { font-size: 14px; font-weight: 600; }
+
+.follow-btn {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  border: 1px solid rgba(167,139,250,0.5);
+  background: transparent; color: #a78bfa;
+  cursor: pointer; font-family: inherit; font-weight: 600;
+  transition: all 0.2s;
+}
+.follow-btn.following {
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  border-color: transparent; color: white;
+}
+
+.video-title {
+  font-size: 15px; font-weight: 500; line-height: 1.4;
+  margin-bottom: 8px; color: rgba(240,232,255,0.95);
+}
+
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: 11px; color: #a78bfa; font-weight: 500; }
+
+/* ── Side Actions ── */
+.side-actions {
+  position: absolute;
+  right: 14px; bottom: 120px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.action-icon {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s;
+  position: relative;
+}
+
+/* ── Hard Press Like ── */
+.like-btn .action-icon {
+  transition: transform 0.1s, border-color 0.3s, box-shadow 0.3s;
+}
+.like-btn.pressing .action-icon {
+  transform: scale(1.15);
+  border-color: rgba(219,39,119,0.6);
+}
+.like-btn.charging .action-icon {
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(255,215,0,0.4);
+  transform: scale(1.25);
+}
+.like-btn.super-liked .action-icon {
+  background: linear-gradient(135deg, #db2777, #f59e0b);
+  border-color: transparent;
+  box-shadow: 0 0 30px rgba(219,39,119,0.5);
+  animation: superLikePulse 1.5s ease-in-out infinite;
+}
+.like-btn.liked .action-icon {
+  border-color: rgba(219,39,119,0.5);
+  box-shadow: 0 0 20px rgba(219,39,119,0.3);
+}
+
+.action-count { font-size: 11px; font-weight: 600; color: rgba(240,232,255,0.8); }
+
+/* Charge ring */
+.charge-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.2s;
+  animation: spin 1s linear infinite;
+}
+.like-btn.charging .charge-ring { opacity: 1; }
+.like-btn.super-liked .charge-ring { opacity: 0; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes superLikePulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(219,39,119,0.4); }
+  50% { box-shadow: 0 0 40px rgba(255,215,0,0.6); }
+}
+
+/* Coin burst */
+.coin-burst {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  pointer-events: none;
+  animation: coinBurst 0.8s ease-out forwards;
+  z-index: 100;
+}
+@keyframes coinBurst {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  50% { opacity: 1; transform: translate(-50%, -180%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -300%) scale(0.8); }
+}
+
+/* Double tap heart */
+.double-tap-heart {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 80px;
+  pointer-events: none;
+  z-index: 80;
+  opacity: 0;
+}
+.double-tap-heart.show { animation: heartPop 0.8s ease-out forwards; }
+@keyframes heartPop {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.3); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  70% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* ── Progress Bar ── */
+.progress-bar {
+  position: absolute;
+  bottom: 100px; left: 16px; right: 16px;
+  z-index: 20;
+  height: 2px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a78bfa, #f472b6);
+  border-radius: 2px;
+  width: 0%;
+}
+
+/* ── Bottom Nav ── */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 50;
+  height: calc(85px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: linear-gradient(to top, rgba(10,0,16,0.98) 0%, rgba(10,0,16,0.85) 100%);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; padding: 8px 16px; border-radius: 12px;
+  transition: all 0.2s;
+}
+.nav-item.active .nav-icon {
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.nav-item.active .nav-label { color: #a78bfa; }
+.nav-icon { font-size: 22px; }
+.nav-label { font-size: 10px; font-weight: 500; color: var(--muted); }
+
+.upload-fab {
+  width: 48px; height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; cursor: pointer;
+  box-shadow: 0 0 20px rgba(124,58,237,0.4);
+  transition: transform 0.2s;
+}
+.upload-fab:active { transform: scale(0.92); }
+
+/* ── Empty State ── */
+.empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 15;
+  text-align: center;
+  padding: 40px;
+}
+.empty-icon { font-size: 64px; filter: drop-shadow(0 0 20px rgba(167,139,250,0.4)); }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+.empty-desc { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 280px; }
+.empty-btn {
+  margin-top: 8px;
+  padding: 12px 28px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  border: none; color: white;
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+}
+
+/* ── Forward Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(12px);
+  z-index: 200;
+  display: none; align-items: flex-end; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.modal-overlay.open { display: flex; opacity: 1; }
+
+.modal-sheet {
+  width: 100%; max-width: 420px;
+  background: linear-gradient(180deg, #12002a, #0a0010);
+  border-top: 1px solid rgba(167,139,250,0.2);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.share-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.share-option {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer;
+}
+.share-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  transition: all 0.2s;
+}
+.share-option:hover .share-icon { border-color: rgba(167,139,250,0.5); transform: scale(1.05); }
+.share-label { font-size: 11px; color: var(--muted); }
+
+.copy-link-row {
+  display: flex; gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.copy-link-row input {
+  flex: 1; background: transparent; border: none;
+  color: var(--text); font-family: inherit; font-size: 13px;
+  outline: none;
+}
+.copy-btn {
+  padding: 8px 16px; border-radius: 8px;
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  border: none; color: white;
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+
+.modal-close {
+  width: 100%; margin-top: 16px;
+  padding: 14px; border-radius: 12px;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--muted); font-family: inherit;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(124,58,237,0.95);
+  backdrop-filter: blur(12px);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 999;
+  white-space: nowrap;
+  border: 1px solid rgba(167,139,250,0.4);
+  box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 380px) {
+  .side-actions { right: 10px; gap: 16px; }
+  .info-panel { width: calc(100% - 60px); padding-bottom: 100px; }
+}
 </style>
+<base target="_blank">
 </head>
 <body>
-<div class="app">
-  <div class="loading" id="loading">
-    <div style="font-size:40px;">⚡</div>
-    <div class="loading-text">Loading Shorts...</div>
-  </div>
 
-  <!-- TOPBAR -->
+<div class="app" id="app">
+
+  <!-- Top Bar -->
   <div class="topbar">
     <div class="logo">Ddott.TV</div>
     <div class="tabs">
-      <div class="tab" onclick="location.href='ddott-home-v2.html'">For You</div>
+      <div class="tab">For You</div>
       <div class="tab active">Shorts</div>
       <div class="tab">Live</div>
     </div>
-    <div class="coins-badge">🪙 <span id="coinCount">0</span></div>
+    <div class="emo-coins">
+      <span>🪙</span>
+      <span id="coinCount">0</span>
+    </div>
   </div>
 
-  <!-- FEED -->
-  <div class="feed" id="feed"></div>
+  <!-- Category Filter -->
+  <div class="cat-bar" id="catBar">
+    <button class="cat-pill active" data-cat="all">All</button>
+    <button class="cat-pill" data-cat="cosmic">Cosmic</button>
+    <button class="cat-pill" data-cat="tech">Tech</button>
+    <button class="cat-pill" data-cat="music">Music</button>
+    <button class="cat-pill" data-cat="emo">EmoVibes</button>
+    <button class="cat-pill" data-cat="web3">Web3</button>
+    <button class="cat-pill" data-cat="dubai">Dubai</button>
+    <button class="cat-pill" data-cat="edu">Education</button>
+  </div>
 
-  <!-- BOTTOM NAV -->
-  <div class="bottomnav">
-    <div class="nav-item" onclick="location.href='index.html'"><span>🏠</span>Home</div>
-    <div class="nav-item" onclick="location.href='ddott-home-v2.html'"><span>🔍</span>Explore</div>
-    <div class="nav-item"><div class="nav-plus">+</div></div>
-    <div class="nav-item active"><span>⚡</span>Shorts</div>
-    <div class="nav-item" onclick="location.href='ddott-creator-channel.html'"><span>👤</span>Profile</div>
+  <!-- Feed -->
+  <div class="feed" id="feed">
+    <div class="double-tap-heart" id="dtHeart">💜</div>
+    <!-- Video cards injected here -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🦋</div>
+      <div class="empty-title">No Shorts Yet</div>
+      <div class="empty-desc">Be the first to upload. Your community is waiting.</div>
+      <button class="empty-btn" onclick="handleUpload()">Upload Short</button>
+    </div>
+  </div>
+
+  <!-- Side Actions -->
+  <div class="side-actions" id="sideActions">
+    <div class="action-btn like-btn" id="likeBtn">
+      <div class="action-icon">
+        <div class="charge-ring"></div>
+        <span id="likeIcon">🤍</span>
+      </div>
+      <span class="action-count" id="likeCount">0</span>
+    </div>
+    <div class="action-btn" onclick="handleCoin()">
+      <div class="action-icon" id="coinIcon">🪙</div>
+      <span class="action-count">Tip</span>
+    </div>
+    <div class="action-btn" onclick="handleComment()">
+      <div class="action-icon">💬</div>
+      <span class="action-count" id="commentCount">0</span>
+    </div>
+    <div class="action-btn" onclick="openForward()">
+      <div class="action-icon">↗</div>
+      <span class="action-count">Forward</span>
+    </div>
+    <div class="action-btn" onclick="handleSave()">
+      <div class="action-icon" id="saveIcon">🔖</div>
+      <span class="action-count" id="saveLabel">Save</span>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">🔍</div>
+      <div class="nav-label">Explore</div>
+    </div>
+    <div class="upload-fab" onclick="handleUpload()">＋</div>
+    <div class="nav-item active">
+      <div class="nav-icon">⚡</div>
+      <div class="nav-label">Shorts</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">Profile</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Forward Modal -->
+<div class="modal-overlay" id="forwardModal" onclick="closeForward(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-title">Forward Short</div>
+    <div class="share-grid">
+      <div class="share-option" onclick="nativeShare()">
+        <div class="share-icon">📱</div>
+        <span class="share-label">Native</span>
+      </div>
+      <div class="share-option" onclick="shareTo('whatsapp')">
+        <div class="share-icon">💬</div>
+        <span class="share-label">WhatsApp</span>
+      </div>
+      <div class="share-option" onclick="shareTo('x')">
+        <div class="share-icon">𝕏</div>
+        <span class="share-label">X / Twitter</span>
+      </div>
+      <div class="share-option" onclick="shareTo('telegram')">
+        <div class="share-icon">✈️</div>
+        <span class="share-label">Telegram</span>
+      </div>
+    </div>
+    <div class="copy-link-row">
+      <input type="text" id="shareLink" value="https://ddott.tv/s/" readonly>
+      <button class="copy-btn" onclick="copyLink()">Copy</button>
+    </div>
+    <button class="modal-close" onclick="closeForward()">Cancel</button>
   </div>
 </div>
 
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script>
-const SUPABASE_URL = window.SUPABASE_URL || 'https://havmduragglvstlxrgag.supabase.co';
-const SUPABASE_KEY = window.SUPABASE_ANON_KEY || '';
+/* ═══════════════════════════════════════════
+   DDOTT.TV SHORTS — CLEAN PRODUCTION SHELL
+   ═══════════════════════════════════════════ */
 
-let shorts = [];
-let current = 0;
-let startY = 0;
+// ── CONFIG ──
+const CONFIG = {
+  superLikeThreshold: 600,   // ms to trigger super like
+  superLikeReward: 5,        // coins awarded on super like
+  normalLikeReward: 1,       // coins awarded on normal like
+  tipCost: 10,               // coins to tip creator
+  followReward: 2,           // coins on first follow
+  swipeThreshold: 40,        // px
+  wheelCooldown: 600,        // ms
+  progressDuration: 12000,   // ms per short
+};
 
-async function loadShorts() {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/videos?is_short=eq.true&order=created_at.desc&limit=20`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-    });
-    const data = await res.json();
-    shorts = data.length ? data : getMockShorts();
-  } catch(e) {
-    shorts = getMockShorts();
-  }
+// ── STATE ──
+let videos = [];              // ← PLUG YOUR API HERE
+let currentIndex = 0;
+let coins = 0;
+let touchStartY = 0;
+let wheelCooldown = false;
+let toastTimer = null;
+
+// Per-video state (prevents farming)
+const videoState = new Map(); // videoId -> { liked, superLiked, saved, followed }
+
+// ── DOM REFS ──
+const feed = document.getElementById('feed');
+const emptyState = document.getElementById('emptyState');
+const progressFill = document.getElementById('progressFill');
+const coinCount = document.getElementById('coinCount');
+const likeBtn = document.getElementById('likeBtn');
+const likeIcon = document.getElementById('likeIcon');
+const likeCount = document.getElementById('likeCount');
+const saveIcon = document.getElementById('saveIcon');
+const saveLabel = document.getElementById('saveLabel');
+const dtHeart = document.getElementById('dtHeart');
+const toastEl = document.getElementById('toast');
+const forwardModal = document.getElementById('forwardModal');
+const shareLinkInput = document.getElementById('shareLink');
+
+// ── INITIALIZE ──
+function init() {
+  updateCoinDisplay();
   renderFeed();
-  document.getElementById('loading').style.display = 'none';
+  bindSwipe();
+  bindLikeHardPress();
+  bindCategories();
+  bindDoubleTap();
 }
 
-function getMockShorts() {
-  return [
-    { id:1, title:'The universe speaks in frequencies we forgot how to hear ✨', username:'cosmos.dwin', likes:14200, comments:843, video_url:null, tags:['DwinUniverse','Cosmic','EmoVibes'] },
-    { id:2, title:'Building an OTT platform from a phone 📱🔥', username:'thewin.dev', likes:8900, comments:421, video_url:null, tags:['DwinUniverse','DevLife','Ddott'] },
-    { id:3, title:'EmoCoins will change how Kerala earns 🪙', username:'emobies05', likes:22100, comments:1203, video_url:null, tags:['EmoCoins','Kerala','Web3'] },
-  ];
-}
-
-function formatNum(n) {
-  if(n >= 1000) return (n/1000).toFixed(1) + 'K';
-  return n;
-}
+// ── DATA / API LAYER ──
+// Replace this with your fetch call:
+// fetch('/api/shorts').then(r => r.json()).then(data => { videos = data; renderFeed(); });
 
 function renderFeed() {
-  const feed = document.getElementById('feed');
-  feed.innerHTML = '';
-  shorts.forEach((s, i) => {
-    const pos = i === current ? 'active' : i === current - 1 ? 'prev' : 'next';
-    const colors = ['#0a0010,#12002a','#001020,#002a1a','#100a00,#2a1500'];
-    const card = document.createElement('div');
-    card.className = `video-card ${pos}`;
-    card.innerHTML = `
-      <div class="video-bg" style="background:linear-gradient(135deg,${colors[i%3]})">
-        ${s.video_url ? `<video src="${s.video_url}" loop playsinline></video>` : `<div class="play-btn">▶️</div>`}
-      </div>
-      <div class="actions">
-        <div class="action-btn" onclick="toggleLike(${i},this)">
-          <div class="action-icon" id="like-${i}">🤍</div>
-          <div class="action-count" id="likecount-${i}">${formatNum(s.likes)}</div>
-        </div>
-        <div class="action-btn">
-          <div class="action-icon">🪙</div>
-          <div class="action-count">Tip</div>
-        </div>
-        <div class="action-btn">
-          <div class="action-icon">💬</div>
-          <div class="action-count">${formatNum(s.comments)}</div>
-        </div>
-        <div class="action-btn">
-          <div class="action-icon">↗️</div>
-          <div class="action-count">Share</div>
-        </div>
-        <div class="action-btn">
-          <div class="action-icon">🔖</div>
-          <div class="action-count">Save</div>
-        </div>
-      </div>
-      <div class="info">
-        <div class="username">@${s.username} <span class="follow-btn">Follow</span></div>
-        <div class="caption">${s.title}</div>
-        <div class="hashtags">${(s.tags||[]).map(t=>'#'+t).join(' ')}</div>
-        <div class="swipe-hint">↑ Swipe up</div>
-      </div>
-    `;
+  // Clear existing cards (keep empty-state and dtHeart)
+  const cards = feed.querySelectorAll('.video-card');
+  cards.forEach(c => c.remove());
+
+  if (!videos.length) {
+    emptyState.style.display = 'flex';
+    document.getElementById('sideActions').style.display = 'none';
+    progressFill.style.display = 'none';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  document.getElementById('sideActions').style.display = 'flex';
+  progressFill.style.display = 'block';
+
+  videos.forEach((v, i) => {
+    const card = buildCard(v, i);
     feed.appendChild(card);
   });
 
-  // Touch swipe
-  feed.ontouchstart = e => startY = e.touches[0].clientY;
-  feed.ontouchend = e => {
-    const diff = startY - e.changedTouches[0].clientY;
-    if(diff > 50 && current < shorts.length - 1) { current++; renderFeed(); }
-    if(diff < -50 && current > 0) { current--; renderFeed(); }
-  };
+  updateCards();
+  startProgress();
 }
 
-function toggleLike(i, el) {
-  const icon = document.getElementById(`like-${i}`);
-  const count = document.getElementById(`likecount-${i}`);
-  if(icon.classList.contains('liked')) {
-    icon.classList.remove('liked');
-    icon.innerHTML = '🤍';
-    shorts[i].likes--;
-  } else {
-    icon.classList.add('liked');
-    icon.innerHTML = '❤️';
-    shorts[i].likes++;
+function buildCard(v, i) {
+  const el = document.createElement('div');
+  el.className = `video-card card-${i} ${i === 0 ? 'active' : 'next'}`;
+  el.dataset.index = i;
+  el.dataset.id = v.id || i;
+
+  // Generate initials for avatar
+  const initial = v.creatorName ? v.creatorName[1].toUpperCase() : '🦋';
+
+  el.innerHTML = `
+    <div class="video-bg">
+      <div class="video-placeholder">
+        <div class="play-glow">▶</div>
+      </div>
+    </div>
+    <div class="video-overlay"></div>
+    <div class="info-panel">
+      <div class="creator-row">
+        <div class="avatar"><div class="avatar-inner">${initial}</div></div>
+        <span class="creator-name">${v.creatorName || '@creator'}</span>
+        <button class="follow-btn" onclick="toggleFollow(this, '${v.id || i}')">Follow</button>
+      </div>
+      <div class="video-title">${v.title || ''}</div>
+      <div class="tags">${(v.tags || []).map(t => `<span class="tag">#${t}</span>`).join('')}</div>
+    </div>
+  `;
+  return el;
+}
+
+// ── NAVIGATION ──
+function updateCards() {
+  const cards = feed.querySelectorAll('.video-card');
+  cards.forEach((el, i) => {
+    el.classList.remove('active', 'prev', 'next');
+    if (i === currentIndex) el.classList.add('active');
+    else if (i < currentIndex) el.classList.add('prev');
+    else el.classList.add('next');
+  });
+
+  // Reset side actions for new video
+  const vidId = videos[currentIndex]?.id || currentIndex;
+  const state = videoState.get(vidId) || {};
+
+  likeBtn.className = 'action-btn like-btn';
+  if (state.superLiked) likeBtn.classList.add('super-liked');
+  else if (state.liked) likeBtn.classList.add('liked');
+
+  likeIcon.textContent = state.superLiked ? '💛' : (state.liked ? '💜' : '🤍');
+  likeCount.textContent = formatCount(videos[currentIndex]?.likes || 0);
+  saveIcon.textContent = state.saved ? '🔖' : '🔖';
+  saveIcon.style.filter = state.saved ? 'hue-rotate(270deg) brightness(1.5)' : '';
+  saveLabel.textContent = state.saved ? 'Saved' : 'Save';
+  document.getElementById('commentCount').textContent = formatCount(videos[currentIndex]?.comments || 0);
+
+  startProgress();
+}
+
+function goNext() {
+  if (currentIndex < videos.length - 1) {
+    currentIndex++;
+    updateCards();
   }
-  count.textContent = formatNum(shorts[i].likes);
 }
 
-// Load coins
-async function loadCoins() {
-  try {
-    const user = JSON.parse(localStorage.getItem('ddott_user') || '{}');
-    if(user.id) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}&select=emo_coins`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      });
-      const data = await res.json();
-      if(data[0]) document.getElementById('coinCount').textContent = data[0].emo_coins || 0;
+function goPrev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    updateCards();
+  }
+}
+
+function bindSwipe() {
+  feed.addEventListener('touchstart', e => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  feed.addEventListener('touchend', e => {
+    const diff = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(diff) > CONFIG.swipeThreshold) {
+      diff > 0 ? goNext() : goPrev();
     }
-  } catch(e) {}
+  });
+
+  feed.addEventListener('wheel', e => {
+    if (wheelCooldown) return;
+    wheelCooldown = true;
+    e.deltaY > 0 ? goNext() : goPrev();
+    setTimeout(() => wheelCooldown = false, CONFIG.wheelCooldown);
+  });
 }
 
-loadShorts();
-loadCoins();
+// ── DOUBLE TAP TO LIKE ──
+function bindDoubleTap() {
+  let tapCount = 0, tapTimer = null;
+  feed.addEventListener('click', e => {
+    if (e.target.closest('.action-btn') || e.target.closest('.follow-btn') || e.target.closest('.upload-fab')) return;
+    tapCount++;
+    if (tapCount === 1) {
+      tapTimer = setTimeout(() => tapCount = 0, 300);
+    } else if (tapCount === 2) {
+      clearTimeout(tapTimer);
+      tapCount = 0;
+      triggerLike('normal');
+      showDoubleTapHeart();
+    }
+  });
+}
+
+function showDoubleTapHeart() {
+  dtHeart.classList.remove('show');
+  void dtHeart.offsetWidth;
+  dtHeart.classList.add('show');
+  setTimeout(() => dtHeart.classList.remove('show'), 800);
+}
+
+// ── HARD PRESS LIKE ──
+function bindLikeHardPress() {
+  let pressTimer = null;
+  let isPressed = false;
+  let pressStart = 0;
+  let raf = null;
+
+  const start = (e) => {
+    if (e.button && e.button !== 0) return;
+    isPressed = true;
+    pressStart = Date.now();
+    likeBtn.classList.add('pressing');
+
+    const tick = () => {
+      if (!isPressed) return;
+      const elapsed = Date.now() - pressStart;
+      if (elapsed > CONFIG.superLikeThreshold && !likeBtn.classList.contains('charging')) {
+        likeBtn.classList.add('charging');
+        if (navigator.vibrate) navigator.vibrate(40);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  };
+
+  const end = () => {
+    if (!isPressed) return;
+    isPressed = false;
+    cancelAnimationFrame(raf);
+    likeBtn.classList.remove('pressing');
+
+    const elapsed = Date.now() - pressStart;
+    const wasCharging = likeBtn.classList.contains('charging');
+    likeBtn.classList.remove('charging');
+
+    if (wasCharging && elapsed >= CONFIG.superLikeThreshold) {
+      triggerLike('super');
+    } else if (elapsed < 200) {
+      triggerLike('normal');
+    } else {
+      triggerLike('normal');
+    }
+  };
+
+  const cancel = () => {
+    isPressed = false;
+    cancelAnimationFrame(raf);
+    likeBtn.classList.remove('pressing', 'charging');
+  };
+
+  likeBtn.addEventListener('touchstart', start, { passive: true });
+  likeBtn.addEventListener('touchend', end);
+  likeBtn.addEventListener('touchcancel', cancel);
+  likeBtn.addEventListener('mousedown', start);
+  likeBtn.addEventListener('mouseup', end);
+  likeBtn.addEventListener('mouseleave', cancel);
+}
+
+// ── LIKE LOGIC ──
+function triggerLike(mode) {
+  const vid = videos[currentIndex];
+  if (!vid) return;
+  const vidId = vid.id || currentIndex;
+  let state = videoState.get(vidId) || {};
+
+  if (mode === 'super') {
+    if (state.superLiked) return; // already super liked
+    state.superLiked = true;
+    state.liked = true;
+    vid.likes = (vid.likes || 0) + CONFIG.superLikeReward;
+    coins += CONFIG.superLikeReward;
+    showToast(`Super Like! +${CONFIG.superLikeReward} 🪙`);
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+    likeBtn.classList.add('super-liked');
+    likeIcon.textContent = '💛';
+    showCoinBurst(likeBtn);
+  } else {
+    if (state.liked && !state.superLiked) {
+      // Unlike
+      state.liked = false;
+      vid.likes = Math.max(0, (vid.likes || 0) - 1);
+      likeBtn.classList.remove('liked', 'super-liked');
+      likeIcon.textContent = '🤍';
+    } else if (state.superLiked) {
+      // Downgrade from super to normal? Or keep super? Let's keep super.
+      return;
+    } else {
+      // Normal like
+      state.liked = true;
+      vid.likes = (vid.likes || 0) + 1;
+      coins += CONFIG.normalLikeReward;
+      likeBtn.classList.add('liked');
+      likeIcon.textContent = '💜';
+      showCoinBurst(likeBtn);
+    }
+  }
+
+  videoState.set(vidId, state);
+  updateCoinDisplay();
+  likeCount.textContent = formatCount(vid.likes);
+}
+
+// ── OTHER ACTIONS ──
+function handleCoin() {
+  if (coins < CONFIG.tipCost) { showToast('Not enough Emo Coins!'); return; }
+  coins -= CONFIG.tipCost;
+  updateCoinDisplay();
+  showCoinBurst(document.getElementById('coinIcon'));
+  showToast(`${CONFIG.tipCost} 🪙 tipped to creator!`);
+}
+
+function handleComment() { showToast('Comments coming soon 💬'); }
+
+function handleSave() {
+  const vid = videos[currentIndex];
+  if (!vid) return;
+  const vidId = vid.id || currentIndex;
+  let state = videoState.get(vidId) || {};
+  state.saved = !state.saved;
+  videoState.set(vidId, state);
+  saveIcon.style.filter = state.saved ? 'hue-rotate(270deg) brightness(1.5)' : '';
+  saveLabel.textContent = state.saved ? 'Saved' : 'Save';
+  showToast(state.saved ? 'Saved to your list ✨' : 'Removed from saved');
+}
+
+function toggleFollow(btn, vidId) {
+  const isFollowing = btn.classList.contains('following');
+  btn.classList.toggle('following');
+  btn.textContent = isFollowing ? 'Follow' : 'Following';
+
+  let state = videoState.get(vidId) || {};
+  if (!isFollowing && !state.followed) {
+    state.followed = true;
+    coins += CONFIG.followReward;
+    updateCoinDisplay();
+    showToast(`+${CONFIG.followReward} 🪙 for following!`);
+  }
+  videoState.set(vidId, state);
+}
+
+function handleUpload() { showToast('Upload your short 🎬 — coming soon!'); }
+
+// ── FORWARD / SHARE ──
+function openForward() {
+  const vid = videos[currentIndex];
+  const slug = vid?.id ? `s/${vid.id}` : '';
+  shareLinkInput.value = `https://ddott.tv/${slug}`;
+  forwardModal.classList.add('open');
+}
+
+function closeForward(e) {
+  if (!e || e.target === forwardModal) forwardModal.classList.remove('open');
+}
+
+function nativeShare() {
+  const vid = videos[currentIndex];
+  if (navigator.share) {
+    navigator.share({
+      title: vid?.title || 'Ddott.TV Short',
+      text: 'Check this out on Ddott.TV',
+      url: shareLinkInput.value
+    }).catch(() => {});
+  } else {
+    showToast('Native share not available');
+  }
+  closeForward();
+}
+
+function shareTo(platform) {
+  const url = encodeURIComponent(shareLinkInput.value);
+  const text = encodeURIComponent('Check this out on Ddott.TV');
+  const links = {
+    whatsapp: `https://wa.me/?text=${text}%20${url}`,
+    x: `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+    telegram: `https://t.me/share/url?url=${url}&text=${text}`
+  };
+  if (links[platform]) window.open(links[platform], '_blank');
+  closeForward();
+}
+
+function copyLink() {
+  shareLinkInput.select();
+  document.execCommand('copy');
+  showToast('Link copied to clipboard!');
+}
+
+// ── CATEGORIES ──
+function bindCategories() {
+  document.querySelectorAll('.cat-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const cat = pill.dataset.cat;
+      showToast(`Loading ${cat}...`);
+      // TODO: fetch(`/api/shorts?category=${cat}`).then(...)
+    });
+  });
+}
+
+// ── UTILITIES ──
+function updateCoinDisplay() {
+  coinCount.textContent = coins.toLocaleString();
+}
+
+function showCoinBurst(el) {
+  const burst = document.createElement('div');
+  burst.className = 'coin-burst';
+  burst.textContent = '🪙';
+  el.style.position = 'relative';
+  el.appendChild(burst);
+  setTimeout(() => burst.remove(), 800);
+}
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2000);
+}
+
+function formatCount(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toString();
+}
+
+let progressRaf;
+function startProgress() {
+  cancelAnimationFrame(progressRaf);
+  progressFill.style.width = '0%';
+  const start = performance.now();
+  const tick = (now) => {
+    const elapsed = now - start;
+    const pct = Math.min((elapsed / CONFIG.progressDuration) * 100, 100);
+    progressFill.style.width = pct + '%';
+    if (pct < 100) progressRaf = requestAnimationFrame(tick);
+  };
+  progressRaf = requestAnimationFrame(tick);
+}
+
+// ── BOOT ──
+init();
 </script>
 </body>
 </html>
