@@ -551,6 +551,7 @@ html, body {
 }
 </style>
 <base target="_blank">
+<script src="supabase-config.js"></script>
 </head>
 <body>
 
@@ -628,7 +629,7 @@ html, body {
 
   <!-- Bottom Nav -->
   <div class="bottom-nav">
-    <div class="nav-item">
+    <div class="nav-item" onclick="window.location='ddott-home-v2.html'">
       <div class="nav-icon">🏠</div>
       <div class="nav-label">Home</div>
     </div>
@@ -738,14 +739,13 @@ function init() {
 // ── DATA / API LAYER ──
 async function loadShorts() {
   try {
-    const res = await fetch('https://havmduragglvstlxrgag.supabase.co/rest/v1/videos?is_short=eq.true&order=created_at.desc&limit=20&select=*,profiles(display_name,username)', {
-      headers: {
-        'apikey': 'sb_publishable_FInfsWgHml8s9dAwiAKQ4Q_Tf79f3G8',
-        'Authorization': 'Bearer sb_publishable_FInfsWgHml8s9dAwiAKQ4Q_Tf79f3G8'
-      }
-    });
-    const data = await res.json();
-    if (data && data.length) {
+    if (typeof db === 'undefined') { renderFeed(); return; }
+    const { data, error } = await db.from('videos')
+      .select('*, profiles(display_name, username)')
+      .eq('is_short', true)
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (!error && data && data.length) {
       videos = data.map(v => ({
         id: v.id,
         title: v.title || '',
