@@ -728,7 +728,7 @@ const shareLinkInput = document.getElementById('shareLink');
 // ── INITIALIZE ──
 function init() {
   updateCoinDisplay();
-  renderFeed();
+  loadShorts();
   bindSwipe();
   bindLikeHardPress();
   bindCategories();
@@ -736,8 +736,31 @@ function init() {
 }
 
 // ── DATA / API LAYER ──
-// Replace this with your fetch call:
-// fetch('/api/shorts').then(r => r.json()).then(data => { videos = data; renderFeed(); });
+async function loadShorts() {
+  try {
+    const res = await fetch('https://havmduragglvstlxrgag.supabase.co/rest/v1/videos?is_short=eq.true&order=created_at.desc&limit=20&select=*,profiles(display_name,username)', {
+      headers: {
+        'apikey': 'sb_publishable_FInfsWgHml8s9dAwiAKQ4Q_Tf79f3G8',
+        'Authorization': 'Bearer sb_publishable_FInfsWgHml8s9dAwiAKQ4Q_Tf79f3G8'
+      }
+    });
+    const data = await res.json();
+    if (data && data.length) {
+      videos = data.map(v => ({
+        id: v.id,
+        title: v.title || '',
+        video_url: v.video_url,
+        creatorName: v.profiles?.display_name || v.profiles?.username || 'Creator',
+        likes: v.likes || 0,
+        comments: v.comments_count || 0,
+        tags: v.tags ? (Array.isArray(v.tags) ? v.tags : v.tags.split(',')) : []
+      }));
+    }
+  } catch(e) {
+    console.error('Shorts load error:', e);
+  }
+  renderFeed();
+}
 
 function renderFeed() {
   // Clear existing cards (keep empty-state and dtHeart)
