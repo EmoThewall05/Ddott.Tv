@@ -2,7 +2,7 @@
   "name": "Ddott TV",
   "short_name": "Ddott TV",
   "description": "The streaming platform that pays everyone",
-  "start_url": "/ddott-tv-app.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#020008",
   "theme_color": "#00f5ff",
