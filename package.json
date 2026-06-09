@@ -1,8 +1,0 @@
-{
-  "name": "ddott-tv",
-  "version": "1.0.0",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.107.0",
-    "node-fetch": "2.6.9"
-  }
-}
