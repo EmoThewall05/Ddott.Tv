@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott.TV — Shorts</title>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;background:#000;font-family:'Exo 2',sans-serif;color:#fff;}
+.app{position:relative;width:100%;height:100vh;max-width:480px;margin:0 auto;overflow:hidden;}
+
+/* TOPBAR */
+.topbar{position:absolute;top:0;left:0;right:0;z-index:50;padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent);}
+.logo{font-size:20px;font-weight:900;background:linear-gradient(135deg,#00e5ff,#b44fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tabs{display:flex;gap:16px;}
+.tab{font-size:13px;color:rgba(255,255,255,0.5);cursor:pointer;padding-bottom:2px;}
+.tab.active{color:#fff;border-bottom:2px solid #b44fff;}
+.coins-badge{background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:20px;padding:4px 10px;font-size:12px;color:#ffd700;display:flex;align-items:center;gap:4px;}
+
+/* FEED */
+.feed{width:100%;height:100vh;overflow:hidden;position:relative;}
+.video-card{position:absolute;inset:0;display:flex;align-items:flex-end;cursor:pointer;transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);}
+.video-card.prev{transform:translateY(-100%);}
+.video-card.active{transform:translateY(0);}
+.video-card.next{transform:translateY(100%);}
+.video-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0010,#12002a);display:flex;align-items:center;justify-content:center;}
+.video-bg video{width:100%;height:100%;object-fit:cover;}
+.play-btn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(255,255,255,0.3);}
+
+/* RIGHT ACTIONS */
+.actions{position:absolute;right:12px;bottom:120px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:10;}
+.action-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.action-icon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.2);}
+.action-icon.liked{background:rgba(255,45,155,0.3);border-color:#ff2d9b;}
+.action-count{font-size:11px;color:rgba(255,255,255,0.8);}
+
+/* BOTTOM INFO */
+.info{position:absolute;bottom:70px;left:12px;right:70px;z-index:10;}
+.username{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.follow-btn{font-size:11px;border:1px solid #fff;border-radius:12px;padding:2px 10px;cursor:pointer;}
+.caption{font-size:13px;line-height:1.4;margin-bottom:6px;color:rgba(255,255,255,0.9);}
+.hashtags{font-size:12px;color:#00e5ff;}
+.swipe-hint{text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;}
+
+/* BOTTOM NAV */
+.bottomnav{position:absolute;bottom:0;left:0;right:0;height:60px;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-around;border-top:1px solid rgba(255,255,255,0.1);z-index:50;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:rgba(255,255,255,0.4);font-size:10px;}
+.nav-item.active{color:#b44fff;}
+.nav-item span{font-size:20px;}
+.nav-plus{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#b44fff);display:flex;align-items:center;justify-content:center;font-size:24px;color:#000;font-weight:900;}
+
+/* LOADING */
+.loading{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:12px;}
+.loading-text{color:rgba(255,255,255,0.5);font-size:14px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="loading" id="loading">
+    <div style="font-size:40px;">⚡</div>
+    <div class="loading-text">Loading Shorts...</div>
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">Ddott.TV</div>
+    <div class="tabs">
+      <div class="tab" onclick="location.href='ddott-home-v2.html'">For You</div>
+      <div class="tab active">Shorts</div>
+      <div class="tab">Live</div>
+    </div>
+    <div class="coins-badge">🪙 <span id="coinCount">0</span></div>
+  </div>
+
+  <!-- FEED -->
+  <div class="feed" id="feed"></div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottomnav">
+    <div class="nav-item" onclick="location.href='index.html'"><span>🏠</span>Home</div>
+    <div class="nav-item" onclick="location.href='ddott-home-v2.html'"><span>🔍</span>Explore</div>
+    <div class="nav-item"><div class="nav-plus">+</div></div>
+    <div class="nav-item active"><span>⚡</span>Shorts</div>
+    <div class="nav-item" onclick="location.href='ddott-creator-channel.html'"><span>👤</span>Profile</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = window.SUPABASE_URL || 'https://havmduragglvstlxrgag.supabase.co';
+const SUPABASE_KEY = window.SUPABASE_ANON_KEY || '';
+
+let shorts = [];
+let current = 0;
+let startY = 0;
+
+async function loadShorts() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/videos?is_short=eq.true&order=created_at.desc&limit=20`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    shorts = data.length ? data : getMockShorts();
+  } catch(e) {
+    shorts = getMockShorts();
+  }
+  renderFeed();
+  document.getElementById('loading').style.display = 'none';
+}
+
+function getMockShorts() {
+  return [
+    { id:1, title:'The universe speaks in frequencies we forgot how to hear ✨', username:'cosmos.dwin', likes:14200, comments:843, video_url:null, tags:['DwinUniverse','Cosmic','EmoVibes'] },
+    { id:2, title:'Building an OTT platform from a phone 📱🔥', username:'thewin.dev', likes:8900, comments:421, video_url:null, tags:['DwinUniverse','DevLife','Ddott'] },
+    { id:3, title:'EmoCoins will change how Kerala earns 🪙', username:'emobies05', likes:22100, comments:1203, video_url:null, tags:['EmoCoins','Kerala','Web3'] },
+  ];
+}
+
+function formatNum(n) {
+  if(n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n;
+}
+
+function renderFeed() {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
+  shorts.forEach((s, i) => {
+    const pos = i === current ? 'active' : i === current - 1 ? 'prev' : 'next';
+    const colors = ['#0a0010,#12002a','#001020,#002a1a','#100a00,#2a1500'];
+    const card = document.createElement('div');
+    card.className = `video-card ${pos}`;
+    card.innerHTML = `
+      <div class="video-bg" style="background:linear-gradient(135deg,${colors[i%3]})">
+        ${s.video_url ? `<video src="${s.video_url}" loop playsinline></video>` : `<div class="play-btn">▶️</div>`}
+      </div>
+      <div class="actions">
+        <div class="action-btn" onclick="toggleLike(${i},this)">
+          <div class="action-icon" id="like-${i}">🤍</div>
+          <div class="action-count" id="likecount-${i}">${formatNum(s.likes)}</div>
+        </div>
+        <div class="action-btn">
+          <div class="action-icon">🪙</div>
+          <div class="action-count">Tip</div>
+        </div>
+        <div class="action-btn">
+          <div class="action-icon">💬</div>
+          <div class="action-count">${formatNum(s.comments)}</div>
+        </div>
+        <div class="action-btn">
+          <div class="action-icon">↗️</div>
+          <div class="action-count">Share</div>
+        </div>
+        <div class="action-btn">
+          <div class="action-icon">🔖</div>
+          <div class="action-count">Save</div>
+        </div>
+      </div>
+      <div class="info">
+        <div class="username">@${s.username} <span class="follow-btn">Follow</span></div>
+        <div class="caption">${s.title}</div>
+        <div class="hashtags">${(s.tags||[]).map(t=>'#'+t).join(' ')}</div>
+        <div class="swipe-hint">↑ Swipe up</div>
+      </div>
+    `;
+    feed.appendChild(card);
+  });
+
+  // Touch swipe
+  feed.ontouchstart = e => startY = e.touches[0].clientY;
+  feed.ontouchend = e => {
+    const diff = startY - e.changedTouches[0].clientY;
+    if(diff > 50 && current < shorts.length - 1) { current++; renderFeed(); }
+    if(diff < -50 && current > 0) { current--; renderFeed(); }
+  };
+}
+
+function toggleLike(i, el) {
+  const icon = document.getElementById(`like-${i}`);
+  const count = document.getElementById(`likecount-${i}`);
+  if(icon.classList.contains('liked')) {
+    icon.classList.remove('liked');
+    icon.innerHTML = '🤍';
+    shorts[i].likes--;
+  } else {
+    icon.classList.add('liked');
+    icon.innerHTML = '❤️';
+    shorts[i].likes++;
+  }
+  count.textContent = formatNum(shorts[i].likes);
+}
+
+// Load coins
+async function loadCoins() {
+  try {
+    const user = JSON.parse(localStorage.getItem('ddott_user') || '{}');
+    if(user.id) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}&select=emo_coins`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      if(data[0]) document.getElementById('coinCount').textContent = data[0].emo_coins || 0;
+    }
+  } catch(e) {}
+}
+
+loadShorts();
+loadCoins();
+</script>
+</body>
+</html>
