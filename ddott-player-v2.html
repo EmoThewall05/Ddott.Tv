@@ -454,7 +454,7 @@
     </style>
 <base target="_blank">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/supabase-config.js"></script>
+    <script src="supabase-config.js"></script>
 </head>
 <body>
 
@@ -571,7 +571,7 @@
             <span class="nav-icon">🏠</span>
             <span>HOME</span>
         </a>
-        <a href="ddott-feed.html" class="nav-item">
+        <a href="ddott-home-v2.html" class="nav-item">
             <span class="nav-icon">📺</span>
             <span>FEED</span>
         </a>
@@ -579,11 +579,11 @@
             <span class="nav-icon">🌐</span>
             <span>COMMUNITY</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="ddott-emo-coins.html" class="nav-item">
             <span class="nav-icon">🪙</span>
             <span>COINS</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="ddott-creator-studio.html" class="nav-item">
             <span class="nav-icon">🎬</span>
             <span>STUDIO</span>
         </a>
@@ -647,29 +647,13 @@
 
         // ===== VIDEO DATABASE / LOOKUP =====
         // Add your video IDs and URLs here, or fetch from API
-        const VIDEO_DB = {
-            // Example entries — replace with your actual video mappings
-            'vid_001': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-            'vid_002': 'https://www.w3schools.com/html/mov_bbb.mp4',
-            'demo': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-        };
+        const VIDEO_DB = {};
 
         function resolveVideoById(id) {
             // Check local database first
             if (VIDEO_DB[id]) {
                 return VIDEO_DB[id];
             }
-
-            // Try localStorage (if you store videos there from home page)
-            try {
-                const stored = localStorage.getItem('ddott_videos');
-                if (stored) {
-                    const videos = JSON.parse(stored);
-                    if (videos[id] && videos[id].url) {
-                        return videos[id].url;
-                    }
-                }
-            } catch(e) { /* ignore */ }
 
             // If ID looks like a URL itself, use it
             if (id.startsWith('http://') || id.startsWith('https://')) {
