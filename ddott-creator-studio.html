@@ -144,6 +144,28 @@ select option { background: #0d0d0d; }
     <div style="color:#888; font-size:0.85rem;">Your video is now live on DDOTT.TV</div>
   </div>
 
+  <div class="input-group">
+    <div class="input-label">VIDEO TYPE</div>
+    <div style="display:flex; gap:12px; margin-top:8px;">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:12px 20px; border-radius:12px; border:1px solid #333; flex:1; justify-content:center;" id="normalLabel">
+        <input type="radio" name="videoType" value="normal" checked onchange="setVideoType(this.value)" style="display:none;">
+        <span style="font-size:1.5rem;">🎬</span>
+        <div>
+          <div style="font-weight:bold;">Normal</div>
+          <div style="color:#666; font-size:0.75rem;">1x Emo Coins</div>
+        </div>
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:12px 20px; border-radius:12px; border:1px solid #333; flex:1; justify-content:center;" id="shortLabel">
+        <input type="radio" name="videoType" value="short" onchange="setVideoType(this.value)" style="display:none;">
+        <span style="font-size:1.5rem;">⚡</span>
+        <div>
+          <div style="font-weight:bold;">Short</div>
+          <div style="color:#b300ff; font-size:0.75rem;">3x Emo Coins 🔥</div>
+        </div>
+      </label>
+    </div>
+  </div>
+
   <button class="publish-btn" id="publishBtn" onclick="publishVideo()">🚀 PUBLISH VIDEO</button>
 </div>
 
@@ -169,6 +191,24 @@ select option { background: #0d0d0d; }
 <script>
 let selectedFile = null;
 let tags = [];
+let isShort = false;
+
+function setVideoType(value) {
+  isShort = value === 'short';
+  const normalLabel = document.getElementById('normalLabel');
+  const shortLabel = document.getElementById('shortLabel');
+  if (isShort) {
+    shortLabel.style.border = '1px solid #b300ff';
+    shortLabel.style.background = '#b300ff22';
+    normalLabel.style.border = '1px solid #333';
+    normalLabel.style.background = 'transparent';
+  } else {
+    normalLabel.style.border = '1px solid #00f5ff';
+    normalLabel.style.background = '#00f5ff11';
+    shortLabel.style.border = '1px solid #333';
+    shortLabel.style.background = 'transparent';
+  }
+}
 
 // ============================================
 // SAMPLE VIDEOS (shown when no DB connection)
@@ -351,44 +391,67 @@ async function publishVideo() {
   if (!title) { alert('Please add a title!'); return; }
 
   const btn = document.getElementById('publishBtn');
-  btn.textContent = '⏳ Uploading...';
+  const statusMsg = document.getElementById('statusMsg');
+  btn.textContent = '⏳ Uploading to Cloudinary...';
   btn.disabled = true;
+  statusMsg.style.display = 'block';
+  statusMsg.style.color = '#00f5ff';
+  statusMsg.textContent = '📤 Uploading video...';
 
   try {
-    // Simulate upload (replace with actual Cloudinary + Supabase)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Step 1: Upload to Cloudinary
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('upload_preset', 'ddott-tv-upload');
+    formData.append('folder', 'ddott-tv');
 
-    // Add to sample videos (for demo)
-    const newVideo = {
-      id: 'vid_' + Date.now(),
+    const cloudRes = await fetch('https://api.cloudinary.com/v1_1/dggip9tpp/video/upload', {
+      method: 'POST',
+      body: formData
+    });
+    const cloudData = await cloudRes.json();
+    if (!cloudData.secure_url) throw new Error('Cloudinary upload failed');
+
+    statusMsg.textContent = '💾 Saving to database...';
+
+    // Step 2: Save to Supabase
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) throw new Error('Not logged in');
+
+    const { error } = await db.from('videos').insert({
+      user_id: user.id,
       title: title,
       description: document.getElementById('videoDesc').value,
       category: document.getElementById('videoCategory').value,
+      video_url: cloudData.secure_url,
+      thumbnail_url: cloudData.secure_url.replace('/video/upload/', '/video/upload/so_0/'),
       views: 0,
       likes: 0,
-      created_at: new Date().toISOString(),
-      video_url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-      thumbnail: '🆕'
-    };
+      is_short: isShort,
+      short_coins_multiplier: isShort ? 3 : 1,
+      tags: tags
+    });
 
-    SAMPLE_VIDEOS.unshift(newVideo);
+    if (error) throw error;
 
-    // Show success
+    statusMsg.style.color = '#00ff88';
+    statusMsg.textContent = isShort ? '✅ Short published! 3x Emo Coins active 🔥' : '✅ Video published!';
     document.getElementById('successCard').classList.add('show');
     btn.textContent = '🎉 Published!';
 
     setTimeout(() => {
-      btn.textContent = '🚀 Publish Video';
+      btn.textContent = '🚀 PUBLISH VIDEO';
       btn.disabled = false;
       document.getElementById('successCard').classList.remove('show');
-      // Switch to My Videos tab
-      showTab('myVideos', document.querySelectorAll('.tab')[1]);
+      statusMsg.style.display = 'none';
+      showTab('myvideos', document.querySelectorAll('.tab')[1]);
     }, 2000);
 
   } catch (err) {
     console.error(err);
-    alert('Upload failed: ' + err.message);
-    btn.textContent = '🚀 Publish Video';
+    statusMsg.style.color = '#ff4444';
+    statusMsg.textContent = '❌ Upload failed: ' + err.message;
+    btn.textContent = '🚀 PUBLISH VIDEO';
     btn.disabled = false;
   }
 }
