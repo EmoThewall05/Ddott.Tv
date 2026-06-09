@@ -1,3 +1,5 @@
 .vercel
 ddott-tv.zip
 node_modules/
+*.zip
+deploy*.zip
