@@ -67,6 +67,31 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
 .loader-icon{font-size:50px;animation:spin 2s linear infinite;}
 @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 .loader-text{font-family:'Orbitron',monospace;font-size:11px;color:#ff0040;letter-spacing:2px;margin-top:12px;}
+
+/* NEWS ANCHOR AVATAR */
+.anchor-wrap{position:absolute;top:36px;right:14px;z-index:15;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.anchor-avatar{width:70px;height:70px;border-radius:50%;border:2px solid #ff0040;overflow:hidden;position:relative;background:linear-gradient(135deg,#1a0820,#000d1a);box-shadow:0 0 20px rgba(255,0,64,0.4);}
+.anchor-face{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.anchor-head{width:38px;height:44px;background:linear-gradient(180deg,#f5c5a3,#e8a882);border-radius:50% 50% 45% 45%;position:relative;margin-top:8px;}
+.anchor-hair{position:absolute;top:-4px;left:-2px;right:-2px;height:22px;background:#2c1810;border-radius:50% 50% 0 0;}
+.anchor-eyes{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;}
+.anchor-eye{width:5px;height:5px;background:#2c1810;border-radius:50%;animation:blink-eye 4s infinite;}
+@keyframes blink-eye{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(0.1)}}
+.anchor-mouth{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:12px;height:5px;background:#c0705a;border-radius:0 0 8px 8px;transition:all 0.1s;}
+.anchor-mouth.talking{animation:talk 0.15s infinite alternate;}
+@keyframes talk{0%{height:3px;width:10px;border-radius:0 0 8px 8px;}100%{height:8px;width:14px;border-radius:4px;}}
+.anchor-suit{position:absolute;bottom:0;left:0;right:0;height:22px;background:linear-gradient(180deg,#1a237e,#0d1757);border-radius:0 0 50% 50%;}
+.anchor-tie{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:6px;height:14px;background:#ff0040;clip-path:polygon(50% 0%,100% 30%,70% 100%,30% 100%,0% 30%);}
+.anchor-label{font-family:'Orbitron',monospace;font-size:7px;color:#ff0040;letter-spacing:1px;background:rgba(0,0,0,0.7);padding:2px 6px;border-radius:3px;border:1px solid rgba(255,0,64,0.3);}
+.anchor-signal{display:flex;gap:2px;align-items:flex-end;height:12px;}
+.anchor-bar{width:3px;background:#ff0040;border-radius:1px;opacity:0.3;}
+.anchor-bar.active{opacity:1;animation:soundbar 0.4s infinite alternate;}
+.anchor-bar:nth-child(1){height:4px;animation-delay:0s;}
+.anchor-bar:nth-child(2){height:8px;animation-delay:0.1s;}
+.anchor-bar:nth-child(3){height:12px;animation-delay:0.2s;}
+.anchor-bar:nth-child(4){height:8px;animation-delay:0.3s;}
+.anchor-bar:nth-child(5){height:4px;animation-delay:0.4s;}
+@keyframes soundbar{0%{transform:scaleY(0.3)}100%{transform:scaleY(1)}}
 </style>
 </head>
 <body>
@@ -95,6 +120,32 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
   
   <div class="story-dots" id="storyDots"></div>
   <div class="news-counter" id="newsCounter"></div>
+  <div class="anchor-wrap">
+    <div class="anchor-avatar">
+      <div class="anchor-face">
+        <div class="anchor-head">
+          <div class="anchor-hair"></div>
+          <div class="anchor-eyes">
+            <div class="anchor-eye"></div>
+            <div class="anchor-eye"></div>
+          </div>
+          <div class="anchor-mouth" id="anchorMouth"></div>
+        </div>
+        <div class="anchor-suit">
+          <div class="anchor-tie"></div>
+        </div>
+      </div>
+    </div>
+    <div class="anchor-label">ON AIR</div>
+    <div class="anchor-signal" id="anchorSignal">
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+    </div>
+  </div>
+
 
   <div class="news-content">
     <div class="news-source-tag" id="newsSource">DDOTT NEWS</div>
@@ -169,12 +220,17 @@ function speakCurrent() {
   const utt = new SpeechSynthesisUtterance(n.title + '. ' + (n.description||''));
   utt.lang = VOICES[lang]||'en-US';
   utt.rate = speed;
-  utt.onstart = () => animateProgress();
+  utt.onstart = () => { 
+    animateProgress(); 
+    startTalking(); 
+  };
   utt.onend = () => {
+    stopTalking();
     speaking = false;
     if(playing) scheduleNext();
   };
   utt.onerror = () => {
+    stopTalking();
     speaking = false;
     if(playing) scheduleNext();
   };
@@ -229,6 +285,7 @@ function prevNews() {
 }
 
 function hardStop() {
+  stopTalking();
   speaking = false;
   synth.cancel();
   clearTimeout(autoTimer);
@@ -254,6 +311,15 @@ document.querySelector('.news-screen').addEventListener('touchend',e=>{
   const dx=e.changedTouches[0].clientX-tx;
   if(Math.abs(dx)>50){ if(dx<0) nextNews(); else prevNews(); }
 });
+
+function startTalking() {
+  document.getElementById('anchorMouth').classList.add('talking');
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.add('active'));
+}
+function stopTalking() {
+  document.getElementById('anchorMouth').classList.remove('talking');
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.remove('active'));
+}
 
 window.onload=()=>loadNews('en',document.querySelector('.lang-btn'));
 </script>
