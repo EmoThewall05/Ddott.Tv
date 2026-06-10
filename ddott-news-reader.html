@@ -103,7 +103,7 @@ async function loadNews(lang, label, btn) {
   stopSpeech();
 
   try {
-    const url = 'https://gnews.io/api/v4/top-headlines?lang=' + lang + '&max=10&apikey=' + API_KEY;
+    const url = 'https://ddott-news.meradivin.workers.dev/news?lang=' + lang;
     const res = await fetch(url);
     const data = await res.json();
     news = data.articles || [];
