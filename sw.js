@@ -1,9 +1,10 @@
-const CACHE = 'ddott-tv-v6';
+const CACHE = 'ddott-tv-v7';
 const FILES = [
   '/',
   '/index.html',
   '/ddott-home-v2.html',
   '/ddott-player-v2.html',
+  '/ddott-player-v3.html',
   '/ddott-shorts.html',
   '/ddott-creator-channel.html',
   '/ddott-messaging.html',
