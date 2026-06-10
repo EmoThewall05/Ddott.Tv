@@ -116,22 +116,22 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
 const WORKER = 'https://ddott-news.meradivin.workers.dev/news';
 const VOICES = {en:'en-US',ml:'ml-IN',hi:'hi-IN',ar:'ar-SA'};
 let news=[], idx=0, playing=false, speed=1, muted=false, lang='en';
-let synth=window.speechSynthesis, utt=null, autoTimer=null, progressTimer=null;
+let synth=window.speechSynthesis, autoTimer=null, progressTimer=null, speaking=false;
 
 async function loadNews(l, btn) {
   lang=l;
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  stopAll();
+  hardStop();
   document.getElementById('loader').style.display='flex';
   try {
     const res = await fetch(WORKER+'?lang='+lang);
     const data = await res.json();
     news = data.articles || [];
-    document.getElementById('loader').style.display='none';
     idx=0;
+    document.getElementById('loader').style.display='none';
     buildDots();
-    showNews(0);
+    renderNews(0);
     document.getElementById('tickerText').textContent = news.map(n=>n.title).join('   •   ');
   } catch(e) {
     document.getElementById('loader').style.display='none';
@@ -140,79 +140,119 @@ async function loadNews(l, btn) {
 }
 
 function buildDots() {
-  document.getElementById('storyDots').innerHTML = news.slice(0,10).map((_,i)=>`<div class="dot ${i===0?'active':''}" onclick="showNews(${i})"></div>`).join('');
+  document.getElementById('storyDots').innerHTML = news.slice(0,10).map((_,i)=>
+    `<div class="dot ${i===0?'active':''}" onclick="jumpTo(${i})"></div>`).join('');
 }
 
-function showNews(i) {
-  idx=i;
-  const n=news[i];
-  if(!n) return;
-  const bgImg = n.image && n.image.startsWith('http') ? `url(${n.image})` : 'linear-gradient(135deg,#1a0010,#000820)';
+function renderNews(i) {
+  if(i < 0 || i >= news.length) return;
+  idx = i;
+  const n = news[idx];
+  const bgImg = (n.image && n.image.startsWith('http')) 
+    ? `url(${n.image})` 
+    : 'linear-gradient(135deg,#1a0010,#000820)';
   document.getElementById('newsBg').style.backgroundImage = bgImg;
   document.getElementById('newsSource').textContent = n.source?.name || 'News';
   document.getElementById('newsHeadline').textContent = n.title;
   document.getElementById('newsBody').textContent = n.description || '';
-  document.getElementById('newsCounter').textContent = (i+1)+' / '+news.length;
-  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+  document.getElementById('newsCounter').textContent = (idx+1)+' / '+news.length;
+  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===idx));
   document.getElementById('progressFill').style.width='0%';
-  clearTimeout(autoTimer);
-  synth.cancel();
-  if(playing) setTimeout(()=>speakNews(n), 300);
 }
 
-function speakNews(n) {
-  synth.cancel();
-  if(muted) { startAutoNext(); return; }
-  utt = new SpeechSynthesisUtterance(n.title + '. ' + (n.description||''));
+function speakCurrent() {
+  if(speaking) return;
+  const n = news[idx];
+  if(!n) return;
+  if(muted) { scheduleNext(); return; }
+  speaking = true;
+  const utt = new SpeechSynthesisUtterance(n.title + '. ' + (n.description||''));
   utt.lang = VOICES[lang]||'en-US';
   utt.rate = speed;
-  utt.onstart = ()=>{ animateProgress(); };
-  utt.onend = ()=>{ document.getElementById('progressFill').style.width='100%'; setTimeout(()=>nextNews(),500); };
-  utt.onerror = ()=>{ nextNews(); };
+  utt.onstart = () => animateProgress();
+  utt.onend = () => {
+    speaking = false;
+    if(playing) scheduleNext();
+  };
+  utt.onerror = () => {
+    speaking = false;
+    if(playing) scheduleNext();
+  };
   synth.speak(utt);
+}
+
+function scheduleNext() {
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    if(!playing) return;
+    if(idx < news.length-1) {
+      renderNews(idx+1);
+      speakCurrent();
+    } else {
+      playing=false;
+      document.getElementById('playBtn').textContent='▶';
+    }
+  }, 1500);
 }
 
 function animateProgress() {
   let w=0;
   clearInterval(progressTimer);
   progressTimer = setInterval(()=>{
-    if(!playing){clearInterval(progressTimer);return;}
-    w=Math.min(w+0.4,95);
+    if(!playing){ clearInterval(progressTimer); return; }
+    w = Math.min(w+0.5, 95);
     document.getElementById('progressFill').style.width=w+'%';
-  },200);
-}
-
-function startAutoNext() {
-  clearTimeout(autoTimer);
-  const fill=document.getElementById('autoFill');
-  fill.style.transition='none'; fill.style.width='0%';
-  setTimeout(()=>{ fill.style.transition='width 15s linear'; fill.style.width='100%'; },50);
-  autoTimer=setTimeout(()=>nextNews(),15000);
+  }, 200);
 }
 
 function togglePlay() {
-  playing=!playing;
-  document.getElementById('playBtn').textContent=playing?'⏸':'▶';
-  if(playing){ speakNews(news[idx]); }
-  else { synth.cancel(); clearTimeout(autoTimer); clearInterval(progressTimer); }
+  playing = !playing;
+  document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
+  if(playing) { speakCurrent(); }
+  else { hardStop(); }
 }
 
-function nextNews() { if(idx<news.length-1){idx++;showNews(idx);} }
-function prevNews() { if(idx>0){idx--;showNews(idx);} }
-function stopAll() { playing=false; synth.cancel(); clearTimeout(autoTimer); clearInterval(progressTimer); document.getElementById('playBtn').textContent='▶'; }
-function cycleSpeed() { const s=[0.75,1,1.25,1.5,2]; const i=s.indexOf(speed); speed=s[(i+1)%s.length]; document.getElementById('speedBtn').textContent=speed+'x'; if(utt&&playing){speakNews(news[idx]);} }
-function toggleMute() { muted=!muted; document.getElementById('volBtn').textContent=muted?'🔇':'🔊'; }
+function jumpTo(i) {
+  hardStop();
+  renderNews(i);
+  if(playing) { playing=true; speakCurrent(); }
+}
 
-// Swipe support
-let tx=0,ty=0;
-document.querySelector('.news-screen').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;});
+function nextNews() {
+  hardStop();
+  if(idx < news.length-1) { renderNews(idx+1); if(playing) speakCurrent(); }
+}
+
+function prevNews() {
+  hardStop();
+  if(idx > 0) { renderNews(idx-1); if(playing) speakCurrent(); }
+}
+
+function hardStop() {
+  speaking = false;
+  synth.cancel();
+  clearTimeout(autoTimer);
+  clearInterval(progressTimer);
+}
+
+function cycleSpeed() {
+  const s=[0.75,1,1.25,1.5,2];
+  const i=s.indexOf(speed);
+  speed=s[(i+1)%s.length];
+  document.getElementById('speedBtn').textContent=speed+'x';
+}
+
+function toggleMute() {
+  muted=!muted;
+  document.getElementById('volBtn').textContent=muted?'🔇':'🔊';
+}
+
+// Swipe
+let tx=0;
+document.querySelector('.news-screen').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;});
 document.querySelector('.news-screen').addEventListener('touchend',e=>{
   const dx=e.changedTouches[0].clientX-tx;
-  const dy=e.changedTouches[0].clientY-ty;
-  if(Math.abs(dx)>Math.abs(dy)){
-    if(dx<-50) nextNews();
-    else if(dx>50) prevNews();
-  }
+  if(Math.abs(dx)>50){ if(dx<0) nextNews(); else prevNews(); }
 });
 
 window.onload=()=>loadNews('en',document.querySelector('.lang-btn'));
