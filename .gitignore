@@ -5,3 +5,8 @@ node_modules/
 deploy*.zip
 *.zip
 supabase-config.js
+
+# Vercel - not used, Cloudflare only
+.vercel/
+vercel.json
+.vercel.json
