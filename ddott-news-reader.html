@@ -130,7 +130,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
       <button class="anchor-toggle-btn active" id="btnMale" onclick="switchAnchor('male')">♂</button>
       <button class="anchor-toggle-btn" id="btnFemale" onclick="switchAnchor('female')">♀</button>
     </div>
-    <div class="anchor-frame" id="anchorFrame" style="position:relative;"><img class="anchor-photo" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=250&fit=crop&crop=face" onerror="this.src=''" /><div class="anchor-mouth-overlay"><div class="anchor-mouth-inner" id="mouthPath"></div></div>
+    <div class="anchor-frame" id="anchorFrame" style="position:relative;"><img class="anchor-photo" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=250&fit=crop&crop=face" onerror="this.style.display='none'" /><div class="anchor-mouth-overlay"><div class="anchor-mouth-inner" id="mouthPath"></div></div>
       <svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://www.w3.org/2000/svg">
   <defs><linearGradient id="bg-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#040d1a"/></linearGradient>
   <linearGradient id="skin-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4956a"/><stop offset="100%" stop-color="#c07848"/></linearGradient></defs>
@@ -225,6 +225,7 @@ async function loadNews(l, btn) {
   lang=l;
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  updateAnchorPhoto();
   hardStop();
   document.getElementById('loader').style.display='flex';
   try {
@@ -479,13 +480,38 @@ const femaleSVGStr = `<svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://
 </svg>`;
 let currentAnchor = 'male';
 
+const ANCHOR_PHOTOS = {
+  "en": {
+    "male": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=250&fit=crop&crop=face"
+  },
+  "ml": {
+    "male": "https://images.unsplash.com/photo-1618641986557-1ecd230959aa?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1610500796385-3ffc1ae2f046?w=200&h=250&fit=crop&crop=face"
+  },
+  "hi": {
+    "male": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?w=200&h=250&fit=crop&crop=face"
+  },
+  "ar": {
+    "male": "https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1608138278545-c6b679ef1c9a?w=200&h=250&fit=crop&crop=face"
+  }
+};
+
 function switchAnchor(gender) {
   currentAnchor = gender;
-  document.getElementById('anchorFrame').innerHTML = gender==='male' 
-    ? `<img class="anchor-photo" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=250&fit=crop&crop=face" onerror="this.src=''" /><div class="anchor-mouth-overlay"><div class="anchor-mouth-inner" id="mouthPath"></div></div>`
-    : `<img class="anchor-photo" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=250&fit=crop&crop=face" onerror="this.src=''" /><div class="anchor-mouth-overlay"><div class="anchor-mouth-inner" id="mouthPath"></div></div>`;
+  updateAnchorPhoto();
   document.getElementById('btnMale').classList.toggle('active', gender==='male');
   document.getElementById('btnFemale').classList.toggle('active', gender==='female');
+}
+
+function updateAnchorPhoto() {
+  const photos = ANCHOR_PHOTOS[lang] || ANCHOR_PHOTOS['en'];
+  const src = currentAnchor === 'male' ? photos.male : photos.female;
+  document.getElementById('anchorFrame').innerHTML = 
+    `<img class="anchor-photo" src="${src}" onerror="this.style.display='none'" />
+     <div class="anchor-mouth-overlay"><div class="anchor-mouth-inner" id="mouthPath"></div></div>`;
 }
 
 function startTalking() {
