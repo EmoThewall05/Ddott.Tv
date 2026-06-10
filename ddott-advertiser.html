@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott Advertiser Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-serif;}
+
+/* TOP BAR */
+.topbar{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(0,0,0,0.95);border-bottom:2px solid #ff0040;display:flex;align-items:center;gap:10px;padding:0 14px;z-index:100;}
+.back-btn{font-size:20px;cursor:pointer;opacity:0.7;}
+.page-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:#ff0040;letter-spacing:2px;}
+.coin-balance{margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,200,0,0.1);border:1px solid rgba(255,200,0,0.3);padding:6px 12px;border-radius:20px;}
+.coin-balance span{font-family:'Orbitron',monospace;font-size:11px;color:#ffd700;font-weight:700;}
+
+/* TABS */
+.tabs{display:flex;gap:0;margin-top:52px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.tab{flex:1;padding:12px 4px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:0.5px;opacity:0.5;border-bottom:2px solid transparent;transition:all 0.3s;}
+.tab.active{opacity:1;color:#ff0040;border-bottom-color:#ff0040;}
+
+/* SECTIONS */
+.section{display:none;padding:16px 14px 100px;}
+.section.active{display:block;}
+
+/* CARDS */
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:14px;}
+.card-title{font-family:'Orbitron',monospace;font-size:10px;color:#ff0040;letter-spacing:1px;margin-bottom:10px;}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed rgba(255,0,64,0.4);border-radius:12px;padding:30px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(255,0,64,0.03);}
+.upload-zone:hover,.upload-zone.drag{border-color:#ff0040;background:rgba(255,0,64,0.08);}
+.upload-icon{font-size:36px;margin-bottom:8px;}
+.upload-text{font-size:13px;opacity:0.7;}
+.upload-sub{font-size:11px;opacity:0.4;margin-top:4px;}
+.upload-progress{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:12px;overflow:hidden;display:none;}
+.upload-progress-fill{height:100%;background:#ff0040;width:0%;transition:width 0.3s;border-radius:2px;}
+.video-preview{width:100%;border-radius:8px;margin-top:10px;display:none;max-height:180px;object-fit:cover;}
+
+/* AI CHAT */
+.ai-chat-box{height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;padding:4px;}
+.ai-chat-box::-webkit-scrollbar{width:3px;}
+.ai-chat-box::-webkit-scrollbar-thumb{background:#ff0040;border-radius:2px;}
+.msg{max-width:85%;padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.5;}
+.msg.ai{background:rgba(255,0,64,0.12);border:1px solid rgba(255,0,64,0.2);align-self:flex-start;border-radius:4px 12px 12px 12px;}
+.msg.user{background:rgba(255,255,255,0.08);align-self:flex-end;border-radius:12px 4px 12px 12px;}
+.msg.ai .ai-label{font-family:'Orbitron',monospace;font-size:8px;color:#ff0040;letter-spacing:1px;margin-bottom:4px;}
+.ai-typing{display:none;align-self:flex-start;}
+.ai-typing span{display:inline-block;width:6px;height:6px;background:#ff0040;border-radius:50%;margin:0 2px;animation:typing 1s infinite;}
+.ai-typing span:nth-child(2){animation-delay:0.2s;}
+.ai-typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes typing{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.chat-input-row{display:flex;gap:8px;}
+.chat-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:10px 14px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;outline:none;}
+.chat-input:focus{border-color:rgba(255,0,64,0.5);}
+.chat-send{width:40px;height:40px;border-radius:50%;background:#ff0040;border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:12px;}
+.form-label{font-size:11px;opacity:0.6;margin-bottom:6px;display:block;letter-spacing:0.5px;}
+.form-input,.form-select{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 12px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;outline:none;}
+.form-input:focus,.form-select:focus{border-color:rgba(255,0,64,0.5);}
+.form-select option{background:#111;}
+.range-wrap{display:flex;align-items:center;gap:10px;}
+.form-range{flex:1;accent-color:#ff0040;}
+.range-val{font-family:'Orbitron',monospace;font-size:11px;color:#ff0040;min-width:40px;text-align:right;}
+
+/* COIN COST DISPLAY */
+.cost-box{background:rgba(255,200,0,0.06);border:1px solid rgba(255,200,0,0.2);border-radius:10px;padding:12px;margin-bottom:12px;}
+.cost-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;opacity:0.8;}
+.cost-total{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#ffd700;padding-top:8px;border-top:1px solid rgba(255,200,0,0.2);}
+
+/* RULES TAGS */
+.rules-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.rule-tag{padding:4px 10px;border-radius:12px;background:rgba(255,0,64,0.15);border:1px solid rgba(255,0,64,0.3);font-size:11px;cursor:pointer;transition:all 0.2s;}
+.rule-tag.active{background:#ff0040;border-color:#ff0040;}
+
+/* SUBMIT BTN */
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#ff0040,#cc0030);border:none;border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-top:8px;}
+.submit-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;text-align:center;}
+.stat-num{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#ff0040;}
+.stat-label{font-size:10px;opacity:0.5;margin-top:4px;letter-spacing:0.5px;}
+.ad-campaign-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px;}
+.campaign-status{display:inline-block;padding:3px 8px;border-radius:6px;font-size:9px;font-family:'Orbitron',monospace;font-weight:700;}
+.status-active{background:rgba(0,255,100,0.15);color:#00ff64;border:1px solid rgba(0,255,100,0.3);}
+.status-pending{background:rgba(255,200,0,0.15);color:#ffd700;border:1px solid rgba(255,200,0,0.3);}
+.progress-bar{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:8px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#ff0040,#ff6080);border-radius:2px;transition:width 0.5s;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(0,0,0,0.95);border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-around;padding:0 10px;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;opacity:0.5;font-size:9px;letter-spacing:0.5px;}
+.nav-item.active{opacity:1;color:#ff0040;}
+.nav-icon{font-size:20px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="back-btn" onclick="history.back()">←</div>
+  <div class="page-title">📢 AD STUDIO</div>
+  <div class="coin-balance">🪙 <span id="coinBalance">0</span> EMO</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('upload')">📤 UPLOAD</div>
+  <div class="tab" onclick="switchTab('ai')">🤖 AI GUIDE</div>
+  <div class="tab" onclick="switchTab('rules')">⚙️ RULES</div>
+  <div class="tab" onclick="switchTab('stats')">📊 STATS</div>
+</div>
+
+<!-- UPLOAD TAB -->
+<div class="section active" id="tab-upload">
+  <div class="card">
+    <div class="card-title">AD VIDEO</div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('videoFile').click()">
+      <div class="upload-icon">🎬</div>
+      <div class="upload-text">Tap to upload ad video</div>
+      <div class="upload-sub">MP4 • Max 2 min • Max 500MB</div>
+      <div class="upload-progress" id="uploadProgress">
+        <div class="upload-progress-fill" id="uploadFill"></div>
+      </div>
+    </div>
+    <input type="file" id="videoFile" accept="video/*" style="display:none" onchange="handleVideoSelect(this)">
+    <video class="video-preview" id="videoPreview" controls></video>
+  </div>
+
+  <div class="card">
+    <div class="card-title">AD DETAILS</div>
+    <div class="form-group">
+      <label class="form-label">AD TITLE</label>
+      <input class="form-input" id="adTitle" placeholder="Your product/brand name" maxlength="60">
+    </div>
+    <div class="form-group">
+      <label class="form-label">PRODUCT DESCRIPTION</label>
+      <textarea class="form-input" id="adDesc" placeholder="Describe your product briefly..." rows="3" style="resize:none;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">CATEGORY</label>
+      <select class="form-select" id="adCategory">
+        <option value="">Select category</option>
+        <option>Technology</option>
+        <option>Fashion</option>
+        <option>Food & Beverage</option>
+        <option>Health & Fitness</option>
+        <option>Education</option>
+        <option>Real Estate</option>
+        <option>Entertainment</option>
+        <option>Finance</option>
+        <option>Travel</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <button class="submit-btn" onclick="switchTab('ai')" style="background:rgba(255,0,64,0.2);border:1px solid #ff0040;">
+      🤖 GET AI ADVICE FIRST
+    </button>
+  </div>
+</div>
+
+<!-- AI GUIDE TAB -->
+<div class="section" id="tab-ai">
+  <div class="card">
+    <div class="card-title">🤖 AI AD CONSULTANT</div>
+    <div class="ai-chat-box" id="aiChatBox">
+      <div class="msg ai">
+        <div class="ai-label">DDOTT AI</div>
+        Hi! I'm your Ad Consultant. Tell me about your product and I'll help you create the perfect campaign — target audience, coin budget, rules, and strategy. What are you advertising?
+      </div>
+    </div>
+    <div class="ai-typing" id="aiTyping">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Describe your product..." onkeydown="if(event.key==='Enter')sendAIMessage()">
+      <button class="chat-send" onclick="sendAIMessage()">➤</button>
+    </div>
+  </div>
+
+  <div class="card" id="aiSuggestCard" style="display:none;">
+    <div class="card-title">✅ AI RECOMMENDATIONS</div>
+    <div id="aiSuggestContent"></div>
+    <button class="submit-btn" onclick="applyAISuggestions()">APPLY SUGGESTIONS →</button>
+  </div>
+</div>
+
+<!-- RULES TAB -->
+<div class="section" id="tab-rules">
+  <div class="card">
+    <div class="card-title">VIEWS & BUDGET</div>
+    <div class="form-group">
+      <label class="form-label">VIEWS TO PURCHASE</label>
+      <div class="range-wrap">
+        <input type="range" class="form-range" id="viewsRange" min="100" max="10000" step="100" value="500" oninput="updateCost()">
+        <div class="range-val" id="viewsVal">500</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">COINS PER WATCH</label>
+      <div class="range-wrap">
+        <input type="range" class="form-range" id="watchCoins" min="2" max="20" value="5" oninput="updateCost()">
+        <div class="range-val" id="watchCoinsVal">5</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">COINS PER SHARE</label>
+      <div class="range-wrap">
+        <input type="range" class="form-range" id="shareCoins" min="5" max="50" value="10" oninput="updateCost()">
+        <div class="range-val" id="shareCoinsVal">10</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cost-box" id="costBox">
+    <div class="cost-row"><span>Views purchased</span><span id="costViews">500</span></div>
+    <div class="cost-row"><span>Coins per watch</span><span id="costWatch">5 🪙</span></div>
+    <div class="cost-row"><span>Coins per share</span><span id="costShare">10 🪙</span></div>
+    <div class="cost-row"><span>Platform fee (10%)</span><span id="costFee">250 🪙</span></div>
+    <div class="cost-total"><span>TOTAL COST</span><span id="costTotal">2,750 🪙</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">TARGETING RULES</div>
+    <div class="form-group">
+      <label class="form-label">LANGUAGE TARGET</label>
+      <div class="rules-wrap" id="langRules">
+        <div class="rule-tag active" onclick="toggleRule(this)">All</div>
+        <div class="rule-tag" onclick="toggleRule(this)">English</div>
+        <div class="rule-tag" onclick="toggleRule(this)">Malayalam</div>
+        <div class="rule-tag" onclick="toggleRule(this)">Hindi</div>
+        <div class="rule-tag" onclick="toggleRule(this)">Arabic</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">SHOW AFTER</label>
+      <div class="rules-wrap" id="afterRules">
+        <div class="rule-tag active" onclick="toggleRule(this)">Any video</div>
+        <div class="rule-tag" onclick="toggleRule(this)">Tech videos</div>
+        <div class="rule-tag" onclick="toggleRule(this)">News</div>
+        <div class="rule-tag" onclick="toggleRule(this)">Shorts</div>
+        <div class="rule-tag" onclick="toggleRule(this)">Education</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">SKIP ALLOWED AFTER</label>
+      <div class="range-wrap">
+        <input type="range" class="form-range" id="skipAfter" min="3" max="30" value="5" oninput="document.getElementById('skipVal').textContent=this.value+'s'">
+        <div class="range-val" id="skipVal">5s</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="publishBtn" onclick="publishAd()">
+    🚀 PUBLISH AD CAMPAIGN
+  </button>
+</div>
+
+<!-- STATS TAB -->
+<div class="section" id="tab-stats">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" id="statViews">0</div>
+      <div class="stat-label">TOTAL VIEWS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statShares">0</div>
+      <div class="stat-label">SHARES</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statReach">0</div>
+      <div class="stat-label">REACH</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statCoinsSpent">0</div>
+      <div class="stat-label">COINS SPENT</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">MY CAMPAIGNS</div>
+    <div id="campaignsList">
+      <div style="text-align:center;opacity:0.4;padding:20px;font-size:13px;">No campaigns yet</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location='ddott-home-v2.html'">
+    <div class="nav-icon">🏠</div><div>HOME</div>
+  </div>
+  <div class="nav-item" onclick="window.location='index.html'">
+    <div class="nav-icon">📺</div><div>FEED</div>
+  </div>
+  <div class="nav-item active">
+    <div class="nav-icon">📢</div><div>ADS</div>
+  </div>
+  <div class="nav-item" onclick="window.location='ddott-emo-coins.html'">
+    <div class="nav-icon">🪙</div><div>COINS</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const CF_AI_WORKER = 'https://ddott-news.meradivin.workers.dev/ai';
+const CLOUDINARY_CLOUD = 'dggip9tpp';
+const CLOUDINARY_PRESET = 'ddott-tv-upload';
+
+let uploadedVideoUrl = '';
+let aiSuggestions = {};
+let currentUser = null;
+let chatHistory = [];
+
+// Init
+window.onload = async () => {
+  updateCost();
+  loadStats();
+};
+
+// TAB SWITCH
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['upload','ai','rules','stats'][i] === tab);
+  });
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// VIDEO UPLOAD
+function handleVideoSelect(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const preview = document.getElementById('videoPreview');
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+  uploadToCloudinary(file);
+}
+
+async function uploadToCloudinary(file) {
+  const progressWrap = document.getElementById('uploadProgress');
+  const fill = document.getElementById('uploadFill');
+  progressWrap.style.display = 'block';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+  formData.append('folder', 'ddott-ads');
+
+  const xhr = new XMLHttpRequest();
+  xhr.upload.onprogress = (e) => {
+    if(e.lengthComputable) {
+      fill.style.width = (e.loaded/e.total*100)+'%';
+    }
+  };
+  xhr.onload = () => {
+    const res = JSON.parse(xhr.responseText);
+    uploadedVideoUrl = res.secure_url;
+    fill.style.width = '100%';
+    document.getElementById('uploadZone').innerHTML = '✅ <div style="margin-top:6px;font-size:12px;color:#00ff64;">Video uploaded successfully!</div>';
+  };
+  xhr.onerror = () => alert('Upload failed. Try again.');
+  xhr.open('POST', \`https://api.cloudinary.com/v1_1/\${CLOUDINARY_CLOUD}/video/upload\`);
+  xhr.send(formData);
+}
+
+// AI CHAT
+async function sendAIMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+
+  appendMsg(msg, 'user');
+  chatHistory.push({role:'user', content: msg});
+
+  document.getElementById('aiTyping').style.display = 'flex';
+  document.getElementById('aiChatBox').scrollTop = 999999;
+
+  try {
+    const systemPrompt = \`You are an expert advertising consultant for Ddott TV — a decentralized video platform where users earn Emo Coins by watching and sharing ads. 
+    
+Your job:
+1. Understand the advertiser's product
+2. Suggest target audience, best video category to show ads after, language targeting
+3. Recommend coins per watch (2-20) and coins per share (5-50) based on product value
+4. Suggest views to purchase (min 100, max 10000)
+5. Give 3 specific ad rules/tips for their product
+
+Always respond in a friendly, professional tone. Keep responses concise (under 150 words).
+At the end, output a JSON block like:
+SUGGESTIONS_JSON:{"views":500,"watchCoins":5,"shareCoins":10,"category":"Technology","languages":["English"],"tip":"Your tip here"}\`;
+
+    const res = await fetch(CF_AI_WORKER, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.response || data.result?.response || 'Sorry, AI unavailable right now.';
+
+    chatHistory.push({role:'assistant', content: reply});
+
+    // Extract suggestions JSON if present
+    const jsonMatch = reply.match(/SUGGESTIONS_JSON:(\{.*\})/);
+    if(jsonMatch) {
+      try {
+        aiSuggestions = JSON.parse(jsonMatch[1]);
+        showAISuggestions(aiSuggestions);
+      } catch(e){}
+    }
+
+    const cleanReply = reply.replace(/SUGGESTIONS_JSON:\{.*\}/, '').trim();
+    document.getElementById('aiTyping').style.display = 'none';
+    appendMsg(cleanReply, 'ai');
+
+  } catch(e) {
+    document.getElementById('aiTyping').style.display = 'none';
+    appendMsg('AI connection failed. Please check your Worker endpoint.', 'ai');
+  }
+}
+
+function appendMsg(text, role) {
+  const box = document.getElementById('aiChatBox');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  if(role === 'ai') div.innerHTML = '<div class="ai-label">DDOTT AI</div>' + text;
+  else div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = 999999;
+}
+
+function showAISuggestions(s) {
+  const card = document.getElementById('aiSuggestCard');
+  const content = document.getElementById('aiSuggestContent');
+  card.style.display = 'block';
+  content.innerHTML = \`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div style="background:rgba(255,0,64,0.1);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:16px;color:#ff0040;">\${s.views||500}</div>
+        <div style="font-size:10px;opacity:0.6;margin-top:3px;">VIEWS</div>
+      </div>
+      <div style="background:rgba(255,200,0,0.1);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:16px;color:#ffd700;">\${s.watchCoins||5} 🪙</div>
+        <div style="font-size:10px;opacity:0.6;margin-top:3px;">PER WATCH</div>
+      </div>
+    </div>
+    <div style="font-size:12px;opacity:0.8;padding:8px;background:rgba(255,255,255,0.04);border-radius:8px;">
+      💡 \${s.tip || 'Optimize your campaign for best results'}
+    </div>
+  \`;
+}
+
+function applyAISuggestions() {
+  if(aiSuggestions.views) {
+    document.getElementById('viewsRange').value = aiSuggestions.views;
+  }
+  if(aiSuggestions.watchCoins) {
+    document.getElementById('watchCoins').value = aiSuggestions.watchCoins;
+  }
+  if(aiSuggestions.shareCoins) {
+    document.getElementById('shareCoins').value = aiSuggestions.shareCoins;
+  }
+  updateCost();
+  switchTab('rules');
+}
+
+// COST CALCULATOR
+function updateCost() {
+  const views = parseInt(document.getElementById('viewsRange').value);
+  const watchC = parseInt(document.getElementById('watchCoins').value);
+  const shareC = parseInt(document.getElementById('shareCoins').value);
+  const base = views * watchC;
+  const fee = Math.floor(base * 0.1);
+  const total = base + fee;
+
+  document.getElementById('viewsVal').textContent = views;
+  document.getElementById('watchCoinsVal').textContent = watchC;
+  document.getElementById('shareCoinsVal').textContent = shareC;
+  document.getElementById('costViews').textContent = views;
+  document.getElementById('costWatch').textContent = watchC + ' 🪙';
+  document.getElementById('costShare').textContent = shareC + ' 🪙';
+  document.getElementById('costFee').textContent = fee.toLocaleString() + ' 🪙';
+  document.getElementById('costTotal').textContent = total.toLocaleString() + ' 🪙';
+}
+
+// RULES TOGGLE
+function toggleRule(el) {
+  el.classList.toggle('active');
+}
+
+// PUBLISH
+async function publishAd() {
+  if(!uploadedVideoUrl) {
+    alert('Please upload a video first!');
+    switchTab('upload');
+    return;
+  }
+  const title = document.getElementById('adTitle').value.trim();
+  if(!title) {
+    alert('Please add an ad title!');
+    switchTab('upload');
+    return;
+  }
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true;
+  btn.textContent = 'PUBLISHING...';
+
+  const views = parseInt(document.getElementById('viewsRange').value);
+  const watchCoins = parseInt(document.getElementById('watchCoins').value);
+  const shareCoins = parseInt(document.getElementById('shareCoins').value);
+  const costTotal = views * watchCoins + Math.floor(views * watchCoins * 0.1);
+
+  const langs = [...document.querySelectorAll('#langRules .rule-tag.active')].map(t=>t.textContent);
+  const afterCats = [...document.querySelectorAll('#afterRules .rule-tag.active')].map(t=>t.textContent);
+  const skipAfter = document.getElementById('skipAfter').value;
+
+  try {
+    const res = await fetch(\`\${SUPABASE_URL}/rest/v1/ads\`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        video_url: uploadedVideoUrl,
+        title: title,
+        description: document.getElementById('adDesc').value,
+        category: document.getElementById('adCategory').value,
+        views_purchased: views,
+        views_delivered: 0,
+        coins_per_watch: watchCoins,
+        coins_per_share: shareCoins,
+        coins_spent: costTotal,
+        target_languages: langs,
+        show_after: afterCats,
+        skip_after_seconds: parseInt(skipAfter),
+        status: 'pending'
+      })
+    });
+
+    if(res.ok) {
+      btn.textContent = '✅ CAMPAIGN SUBMITTED!';
+      btn.style.background = 'rgba(0,255,100,0.2)';
+      setTimeout(() => switchTab('stats'), 1500);
+      loadStats();
+    } else {
+      throw new Error('Failed');
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '🚀 PUBLISH AD CAMPAIGN';
+    alert('Failed to publish. Check Supabase connection.');
+  }
+}
+
+// LOAD STATS
+async function loadStats() {
+  try {
+    const res = await fetch(\`\${SUPABASE_URL}/rest/v1/ads?select=*&order=created_at.desc\`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const ads = await res.json();
+    if(!Array.isArray(ads)) return;
+
+    const totalViews = ads.reduce((a,b) => a + (b.views_delivered||0), 0);
+    const totalCoins = ads.reduce((a,b) => a + (b.coins_spent||0), 0);
+
+    document.getElementById('statViews').textContent = totalViews;
+    document.getElementById('statCoinsSpent').textContent = totalCoins;
+
+    const list = document.getElementById('campaignsList');
+    if(ads.length === 0) {
+      list.innerHTML = '<div style="text-align:center;opacity:0.4;padding:20px;font-size:13px;">No campaigns yet</div>';
+      return;
+    }
+
+    list.innerHTML = ads.map(ad => \`
+      <div class="ad-campaign-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-weight:700;font-size:13px;">\${ad.title}</div>
+          <span class="campaign-status \${ad.status==='active'?'status-active':'status-pending'}">\${(ad.status||'pending').toUpperCase()}</span>
+        </div>
+        <div style="font-size:11px;opacity:0.5;">\${ad.views_delivered||0} / \${ad.views_purchased||0} views</div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width:\${Math.min(100,((ad.views_delivered||0)/(ad.views_purchased||1))*100)}%"></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;opacity:0.6;">
+          <span>👁 \${ad.coins_per_watch}🪙/watch</span>
+          <span>🔗 \${ad.coins_per_share}🪙/share</span>
+        </div>
+      </div>
+    \`).join('');
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
