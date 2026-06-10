@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI News Reader</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--cyan:#00f5ff;--purple:#b400ff;--pink:#ff00c8;--gold:#ffd700;--dark:#04000f;--darker:#020008;--surface:#0a0020;--text:#e8d5ff;--muted:#6b4d8a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--darker);color:var(--text);font-family:'Rajdhani',sans-serif;}
+.top-nav{position:fixed;top:0;left:0;right:0;height:58px;z-index:200;display:flex;align-items:center;gap:8px;padding:0 14px;background:rgba(4,0,15,0.96);backdrop-filter:blur(24px);border-bottom:1px solid rgba(0,245,255,0.1);}
+.logo{font-family:'Orbitron',monospace;font-size:15px;font-weight:900;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;}
+.back-btn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid rgba(0,245,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+.content{padding:70px 16px 100px;max-width:600px;margin:0 auto;}
+.lang-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px;padding-bottom:4px;}
+.lang-strip::-webkit-scrollbar{display:none;}
+.lang-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid rgba(0,245,255,0.2);background:var(--surface);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;}
+.lang-btn.active{background:linear-gradient(135deg,var(--cyan),var(--purple));border-color:transparent;color:#000;font-weight:700;}
+.player-card{background:var(--surface);border:1px solid rgba(0,245,255,0.15);border-radius:16px;padding:16px;margin-bottom:16px;}
+.now-playing{font-family:'Orbitron',monospace;font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;}
+.news-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.4;}
+.news-source{font-size:11px;color:var(--muted);margin-bottom:12px;}
+.controls{display:flex;align-items:center;gap:10px;}
+.play-btn{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(0,245,255,0.3);}
+.ctrl-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.speed-btn{padding:4px 10px;border-radius:10px;background:rgba(180,0,255,0.15);border:1px solid rgba(180,0,255,0.3);color:var(--purple);font-family:'Orbitron',monospace;font-size:10px;cursor:pointer;}
+.progress-bar{flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));width:0%;transition:width 0.3s;border-radius:2px;}
+.news-list{display:flex;flex-direction:column;gap:10px;}
+.news-item{background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;cursor:pointer;transition:all 0.2s;display:flex;gap:10px;align-items:flex-start;}
+.news-item:active{transform:scale(0.98);}
+.news-item.active{border-color:rgba(0,245,255,0.3);background:rgba(0,245,255,0.05);}
+.news-num{font-family:'Orbitron',monospace;font-size:11px;color:var(--purple);flex-shrink:0;margin-top:2px;}
+.news-item-title{font-size:13px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:3px;}
+.news-item-meta{font-size:10px;color:var(--muted);}
+.loading{text-align:center;padding:40px;color:var(--muted);}
+.loader-orb{font-size:40px;animation:float 1.5s ease-in-out infinite;display:block;margin-bottom:10px;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.sec-title{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--purple);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(180,0,255,0.4),transparent);}
+.speaking-wave{display:none;align-items:center;gap:3px;margin-left:8px;}
+.speaking-wave.active{display:flex;}
+.wave-bar{width:3px;background:var(--cyan);border-radius:2px;animation:wave 0.8s ease-in-out infinite;}
+.wave-bar:nth-child(2){animation-delay:0.1s;height:12px;}
+.wave-bar:nth-child(3){animation-delay:0.2s;height:18px;}
+.wave-bar:nth-child(4){animation-delay:0.3s;height:12px;}
+.wave-bar:nth-child(5){animation-delay:0.4s;height:8px;}
+@keyframes wave{0%,100%{transform:scaleY(0.5)}50%{transform:scaleY(1.2)}}
+</style>
+</head>
+<body>
+<div class="top-nav">
+  <div class="back-btn" onclick="history.back()">←</div>
+  <div class="logo">AI NEWS</div>
+  <div style="flex:1"></div>
+  <div style="font-size:11px;color:var(--muted)" id="newsCount"></div>
+</div>
+<div class="content">
+  <div class="lang-strip">
+    <button class="lang-btn active" onclick="loadNews('en','English',this)">🇬🇧 English</button>
+    <button class="lang-btn" onclick="loadNews('ml','Malayalam',this)">🇮🇳 Malayalam</button>
+    <button class="lang-btn" onclick="loadNews('hi','Hindi',this)">🇮🇳 Hindi</button>
+    <button class="lang-btn" onclick="loadNews('ar','Arabic',this)">🇦🇪 Arabic</button>
+  </div>
+
+  <div class="player-card" id="playerCard" style="display:none">
+    <div class="now-playing">▶ NOW READING</div>
+    <div class="news-title" id="playingTitle">-</div>
+    <div class="news-source" id="playingSource">-</div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="prevNews()">⏮</button>
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="ctrl-btn" onclick="nextNews()">⏭</button>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <button class="speed-btn" onclick="cycleSpeed()" id="speedBtn">1x</button>
+      <div class="speaking-wave" id="speakWave">
+        <div class="wave-bar" style="height:8px"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar" style="height:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title" id="newsLabel">TOP STORIES</div>
+  <div id="newsList"><div class="loading"><span class="loader-orb">📰</span>Loading news...</div></div>
+</div>
+
+<script>
+const API_KEY = '35beae67f6b59d4d5fb16ab23ba5e7da';
+const LANG_VOICES = { en: 'en-US', ml: 'ml-IN', hi: 'hi-IN', ar: 'ar-SA' };
+let news = [], currentIdx = 0, speaking = false, speed = 1, currentLang = 'en';
+let synth = window.speechSynthesis;
+
+async function loadNews(lang, label, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('newsLabel').textContent = label.toUpperCase() + ' NEWS';
+  document.getElementById('newsList').innerHTML = '<div class="loading"><span class="loader-orb">📡</span>Fetching ' + label + ' news...</div>';
+  stopSpeech();
+
+  try {
+    const url = 'https://gnews.io/api/v4/top-headlines?lang=' + lang + '&max=10&apikey=' + API_KEY;
+    const res = await fetch(url);
+    const data = await res.json();
+    news = data.articles || [];
+    document.getElementById('newsCount').textContent = news.length + ' stories';
+    renderNews();
+  } catch(e) {
+    document.getElementById('newsList').innerHTML = '<div class="loading">❌ Failed to load news</div>';
+  }
+}
+
+function renderNews() {
+  const list = document.getElementById('newsList');
+  if (!news.length) { list.innerHTML = '<div class="loading">No news found</div>'; return; }
+  list.innerHTML = news.map((n,i) => `
+    <div class="news-item ${i===currentIdx?'active':''}" id="ni${i}" onclick="playNews(${i})">
+      <div class="news-num">${String(i+1).padStart(2,'0')}</div>
+      <div>
+        <div class="news-item-title">${n.title}</div>
+        <div class="news-item-meta">${n.source?.name || 'News'} · ${new Date(n.publishedAt).toLocaleDateString()}</div>
+      </div>
+    </div>`).join('');
+}
+
+function playNews(idx) {
+  currentIdx = idx;
+  const n = news[idx];
+  document.getElementById('playerCard').style.display = 'block';
+  document.getElementById('playingTitle').textContent = n.title;
+  document.getElementById('playingSource').textContent = (n.source?.name || 'News') + ' · ' + new Date(n.publishedAt).toLocaleDateString();
+  document.querySelectorAll('.news-item').forEach((el,i) => el.classList.toggle('active', i===idx));
+  speak(n.title + '. ' + (n.description || ''));
+}
+
+function speak(text) {
+  stopSpeech();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = LANG_VOICES[currentLang] || 'en-US';
+  utt.rate = speed;
+  utt.onstart = () => { speaking=true; document.getElementById('playBtn').textContent='⏸'; document.getElementById('speakWave').classList.add('active'); };
+  utt.onend = () => { speaking=false; document.getElementById('playBtn').textContent='▶'; document.getElementById('speakWave').classList.remove('active'); document.getElementById('progressFill').style.width='100%'; setTimeout(()=>{document.getElementById('progressFill').style.width='0%'; nextNews();},800); };
+  utt.onerror = () => { speaking=false; document.getElementById('playBtn').textContent='▶'; };
+  synth.speak(utt);
+  animateProgress();
+}
+
+function animateProgress() {
+  let w = 0;
+  const fill = document.getElementById('progressFill');
+  const iv = setInterval(() => { if(!speaking){clearInterval(iv);return;} w = Math.min(w+0.5,95); fill.style.width=w+'%'; }, 200);
+}
+
+function togglePlay() { if(speaking){stopSpeech();}else{if(news[currentIdx])playNews(currentIdx);} }
+function stopSpeech() { synth.cancel(); speaking=false; document.getElementById('playBtn').textContent='▶'; document.getElementById('speakWave').classList.remove('active'); }
+function nextNews() { if(currentIdx < news.length-1) playNews(currentIdx+1); }
+function prevNews() { if(currentIdx > 0) playNews(currentIdx-1); }
+function cycleSpeed() { const speeds=[0.75,1,1.25,1.5,2]; const i=speeds.indexOf(speed); speed=speeds[(i+1)%speeds.length]; document.getElementById('speedBtn').textContent=speed+'x'; }
+
+window.onload = () => loadNews('en','English', document.querySelector('.lang-btn'));
+</script>
+</body>
+</html>
