@@ -434,6 +434,9 @@ async function publishVideo() {
 
     if (error) throw error;
 
+    // Award upload coins
+    await addCoins(50, 'upload_reward', 'Video uploaded: ' + title);
+
     statusMsg.style.color = '#00ff88';
     statusMsg.textContent = isShort ? '✅ Short published! 3x Emo Coins active 🔥' : '✅ Video published!';
     document.getElementById('successCard').classList.add('show');
