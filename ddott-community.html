@@ -444,7 +444,7 @@ function loadAIFeatures() {
   ];
 
   document.getElementById('aiFeatures').innerHTML = features.map((f, i) => `
-    <div class="ai-card" style="animation-delay:${i * 0.05}s">
+    <div class="ai-card" style="animation-delay:${i * 0.05}s" onclick="openAIFeature('${f.name}')">
       <div class="ai-icon" style="background:${f.color};border:1px solid ${f.border}">${f.icon}</div>
       <div class="ai-info">
         <div class="ai-name">${f.name}</div>
@@ -456,6 +456,10 @@ function loadAIFeatures() {
 }
 
 // ============================================
+function openAIFeature(name) {
+  if(name === 'AI News Reader') window.location.href = 'ddott-news-reader.html';
+  else if(name === 'AI Human Talk') window.location.href = 'ddott-ai-butterfly.html';
+}
 // LOAD COLLABS FROM DATABASE
 // ============================================
 async function loadCollabs() {
