@@ -147,7 +147,8 @@ function showNews(i) {
   idx=i;
   const n=news[i];
   if(!n) return;
-  document.getElementById('newsBg').style.backgroundImage = n.image ? `url(${n.image})` : 'linear-gradient(135deg,#1a0010,#000820)';
+  const bgImg = n.image && n.image.startsWith('http') ? `url(${n.image})` : 'linear-gradient(135deg,#1a0010,#000820)';
+  document.getElementById('newsBg').style.backgroundImage = bgImg;
   document.getElementById('newsSource').textContent = n.source?.name || 'News';
   document.getElementById('newsHeadline').textContent = n.title;
   document.getElementById('newsBody').textContent = n.description || '';
@@ -155,7 +156,8 @@ function showNews(i) {
   document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===i));
   document.getElementById('progressFill').style.width='0%';
   clearTimeout(autoTimer);
-  if(playing) speakNews(n);
+  synth.cancel();
+  if(playing) setTimeout(()=>speakNews(n), 300);
 }
 
 function speakNews(n) {
@@ -195,8 +197,8 @@ function togglePlay() {
   else { synth.cancel(); clearTimeout(autoTimer); clearInterval(progressTimer); }
 }
 
-function nextNews() { if(idx<news.length-1){showNews(idx+1);if(playing)speakNews(news[idx]);} }
-function prevNews() { if(idx>0){showNews(idx-1);if(playing)speakNews(news[idx]);} }
+function nextNews() { if(idx<news.length-1){idx++;showNews(idx);} }
+function prevNews() { if(idx>0){idx--;showNews(idx);} }
 function stopAll() { playing=false; synth.cancel(); clearTimeout(autoTimer); clearInterval(progressTimer); document.getElementById('playBtn').textContent='▶'; }
 function cycleSpeed() { const s=[0.75,1,1.25,1.5,2]; const i=s.indexOf(speed); speed=s[(i+1)%s.length]; document.getElementById('speedBtn').textContent=speed+'x'; if(utt&&playing){speakNews(news[idx]);} }
 function toggleMute() { muted=!muted; document.getElementById('volBtn').textContent=muted?'🔇':'🔊'; }
