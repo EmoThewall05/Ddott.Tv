@@ -68,30 +68,31 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
 @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 .loader-text{font-family:'Orbitron',monospace;font-size:11px;color:#ff0040;letter-spacing:2px;margin-top:12px;}
 
-/* NEWS ANCHOR AVATAR */
-.anchor-wrap{position:absolute;top:36px;right:14px;z-index:15;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.anchor-avatar{width:70px;height:70px;border-radius:50%;border:2px solid #ff0040;overflow:hidden;position:relative;background:linear-gradient(135deg,#1a0820,#000d1a);box-shadow:0 0 20px rgba(255,0,64,0.4);}
-.anchor-face{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
-.anchor-head{width:38px;height:44px;background:linear-gradient(180deg,#f5c5a3,#e8a882);border-radius:50% 50% 45% 45%;position:relative;margin-top:8px;}
-.anchor-hair{position:absolute;top:-4px;left:-2px;right:-2px;height:22px;background:#2c1810;border-radius:50% 50% 0 0;}
-.anchor-eyes{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;}
-.anchor-eye{width:5px;height:5px;background:#2c1810;border-radius:50%;animation:blink-eye 4s infinite;}
-@keyframes blink-eye{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(0.1)}}
-.anchor-mouth{position:absolute;bottom:11px;left:50%;transform:translateX(-50%);width:12px;height:5px;background:#c0705a;border-radius:0 0 8px 8px;transition:all 0.1s;}
-.anchor-mouth.talking{animation:talk 0.15s infinite alternate;}
-@keyframes talk{0%{height:3px;width:10px;border-radius:0 0 8px 8px;}100%{height:8px;width:14px;border-radius:4px;}}
-.anchor-suit{position:absolute;bottom:0;left:0;right:0;height:16px;background:linear-gradient(180deg,#1a237e,#0d1757);border-radius:0 0 50% 50%;}
-.anchor-tie{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:6px;height:14px;background:#ff0040;clip-path:polygon(50% 0%,100% 30%,70% 100%,30% 100%,0% 30%);}
-.anchor-label{font-family:'Orbitron',monospace;font-size:7px;color:#ff0040;letter-spacing:1px;background:rgba(0,0,0,0.7);padding:2px 6px;border-radius:3px;border:1px solid rgba(255,0,64,0.3);}
-.anchor-signal{display:flex;gap:2px;align-items:flex-end;height:12px;}
-.anchor-bar{width:3px;background:#ff0040;border-radius:1px;opacity:0.3;}
-.anchor-bar.active{opacity:1;animation:soundbar 0.4s infinite alternate;}
-.anchor-bar:nth-child(1){height:4px;animation-delay:0s;}
-.anchor-bar:nth-child(2){height:8px;animation-delay:0.1s;}
-.anchor-bar:nth-child(3){height:12px;animation-delay:0.2s;}
-.anchor-bar:nth-child(4){height:8px;animation-delay:0.3s;}
-.anchor-bar:nth-child(5){height:4px;animation-delay:0.4s;}
-@keyframes soundbar{0%{transform:scaleY(0.3)}100%{transform:scaleY(1)}}
+
+
+/* REALISTIC ANCHOR */
+.anchor-wrap{position:absolute;top:36px;right:10px;z-index:15;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.anchor-toggle{display:flex;gap:4px;margin-bottom:3px;}
+.anchor-toggle-btn{padding:2px 8px;border-radius:8px;border:1px solid rgba(255,0,64,0.5);background:rgba(0,0,0,0.6);color:#fff;font-size:9px;font-family:'Orbitron',monospace;cursor:pointer;}
+.anchor-toggle-btn.active{background:#ff0040;border-color:#ff0040;}
+.anchor-frame{width:72px;height:88px;border-radius:12px;border:2px solid #ff0040;overflow:hidden;position:relative;box-shadow:0 0 16px rgba(255,0,64,0.5);}
+.anchor-svg{width:100%;height:100%;}
+.anchor-label{font-family:'Orbitron',monospace;font-size:7px;color:#ff0040;letter-spacing:1px;background:rgba(0,0,0,0.8);padding:2px 7px;border-radius:3px;border:1px solid rgba(255,0,64,0.4);}
+.anchor-bars{display:flex;gap:2px;align-items:flex-end;height:10px;margin-top:1px;}
+.anchor-bar{width:3px;background:#ff0040;border-radius:1px;opacity:0.25;transition:opacity 0.2s;}
+.anchor-bar:nth-child(1){height:3px;}
+.anchor-bar:nth-child(2){height:6px;}
+.anchor-bar:nth-child(3){height:10px;}
+.anchor-bar:nth-child(4){height:6px;}
+.anchor-bar:nth-child(5){height:3px;}
+.anchor-bar.active{opacity:1;animation:abar 0.35s infinite alternate;}
+.anchor-bar:nth-child(1){animation-delay:0s;}
+.anchor-bar:nth-child(2){animation-delay:0.07s;}
+.anchor-bar:nth-child(3){animation-delay:0.14s;}
+.anchor-bar:nth-child(4){animation-delay:0.21s;}
+.anchor-bar:nth-child(5){animation-delay:0.28s;}
+@keyframes abar{0%{transform:scaleY(0.3)}100%{transform:scaleY(1)}}
+#mouthPath{transition:d 0.1s;}
 </style>
 </head>
 <body>
@@ -120,22 +121,69 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
   
   <div class="story-dots" id="storyDots"></div>
   <div class="news-counter" id="newsCounter"></div>
-  <div class="anchor-wrap">
-    <div class="anchor-avatar">
-      <div class="anchor-face">
-        <div class="anchor-head">
-          <div class="anchor-hair"></div>
-          <div class="anchor-eyes">
-            <div class="anchor-eye"></div>
-            <div class="anchor-eye"></div>
-          </div>
-          <div class="anchor-mouth" id="anchorMouth"></div>
-        </div>
-        <div class="anchor-suit">
-          <div class="anchor-tie"></div>
-        </div>
-      </div>
+  <div class="anchor-wrap" id="anchorWrap">
+    <div class="anchor-toggle">
+      <button class="anchor-toggle-btn active" id="btnMale" onclick="switchAnchor('male')">♂</button>
+      <button class="anchor-toggle-btn" id="btnFemale" onclick="switchAnchor('female')">♀</button>
     </div>
+    <div class="anchor-frame" id="anchorFrame">
+      <svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="bg-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#040d1a"/></linearGradient>
+  <linearGradient id="skin-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4956a"/><stop offset="100%" stop-color="#c07848"/></linearGradient></defs>
+  <rect width="72" height="88" fill="url(#bg-m)"/>
+  <!-- suit -->
+  <rect x="8" y="62" width="56" height="30" rx="4" fill="#0d2144"/>
+  <polygon points="36,62 28,88 36,75" fill="#1a3a6e"/>
+  <polygon points="36,62 44,88 36,75" fill="#1a3a6e"/>
+  <!-- tie -->
+  <polygon points="36,63 33,70 36,85 39,70" fill="#ff0040"/>
+  <!-- collar -->
+  <polygon points="24,62 36,68 36,74" fill="#ffffff"/>
+  <polygon points="48,62 36,68 36,74" fill="#f0f0f0"/>
+  <!-- neck -->
+  <rect x="29" y="54" width="14" height="12" rx="4" fill="url(#skin-m)"/>
+  <!-- head -->
+  <ellipse cx="36" cy="36" rx="20" ry="23" fill="url(#skin-m)"/>
+  <!-- hair -->
+  <ellipse cx="36" cy="15" rx="20" ry="10" fill="#1a0f08"/>
+  <rect x="16" y="14" width="40" height="8" fill="#1a0f08"/>
+  <!-- ear left -->
+  <ellipse cx="16" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- ear right -->
+  <ellipse cx="56" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- eyebrow left -->
+  <path d="M22 26 Q28 23 32 25" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eyebrow right -->
+  <path d="M40 25 Q44 23 50 26" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eye left white -->
+  <ellipse cx="27" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye right white -->
+  <ellipse cx="45" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye left iris -->
+  <circle cx="27" cy="32" r="2.5" fill="#3d2b1f"/>
+  <circle cx="45" cy="32" r="2.5" fill="#3d2b1f"/>
+  <!-- eye shine -->
+  <circle cx="28" cy="31" r="1" fill="white"/>
+  <circle cx="46" cy="31" r="1" fill="white"/>
+  <!-- nose -->
+  <path d="M34 36 Q36 42 38 36" stroke="#a0623a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="33" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <ellipse cx="39" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <!-- mouth -->
+  <path id="mouthPath" d="M28 48 Q36 52 44 48" stroke="#8B3a2a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M28 48 Q36 46 44 48" stroke="none" fill="#c0504a" opacity="0.5"/>
+</svg>
+    </div>
+    <div class="anchor-label" id="anchorLabel">ON AIR</div>
+    <div class="anchor-bars" id="anchorBars">
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+    </div>
+  </div>
+  
     <div class="anchor-label">ON AIR</div>
     <div class="anchor-signal" id="anchorSignal">
       <div class="anchor-bar"></div>
@@ -319,6 +367,152 @@ function startTalking() {
 function stopTalking() {
   document.getElementById('anchorMouth').classList.remove('talking');
   document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.remove('active'));
+}
+
+
+const maleSVGStr = `<svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="bg-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#040d1a"/></linearGradient>
+  <linearGradient id="skin-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4956a"/><stop offset="100%" stop-color="#c07848"/></linearGradient></defs>
+  <rect width="72" height="88" fill="url(#bg-m)"/>
+  <!-- suit -->
+  <rect x="8" y="62" width="56" height="30" rx="4" fill="#0d2144"/>
+  <polygon points="36,62 28,88 36,75" fill="#1a3a6e"/>
+  <polygon points="36,62 44,88 36,75" fill="#1a3a6e"/>
+  <!-- tie -->
+  <polygon points="36,63 33,70 36,85 39,70" fill="#ff0040"/>
+  <!-- collar -->
+  <polygon points="24,62 36,68 36,74" fill="#ffffff"/>
+  <polygon points="48,62 36,68 36,74" fill="#f0f0f0"/>
+  <!-- neck -->
+  <rect x="29" y="54" width="14" height="12" rx="4" fill="url(#skin-m)"/>
+  <!-- head -->
+  <ellipse cx="36" cy="36" rx="20" ry="23" fill="url(#skin-m)"/>
+  <!-- hair -->
+  <ellipse cx="36" cy="15" rx="20" ry="10" fill="#1a0f08"/>
+  <rect x="16" y="14" width="40" height="8" fill="#1a0f08"/>
+  <!-- ear left -->
+  <ellipse cx="16" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- ear right -->
+  <ellipse cx="56" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- eyebrow left -->
+  <path d="M22 26 Q28 23 32 25" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eyebrow right -->
+  <path d="M40 25 Q44 23 50 26" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eye left white -->
+  <ellipse cx="27" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye right white -->
+  <ellipse cx="45" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye left iris -->
+  <circle cx="27" cy="32" r="2.5" fill="#3d2b1f"/>
+  <circle cx="45" cy="32" r="2.5" fill="#3d2b1f"/>
+  <!-- eye shine -->
+  <circle cx="28" cy="31" r="1" fill="white"/>
+  <circle cx="46" cy="31" r="1" fill="white"/>
+  <!-- nose -->
+  <path d="M34 36 Q36 42 38 36" stroke="#a0623a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="33" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <ellipse cx="39" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <!-- mouth -->
+  <path id="mouthPath" d="M28 48 Q36 52 44 48" stroke="#8B3a2a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M28 48 Q36 46 44 48" stroke="none" fill="#c0504a" opacity="0.5"/>
+</svg>`;
+const femaleSVGStr = `<svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="bg-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a0828"/><stop offset="100%" stop-color="#0d0418"/></linearGradient>
+  <linearGradient id="skin-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0b090"/><stop offset="100%" stop-color="#d8865e"/></linearGradient></defs>
+  <rect width="72" height="88" fill="url(#bg-f)"/>
+  <!-- suit -->
+  <rect x="8" y="62" width="56" height="30" rx="4" fill="#2d0a3e"/>
+  <path d="M28 62 Q36 72 44 62" fill="#ff0040" opacity="0.8"/>
+  <!-- neck -->
+  <rect x="30" y="54" width="12" height="12" rx="4" fill="url(#skin-f)"/>
+  <!-- head -->
+  <ellipse cx="36" cy="35" rx="19" ry="22" fill="url(#skin-f)"/>
+  <!-- long hair back -->
+  <ellipse cx="36" cy="34" rx="22" ry="24" fill="#1a0808"/>
+  <!-- face on top -->
+  <ellipse cx="36" cy="35" rx="19" ry="22" fill="url(#skin-f)"/>
+  <!-- hair top -->
+  <ellipse cx="36" cy="14" rx="19" ry="9" fill="#1a0808"/>
+  <rect x="17" y="13" width="38" height="7" fill="#1a0808"/>
+  <!-- hair side left -->
+  <rect x="15" y="14" width="5" height="28" rx="3" fill="#1a0808"/>
+  <!-- hair side right -->
+  <rect x="52" y="14" width="5" height="28" rx="3" fill="#1a0808"/>
+  <!-- ear -->
+  <ellipse cx="17" cy="36" rx="3" ry="4" fill="#d8865e"/>
+  <ellipse cx="55" cy="36" rx="3" ry="4" fill="#d8865e"/>
+  <!-- earring -->
+  <circle cx="17" cy="41" r="2" fill="#ffd700"/>
+  <circle cx="55" cy="41" r="2" fill="#ffd700"/>
+  <!-- eyebrow left - arched -->
+  <path d="M21 25 Q27 21 31 24" stroke="#1a0808" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- eyebrow right -->
+  <path d="M41 24 Q45 21 51 25" stroke="#1a0808" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- eye shadow -->
+  <ellipse cx="26" cy="31" rx="6" ry="4" fill="#7b3fa0" opacity="0.3"/>
+  <ellipse cx="46" cy="31" rx="6" ry="4" fill="#7b3fa0" opacity="0.3"/>
+  <!-- eye white -->
+  <ellipse cx="26" cy="31" rx="5" ry="3.5" fill="white"/>
+  <ellipse cx="46" cy="31" rx="5" ry="3.5" fill="white"/>
+  <!-- lashes top left -->
+  <path d="M21 28 L19 25 M23 27 L22 24 M25 27 L25 24 M27 27 L28 24 M29 28 L31 25" stroke="#1a0808" stroke-width="1" fill="none"/>
+  <!-- lashes top right -->
+  <path d="M41 28 L39 25 M43 27 L42 24 M45 27 L45 24 M47 27 L48 24 M49 28 L51 25" stroke="#1a0808" stroke-width="1" fill="none"/>
+  <!-- iris -->
+  <circle cx="26" cy="31" r="2.5" fill="#4a2040"/>
+  <circle cx="46" cy="31" r="2.5" fill="#4a2040"/>
+  <circle cx="27" cy="30" r="1" fill="white"/>
+  <circle cx="47" cy="30" r="1" fill="white"/>
+  <!-- nose -->
+  <path d="M34 37 Q36 41 38 37" stroke="#c07050" stroke-width="1.2" fill="none"/>
+  <!-- lips -->
+  <path d="M27 47 Q31 44 36 45 Q41 44 45 47" fill="#e03060"/>
+  <path id="mouthPath" d="M27 47 Q36 52 45 47" fill="#c02050"/>
+  <path d="M27 47 Q36 49 45 47" fill="#ff6080" opacity="0.6"/>
+  <!-- cheek blush -->
+  <ellipse cx="18" cy="38" rx="5" ry="3" fill="#ff8080" opacity="0.25"/>
+  <ellipse cx="54" cy="38" rx="5" ry="3" fill="#ff8080" opacity="0.25"/>
+</svg>`;
+let currentAnchor = 'male';
+
+function switchAnchor(gender) {
+  currentAnchor = gender;
+  document.getElementById('anchorFrame').innerHTML = gender==='male' ? maleSVGStr : femaleSVGStr;
+  document.getElementById('btnMale').classList.toggle('active', gender==='male');
+  document.getElementById('btnFemale').classList.toggle('active', gender==='female');
+}
+
+function startTalking() {
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.add('active'));
+  document.getElementById('anchorLabel').textContent = 'ON AIR';
+  animateMouth(true);
+}
+
+function stopTalking() {
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.remove('active'));
+  animateMouth(false);
+}
+
+let mouthInterval = null;
+function animateMouth(talking) {
+  clearInterval(mouthInterval);
+  const el = document.getElementById('mouthPath');
+  if(!el) return;
+  if(!talking) {
+    if(currentAnchor==='male') el.setAttribute('d','M28 48 Q36 52 44 48');
+    else el.setAttribute('d','M27 47 Q36 52 45 47');
+    return;
+  }
+  let open = false;
+  mouthInterval = setInterval(()=>{
+    const el2 = document.getElementById('mouthPath');
+    if(!el2){ clearInterval(mouthInterval); return; }
+    open = !open;
+    if(currentAnchor==='male')
+      el2.setAttribute('d', open ? 'M28 47 Q36 54 44 47' : 'M28 48 Q36 51 44 48');
+    else
+      el2.setAttribute('d', open ? 'M27 46 Q36 54 45 46' : 'M27 47 Q36 51 45 47');
+  }, 150);
 }
 
 window.onload=()=>loadNews('en',document.querySelector('.lang-btn'));
