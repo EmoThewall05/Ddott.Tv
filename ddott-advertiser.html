@@ -384,8 +384,7 @@ SUGGESTIONS_JSON:{"views":500,"watchCoins":5,"shareCoins":10,"category":"Technol
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        system: systemPrompt,
-        messages: chatHistory
+        messages: [{role:"system", content: systemPrompt}, ...chatHistory]
       })
     });
     const data = await res.json();
