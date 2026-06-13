@@ -287,7 +287,7 @@ function speakCurrent() {
     speaking = false;
     if(playing) scheduleNext();
   };
-  if(synth) synth.speak(utt);
+  if(synth) if(synth) synth.speak(utt);
 }
 
 function scheduleNext() {
@@ -340,7 +340,7 @@ function prevNews() {
 function hardStop() {
   stopTalking();
   speaking = false;
-  if(synth) synth.cancel();
+  if(synth) if(synth) synth.cancel();
   clearTimeout(autoTimer);
   clearInterval(progressTimer);
 }
