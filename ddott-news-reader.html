@@ -4,106 +4,99 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ddott News</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-serif;overflow:hidden;}
 
 /* CHANNEL HEADER */
-.channel-bar{position:fixed;top:0;left:0;right:0;height:48px;z-index:100;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(0,0,0,0.95);border-bottom:2px solid #ff0040;}
+.channel-bar{position:fixed;top:0;left:0;right:0;height:48px;z-index:100;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);border-bottom:2px solid #ff0040;}
 .back-btn{font-size:18px;cursor:pointer;opacity:0.7;}
-.channel-logo{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:#ff0040;letter-spacing:2px;}
+.channel-logo{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:#ff0040;letter-spacing:2px;}
 .live-tag{display:flex;align-items:center;gap:4px;padding:3px 8px;background:#ff0040;border-radius:3px;font-family:'Orbitron',monospace;font-size:8px;font-weight:700;letter-spacing:1px;}
 .live-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 0.8s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.lang-strip{display:flex;gap:5px;margin-left:auto;}
-.lang-btn{padding:4px 10px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;}
-.lang-btn.active{background:#ff0040;border-color:#ff0040;}
+.lang-strip{display:flex;gap:6px;margin-left:auto;}
+.lang-btn{padding:4px 10px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;}
+.lang-btn.active{background:#ff0040;border-color:#ff0040;font-weight:700;}
 
-/* MAIN SCREEN */
-.news-screen{position:fixed;top:48px;left:0;right:0;bottom:0;background:#000;display:flex;flex-direction:column;}
+/* MAIN VIDEO AREA */
+.news-screen{position:fixed;top:48px;left:0;right:0;bottom:0;background:#000;}
 
-/* STUDIO BG - no random images */
-.studio-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%, #1a0008 0%, #0a000f 50%, #000 100%);}
-.studio-bg::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,0,64,0.015) 60px,rgba(255,0,64,0.015) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,0,64,0.015) 60px,rgba(255,0,64,0.015) 61px);}
-.studio-glow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:120%;height:40%;background:radial-gradient(ellipse,rgba(255,0,64,0.08) 0%,transparent 70%);}
+/* BG IMAGE */
+.news-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 0.8s ease;}
+.news-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.85) 70%,rgba(0,0,0,0.97) 100%);}
 
 /* BREAKING TICKER */
-.ticker-wrap{position:absolute;top:0;left:0;right:0;height:28px;background:rgba(255,0,64,0.92);display:flex;align-items:center;overflow:hidden;z-index:10;}
-.ticker-label{padding:0 10px;font-family:'Orbitron',monospace;font-size:8px;font-weight:900;letter-spacing:1px;background:#fff;color:#ff0040;height:100%;display:flex;align-items:center;flex-shrink:0;white-space:nowrap;}
-.ticker-text{white-space:nowrap;animation:ticker 50s linear infinite;font-size:11px;font-weight:700;padding-left:20px;letter-spacing:0.3px;}
+.ticker-wrap{position:absolute;top:0;left:0;right:0;height:32px;background:rgba(255,0,64,0.9);display:flex;align-items:center;overflow:hidden;z-index:10;}
+.ticker-label{padding:0 12px;font-family:'Orbitron',monospace;font-size:9px;font-weight:900;letter-spacing:1px;background:#fff;color:#ff0040;height:100%;display:flex;align-items:center;flex-shrink:0;}
+.ticker-text{white-space:nowrap;animation:ticker 40s linear infinite;font-size:12px;font-weight:600;padding-left:20px;}
 @keyframes ticker{0%{transform:translateX(100vw)}100%{transform:translateX(-100%)}}
 
-/* NEWS DOTS */
-.story-dots{position:absolute;top:34px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:10;}
-.dot{width:18px;height:3px;border-radius:2px;background:rgba(255,255,255,0.25);transition:all 0.3s;cursor:pointer;}
-.dot.active{background:#ff0040;width:28px;}
+/* NEWS CONTENT */
+.news-content{position:absolute;bottom:0;left:0;right:0;padding:16px 14px 20px;z-index:10;}
+.news-source-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(255,0,64,0.8);border-radius:3px;font-size:10px;font-weight:700;letter-spacing:0.5px;margin-bottom:8px;}
+.news-counter{position:absolute;top:40px;right:100px;font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,0.6);}
+.news-headline{font-size:18px;font-weight:700;line-height:1.3;margin-bottom:8px;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
+.news-body{font-size:13px;line-height:1.5;color:rgba(255,255,255,0.85);max-height:80px;overflow:hidden;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
 
-/* AUTO PROGRESS */
-.auto-bar{position:absolute;top:28px;left:0;right:0;height:3px;background:rgba(255,255,255,0.08);}
-.auto-fill{height:100%;background:rgba(255,0,64,0.5);width:0%;transition:width linear;}
-
-/* ANCHOR AREA - CENTER STAGE */
-.anchor-stage{position:absolute;top:40px;left:0;right:0;bottom:160px;display:flex;align-items:flex-end;justify-content:center;z-index:5;}
-.anchor-container{display:flex;flex-direction:column;align-items:center;gap:0;}
-
-/* ANCHOR AVATAR - Large SVG */
-.anchor-svg-wrap{width:160px;height:200px;position:relative;filter:drop-shadow(0 0 20px rgba(255,0,64,0.3));}
-.anchor-svg-wrap svg{width:100%;height:100%;}
-
-/* DESK */
-.anchor-desk{width:260px;height:28px;background:linear-gradient(180deg,#1a0a20,#0d0614);border-top:2px solid rgba(255,0,64,0.5);border-radius:8px 8px 0 0;position:relative;margin-top:-8px;}
-.anchor-desk::before{content:'';position:absolute;top:-1px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,0,64,0.8),transparent);}
-
-/* ANCHOR CONTROLS */
-.anchor-controls{position:absolute;top:34px;right:10px;display:flex;flex-direction:column;gap:6px;z-index:15;}
-.gender-wrap{display:flex;gap:4px;}
-.gender-btn{padding:3px 8px;border-radius:8px;border:1px solid rgba(255,0,64,0.4);background:rgba(0,0,0,0.7);color:#fff;font-size:9px;font-family:'Orbitron',monospace;cursor:pointer;}
-.gender-btn.active{background:#ff0040;border-color:#ff0040;}
-.on-air-badge{display:flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(0,0,0,0.8);border:1px solid rgba(255,0,64,0.4);border-radius:6px;font-family:'Orbitron',monospace;font-size:8px;color:#ff0040;}
-.on-air-dot{width:5px;height:5px;border-radius:50%;background:#ff0040;animation:blink 0.8s infinite;}
-.voice-bars{display:flex;gap:2px;align-items:flex-end;height:14px;}
-.vbar{width:3px;border-radius:1px;background:#ff0040;opacity:0.2;transition:all 0.15s;}
-.vbar:nth-child(1){height:4px;}
-.vbar:nth-child(2){height:8px;}
-.vbar:nth-child(3){height:14px;}
-.vbar:nth-child(4){height:8px;}
-.vbar:nth-child(5){height:4px;}
-.vbar.active{opacity:1;animation:vb 0.3s infinite alternate;}
-.vbar:nth-child(1){animation-delay:0s;}
-.vbar:nth-child(2){animation-delay:0.06s;}
-.vbar:nth-child(3){animation-delay:0.12s;}
-.vbar:nth-child(4){animation-delay:0.18s;}
-.vbar:nth-child(5){animation-delay:0.24s;}
-@keyframes vb{0%{transform:scaleY(0.3)}100%{transform:scaleY(1)}}
-
-/* NEWS CONTENT AREA */
-.news-content{position:absolute;bottom:60px;left:0;right:0;padding:0 14px 8px;z-index:10;}
-.news-source-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.news-source-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:rgba(255,0,64,0.85);border-radius:3px;font-size:9px;font-weight:700;letter-spacing:0.5px;font-family:'Orbitron',monospace;}
-.news-counter{font-family:'Orbitron',monospace;font-size:9px;color:rgba(255,255,255,0.4);margin-left:auto;}
-.news-headline{font-size:17px;font-weight:700;line-height:1.35;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,0.9);}
-.news-headline.ml-text{font-family:'Noto Sans Malayalam','Rajdhani',sans-serif;font-size:15px;}
-.news-body{font-size:12px;line-height:1.5;color:rgba(255,255,255,0.75);max-height:52px;overflow:hidden;}
-.news-body.ml-text{font-family:'Noto Sans Malayalam','Rajdhani',sans-serif;font-size:12px;}
-
-/* TELEPROMPTER WORD HIGHLIGHT */
-.word.active{background:rgba(255,0,64,0.35);border-radius:2px;padding:0 1px;}
+/* TELEPROMPTER HIGHLIGHT */
+.word{display:inline;transition:all 0.1s;}
+.word.active{background:rgba(255,0,64,0.4);border-radius:2px;padding:0 2px;}
 
 /* CONTROLS */
-.controls-bar{position:absolute;bottom:0;left:0;right:0;height:60px;padding:8px 14px;background:linear-gradient(to top,rgba(0,0,0,0.98),rgba(0,0,0,0.7));display:flex;align-items:center;gap:8px;z-index:20;}
-.ctrl-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);color:#fff;}
-.play-btn{width:46px;height:46px;background:#ff0040;border:none;box-shadow:0 0 18px rgba(255,0,64,0.5);font-size:16px;}
-.progress{flex:1;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;cursor:pointer;}
+.controls-bar{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);display:flex;align-items:center;gap:10px;z-index:20;}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.play-btn{width:50px;height:50px;background:#ff0040;border:none;box-shadow:0 0 20px rgba(255,0,64,0.5);}
+.progress{flex:1;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;cursor:pointer;}
 .progress-fill{height:100%;background:#ff0040;width:0%;transition:width 0.3s;border-radius:2px;}
-.speed-btn{padding:4px 9px;border-radius:7px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Orbitron',monospace;font-size:9px;cursor:pointer;}
-.vol-btn{font-size:17px;cursor:pointer;opacity:0.7;}
+.speed-btn{padding:5px 10px;border-radius:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-family:'Orbitron',monospace;font-size:10px;cursor:pointer;}
+.vol-btn{font-size:18px;cursor:pointer;opacity:0.7;}
+
+/* NEWS SWIPE DOTS */
+.story-dots{position:absolute;top:40px;left:14px;display:flex;gap:5px;z-index:10;}
+.dot{width:20px;height:3px;border-radius:2px;background:rgba(255,255,255,0.3);transition:all 0.3s;cursor:pointer;}
+.dot.active{background:#ff0040;width:30px;}
+
+/* AUTO NEXT */
+.auto-bar{position:absolute;top:32px;left:0;right:0;height:4px;background:rgba(255,255,255,0.1);}
+.auto-fill{height:100%;background:rgba(255,0,64,0.6);width:0%;transition:width linear;}
 
 /* LOADING */
 .loader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;z-index:50;}
-.loader-icon{font-size:44px;animation:spin 2s linear infinite;}
+.loader-icon{font-size:50px;animation:spin 2s linear infinite;}
 @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-.loader-text{font-family:'Orbitron',monospace;font-size:10px;color:#ff0040;letter-spacing:2px;margin-top:10px;}
+.loader-text{font-family:'Orbitron',monospace;font-size:11px;color:#ff0040;letter-spacing:2px;margin-top:12px;}
+
+
+
+/* REALISTIC ANCHOR */
+.anchor-wrap{position:absolute;top:36px;right:10px;z-index:15;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.anchor-toggle{display:flex;gap:4px;margin-bottom:3px;}
+.anchor-toggle-btn{padding:2px 8px;border-radius:8px;border:1px solid rgba(255,0,64,0.5);background:rgba(0,0,0,0.6);color:#fff;font-size:9px;font-family:'Orbitron',monospace;cursor:pointer;}
+.anchor-toggle-btn.active{background:#ff0040;border-color:#ff0040;}
+.anchor-frame{width:80px;height:100px;border-radius:12px;border:2px solid #ff0040;overflow:hidden;position:relative;box-shadow:0 0 16px rgba(255,0,64,0.5);background:#040d1a;}
+.anchor-photo{width:100%;height:100%;object-fit:cover;object-position:top;}
+.anchor-mouth-overlay{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);width:18px;height:8px;border-radius:0 0 10px 10px;background:transparent;overflow:hidden;}
+.anchor-mouth-inner{width:100%;height:100%;background:#8b2020;border-radius:0 0 10px 10px;transform:scaleY(0);transition:transform 0.1s;}
+.anchor-mouth-inner.open{transform:scaleY(1);}
+.anchor-svg{width:100%;height:100%;}
+.anchor-label{font-family:'Orbitron',monospace;font-size:7px;color:#ff0040;letter-spacing:1px;background:rgba(0,0,0,0.8);padding:2px 7px;border-radius:3px;border:1px solid rgba(255,0,64,0.4);}
+.anchor-bars{display:flex;gap:2px;align-items:flex-end;height:10px;margin-top:1px;}
+.anchor-bar{width:3px;background:#ff0040;border-radius:1px;opacity:0.25;transition:opacity 0.2s;}
+.anchor-bar:nth-child(1){height:3px;}
+.anchor-bar:nth-child(2){height:6px;}
+.anchor-bar:nth-child(3){height:10px;}
+.anchor-bar:nth-child(4){height:6px;}
+.anchor-bar:nth-child(5){height:3px;}
+.anchor-bar.active{opacity:1;animation:abar 0.35s infinite alternate;}
+.anchor-bar:nth-child(1){animation-delay:0s;}
+.anchor-bar:nth-child(2){animation-delay:0.07s;}
+.anchor-bar:nth-child(3){animation-delay:0.14s;}
+.anchor-bar:nth-child(4){animation-delay:0.21s;}
+.anchor-bar:nth-child(5){animation-delay:0.28s;}
+@keyframes abar{0%{transform:scaleY(0.3)}100%{transform:scaleY(1)}}
+#mouthPath{transition:d 0.1s;}
 </style>
 </head>
 <body>
@@ -126,37 +119,88 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
     <div class="loader-text">LOADING NEWS...</div>
   </div>
 
-  <div class="studio-bg"><div class="studio-glow"></div></div>
+  <div class="news-bg" id="newsBg"></div>
   <div class="auto-bar"><div class="auto-fill" id="autoFill"></div></div>
   <div class="ticker-wrap"><div class="ticker-label">BREAKING</div><div class="ticker-text" id="tickerText">Loading latest news...</div></div>
+  
   <div class="story-dots" id="storyDots"></div>
-
-  <!-- ANCHOR CONTROLS -->
-  <div class="anchor-controls">
-    <div class="gender-wrap">
-      <button class="gender-btn active" id="btnMale" onclick="switchAnchor('male')">♂</button>
-      <button class="gender-btn" id="btnFemale" onclick="switchAnchor('female')">♀</button>
+  <div class="news-counter" id="newsCounter"></div>
+  <div class="anchor-wrap" id="anchorWrap">
+    <div class="anchor-toggle">
+      <button class="anchor-toggle-btn active" id="btnMale" onclick="switchAnchor('male')">♂</button>
+      <button class="anchor-toggle-btn" id="btnFemale" onclick="switchAnchor('female')">♀</button>
     </div>
-    <div class="on-air-badge"><div class="on-air-dot"></div><span id="airLabel">ON AIR</span></div>
-    <div class="voice-bars" id="voiceBars">
-      <div class="vbar"></div><div class="vbar"></div><div class="vbar"></div><div class="vbar"></div><div class="vbar"></div>
+    <div class="anchor-frame" id="anchorFrame" style="position:relative;"><img class="anchor-photo" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=250&fit=crop&crop=face" onerror="this.style.display='none'" /><div class="anchor-mouth-overlay"><div class="anchor-mouth-inner" id="mouthPath"></div></div>
+      <svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="bg-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#040d1a"/></linearGradient>
+  <linearGradient id="skin-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4956a"/><stop offset="100%" stop-color="#c07848"/></linearGradient></defs>
+  <rect width="72" height="88" fill="url(#bg-m)"/>
+  <!-- suit -->
+  <rect x="8" y="62" width="56" height="30" rx="4" fill="#0d2144"/>
+  <polygon points="36,62 28,88 36,75" fill="#1a3a6e"/>
+  <polygon points="36,62 44,88 36,75" fill="#1a3a6e"/>
+  <!-- tie -->
+  <polygon points="36,63 33,70 36,85 39,70" fill="#ff0040"/>
+  <!-- collar -->
+  <polygon points="24,62 36,68 36,74" fill="#ffffff"/>
+  <polygon points="48,62 36,68 36,74" fill="#f0f0f0"/>
+  <!-- neck -->
+  <rect x="29" y="54" width="14" height="12" rx="4" fill="url(#skin-m)"/>
+  <!-- head -->
+  <ellipse cx="36" cy="36" rx="20" ry="23" fill="url(#skin-m)"/>
+  <!-- hair -->
+  <ellipse cx="36" cy="15" rx="20" ry="10" fill="#1a0f08"/>
+  <rect x="16" y="14" width="40" height="8" fill="#1a0f08"/>
+  <!-- ear left -->
+  <ellipse cx="16" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- ear right -->
+  <ellipse cx="56" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- eyebrow left -->
+  <path d="M22 26 Q28 23 32 25" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eyebrow right -->
+  <path d="M40 25 Q44 23 50 26" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eye left white -->
+  <ellipse cx="27" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye right white -->
+  <ellipse cx="45" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye left iris -->
+  <circle cx="27" cy="32" r="2.5" fill="#3d2b1f"/>
+  <circle cx="45" cy="32" r="2.5" fill="#3d2b1f"/>
+  <!-- eye shine -->
+  <circle cx="28" cy="31" r="1" fill="white"/>
+  <circle cx="46" cy="31" r="1" fill="white"/>
+  <!-- nose -->
+  <path d="M34 36 Q36 42 38 36" stroke="#a0623a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="33" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <ellipse cx="39" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <!-- mouth -->
+  <path id="mouthPath" d="M28 48 Q36 52 44 48" stroke="#8B3a2a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M28 48 Q36 46 44 48" stroke="none" fill="#c0504a" opacity="0.5"/>
+</svg>
+    </div>
+    <div class="anchor-label" id="anchorLabel">ON AIR</div>
+    <div class="anchor-bars" id="anchorBars">
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+    </div>
+  </div>
+  
+    <div class="anchor-label">ON AIR</div>
+    <div class="anchor-signal" id="anchorSignal">
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
+      <div class="anchor-bar"></div>
     </div>
   </div>
 
-  <!-- ANCHOR STAGE -->
-  <div class="anchor-stage">
-    <div class="anchor-container">
-      <div class="anchor-svg-wrap" id="anchorSvgWrap"></div>
-      <div class="anchor-desk"></div>
-    </div>
-  </div>
 
-  <!-- NEWS CONTENT -->
   <div class="news-content">
-    <div class="news-source-row">
-      <div class="news-source-tag" id="newsSource">DDOTT NEWS</div>
-      <div class="news-counter" id="newsCounter"></div>
-    </div>
+    <div class="news-source-tag" id="newsSource">DDOTT NEWS</div>
     <div class="news-headline" id="newsHeadline">Loading...</div>
     <div class="news-body" id="newsBody"></div>
   </div>
@@ -173,175 +217,17 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
 
 <script>
 const WORKER = 'https://ddott-news.meradivin.workers.dev/news';
-const VOICES = {en:'en-US', ml:'ml-IN', hi:'hi-IN', ar:'ar-SA'};
+const VOICES = {en:'en-US',ml:'ml-IN',hi:'hi-IN',ar:'ar-SA'};
 let news=[], idx=0, playing=false, speed=1, muted=false, lang='en';
-let synth=window.speechSynthesis, autoTimer=null, progressTimer=null, speaking=false;
-let currentAnchor='male', mouthInterval=null;
+let synth=window.speechSynthesis||null, autoTimer=null, progressTimer=null, speaking=false;
 
-// ── SVG ANCHORS ──────────────────────────────────────────────
-const MALE_SVG = `<svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="bgm" cx="50%" cy="80%"><stop offset="0%" stop-color="#12002a"/><stop offset="100%" stop-color="#050010"/></radialGradient>
-    <linearGradient id="skinm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4956a"/><stop offset="100%" stop-color="#b8733e"/></linearGradient>
-    <linearGradient id="suitm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d2144"/><stop offset="100%" stop-color="#071428"/></linearGradient>
-  </defs>
-  <rect width="120" height="160" fill="url(#bgm)"/>
-  <!-- body/suit -->
-  <rect x="10" y="110" width="100" height="55" rx="8" fill="url(#suitm)"/>
-  <polygon points="60,110 44,160 60,138" fill="#1a3a6e"/>
-  <polygon points="60,110 76,160 60,138" fill="#152e58"/>
-  <!-- tie -->
-  <polygon points="60,112 56,124 60,150 64,124" fill="#ff0040"/>
-  <!-- shirt collar -->
-  <polygon points="38,110 60,122 60,130" fill="#ffffff"/>
-  <polygon points="82,110 60,122 60,130" fill="#eeeeee"/>
-  <!-- neck -->
-  <rect x="49" y="96" width="22" height="18" rx="6" fill="url(#skinm)"/>
-  <!-- head -->
-  <ellipse cx="60" cy="62" rx="34" ry="40" fill="url(#skinm)"/>
-  <!-- hair -->
-  <ellipse cx="60" cy="24" rx="34" ry="16" fill="#1a0f08"/>
-  <rect x="26" y="23" width="68" height="14" fill="#1a0f08"/>
-  <!-- ears -->
-  <ellipse cx="26" cy="64" rx="7" ry="9" fill="#b8733e"/>
-  <ellipse cx="94" cy="64" rx="7" ry="9" fill="#b8733e"/>
-  <!-- eyebrows -->
-  <path d="M36 46 Q46 41 54 44" stroke="#1a0f08" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M66 44 Q74 41 84 46" stroke="#1a0f08" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <!-- eyes white -->
-  <ellipse cx="45" cy="56" rx="9" ry="7" fill="white"/>
-  <ellipse cx="75" cy="56" rx="9" ry="7" fill="white"/>
-  <!-- iris -->
-  <circle cx="45" cy="56" r="5" fill="#2d1a0e"/>
-  <circle cx="75" cy="56" r="5" fill="#2d1a0e"/>
-  <circle cx="47" cy="54" r="2" fill="white"/>
-  <circle cx="77" cy="54" r="2" fill="white"/>
-  <!-- nose -->
-  <path d="M56 66 Q60 74 64 66" stroke="#9a5c2e" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <ellipse cx="55" cy="72" rx="4" ry="2.5" fill="#a86840"/>
-  <ellipse cx="65" cy="72" rx="4" ry="2.5" fill="#a86840"/>
-  <!-- mouth -->
-  <path id="mouth-m" d="M46 84 Q60 90 74 84" stroke="#7a2e20" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M46 84 Q60 80 74 84" fill="#c0504a" opacity="0.4"/>
-</svg>`;
-
-const FEMALE_SVG = `<svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="bgf" cx="50%" cy="80%"><stop offset="0%" stop-color="#1a0520"/><stop offset="100%" stop-color="#080010"/></radialGradient>
-    <linearGradient id="skinf" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0b090"/><stop offset="100%" stop-color="#d0805a"/></linearGradient>
-    <linearGradient id="suitf" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2d0a3e"/><stop offset="100%" stop-color="#1a0628"/></linearGradient>
-  </defs>
-  <rect width="120" height="160" fill="url(#bgf)"/>
-  <!-- body -->
-  <rect x="10" y="110" width="100" height="55" rx="8" fill="url(#suitf)"/>
-  <path d="M44 110 Q60 128 76 110" fill="#ff0040" opacity="0.85"/>
-  <!-- neck -->
-  <rect x="50" y="96" width="20" height="18" rx="6" fill="url(#skinf)"/>
-  <!-- head -->
-  <ellipse cx="60" cy="62" rx="32" ry="38" fill="url(#skinf)"/>
-  <!-- hair back -->
-  <ellipse cx="60" cy="60" rx="36" ry="42" fill="#1a0808"/>
-  <!-- face over hair -->
-  <ellipse cx="60" cy="62" rx="32" ry="38" fill="url(#skinf)"/>
-  <!-- hair top -->
-  <ellipse cx="60" cy="24" rx="32" ry="14" fill="#1a0808"/>
-  <rect x="28" y="23" width="64" height="12" fill="#1a0808"/>
-  <!-- hair sides -->
-  <rect x="24" y="24" width="9" height="46" rx="5" fill="#1a0808"/>
-  <rect x="87" y="24" width="9" height="46" rx="5" fill="#1a0808"/>
-  <!-- ears -->
-  <ellipse cx="28" cy="64" rx="6" ry="8" fill="#d0805a"/>
-  <ellipse cx="92" cy="64" rx="6" ry="8" fill="#d0805a"/>
-  <!-- earrings -->
-  <circle cx="28" cy="74" r="4" fill="#ffd700"/>
-  <circle cx="92" cy="74" r="4" fill="#ffd700"/>
-  <!-- eyebrows arched -->
-  <path d="M34 44 Q44 38 52 42" stroke="#1a0808" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-  <path d="M68 42 Q76 38 86 44" stroke="#1a0808" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-  <!-- eye shadow -->
-  <ellipse cx="44" cy="55" rx="11" ry="7" fill="#7b3fa0" opacity="0.25"/>
-  <ellipse cx="76" cy="55" rx="11" ry="7" fill="#7b3fa0" opacity="0.25"/>
-  <!-- eyes white -->
-  <ellipse cx="44" cy="55" rx="9" ry="6.5" fill="white"/>
-  <ellipse cx="76" cy="55" rx="9" ry="6.5" fill="white"/>
-  <!-- lashes -->
-  <path d="M35 50 L32 46 M38 49 L36 45 M41 48 L40 44 M44 48 L44 44 M47 49 L49 45 M50 50 L53 47" stroke="#1a0808" stroke-width="1.5" fill="none"/>
-  <path d="M67 50 L64 46 M70 49 L68 45 M73 48 L73 44 M76 48 L76 44 M79 49 L81 45 M82 50 L85 47" stroke="#1a0808" stroke-width="1.5" fill="none"/>
-  <!-- iris -->
-  <circle cx="44" cy="55" r="5" fill="#3a1040"/>
-  <circle cx="76" cy="55" r="5" fill="#3a1040"/>
-  <circle cx="46" cy="53" r="2" fill="white"/>
-  <circle cx="78" cy="53" r="2" fill="white"/>
-  <!-- nose -->
-  <path d="M57 67 Q60 73 63 67" stroke="#b06040" stroke-width="1.8" fill="none"/>
-  <!-- lips -->
-  <path d="M44 82 Q52 77 60 78 Q68 77 76 82" fill="#e03060"/>
-  <path id="mouth-f" d="M44 82 Q60 90 76 82" fill="#c02050"/>
-  <path d="M44 82 Q60 84 76 82" fill="#ff6090" opacity="0.5"/>
-  <!-- cheek blush -->
-  <ellipse cx="28" cy="66" rx="9" ry="5" fill="#ff8080" opacity="0.2"/>
-  <ellipse cx="92" cy="66" rx="9" ry="5" fill="#ff8080" opacity="0.2"/>
-</svg>`;
-
-function renderAnchor(gender) {
-  document.getElementById('anchorSvgWrap').innerHTML = gender === 'male' ? MALE_SVG : FEMALE_SVG;
-}
-
-function switchAnchor(gender) {
-  currentAnchor = gender;
-  renderAnchor(gender);
-  document.getElementById('btnMale').classList.toggle('active', gender==='male');
-  document.getElementById('btnFemale').classList.toggle('active', gender==='female');
-}
-
-// ── MOUTH ANIMATION ──────────────────────────────────────────
-function startTalking() {
-  document.querySelectorAll('.vbar').forEach(b=>b.classList.add('active'));
-  document.getElementById('airLabel').textContent = 'ON AIR';
-  let open=false;
-  clearInterval(mouthInterval);
-  mouthInterval = setInterval(()=>{
-    const mId = currentAnchor==='male' ? 'mouth-m' : 'mouth-f';
-    const el = document.getElementById(mId);
-    if(!el){clearInterval(mouthInterval);return;}
-    open=!open;
-    if(currentAnchor==='male'){
-      el.setAttribute('d', open
-        ? 'M46 84 Q60 96 74 84'
-        : 'M46 84 Q60 90 74 84');
-    } else {
-      el.setAttribute('d', open
-        ? 'M44 82 Q60 96 76 82'
-        : 'M44 82 Q60 90 76 82');
-    }
-  }, 140);
-}
-
-function stopTalking() {
-  clearInterval(mouthInterval);
-  document.querySelectorAll('.vbar').forEach(b=>b.classList.remove('active'));
-  const mId = currentAnchor==='male' ? 'mouth-m' : 'mouth-f';
-  const el = document.getElementById(mId);
-  if(el){
-    el.setAttribute('d', currentAnchor==='male'
-      ? 'M46 84 Q60 90 74 84'
-      : 'M44 82 Q60 90 76 82');
-  }
-}
-
-// ── NEWS LOAD ────────────────────────────────────────────────
 async function loadNews(l, btn) {
   lang=l;
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  updateAnchorPhoto();
   hardStop();
   document.getElementById('loader').style.display='flex';
-
-  // Malayalam font for headline/body
-  const isML = l==='ml';
-  document.getElementById('newsHeadline').className = 'news-headline' + (isML?' ml-text':'');
-  document.getElementById('newsBody').className = 'news-body' + (isML?' ml-text':'');
-
   try {
     const res = await fetch(WORKER+'?lang='+lang);
     const data = await res.json();
@@ -363,10 +249,14 @@ function buildDots() {
 }
 
 function renderNews(i) {
-  if(i<0||i>=news.length) return;
-  idx=i;
+  if(i < 0 || i >= news.length) return;
+  idx = i;
   const n = news[idx];
-  document.getElementById('newsSource').textContent = n.source?.name || 'DDOTT NEWS';
+  const bgImg = (n.image && n.image.startsWith('http')) 
+    ? `url(${n.image})` 
+    : 'linear-gradient(135deg,#1a0010,#000820)';
+  document.getElementById('newsBg').style.backgroundImage = bgImg;
+  document.getElementById('newsSource').textContent = n.source?.name || 'News';
   document.getElementById('newsHeadline').textContent = n.title;
   document.getElementById('newsBody').textContent = n.description || '';
   document.getElementById('newsCounter').textContent = (idx+1)+' / '+news.length;
@@ -374,80 +264,95 @@ function renderNews(i) {
   document.getElementById('progressFill').style.width='0%';
 }
 
-// ── TTS WITH IMPROVED MALAYALAM ──────────────────────────────
-function getBestVoice(lang) {
-  const voices = synth.getVoices();
-  const code = VOICES[lang]||'en-US';
-  // Try exact match first
-  let v = voices.find(v=>v.lang===code);
-  // Fallback: partial match
-  if(!v) v = voices.find(v=>v.lang.startsWith(code.split('-')[0]));
-  return v || null;
-}
-
 function speakCurrent() {
   if(speaking) return;
   const n = news[idx];
   if(!n) return;
   if(muted) { scheduleNext(); return; }
-  speaking=true;
-
-  const text = n.title + '. ' + (n.description||'');
-  const utt = new SpeechSynthesisUtterance(text);
+  speaking = true;
+  const utt = new SpeechSynthesisUtterance(n.title + '. ' + (n.description||''));
   utt.lang = VOICES[lang]||'en-US';
-  utt.rate = lang==='ml' ? speed * 0.85 : speed; // slightly slower for Malayalam
-  utt.pitch = lang==='ml' ? 1.05 : 1.0;
-
-  const voice = getBestVoice(lang);
-  if(voice) utt.voice = voice;
-
-  utt.onstart = ()=>{ animateProgress(); startTalking(); };
-  utt.onend = ()=>{ stopTalking(); speaking=false; if(playing) scheduleNext(); };
-  utt.onerror = ()=>{ stopTalking(); speaking=false; if(playing) scheduleNext(); };
-  synth.speak(utt);
+  utt.rate = speed;
+  utt.onstart = () => { 
+    animateProgress(); 
+    startTalking(); 
+  };
+  utt.onend = () => {
+    stopTalking();
+    speaking = false;
+    if(playing) scheduleNext();
+  };
+  utt.onerror = () => {
+    stopTalking();
+    speaking = false;
+    if(playing) scheduleNext();
+  };
+  if(synth) synth.speak(utt);
 }
 
 function scheduleNext() {
   clearTimeout(autoTimer);
-  autoTimer = setTimeout(()=>{
+  autoTimer = setTimeout(() => {
     if(!playing) return;
-    if(idx<news.length-1){ renderNews(idx+1); speakCurrent(); }
-    else { playing=false; document.getElementById('playBtn').textContent='▶'; }
-  }, 1200);
+    if(idx < news.length-1) {
+      renderNews(idx+1);
+      speakCurrent();
+    } else {
+      playing=false;
+      document.getElementById('playBtn').textContent='▶';
+    }
+  }, 1500);
 }
 
 function animateProgress() {
-  let w=0; clearInterval(progressTimer);
+  let w=0;
+  clearInterval(progressTimer);
   progressTimer = setInterval(()=>{
-    if(!playing){clearInterval(progressTimer);return;}
-    w=Math.min(w+0.4,95);
+    if(!playing){ clearInterval(progressTimer); return; }
+    w = Math.min(w+0.5, 95);
     document.getElementById('progressFill').style.width=w+'%';
   }, 200);
 }
 
 function togglePlay() {
-  playing=!playing;
-  document.getElementById('playBtn').textContent=playing?'⏸':'▶';
-  if(playing) speakCurrent(); else hardStop();
+  playing = !playing;
+  document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
+  if(playing) { speakCurrent(); }
+  else { hardStop(); }
 }
 
-function jumpTo(i){ hardStop(); renderNews(i); if(playing){playing=true;speakCurrent();} }
-function nextNews(){ hardStop(); if(idx<news.length-1){renderNews(idx+1);if(playing)speakCurrent();} }
-function prevNews(){ hardStop(); if(idx>0){renderNews(idx-1);if(playing)speakCurrent();} }
-
-function hardStop(){
-  stopTalking(); speaking=false; synth.cancel();
-  clearTimeout(autoTimer); clearInterval(progressTimer);
+function jumpTo(i) {
+  hardStop();
+  renderNews(i);
+  if(playing) { playing=true; speakCurrent(); }
 }
 
-function cycleSpeed(){
+function nextNews() {
+  hardStop();
+  if(idx < news.length-1) { renderNews(idx+1); if(playing) speakCurrent(); }
+}
+
+function prevNews() {
+  hardStop();
+  if(idx > 0) { renderNews(idx-1); if(playing) speakCurrent(); }
+}
+
+function hardStop() {
+  stopTalking();
+  speaking = false;
+  if(synth) synth.cancel();
+  clearTimeout(autoTimer);
+  clearInterval(progressTimer);
+}
+
+function cycleSpeed() {
   const s=[0.75,1,1.25,1.5,2];
   const i=s.indexOf(speed);
   speed=s[(i+1)%s.length];
   document.getElementById('speedBtn').textContent=speed+'x';
 }
 
-function toggleMute(){
+function toggleMute() {
   muted=!muted;
   document.getElementById('volBtn').textContent=muted?'🔇':'🔊';
 }
@@ -457,18 +362,187 @@ let tx=0;
 document.querySelector('.news-screen').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;});
 document.querySelector('.news-screen').addEventListener('touchend',e=>{
   const dx=e.changedTouches[0].clientX-tx;
-  if(Math.abs(dx)>50){if(dx<0)nextNews();else prevNews();}
+  if(Math.abs(dx)>50){ if(dx<0) nextNews(); else prevNews(); }
 });
 
-// Init
-window.onload=()=>{
-  renderAnchor('male');
-  // Wait for voices to load
-  if(synth.getVoices().length===0){
-    synth.addEventListener('voiceschanged',()=>{},{ once:true });
+function startTalking() {
+  document.getElementById('anchorMouth').classList.add('talking');
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.add('active'));
+}
+function stopTalking() {
+  document.getElementById('anchorMouth').classList.remove('talking');
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.remove('active'));
+}
+
+
+const maleSVGStr = `<svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="bg-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#040d1a"/></linearGradient>
+  <linearGradient id="skin-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4956a"/><stop offset="100%" stop-color="#c07848"/></linearGradient></defs>
+  <rect width="72" height="88" fill="url(#bg-m)"/>
+  <!-- suit -->
+  <rect x="8" y="62" width="56" height="30" rx="4" fill="#0d2144"/>
+  <polygon points="36,62 28,88 36,75" fill="#1a3a6e"/>
+  <polygon points="36,62 44,88 36,75" fill="#1a3a6e"/>
+  <!-- tie -->
+  <polygon points="36,63 33,70 36,85 39,70" fill="#ff0040"/>
+  <!-- collar -->
+  <polygon points="24,62 36,68 36,74" fill="#ffffff"/>
+  <polygon points="48,62 36,68 36,74" fill="#f0f0f0"/>
+  <!-- neck -->
+  <rect x="29" y="54" width="14" height="12" rx="4" fill="url(#skin-m)"/>
+  <!-- head -->
+  <ellipse cx="36" cy="36" rx="20" ry="23" fill="url(#skin-m)"/>
+  <!-- hair -->
+  <ellipse cx="36" cy="15" rx="20" ry="10" fill="#1a0f08"/>
+  <rect x="16" y="14" width="40" height="8" fill="#1a0f08"/>
+  <!-- ear left -->
+  <ellipse cx="16" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- ear right -->
+  <ellipse cx="56" cy="37" rx="4" ry="5" fill="#c07848"/>
+  <!-- eyebrow left -->
+  <path d="M22 26 Q28 23 32 25" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eyebrow right -->
+  <path d="M40 25 Q44 23 50 26" stroke="#1a0f08" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- eye left white -->
+  <ellipse cx="27" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye right white -->
+  <ellipse cx="45" cy="32" rx="5" ry="4" fill="white"/>
+  <!-- eye left iris -->
+  <circle cx="27" cy="32" r="2.5" fill="#3d2b1f"/>
+  <circle cx="45" cy="32" r="2.5" fill="#3d2b1f"/>
+  <!-- eye shine -->
+  <circle cx="28" cy="31" r="1" fill="white"/>
+  <circle cx="46" cy="31" r="1" fill="white"/>
+  <!-- nose -->
+  <path d="M34 36 Q36 42 38 36" stroke="#a0623a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="33" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <ellipse cx="39" cy="40" rx="2" ry="1.2" fill="#b87050"/>
+  <!-- mouth -->
+  <path id="mouthPath" d="M28 48 Q36 52 44 48" stroke="#8B3a2a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M28 48 Q36 46 44 48" stroke="none" fill="#c0504a" opacity="0.5"/>
+</svg>`;
+const femaleSVGStr = `<svg class="anchor-svg" viewBox="0 0 72 88" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="bg-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a0828"/><stop offset="100%" stop-color="#0d0418"/></linearGradient>
+  <linearGradient id="skin-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0b090"/><stop offset="100%" stop-color="#d8865e"/></linearGradient></defs>
+  <rect width="72" height="88" fill="url(#bg-f)"/>
+  <!-- suit -->
+  <rect x="8" y="62" width="56" height="30" rx="4" fill="#2d0a3e"/>
+  <path d="M28 62 Q36 72 44 62" fill="#ff0040" opacity="0.8"/>
+  <!-- neck -->
+  <rect x="30" y="54" width="12" height="12" rx="4" fill="url(#skin-f)"/>
+  <!-- head -->
+  <ellipse cx="36" cy="35" rx="19" ry="22" fill="url(#skin-f)"/>
+  <!-- long hair back -->
+  <ellipse cx="36" cy="34" rx="22" ry="24" fill="#1a0808"/>
+  <!-- face on top -->
+  <ellipse cx="36" cy="35" rx="19" ry="22" fill="url(#skin-f)"/>
+  <!-- hair top -->
+  <ellipse cx="36" cy="14" rx="19" ry="9" fill="#1a0808"/>
+  <rect x="17" y="13" width="38" height="7" fill="#1a0808"/>
+  <!-- hair side left -->
+  <rect x="15" y="14" width="5" height="28" rx="3" fill="#1a0808"/>
+  <!-- hair side right -->
+  <rect x="52" y="14" width="5" height="28" rx="3" fill="#1a0808"/>
+  <!-- ear -->
+  <ellipse cx="17" cy="36" rx="3" ry="4" fill="#d8865e"/>
+  <ellipse cx="55" cy="36" rx="3" ry="4" fill="#d8865e"/>
+  <!-- earring -->
+  <circle cx="17" cy="41" r="2" fill="#ffd700"/>
+  <circle cx="55" cy="41" r="2" fill="#ffd700"/>
+  <!-- eyebrow left - arched -->
+  <path d="M21 25 Q27 21 31 24" stroke="#1a0808" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- eyebrow right -->
+  <path d="M41 24 Q45 21 51 25" stroke="#1a0808" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- eye shadow -->
+  <ellipse cx="26" cy="31" rx="6" ry="4" fill="#7b3fa0" opacity="0.3"/>
+  <ellipse cx="46" cy="31" rx="6" ry="4" fill="#7b3fa0" opacity="0.3"/>
+  <!-- eye white -->
+  <ellipse cx="26" cy="31" rx="5" ry="3.5" fill="white"/>
+  <ellipse cx="46" cy="31" rx="5" ry="3.5" fill="white"/>
+  <!-- lashes top left -->
+  <path d="M21 28 L19 25 M23 27 L22 24 M25 27 L25 24 M27 27 L28 24 M29 28 L31 25" stroke="#1a0808" stroke-width="1" fill="none"/>
+  <!-- lashes top right -->
+  <path d="M41 28 L39 25 M43 27 L42 24 M45 27 L45 24 M47 27 L48 24 M49 28 L51 25" stroke="#1a0808" stroke-width="1" fill="none"/>
+  <!-- iris -->
+  <circle cx="26" cy="31" r="2.5" fill="#4a2040"/>
+  <circle cx="46" cy="31" r="2.5" fill="#4a2040"/>
+  <circle cx="27" cy="30" r="1" fill="white"/>
+  <circle cx="47" cy="30" r="1" fill="white"/>
+  <!-- nose -->
+  <path d="M34 37 Q36 41 38 37" stroke="#c07050" stroke-width="1.2" fill="none"/>
+  <!-- lips -->
+  <path d="M27 47 Q31 44 36 45 Q41 44 45 47" fill="#e03060"/>
+  <path id="mouthPath" d="M27 47 Q36 52 45 47" fill="#c02050"/>
+  <path d="M27 47 Q36 49 45 47" fill="#ff6080" opacity="0.6"/>
+  <!-- cheek blush -->
+  <ellipse cx="18" cy="38" rx="5" ry="3" fill="#ff8080" opacity="0.25"/>
+  <ellipse cx="54" cy="38" rx="5" ry="3" fill="#ff8080" opacity="0.25"/>
+</svg>`;
+let currentAnchor = 'male';
+
+const ANCHOR_PHOTOS = {
+  "en": {
+    "male": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=250&fit=crop&crop=face"
+  },
+  "ml": {
+    "male": "https://images.unsplash.com/photo-1618641986557-1ecd230959aa?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1610500796385-3ffc1ae2f046?w=200&h=250&fit=crop&crop=face"
+  },
+  "hi": {
+    "male": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?w=200&h=250&fit=crop&crop=face"
+  },
+  "ar": {
+    "male": "https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=200&h=250&fit=crop&crop=face",
+    "female": "https://images.unsplash.com/photo-1608138278545-c6b679ef1c9a?w=200&h=250&fit=crop&crop=face"
   }
-  loadNews('en',document.querySelector('.lang-btn'));
 };
+
+function switchAnchor(gender) {
+  currentAnchor = gender;
+  updateAnchorPhoto();
+  document.getElementById('btnMale').classList.toggle('active', gender==='male');
+  document.getElementById('btnFemale').classList.toggle('active', gender==='female');
+}
+
+function updateAnchorPhoto() {
+  const photos = ANCHOR_PHOTOS[lang] || ANCHOR_PHOTOS['en'];
+  const src = currentAnchor === 'male' ? photos.male : photos.female;
+  document.getElementById('anchorFrame').innerHTML = 
+    `<img class="anchor-photo" src="${src}" onerror="this.style.display='none'" />
+     <div class="anchor-mouth-overlay"><div class="anchor-mouth-inner" id="mouthPath"></div></div>`;
+}
+
+function startTalking() {
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.add('active'));
+  document.getElementById('anchorLabel').textContent = 'ON AIR';
+  animateMouth(true);
+}
+
+function stopTalking() {
+  document.querySelectorAll('.anchor-bar').forEach(b=>b.classList.remove('active'));
+  animateMouth(false);
+}
+
+let mouthInterval = null;
+function animateMouth(talking) {
+  clearInterval(mouthInterval);
+  if(!talking) {
+    const el = document.getElementById('mouthPath');
+    if(el) el.classList.remove('open');
+    return;
+  }
+  let open = false;
+  mouthInterval = setInterval(()=>{
+    const el = document.getElementById('mouthPath');
+    if(!el){ clearInterval(mouthInterval); return; }
+    open = !open;
+    el.classList.toggle('open', open);
+  }, 150);
+}
+
+window.onload=()=>loadNews('en',document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
