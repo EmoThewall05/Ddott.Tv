@@ -1,0 +1,3 @@
+name = "ddott-tv-add-ai-chat"
+main = "worker.js"
+compatibility_date = "2024-01-01"
