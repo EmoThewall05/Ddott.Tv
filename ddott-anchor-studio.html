@@ -190,7 +190,8 @@ function resizeCanvas(){
   const screen = document.getElementById('newsScreen');
   canvas.width = screen.clientWidth;
   // height = available space minus controls and subtitle
-  canvas.height = screen.clientHeight - 26; // below ticker
+  canvas.height = screen.clientHeight - 26;
+  canvas.style.height = canvas.height + 'px'; // below ticker
   canvas.style.width = '100%';
   canvas.style.height = (screen.clientHeight - 26) + 'px';
 }
@@ -934,4 +935,4 @@ resizeCanvas();
 drawStudio();
 startBreath();
 startBlink();
-window.onload=()=>loadNews('en',document.querySelector('.lang-btn'));
+document.addEventListener('DOMContentLoaded',()=>loadNews('en',document.querySelector('.lang-btn')));
