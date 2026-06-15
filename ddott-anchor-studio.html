@@ -1287,7 +1287,12 @@ document.getElementById('btn-stop').addEventListener('click', function() {
 async function checkWorker() {
   const statusEl = document.getElementById('worker-status');
   try {
-    const res = await fetch(config.workerUrl + '?lang=en&q=test', {signal: AbortSignal.timeout(5000)});
+    const res = await fetch(config.workerUrl + '/news', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({language: 'en', gender: 'female'}),
+      signal: AbortSignal.timeout(8000)
+    });
     if (res.ok) {
       statusEl.textContent = 'Worker connected ✓';
       statusEl.style.color = '#00ff88';
