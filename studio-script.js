@@ -33,6 +33,7 @@ async function publishVideo() {
   showToast('💾 SAVING...');
 
   // Save to videos table
+  const isShort = document.getElementById('isShort')?.checked || false;
   const insertData = {
     title: title,
     description: description,
@@ -41,7 +42,9 @@ async function publishVideo() {
     video_url: videoUrl,
     views: 0,
     likes: 0,
-    emo_coins_earned: 0
+    emo_coins_earned: 0,
+    is_short: isShort,
+    short_coins_multiplier: isShort ? 3 : 1
   };
   if (user && user.id) insertData.user_id = user.id;
 
