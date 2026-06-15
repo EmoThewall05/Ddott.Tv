@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DDOTT NEWS Studio v4.1 - AI News Anchor</title>
+    <title>DDOTT NEWS Studio v4.2 - AI News Anchor</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -228,7 +228,7 @@
         <span>LIVE</span>
     </div>
     <div id="worker-panel">
-        <h3>⚙️ Worker Config</h3>
+        <h3>Worker Config</h3>
         <input type="text" id="worker-url" value="https://ddott-news.meradivin.workers.dev" placeholder="Worker URL">
         <div class="hint">
             <span id="status-indicator" class="status-offline"></span>
@@ -274,8 +274,8 @@
 
 <script>
 // ============================================================
-// DDOTT NEWS STUDIO v4.1 - AI News Anchor System
-// Worker-only architecture - No Gemini key needed in frontend
+// DDOTT NEWS STUDIO v4.2 - AI News Anchor System
+// Matches Cloudflare Worker: POST /news -> {text: "..."}
 // ============================================================
 
 const canvas = document.getElementById('anchor-canvas');
@@ -1205,7 +1205,8 @@ function speakText(text, lang) {
 }
 
 // ============================================================
-// WORKER API - All AI calls go through Cloudflare Worker
+// WORKER API - Matches your Cloudflare Worker exactly
+// POST /news -> {text: "news content"}
 // ============================================================
 
 async function generateNews() {
@@ -1223,6 +1224,7 @@ async function generateNews() {
     updateWorkerStatus('loading', 'Generating news...');
 
     try {
+        // Matches your worker: POST /news with {language, gender, category}
         const response = await fetch(workerUrl + '/news', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1239,24 +1241,28 @@ async function generateNews() {
 
         const data = await response.json();
 
-        if (data.news) {
+        // Your worker returns: {text: "news content"}
+        if (data.text) {
+            document.getElementById('ticker-text').textContent = data.text.replace(/
+/g, ' - ');
+            speakText(data.text, config.language);
+            updateWorkerStatus('online', 'Worker connected - ' + config.language.toUpperCase());
+        } else if (data.news) {
+            // Fallback for alternative response format
             document.getElementById('ticker-text').textContent = data.news.replace(/
 /g, ' - ');
             speakText(data.news, config.language);
             updateWorkerStatus('online', 'Worker connected');
-        } else if (data.text) {
-            document.getElementById('ticker-text').textContent = data.text.replace(/
-/g, ' - ');
-            speakText(data.text, config.language);
-            updateWorkerStatus('online', 'Worker connected');
+        } else if (data.error) {
+            throw new Error(data.error);
         } else {
-            throw new Error('Invalid worker response');
+            throw new Error('Invalid worker response format');
         }
     } catch (error) {
         console.error('News generation error:', error);
         updateWorkerStatus('offline', 'Worker error: ' + error.message);
 
-        // Fallback demo text
+        // Fallback demo text when worker fails
         const fallback = {
             'en': 'Welcome to DDOTT News. This is a demonstration of our AI-powered news anchor system. Please configure your Cloudflare Worker to enable live news generation.',
             'ml': 'ഡോട്ട് ന്യൂസിലേക്ക് സ്വാഗതം. ഇത് ഞങ്ങളുടെ എഐ-പവർഡ് ന്യൂസ് ആങ്കർ സിസ്റ്റത്തിന്റെ പ്രദർശനമാണ്. ലൈവ് ന്യൂസ് ജനറേഷൻ സജീവമാക്കാൻ നിങ്ങളുടെ ക്ലൗഡ്ഫ്ലെയർ വർക്കർ കോൺഫിഗർ ചെയ്യുക.',
