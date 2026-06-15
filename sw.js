@@ -1,4 +1,4 @@
-const CACHE = 'ddott-tv-v9';
+const CACHE = 'ddott-tv-v10';
 const FILES = [
   '/',
   '/index.html',
@@ -15,7 +15,11 @@ const FILES = [
   '/supabase-config.js',
   '/auth.js',
   '/ddott-anchor-studio.html',
-  '/ddott-auto-translate.html'
+  '/ddott-auto-translate.html',
+  '/ddott-login.html',
+  '/ddott-news-reader.html',
+  '/ddott-advertiser.html',
+  '/ddott-community.html'
 ];
 
 self.addEventListener('install', e => {
