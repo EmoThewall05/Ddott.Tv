@@ -1225,15 +1225,7 @@ async function generateNews() {
 
     try {
         // Matches your worker: POST /news with {language, gender, category}
-        const response = await fetch(workerUrl + '/news', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                language: config.language,
-                gender: config.gender,
-                category: 'general'
-            })
-        });
+        const response = await fetch(workerUrl + '?lang=' + config.language);
 
         if (!response.ok) {
             throw new Error('Worker response: ' + response.status);
@@ -1241,23 +1233,13 @@ async function generateNews() {
 
         const data = await response.json();
 
-        // Your worker returns: {text: "news content"}
-        if (data.text) {
-            document.getElementById('ticker-text').textContent = data.text.replace(/
-/g, ' - ');
-            speakText(data.text, config.language);
-            updateWorkerStatus('online', 'Worker connected - ' + config.language.toUpperCase());
-        } else if (data.news) {
-            // Fallback for alternative response format
-            document.getElementById('ticker-text').textContent = data.news.replace(/
-/g, ' - ');
-            speakText(data.news, config.language);
-            updateWorkerStatus('online', 'Worker connected');
-        } else if (data.error) {
-            throw new Error(data.error);
-        } else {
-            throw new Error('Invalid worker response format');
-        }
+        const articles = data.articles || [];
+        if (!articles.length) throw new Error('No articles');
+        const newsText = articles.slice(0,3).map(a => a.title + '. ' + (a.description||'')).join(' | ');
+        if (newsText) {
+            document.getElementById('ticker-text').textContent = newsText.replace(/\n/g, ' - ');
+            speakText(newsText, config.language);
+            updateWorkerStatus('online', 'News loaded - ' + config.language.toUpperCase());
     } catch (error) {
         console.error('News generation error:', error);
         updateWorkerStatus('offline', 'Worker error: ' + error.message);
