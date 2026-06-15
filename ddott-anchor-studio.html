@@ -423,7 +423,7 @@ function drawStudio(){
 
   // ── ANCHOR
   const anchorCX = W/2;
-  const anchorBaseY = H * 0.60;
+  const anchorBaseY = H * 0.65;
   const breathOff = Math.sin(breathPhase) * 1.5;
   drawAnchor(anchorCX, anchorBaseY + breathOff, W, H, p, isFemale, isArab);
 
@@ -614,7 +614,7 @@ function drawStudioLighting(W, H, studioTop){
 
 // ── NEWS DESK
 function drawDesk(W, H){
-  const deskTop = H * 0.62;
+  const deskTop = H * 0.58;
   const deskH = H * 0.14;
   const deskW = W * 0.92;
   const dx = (W-deskW)/2;
@@ -663,7 +663,7 @@ function drawDesk(W, H){
 
 // ── DESK FOREGROUND
 function drawDeskForeground(W, H){
-  const deskTop = H * 0.62;
+  const deskTop = H * 0.58;
   const fgGrad = ctx.createLinearGradient(0, deskTop+H*0.03, 0, H);
   fgGrad.addColorStop(0,'rgba(6,12,24,0.0)');
   fgGrad.addColorStop(0.3,'rgba(4,8,18,0.65)');
