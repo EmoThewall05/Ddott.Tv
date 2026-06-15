@@ -203,6 +203,10 @@
       <div class="page-card" onclick="window.location.href='ddott-shorts.html'">
         <div class="pc-icon">⚡</div><div class="pc-title">Shorts</div><div class="pc-desc">Vertical short videos</div>
       </div>
+      <div class="page-card" onclick="nav('anchor-studio')">
+        <div class="pc-badge b-new">NEW</div>
+        <div class="pc-icon">🎙️</div><div class="pc-title">Anchor Studio</div><div class="pc-desc">Live streaming &amp; broadcast</div>
+      </div>
       <div class="page-card" onclick="nav('landing')" style="border-color:rgba(255,0,200,0.1)">
         <div class="pc-icon">🌐</div><div class="pc-title">Landing Page</div><div class="pc-desc">Ddott TV public homepage</div>
       </div>
@@ -247,9 +251,9 @@
     home:'ddott-home-v2.html', feed:'ddott-home-v2.html', community:'ddott-community.html', player:'ddott-player-v3.html',
     channel:'ddott-creator-channel.html', messages:'ddott-messaging.html',
     coins:'ddott-emo-coins.html', ai:'ddott-ai-butterfly.html',
-    studio:'/studio', landing:'ddott-landing-v2.html', advertiser:'ddott-advertiser.html'
+    studio:'/studio', 'anchor-studio':'/anchor-studio', landing:'ddott-landing-v2.html', advertiser:'ddott-advertiser.html'
   };
-  const tabMap = { feed:'t-feed', home:'t-feed', player:'t-feed', channel:'t-home', messages:'t-messages', coins:'t-coins', ai:'t-home', studio:'t-studio', landing:'t-home' };
+  const tabMap = { feed:'t-feed', home:'t-feed', player:'t-feed', channel:'t-home', messages:'t-messages', coins:'t-coins', ai:'t-home', studio:'t-studio', 'anchor-studio':'t-studio', landing:'t-home' };
 
   // Inject into iframe to hide its own nav & tab bar
   const HIDE_CSS = `<style id="__sf__">
