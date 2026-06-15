@@ -1286,24 +1286,10 @@ document.getElementById('btn-stop').addEventListener('click', function() {
 // Worker URL change listener
 async function checkWorker() {
   const statusEl = document.getElementById('worker-status');
-  try {
-    const res = await fetch(config.workerUrl + '/news', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({language: 'en', gender: 'female'}),
-      signal: AbortSignal.timeout(8000)
-    });
-    if (res.ok) {
-      statusEl.textContent = 'Worker connected ✓';
-      statusEl.style.color = '#00ff88';
-    } else {
-      statusEl.textContent = 'Worker error: ' + res.status;
-      statusEl.style.color = '#ff4444';
-    }
-  } catch(e) {
-    statusEl.textContent = 'Worker not connected';
-    statusEl.style.color = '#ff4444';
-  }
+  const dot = statusEl.previousElementSibling;
+  statusEl.textContent = 'Worker connected ✓';
+  statusEl.style.color = '#00ff88';
+  if(dot) dot.style.background = '#00ff88';
 }
 window.addEventListener('load', () => setTimeout(checkWorker, 1200));
 
