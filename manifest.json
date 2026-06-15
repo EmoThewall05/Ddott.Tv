@@ -7,6 +7,12 @@
   "background_color": "#020008",
   "theme_color": "#00f5ff",
   "orientation": "portrait",
+  "lang": "en",
+  "categories": [
+    "entertainment",
+    "social",
+    "video"
+  ],
   "icons": [
     {
       "src": "icon-192.png",
@@ -17,6 +23,54 @@
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Feed",
+      "url": "/feed",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Shorts",
+      "url": "/shorts",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Emo Coins",
+      "url": "/coins",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Creator Studio",
+      "url": "/studio",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
