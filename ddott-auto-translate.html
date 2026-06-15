@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ddott TV — Auto Translation</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff; --purple: #b400ff; --pink: #ff00c8; --gold: #ffd700;
+    --green: #00ff88; --orange: #ff8c00; --red: #ff3355;
+    --dark: #04000f; --darker: #020008; --surface: #0a0020;
+    --surface2: #110030; --surface3: #1a0040; --text: #e8d5ff; --muted: #6b4d8a;
+    --glow-cyan: 0 0 20px #00f5ff88, 0 0 40px #00f5ff33;
+    --glow-purple: 0 0 20px #b400ff88, 0 0 40px #b400ff33;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { background:var(--darker); color:var(--text); font-family:'Rajdhani',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(0,245,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(180,0,255,0.02) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+    animation:gridMove 25s linear infinite;
+  }
+  @keyframes gridMove{to{transform:translateY(40px)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  @keyframes subtitleIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* NAV */
+  nav {
+    position:sticky; top:0; z-index:100;
+    display:flex; align-items:center; gap:10px; padding:12px 16px;
+    background:rgba(4,0,15,0.95); backdrop-filter:blur(24px);
+    border-bottom:1px solid rgba(0,245,255,0.1);
+  }
+  .back-btn { width:34px; height:34px; border-radius:50%; background:rgba(0,245,255,0.08); border:1px solid rgba(0,245,255,0.2); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; flex-shrink:0; }
+  .logo { font-family:'Orbitron',monospace; font-size:14px; font-weight:900; background:linear-gradient(90deg,var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:2px; cursor:pointer; }
+  .logo em { -webkit-text-fill-color:var(--pink); font-style:normal; }
+  .nav-title { font-family:'Orbitron',monospace; font-size:10px; color:var(--cyan); letter-spacing:1px; margin-right:auto; }
+  .nav-badge { padding:4px 10px; border-radius:12px; background:rgba(0,245,255,0.1); border:1px solid rgba(0,245,255,0.3); font-family:'Orbitron',monospace; font-size:8px; color:var(--cyan); letter-spacing:1px; }
+
+  .page { position:relative; z-index:1; padding:16px 16px 90px; }
+
+  /* HERO */
+  .hero {
+    text-align:center; padding:20px 16px 18px;
+    background:radial-gradient(ellipse at 50% 0%, rgba(0,245,255,0.08) 0%, transparent 70%);
+    margin-bottom:20px; animation:fadeUp 0.4s ease both;
+  }
+  .hero-icon { font-size:44px; display:block; margin-bottom:10px; animation:float 3s ease-in-out infinite; }
+  .hero-title { font-family:'Orbitron',monospace; font-size:18px; font-weight:900; background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:2px; margin-bottom:6px; }
+  .hero-sub { font-size:12px; color:var(--muted); line-height:1.6; }
+  .hero-sub b { color:var(--cyan); }
+
+  /* LANGUAGE SELECTOR */
+  .sec-title { font-family:'Orbitron',monospace; font-size:9px; letter-spacing:2px; color:var(--purple); margin:16px 0 10px; display:flex; align-items:center; gap:8px; }
+  .sec-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(180,0,255,0.4),transparent); }
+
+  .lang-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
+  .lang-btn {
+    padding:10px 6px; border-radius:10px; text-align:center; cursor:pointer;
+    background:var(--surface); border:1px solid rgba(0,245,255,0.08);
+    transition:all 0.2s; animation:fadeUp 0.4s ease both;
+  }
+  .lang-btn.active { border-color:var(--cyan); background:rgba(0,245,255,0.08); box-shadow:var(--glow-cyan); }
+  .lang-flag { font-size:22px; display:block; margin-bottom:4px; }
+  .lang-name { font-family:'Orbitron',monospace; font-size:8px; color:var(--text); letter-spacing:0.5px; }
+  .lang-native { font-size:10px; color:var(--muted); margin-top:2px; }
+
+  /* MORE LANGUAGES */
+  .more-lang-scroll { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; margin-bottom:20px; padding-bottom:2px; }
+  .more-lang-scroll::-webkit-scrollbar { display:none; }
+  .mlang-chip { flex-shrink:0; padding:6px 12px; border-radius:16px; background:var(--surface); border:1px solid rgba(180,0,255,0.12); font-size:11px; color:var(--muted); cursor:pointer; transition:all 0.2s; white-space:nowrap; display:flex; align-items:center; gap:5px; }
+  .mlang-chip.active { border-color:var(--purple); color:var(--purple); background:rgba(180,0,255,0.08); }
+
+  /* TRANSLATE INPUT */
+  .translate-box {
+    background:var(--surface); border:1px solid rgba(0,245,255,0.12);
+    border-radius:14px; padding:14px; margin-bottom:14px;
+    animation:fadeUp 0.5s ease both;
+  }
+  .translate-box-title { font-family:'Orbitron',monospace; font-size:9px; color:var(--muted); letter-spacing:1px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+  textarea.translate-input {
+    width:100%; background:var(--surface2); border:1px solid rgba(0,245,255,0.1);
+    border-radius:10px; padding:12px; color:var(--text); font-family:'Rajdhani',sans-serif;
+    font-size:14px; line-height:1.5; outline:none; resize:none; min-height:90px;
+    transition:border-color 0.2s;
+  }
+  textarea.translate-input:focus { border-color:var(--cyan); }
+  textarea.translate-input::placeholder { color:var(--muted); }
+
+  .detect-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .detect-label { font-size:11px; color:var(--muted); flex:1; }
+  .detect-lang { font-size:11px; color:var(--cyan); font-weight:600; }
+
+  /* TRANSLATE BTN */
+  .translate-btn {
+    width:100%; padding:14px; border-radius:12px;
+    background:linear-gradient(135deg,var(--cyan),var(--purple));
+    border:none; color:var(--dark); font-family:'Orbitron',monospace;
+    font-size:11px; letter-spacing:2px; font-weight:900; cursor:pointer;
+    box-shadow:var(--glow-cyan); transition:all 0.2s; margin-bottom:14px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .translate-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none !important; }
+  .translate-btn:not(:disabled):active { transform:scale(0.98); }
+
+  /* RESULT */
+  .result-box {
+    background:var(--surface); border:1px solid rgba(180,0,255,0.2);
+    border-radius:14px; padding:14px; margin-bottom:14px;
+    display:none; animation:fadeUp 0.4s ease both;
+  }
+  .result-box.show { display:block; }
+  .result-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .result-lang-badge { padding:4px 10px; border-radius:10px; background:rgba(180,0,255,0.1); border:1px solid rgba(180,0,255,0.3); font-family:'Orbitron',monospace; font-size:8px; color:var(--purple); letter-spacing:1px; }
+  .result-actions { display:flex; gap:8px; }
+  .result-action-btn { padding:5px 10px; border-radius:8px; background:rgba(0,245,255,0.08); border:1px solid rgba(0,245,255,0.2); font-family:'Orbitron',monospace; font-size:8px; color:var(--cyan); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:4px; }
+  .result-action-btn:active { background:rgba(0,245,255,0.15); }
+  .result-text { font-size:15px; line-height:1.7; color:var(--text); }
+
+  /* SUBTITLE PREVIEW */
+  .subtitle-preview {
+    background:var(--surface); border:1px solid rgba(0,245,255,0.1);
+    border-radius:14px; overflow:hidden; margin-bottom:14px;
+    display:none; animation:fadeUp 0.4s ease both;
+  }
+  .subtitle-preview.show { display:block; }
+  .sp-header { padding:10px 14px; background:rgba(0,245,255,0.04); border-bottom:1px solid rgba(0,245,255,0.08); display:flex; align-items:center; justify-content:space-between; }
+  .sp-title { font-family:'Orbitron',monospace; font-size:9px; color:var(--cyan); letter-spacing:1px; }
+  .sp-live { display:flex; align-items:center; gap:4px; font-family:'Orbitron',monospace; font-size:8px; color:var(--green); }
+  .sp-dot { width:5px; height:5px; border-radius:50%; background:var(--green); animation:pulse 0.8s infinite; }
+  .video-mock {
+    height:140px; background:linear-gradient(135deg,#0a0020,#020008);
+    display:flex; align-items:flex-end; justify-content:center;
+    position:relative; overflow:hidden;
+  }
+  .video-mock-content { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; }
+  .video-play-icon { font-size:32px; opacity:0.4; }
+  .video-label { font-family:'Orbitron',monospace; font-size:8px; color:var(--muted); letter-spacing:1px; }
+  .subtitle-bar {
+    position:absolute; bottom:0; left:0; right:0; padding:8px 14px;
+    background:linear-gradient(transparent, rgba(0,0,0,0.85));
+    text-align:center;
+  }
+  .subtitle-text {
+    display:inline-block; background:rgba(0,0,0,0.75); padding:4px 12px;
+    border-radius:6px; font-size:13px; color:#fff; line-height:1.5;
+    border-bottom:2px solid var(--cyan); animation:subtitleIn 0.3s ease;
+  }
+
+  /* VIDEO CARDS */
+  .video-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+  .video-card {
+    display:flex; gap:10px; padding:10px 12px; border-radius:12px;
+    background:var(--surface); border:1px solid rgba(0,245,255,0.07);
+    cursor:pointer; transition:all 0.2s; animation:fadeUp 0.4s ease both;
+    align-items:center;
+  }
+  .video-card:active { border-color:rgba(0,245,255,0.25); background:var(--surface2); }
+  .vc-thumb { width:70px; height:50px; border-radius:8px; background:linear-gradient(135deg,var(--surface2),var(--surface3)); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid rgba(0,245,255,0.08); position:relative; overflow:hidden; }
+  .vc-sub-indicator { position:absolute; bottom:3px; right:3px; padding:1px 4px; border-radius:3px; background:rgba(0,245,255,0.15); border:1px solid rgba(0,245,255,0.3); font-family:'Orbitron',monospace; font-size:6px; color:var(--cyan); }
+  .vc-info { flex:1; min-width:0; }
+  .vc-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .vc-meta { font-size:10px; color:var(--muted); }
+  .vc-translate-btn { padding:5px 10px; border-radius:8px; background:rgba(180,0,255,0.1); border:1px solid rgba(180,0,255,0.25); font-family:'Orbitron',monospace; font-size:8px; color:var(--purple); cursor:pointer; flex-shrink:0; transition:all 0.2s; }
+  .vc-translate-btn.done { background:rgba(0,255,136,0.1); border-color:rgba(0,255,136,0.3); color:var(--green); }
+
+  /* LOADING */
+  .loading-spinner { width:18px; height:18px; border:2px solid rgba(4,0,15,0.4); border-top-color:var(--dark); border-radius:50%; animation:spin 0.8s linear infinite; }
+
+  /* STATS ROW */
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
+  .stat-card { padding:12px 8px; border-radius:10px; background:var(--surface); border:1px solid rgba(0,245,255,0.07); text-align:center; animation:fadeUp 0.4s ease both; }
+  .stat-num { font-family:'Orbitron',monospace; font-size:16px; font-weight:900; margin-bottom:2px; }
+  .stat-label { font-size:9px; color:var(--muted); letter-spacing:0.5px; }
+
+  /* BOTTOM TABS */
+  .tab-bar { position:fixed; bottom:0; left:0; right:0; height:56px; z-index:100; display:flex; align-items:stretch; background:rgba(4,0,15,0.97); backdrop-filter:blur(24px); border-top:1px solid rgba(0,245,255,0.08); }
+  .tab-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; transition:all 0.2s; position:relative; }
+  .tab-item::after { content:''; position:absolute; top:0; left:15%; right:15%; height:2px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,var(--cyan),var(--purple)); opacity:0; transition:opacity 0.2s; }
+  .tab-item.active::after { opacity:1; }
+  .tab-icon { font-size:19px; filter:grayscale(0.5) opacity(0.55); transition:all 0.2s; }
+  .tab-item.active .tab-icon { filter:drop-shadow(0 0 5px var(--cyan)); transform:scale(1.1); }
+  .tab-label { font-family:'Orbitron',monospace; font-size:7px; letter-spacing:0.5px; color:var(--muted); transition:color 0.2s; }
+  .tab-item.active .tab-label { color:var(--cyan); }
+
+  .neon-div { height:1px; background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent); margin:14px 0; opacity:0.2; }
+
+  /* TOAST */
+  .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#00ff88,#00f5ff); color:#020008; font-family:'Orbitron',monospace; font-size:9px; padding:9px 18px; border-radius:18px; z-index:300; letter-spacing:1px; font-weight:700; white-space:nowrap; pointer-events:none; }
+
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-thumb { background:var(--purple); border-radius:4px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="back-btn" onclick="history.back()">←</div>
+  <div class="logo">DDOTT<em>.</em>TV</div>
+  <div class="nav-title">🌐 AUTO TRANSLATE</div>
+  <div class="nav-badge">50+ LANG</div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-icon">🌐</span>
+    <div class="hero-title">AUTO TRANSLATION</div>
+    <div class="hero-sub">
+      Every video in <b>your language</b> — AI subtitles live.<br>
+      Malayalam · Hindi · Arabic · Tamil · 50+ more
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card" style="animation-delay:0.05s">
+      <div class="stat-num" style="color:var(--cyan)">50+</div>
+      <div class="stat-label">LANGUAGES</div>
+    </div>
+    <div class="stat-card" style="animation-delay:0.1s">
+      <div class="stat-num" style="color:var(--purple)">AI</div>
+      <div class="stat-label">POWERED</div>
+    </div>
+    <div class="stat-card" style="animation-delay:0.15s">
+      <div class="stat-num" style="color:var(--green)">LIVE</div>
+      <div class="stat-label">SUBTITLES</div>
+    </div>
+  </div>
+
+  <!-- LANGUAGE SELECTOR -->
+  <div class="sec-title">🗣️ CHOOSE YOUR LANGUAGE</div>
+  <div class="lang-grid">
+    <div class="lang-btn active" onclick="selectLang(this,'ml','Malayalam','മലയാളം')" style="animation-delay:0.05s">
+      <span class="lang-flag">🇮🇳</span>
+      <div class="lang-name">MALAYALAM</div>
+      <div class="lang-native">മലയാളം</div>
+    </div>
+    <div class="lang-btn" onclick="selectLang(this,'hi','Hindi','हिन्दी')" style="animation-delay:0.1s">
+      <span class="lang-flag">🇮🇳</span>
+      <div class="lang-name">HINDI</div>
+      <div class="lang-native">हिन्दी</div>
+    </div>
+    <div class="lang-btn" onclick="selectLang(this,'ar','Arabic','عربي')" style="animation-delay:0.15s">
+      <span class="lang-flag">🇦🇪</span>
+      <div class="lang-name">ARABIC</div>
+      <div class="lang-native">عربي</div>
+    </div>
+    <div class="lang-btn" onclick="selectLang(this,'ta','Tamil','தமிழ்')" style="animation-delay:0.2s">
+      <span class="lang-flag">🇮🇳</span>
+      <div class="lang-name">TAMIL</div>
+      <div class="lang-native">தமிழ்</div>
+    </div>
+    <div class="lang-btn" onclick="selectLang(this,'en','English','English')" style="animation-delay:0.25s">
+      <span class="lang-flag">🇬🇧</span>
+      <div class="lang-name">ENGLISH</div>
+      <div class="lang-native">English</div>
+    </div>
+    <div class="lang-btn" onclick="selectLang(this,'fr','French','Français')" style="animation-delay:0.3s">
+      <span class="lang-flag">🇫🇷</span>
+      <div class="lang-name">FRENCH</div>
+      <div class="lang-native">Français</div>
+    </div>
+  </div>
+
+  <!-- MORE LANGUAGES -->
+  <div class="more-lang-scroll" id="moreLangs">
+    <div class="mlang-chip" onclick="selectMoreLang(this,'te','Telugu')">🇮🇳 Telugu</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'kn','Kannada')">🇮🇳 Kannada</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'ur','Urdu')">🇵🇰 Urdu</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'zh','Chinese')">🇨🇳 Chinese</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'ja','Japanese')">🇯🇵 Japanese</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'ko','Korean')">🇰🇷 Korean</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'es','Spanish')">🇪🇸 Spanish</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'pt','Portuguese')">🇵🇹 Portuguese</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'de','German')">🇩🇪 German</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'ru','Russian')">🇷🇺 Russian</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'tr','Turkish')">🇹🇷 Turkish</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'id','Indonesian')">🇮🇩 Indonesian</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'sw','Swahili')">🇰🇪 Swahili</div>
+    <div class="mlang-chip" onclick="selectMoreLang(this,'bn','Bengali')">🇧🇩 Bengali</div>
+  </div>
+
+  <div class="neon-div"></div>
+
+  <!-- TRANSLATE INPUT -->
+  <div class="sec-title">✍️ TRANSLATE TEXT</div>
+  <div class="translate-box">
+    <div class="translate-box-title">📝 ENTER TEXT TO TRANSLATE</div>
+    <textarea class="translate-input" id="inputText" placeholder="Paste video title, description, or any text here..." rows="4" oninput="detectLang()"></textarea>
+    <div class="detect-row">
+      <div class="detect-label">Detected language:</div>
+      <div class="detect-lang" id="detectedLang">—</div>
+    </div>
+  </div>
+
+  <button class="translate-btn" id="translateBtn" onclick="translateText()">
+    <span id="btnIcon">🌐</span>
+    <span id="btnText">TRANSLATE NOW</span>
+  </button>
+
+  <!-- RESULT -->
+  <div class="result-box" id="resultBox">
+    <div class="result-header">
+      <div class="result-lang-badge" id="resultLangBadge">→ MALAYALAM</div>
+      <div class="result-actions">
+        <div class="result-action-btn" onclick="copyResult()">📋 COPY</div>
+        <div class="result-action-btn" onclick="speakResult()">🔊 SPEAK</div>
+      </div>
+    </div>
+    <div class="result-text" id="resultText"></div>
+  </div>
+
+  <!-- SUBTITLE PREVIEW -->
+  <div class="subtitle-preview" id="subtitlePreview">
+    <div class="sp-header">
+      <div class="sp-title">🎬 SUBTITLE PREVIEW</div>
+      <div class="sp-live"><div class="sp-dot"></div>LIVE</div>
+    </div>
+    <div class="video-mock">
+      <div class="video-mock-content">
+        <div class="video-play-icon">▶️</div>
+        <div class="video-label">VIDEO PLAYING</div>
+      </div>
+      <div class="subtitle-bar">
+        <div class="subtitle-text" id="subtitleDisplay">...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="neon-div"></div>
+
+  <!-- SAMPLE VIDEOS -->
+  <div class="sec-title">📺 VIDEOS — AUTO SUBTITLES</div>
+  <div class="video-list" id="videoList">
+    <!-- Populated by JS -->
+  </div>
+
+</div>
+
+<!-- BOTTOM TABS -->
+<div class="tab-bar">
+  <div class="tab-item" onclick="window.location='ddott-tv-app.html'"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
+  <div class="tab-item" onclick="window.location='ddott-home-v2.html'"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
+  <div class="tab-item active"><div class="tab-icon">🌐</div><div class="tab-label">COMMUNITY</div></div>
+  <div class="tab-item" onclick="window.location='ddott-emo-coins.html'"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
+  <div class="tab-item" onclick="window.location='ddott-creator-studio.html'"><div class="tab-icon">🎬</div><div class="tab-label">STUDIO</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+// ============================================
+// AUTO TRANSLATION — Claude API Powered
+// ============================================
+
+let selectedLang = { code: 'ml', name: 'Malayalam', native: 'മലയാളം' };
+let translatedText = '';
+let subtitleInterval = null;
+
+// ============================================
+// LANGUAGE SELECTION
+// ============================================
+function selectLang(el, code, name, native) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mlang-chip').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedLang = { code, name, native };
+  updateResultBadge();
+  showToast(`🌐 ${name} selected`);
+}
+
+function selectMoreLang(el, code, name) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mlang-chip').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedLang = { code, name, native: name };
+  updateResultBadge();
+  showToast(`🌐 ${name} selected`);
+}
+
+function updateResultBadge() {
+  document.getElementById('resultLangBadge').textContent = `→ ${selectedLang.name.toUpperCase()}`;
+}
+
+// ============================================
+// LANGUAGE DETECTION (simple heuristic)
+// ============================================
+function detectLang() {
+  const text = document.getElementById('inputText').value;
+  const el = document.getElementById('detectedLang');
+  if (!text.trim()) { el.textContent = '—'; return; }
+
+  // Simple script detection
+  if (/[\u0D00-\u0D7F]/.test(text)) el.textContent = 'Malayalam 🇮🇳';
+  else if (/[\u0900-\u097F]/.test(text)) el.textContent = 'Hindi 🇮🇳';
+  else if (/[\u0600-\u06FF]/.test(text)) el.textContent = 'Arabic 🇦🇪';
+  else if (/[\u0B80-\u0BFF]/.test(text)) el.textContent = 'Tamil 🇮🇳';
+  else if (/[\u4E00-\u9FFF]/.test(text)) el.textContent = 'Chinese 🇨🇳';
+  else if (/[\u3040-\u30FF]/.test(text)) el.textContent = 'Japanese 🇯🇵';
+  else if (/[\uAC00-\uD7A3]/.test(text)) el.textContent = 'Korean 🇰🇷';
+  else if (/[a-zA-Z]/.test(text)) el.textContent = 'English 🇬🇧';
+  else el.textContent = 'Unknown';
+}
+
+// ============================================
+// TRANSLATE WITH CLAUDE API
+// ============================================
+async function translateText() {
+  const text = document.getElementById('inputText').value.trim();
+  if (!text) { showToast('⚠️ Enter text first!'); return; }
+
+  const btn = document.getElementById('translateBtn');
+  const btnIcon = document.getElementById('btnIcon');
+  const btnText = document.getElementById('btnText');
+  const resultBox = document.getElementById('resultBox');
+  const resultTextEl = document.getElementById('resultText');
+
+  // Loading state
+  btn.disabled = true;
+  btnIcon.innerHTML = '<div class="loading-spinner"></div>';
+  btnText.textContent = 'TRANSLATING...';
+  resultBox.classList.remove('show');
+  document.getElementById('subtitlePreview').classList.remove('show');
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: `You are a professional translator. Translate the given text accurately to ${selectedLang.name}. 
+Rules:
+- Return ONLY the translated text, nothing else
+- No explanations, no labels, no preamble
+- Keep proper nouns, brand names, and technical terms as-is unless they have a common translation
+- Maintain the original tone and style
+- If the text is already in ${selectedLang.name}, return it as-is`,
+        messages: [{ role: 'user', content: text }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.content && data.content[0]) {
+      translatedText = data.content[0].text.trim();
+      resultTextEl.textContent = translatedText;
+      resultBox.classList.add('show');
+      updateResultBadge();
+
+      // Show subtitle preview
+      showSubtitlePreview(translatedText);
+      showToast('✅ TRANSLATED!');
+    } else {
+      throw new Error('No translation returned');
+    }
+
+  } catch (err) {
+    console.error('Translation error:', err);
+    // Fallback
+    resultTextEl.textContent = `[Translation service unavailable. Selected: ${selectedLang.name}]`;
+    resultBox.classList.add('show');
+    showToast('⚠️ Try again');
+  } finally {
+    btn.disabled = false;
+    btnIcon.textContent = '🌐';
+    btnText.textContent = 'TRANSLATE NOW';
+  }
+}
+
+// ============================================
+// SUBTITLE PREVIEW ANIMATION
+// ============================================
+function showSubtitlePreview(text) {
+  const preview = document.getElementById('subtitlePreview');
+  const display = document.getElementById('subtitleDisplay');
+  preview.classList.add('show');
+
+  // Split into chunks for subtitle effect
+  const words = text.split(' ');
+  const chunkSize = 5;
+  const chunks = [];
+  for (let i = 0; i < words.length; i += chunkSize) {
+    chunks.push(words.slice(i, i + chunkSize).join(' '));
+  }
+
+  if (chunks.length === 0) return;
+
+  let idx = 0;
+  display.textContent = chunks[0];
+
+  if (subtitleInterval) clearInterval(subtitleInterval);
+  subtitleInterval = setInterval(() => {
+    idx = (idx + 1) % chunks.length;
+    display.style.animation = 'none';
+    display.offsetHeight; // reflow
+    display.style.animation = 'subtitleIn 0.3s ease';
+    display.textContent = chunks[idx];
+  }, 2500);
+}
+
+// ============================================
+// COPY & SPEAK
+// ============================================
+function copyResult() {
+  if (!translatedText) return;
+  navigator.clipboard.writeText(translatedText).then(() => {
+    showToast('📋 COPIED!');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = translatedText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('📋 COPIED!');
+  });
+}
+
+function speakResult() {
+  if (!translatedText) return;
+  if (!('speechSynthesis' in window)) { showToast('⚠️ Voice not supported'); return; }
+
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(translatedText);
+
+  // Map lang codes to BCP 47
+  const langMap = {
+    ml: 'ml-IN', hi: 'hi-IN', ar: 'ar-SA', ta: 'ta-IN',
+    en: 'en-US', fr: 'fr-FR', te: 'te-IN', kn: 'kn-IN',
+    ur: 'ur-PK', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR',
+    es: 'es-ES', pt: 'pt-PT', de: 'de-DE', ru: 'ru-RU',
+    tr: 'tr-TR', id: 'id-ID', bn: 'bn-BD', sw: 'sw-KE'
+  };
+  utter.lang = langMap[selectedLang.code] || 'en-US';
+  utter.rate = 0.9;
+  window.speechSynthesis.speak(utter);
+  showToast('🔊 SPEAKING...');
+}
+
+// ============================================
+// SAMPLE VIDEOS FROM SUPABASE
+// ============================================
+async function loadVideos() {
+  const list = document.getElementById('videoList');
+
+  const sampleVideos = [
+    { emoji: '🎵', title: 'Malayalam Song — Summer Vibes', meta: 'Music · 2.4K views', translated: false },
+    { emoji: '🎬', title: 'Short Film: Echoes', meta: 'Drama · 1.1K views', translated: true },
+    { emoji: '📰', title: 'Tech News Roundup 2024', meta: 'News · 890 views', translated: false },
+    { emoji: '🎙️', title: 'Crypto & DeFi Discussion', meta: 'Podcast · 3.2K views', translated: true },
+    { emoji: '😂', title: 'Comedy Skit — Office Life', meta: 'Comedy · 5.6K views', translated: false },
+  ];
+
+  // Try to load real videos from Supabase
+  try {
+    if (typeof db !== 'undefined') {
+      const { data } = await db.from('videos').select('id,title,category,view_count').order('created_at',{ascending:false}).limit(5);
+      if (data && data.length > 0) {
+        const icons = { music:'🎵', short_film:'🎬', news:'📰', podcast:'🎙️', comedy:'😂', drama:'🎭', education:'📚' };
+        list.innerHTML = data.map((v,i) => `
+          <div class="video-card" style="animation-delay:${i*0.07}s">
+            <div class="vc-thumb">
+              ${icons[v.category] || '📺'}
+              <div class="vc-sub-indicator">SUB</div>
+            </div>
+            <div class="vc-info">
+              <div class="vc-title">${v.title || 'Untitled'}</div>
+              <div class="vc-meta">${v.category || 'Video'} · ${v.view_count || 0} views</div>
+            </div>
+            <div class="vc-translate-btn" onclick="translateVideo(this, '${v.title}')">TRANSLATE</div>
+          </div>
+        `).join('');
+        return;
+      }
+    }
+  } catch(e) { console.log('DB fallback to samples'); }
+
+  // Sample fallback
+  list.innerHTML = sampleVideos.map((v,i) => `
+    <div class="video-card" style="animation-delay:${i*0.07}s">
+      <div class="vc-thumb">
+        ${v.emoji}
+        ${v.translated ? '<div class="vc-sub-indicator">SUB</div>' : ''}
+      </div>
+      <div class="vc-info">
+        <div class="vc-title">${v.title}</div>
+        <div class="vc-meta">${v.meta}</div>
+      </div>
+      <div class="vc-translate-btn ${v.translated ? 'done' : ''}" onclick="translateVideo(this, '${v.title}')">
+        ${v.translated ? '✅ DONE' : 'TRANSLATE'}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// TRANSLATE A VIDEO TITLE
+// ============================================
+async function translateVideo(btn, title) {
+  if (btn.classList.contains('done')) { showToast('✅ Already translated!'); return; }
+
+  btn.textContent = '...';
+  btn.style.opacity = '0.5';
+
+  // Set input and translate
+  document.getElementById('inputText').value = title;
+  detectLang();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 200,
+        system: `Translate to ${selectedLang.name}. Return ONLY the translation, nothing else.`,
+        messages: [{ role: 'user', content: title }]
+      })
+    });
+    const data = await response.json();
+    if (data.content && data.content[0]) {
+      translatedText = data.content[0].text.trim();
+      document.getElementById('resultText').textContent = translatedText;
+      document.getElementById('resultBox').classList.add('show');
+      updateResultBadge();
+      showSubtitlePreview(translatedText);
+      btn.textContent = '✅ DONE';
+      btn.classList.add('done');
+      showToast(`✅ TRANSLATED TO ${selectedLang.name.toUpperCase()}!`);
+    }
+  } catch(e) {
+    btn.textContent = 'RETRY';
+    btn.style.opacity = '1';
+    showToast('⚠️ Try again');
+  }
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+// ============================================
+// INIT
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+  loadVideos();
+  updateResultBadge();
+});
+</script>
+
+</body>
+</html>
