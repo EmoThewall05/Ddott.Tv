@@ -215,6 +215,15 @@
       </div>
     </div>
 
+          <div class="page-card" onclick="nav('translate')" style="border-color:rgba(0,245,255,0.15)">
+        <div class="pc-badge b-ai">AI</div>
+        <div class="pc-icon">🌍</div><div class="pc-title">Auto Translate</div><div class="pc-desc">50+ lang AI subtitles live</div>
+      </div>
+      <div class="page-card" onclick="nav('news')">
+        <div class="pc-badge b-live">LIVE</div>
+        <div class="pc-icon">📰</div><div class="pc-title">News Reader</div><div class="pc-desc">AI-powered news briefing</div>
+      </div>
+    </div>
     <div class="sec-title" style="margin-top:18px">DWIN UNIVERSE</div>
     <div class="pages-grid" style="margin-bottom:20px">
       <div class="page-card" onclick="window.open('https://thewall-web3-iie7.vercel.app','_blank')" style="border-color:rgba(0,245,255,0.15)">
@@ -251,9 +260,9 @@
     home:'ddott-home-v2.html', feed:'ddott-home-v2.html', community:'ddott-community.html', player:'ddott-player-v3.html',
     channel:'ddott-creator-channel.html', messages:'ddott-messaging.html',
     coins:'ddott-emo-coins.html', ai:'ddott-ai-butterfly.html',
-    studio:'/studio', 'anchor-studio':'/anchor-studio', landing:'ddott-landing-v2.html', advertiser:'ddott-advertiser.html'
+    studio:'/studio', 'anchor-studio':'/anchor-studio', landing:'ddott-landing-v2.html', advertiser:'ddott-advertiser.html', translate:'ddott-auto-translate.html', news:'ddott-news-reader.html', login:'ddott-login.html'
   };
-  const tabMap = { feed:'t-feed', player:'t-feed', channel:'t-home', messages:'t-home', coins:'t-coins', ai:'t-home', studio:'t-studio', 'anchor-studio':'t-studio', landing:'t-home' };
+  const tabMap = { feed:'t-feed', player:'t-feed', channel:'t-home', messages:'t-home', coins:'t-coins', ai:'t-home', studio:'t-studio', 'anchor-studio':'t-studio', landing:'t-home', translate:'t-community', news:'t-feed' };
 
   // Inject into iframe to hide its own nav & tab bar
   const HIDE_CSS = `<style id="__sf__">
