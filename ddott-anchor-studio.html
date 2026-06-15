@@ -409,7 +409,7 @@ function drawStudio(){
   drawNewsBackground(W, H, bgH);
 
   // ── STUDIO FLOOR
-  const studioTop = H * 0.45;
+  const studioTop = H * 0.38;
   drawStudioFloor(W, H, studioTop);
 
   // ── STUDIO SCREEN (World Map)
@@ -423,7 +423,7 @@ function drawStudio(){
 
   // ── ANCHOR
   const anchorCX = W/2;
-  const anchorBaseY = H * 0.82;
+  const anchorBaseY = H * 0.72;
   const breathOff = Math.sin(breathPhase) * 1.5;
   drawAnchor(anchorCX, anchorBaseY + breathOff, W, H, p, isFemale, isArab);
 
