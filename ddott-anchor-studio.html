@@ -2,107 +2,211 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ddott News Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DDOTT NEWS — AI Broadcast Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-serif;overflow:hidden;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani','Inter',sans-serif;overflow:hidden;touch-action:manipulation;}
 
-/* CHANNEL BAR */
+/* ═══════════════════════════════════════
+   CHANNEL BAR
+═══════════════════════════════════════ */
 .channel-bar{
-  position:fixed;top:0;left:0;right:0;height:48px;z-index:100;
+  position:fixed;top:0;left:0;right:0;height:52px;z-index:100;
   display:flex;align-items:center;gap:10px;padding:0 14px;
-  background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);
+  background:rgba(0,0,0,0.92);backdrop-filter:blur(14px);
   border-bottom:2px solid #ff0040;
 }
-.back-btn{font-size:18px;cursor:pointer;opacity:0.7;}
-.channel-logo{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:#ff0040;letter-spacing:2px;}
-.live-tag{display:flex;align-items:center;gap:4px;padding:3px 8px;background:#ff0040;border-radius:3px;font-family:'Orbitron',monospace;font-size:8px;font-weight:700;}
-.live-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 0.8s infinite;}
+.back-btn{font-size:20px;cursor:pointer;opacity:0.8;transition:0.2s;padding:4px;}
+.back-btn:active{opacity:0.4;transform:scale(0.9);}
+.channel-logo{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:#ff0040;letter-spacing:2px;}
+.live-tag{display:flex;align-items:center;gap:5px;padding:4px 10px;background:#ff0040;border-radius:3px;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 0.8s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
 .lang-strip{display:flex;gap:5px;margin-left:auto;}
-.lang-btn{padding:4px 10px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;font-size:11px;cursor:pointer;transition:all 0.2s;}
-.lang-btn.active{background:#ff0040;border-color:#ff0040;font-weight:700;}
+.lang-btn{padding:5px 11px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:transparent;color:#fff;font-size:11px;cursor:pointer;transition:all 0.25s;font-family:'Orbitron',monospace;}
+.lang-btn.active{background:#ff0040;border-color:#ff0040;font-weight:700;box-shadow:0 0 12px rgba(255,0,64,0.4);}
 
-/* MAIN */
-.news-screen{position:fixed;top:48px;left:0;right:0;bottom:0;background:#000;overflow:hidden;}
+/* ═══════════════════════════════════════
+   MAIN SCREEN
+═══════════════════════════════════════ */
+.news-screen{position:fixed;top:52px;left:0;right:0;bottom:0;background:#000;overflow:hidden;}
 
-/* TICKER */
-.ticker-wrap{position:absolute;top:0;left:0;right:0;height:26px;background:rgba(220,0,40,0.95);display:flex;align-items:center;overflow:hidden;z-index:20;}
-.ticker-label{padding:0 10px;font-family:'Orbitron',monospace;font-size:8px;font-weight:900;letter-spacing:1px;background:#fff;color:#ff0040;height:100%;display:flex;align-items:center;flex-shrink:0;}
-.ticker-text{white-space:nowrap;animation:ticker 55s linear infinite;font-size:11px;font-weight:600;padding-left:24px;}
+/* ═══════════════════════════════════════
+   LOADER
+═══════════════════════════════════════ */
+.loader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;z-index:60;transition:opacity 0.5s;}
+.loader-icon{font-size:52px;animation:spin 2s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-family:'Orbitron',monospace;font-size:11px;color:#ff0040;letter-spacing:4px;margin-top:14px;}
+.loader-sub{font-size:12px;color:rgba(255,255,255,0.4);margin-top:8px;}
+
+/* ═══════════════════════════════════════
+   TICKER
+═══════════════════════════════════════ */
+.ticker-wrap{position:absolute;top:0;left:0;right:0;height:28px;background:rgba(220,0,40,0.95);display:flex;align-items:center;overflow:hidden;z-index:20;}
+.ticker-label{padding:0 12px;font-family:'Orbitron',monospace;font-size:9px;font-weight:900;letter-spacing:1.5px;background:#fff;color:#ff0040;height:100%;display:flex;align-items:center;flex-shrink:0;}
+.ticker-text{white-space:nowrap;animation:ticker 50s linear infinite;font-size:12px;font-weight:600;padding-left:24px;}
 @keyframes ticker{0%{transform:translateX(100vw)}100%{transform:translateX(-250%)}}
 
-/* STUDIO CANVAS — full screen */
-#studioCanvas{
-  position:absolute;top:26px;left:0;right:0;
-  width:100%;
-  display:block;
+/* ═══════════════════════════════════════
+   STUDIO CANVAS
+═══════════════════════════════════════ */
+#studioCanvas{position:absolute;top:28px;left:0;right:0;width:100%;display:block;}
+
+/* ═══════════════════════════════════════
+   BROADCAST OVERLAYS
+═══════════════════════════════════════ */
+
+/* ON AIR Indicator */
+.on-air-indicator{
+  position:absolute;top:36px;right:14px;z-index:30;
+  display:flex;align-items:center;gap:6px;
+  padding:4px 10px;background:rgba(255,0,0,0.15);border:1px solid rgba(255,0,0,0.4);border-radius:4px;
+  backdrop-filter:blur(4px);
+}
+.on-air-text{font-family:'Orbitron',monospace;font-size:8px;font-weight:700;color:#ff3333;letter-spacing:2px;}
+.on-air-pulse{width:7px;height:7px;border-radius:50%;background:#ff0000;box-shadow:0 0 8px #ff0000,0 0 16px rgba(255,0,0,0.5);animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
+
+/* Recording Dot */
+.rec-indicator{
+  position:absolute;top:36px;left:14px;z-index:30;
+  display:flex;align-items:center;gap:5px;
+  padding:3px 8px;background:rgba(0,0,0,0.5);border-radius:3px;
+}
+.rec-dot{width:6px;height:6px;border-radius:50%;background:#ff0000;animation:recBlink 1s infinite;}
+@keyframes recBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+.rec-text{font-family:'Orbitron',monospace;font-size:8px;color:rgba(255,255,255,0.6);letter-spacing:1px;}
+
+/* Timecode */
+.timecode{
+  position:absolute;top:36px;left:50%;transform:translateX(-50%);z-index:30;
+  font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:2px;
+  background:rgba(0,0,0,0.4);padding:3px 10px;border-radius:3px;
 }
 
-/* NEWS OVERLAY — bottom */
-.news-overlay{
-  position:absolute;bottom:44px;left:0;right:0;
-  z-index:15;
+/* ═══════════════════════════════════════
+   TELEPROMPTER
+═══════════════════════════════════════ */
+.teleprompter{
+  position:absolute;bottom:110px;left:0;right:0;z-index:25;
+  padding:0 16px;
+  pointer-events:none;
+}
+.tp-glass{
+  background:rgba(0,10,30,0.45);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  padding:14px 18px;
+  max-height:90px;
+  overflow:hidden;
+  position:relative;
+}
+.tp-glass::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:14px;
+  background:linear-gradient(to bottom,rgba(0,10,30,0.8),transparent);z-index:2;
+}
+.tp-glass::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:14px;
+  background:linear-gradient(to top,rgba(0,10,30,0.8),transparent);z-index:2;
+}
+.tp-line{
+  font-size:15px;line-height:1.55;font-weight:500;
+  text-shadow:0 1px 4px rgba(0,0,0,0.9);
+  transition:all 0.15s;
+}
+.tp-word{display:inline;padding:0 1px;border-radius:2px;transition:all 0.12s;}
+.tp-word.active{background:rgba(255,0,64,0.5);color:#fff;text-shadow:0 0 10px rgba(255,100,100,0.8);font-weight:700;}
+.tp-word.done{color:rgba(255,255,255,0.35);}
+.tp-word.upcoming{color:rgba(255,255,255,0.7);}
+
+/* ═══════════════════════════════════════
+   LOWER THIRDS
+═══════════════════════════════════════ */
+.lower-thirds{
+  position:absolute;bottom:48px;left:0;right:0;z-index:25;
   padding:0 12px;
+  transform:translateY(100%);opacity:0;
+  transition:transform 0.5s cubic-bezier(0.22,1,0.36,1),opacity 0.4s;
 }
-.news-source-bar{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:4px 12px;margin-bottom:6px;
-  background:rgba(255,0,64,0.9);border-radius:3px;
-  font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:1px;
+.lower-thirds.show{transform:translateY(0);opacity:1;}
+.lt-main{
+  display:flex;align-items:flex-end;gap:0;
 }
-.tp-headline{
-  font-size:17px;font-weight:700;line-height:1.38;
-  text-shadow:0 2px 12px rgba(0,0,0,1);
-  margin-bottom:5px;
+.lt-name-block{
+  background:#ff0040;
+  padding:6px 16px 6px 14px;
+  border-radius:4px 4px 0 0;
+  position:relative;
 }
-.word{display:inline;border-radius:3px;padding:0 1px;transition:all 0.08s;}
-.word.active{background:rgba(255,0,64,0.65);color:#fff;text-shadow:0 0 10px #ff6060;}
-.word.done{color:rgba(255,255,255,0.38);}
+.lt-name-block::after{
+  content:'';position:absolute;right:-12px;bottom:0;width:0;height:0;
+  border-left:12px solid #ff0040;border-top:0 solid transparent;border-bottom:28px solid transparent;
+}
+.lt-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;color:#fff;}
+.lt-title{font-size:9px;color:rgba(255,255,255,0.8);margin-top:1px;letter-spacing:1px;}
+.lt-info-block{
+  flex:1;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(6px);
+  padding:6px 14px 6px 22px;
+  border-top:3px solid #ff0040;
+  border-radius:0 4px 0 0;
+  min-height:28px;
+  display:flex;align-items:center;
+}
+.lt-source{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;color:#ff7090;letter-spacing:1px;margin-right:10px;flex-shrink:0;}
+.lt-headline{font-size:13px;font-weight:600;color:#fff;line-height:1.35;}
 
-/* SUBTITLE */
-.subtitle-bar{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:7px 16px;min-height:36px;
-  background:rgba(0,0,0,0.85);
-  font-size:12px;line-height:1.45;color:rgba(255,255,255,0.9);
-  text-align:center;
-  border-top:1px solid rgba(255,0,64,0.3);
-  z-index:15;
-}
-.sw.sub-active{color:#ff7090;font-weight:700;}
+/* ═══════════════════════════════════════
+   STORY DOTS
+═══════════════════════════════════════ */
+.story-dots{position:absolute;top:34px;left:14px;display:flex;gap:5px;z-index:20;}
+.dot{width:20px;height:3px;border-radius:2px;background:rgba(255,255,255,0.15);transition:all 0.3s;cursor:pointer;}
+.dot.active{background:#ff0040;width:28px;box-shadow:0 0 8px rgba(255,0,64,0.5);}
+.news-counter{position:absolute;top:32px;right:14px;font-family:'Orbitron',monospace;font-size:9px;color:rgba(255,255,255,0.35);z-index:20;}
 
-/* CONTROLS */
+/* ═══════════════════════════════════════
+   GENDER TOGGLE
+═══════════════════════════════════════ */
+.gender-toggle{position:absolute;top:64px;right:14px;display:flex;gap:4px;z-index:20;}
+.gender-btn{padding:3px 10px;border-radius:10px;border:1px solid rgba(255,0,64,0.35);background:rgba(0,0,0,0.6);color:#fff;font-size:9px;font-family:'Orbitron',monospace;cursor:pointer;transition:all 0.2s;}
+.gender-btn.active{background:#ff0040;border-color:#ff0040;box-shadow:0 0 10px rgba(255,0,64,0.3);}
+
+/* ═══════════════════════════════════════
+   CONTROLS
+═══════════════════════════════════════ */
 .controls-bar{
-  position:absolute;bottom:38px;left:0;right:0;
-  padding:4px 14px;display:flex;align-items:center;gap:8px;z-index:25;
+  position:absolute;bottom:0;left:0;right:0;height:48px;
+  padding:0 14px;display:flex;align-items:center;gap:10px;z-index:35;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);
+  border-top:1px solid rgba(255,255,255,0.06);
 }
-.ctrl-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.18);background:rgba(10,10,20,0.8);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
-.play-btn{width:48px;height:48px;background:#ff0040;border:none;box-shadow:0 0 20px rgba(255,0,64,0.6);font-size:18px;}
-.progress{flex:1;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;overflow:hidden;}
-.progress-fill{height:100%;background:#ff0040;width:0%;transition:width 0.3s;border-radius:2px;}
-.speed-btn{padding:5px 9px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;font-family:'Orbitron',monospace;font-size:9px;cursor:pointer;}
-.vol-btn{font-size:18px;cursor:pointer;opacity:0.75;}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);background:rgba(15,15,25,0.8);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);transition:all 0.15s;}
+.ctrl-btn:active{transform:scale(0.92);background:rgba(255,0,64,0.2);}
+.play-btn{width:48px;height:48px;background:#ff0040;border:none;box-shadow:0 0 24px rgba(255,0,64,0.5);font-size:18px;}
+.play-btn:active{transform:scale(0.92);box-shadow:0 0 30px rgba(255,0,64,0.7);}
+.progress{flex:1;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:#ff0040;width:0%;transition:width 0.3s;border-radius:2px;box-shadow:0 0 6px rgba(255,0,64,0.4);}
+.speed-btn{padding:5px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Orbitron',monospace;font-size:9px;cursor:pointer;transition:all 0.15s;}
+.vol-btn{font-size:18px;cursor:pointer;opacity:0.75;padding:4px;transition:0.2s;}
+.vol-btn:active{opacity:0.4;transform:scale(0.9);}
 
-/* STORY DOTS */
-.story-dots{position:absolute;top:32px;left:14px;display:flex;gap:5px;z-index:20;}
-.dot{width:18px;height:3px;border-radius:2px;background:rgba(255,255,255,0.2);transition:all 0.3s;cursor:pointer;}
-.dot.active{background:#ff0040;width:28px;}
-.news-counter{position:absolute;top:30px;right:14px;font-family:'Orbitron',monospace;font-size:9px;color:rgba(255,255,255,0.4);z-index:20;}
-
-/* GENDER TOGGLE */
-.gender-toggle{position:absolute;top:30px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:20;}
-.gender-btn{padding:2px 10px;border-radius:10px;border:1px solid rgba(255,0,64,0.4);background:rgba(0,0,0,0.7);color:#fff;font-size:9px;font-family:'Orbitron',monospace;cursor:pointer;transition:all 0.2s;}
-.gender-btn.active{background:#ff0040;border-color:#ff0040;}
-
-/* LOADER */
-.loader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;z-index:50;}
-.loader-icon{font-size:48px;animation:spin 2s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-text{font-family:'Orbitron',monospace;font-size:10px;color:#ff0040;letter-spacing:3px;margin-top:12px;}
+/* ═══════════════════════════════════════
+   BREAKING BANNER
+═══════════════════════════════════════ */
+.breaking-banner{
+  position:absolute;top:28px;left:0;right:0;z-index:22;
+  background:rgba(255,0,0,0.85);padding:4px 14px;
+  font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;
+  text-align:center;transform:translateY(-100%);transition:transform 0.4s;
+}
+.breaking-banner.show{transform:translateY(0);}
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -111,34 +215,66 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
   <div class="channel-logo">📺 DDOTT NEWS</div>
   <div class="live-tag"><div class="live-dot"></div>LIVE</div>
   <div class="lang-strip">
-    <button class="lang-btn active" onclick="loadNews('en',this)">EN</button>
-    <button class="lang-btn" onclick="loadNews('ml',this)">ML</button>
-    <button class="lang-btn" onclick="loadNews('hi',this)">HI</button>
-    <button class="lang-btn" onclick="loadNews('ar',this)">AR</button>
+    <button class="lang-btn active" data-lang="en" onclick="loadNews('en',this)">EN</button>
+    <button class="lang-btn" data-lang="ml" onclick="loadNews('ml',this)">ML</button>
+    <button class="lang-btn" data-lang="hi" onclick="loadNews('hi',this)">HI</button>
+    <button class="lang-btn" data-lang="ar" onclick="loadNews('ar',this)">AR</button>
   </div>
 </div>
 
 <div class="news-screen" id="newsScreen">
-  <div class="loader" id="loader"><div class="loader-icon">📡</div><div class="loader-text">LOADING NEWS...</div></div>
+  <div class="loader" id="loader">
+    <div class="loader-icon">📡</div>
+    <div class="loader-text">INITIALIZING BROADCAST</div>
+    <div class="loader-sub">Loading AI News Studio...</div>
+  </div>
 
   <div class="ticker-wrap">
     <div class="ticker-label">BREAKING</div>
-    <div class="ticker-text" id="tickerText">Loading latest news...</div>
+    <div class="ticker-text" id="tickerText">Loading latest news from around the world...</div>
   </div>
 
+  <div class="breaking-banner" id="breakingBanner">⚠️ BREAKING NEWS</div>
+
   <canvas id="studioCanvas"></canvas>
+
+  <div class="rec-indicator">
+    <div class="rec-dot"></div>
+    <div class="rec-text">REC</div>
+  </div>
+
+  <div class="timecode" id="timecode">00:00:00:00</div>
+
+  <div class="on-air-indicator">
+    <div class="on-air-pulse"></div>
+    <div class="on-air-text">ON AIR</div>
+  </div>
 
   <div class="story-dots" id="storyDots"></div>
   <div class="news-counter" id="newsCounter"></div>
 
   <div class="gender-toggle">
-    <button class="gender-btn active" id="btnMale" onclick="switchGender('male')">♂</button>
-    <button class="gender-btn" id="btnFemale" onclick="switchGender('female')">♀</button>
+    <button class="gender-btn active" id="btnMale" onclick="switchGender('male')">♂ MALE</button>
+    <button class="gender-btn" id="btnFemale" onclick="switchGender('female')">♀ FEMALE</button>
   </div>
 
-  <div class="news-overlay">
-    <div class="news-source-bar" id="tpSource" style="display:none">DDOTT NEWS</div>
-    <div class="tp-headline" id="tpHeadline"></div>
+  <div class="teleprompter" id="teleprompter">
+    <div class="tp-glass" id="tpGlass">
+      <div class="tp-line" id="tpLine"></div>
+    </div>
+  </div>
+
+  <div class="lower-thirds" id="lowerThirds">
+    <div class="lt-main">
+      <div class="lt-name-block">
+        <div class="lt-name" id="ltName">ANDERSON</div>
+        <div class="lt-title" id="ltTitle">EN ANCHOR</div>
+      </div>
+      <div class="lt-info-block">
+        <div class="lt-source" id="ltSource">DDOTT NEWS</div>
+        <div class="lt-headline" id="ltHeadline">Welcome to Ddott News</div>
+      </div>
+    </div>
   </div>
 
   <div class="controls-bar">
@@ -146,39 +282,84 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans-ser
     <button class="ctrl-btn play-btn" id="playBtn" onclick="togglePlay()">▶</button>
     <button class="ctrl-btn" onclick="nextNews()">⏭</button>
     <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
-    <button class="speed-btn" onclick="cycleSpeed()" id="speedBtn">1x</button>
+    <button class="speed-btn" onclick="cycleSpeed()" id="speedBtn">1.0x</button>
     <div class="vol-btn" onclick="toggleMute()" id="volBtn">🔊</div>
   </div>
-
-  <div class="subtitle-bar" id="subtitleBar"></div>
 </div>
 
 <script>
+// ═════════════════════════════════════════════════════════════════
+// DDOTT NEWS — AI BROADCAST STUDIO v2.0
+// Built by Divin (Dwin) | Ddott TV | EmoTheWall
+// ═════════════════════════════════════════════════════════════════
+
 // ═══════════════════════════════════════
-// ANCHOR PROFILES
+// ANCHOR PROFILES — Culturally Accurate
 // ═══════════════════════════════════════
 const ANCHORS = {
   en:{
-    male:{skin:'#f0c090',skinD:'#d8a070',skinS:'#ffe0c0',hair:'#3d2008',eye:'#2a5878',lip:'#c07060',suit:'#1e3a5a',tie:'#c0392b',shirt:'#ffffff',brow:'#2a1608',blush:'rgba(240,160,130,0.15)',name:'Anderson',label:'EN ANCHOR'},
-    female:{skin:'#f5c8a0',skinD:'#e0a878',skinS:'#ffe8cc',hair:'#7a3010',eye:'#3a7040',lip:'#d84070',suit:'#2a0838',tie:'#ff60a0',shirt:'#fff0ff',brow:'#4a2010',blush:'rgba(255,160,140,0.2)',name:'Emily',label:'EN ANCHOR'}
+    male:{
+      skin:'#e8b894',skinD:'#c4906a',skinS:'#f5d4b8',skinM:'#d4a078',
+      hair:'#2a1810',eye:'#1a3a5a',lip:'#b06050',suit:'#1a2f4a',tie:'#c0392b',shirt:'#f0f0f0',
+      brow:'#1e1008',blush:'rgba(220,140,100,0.12)',name:'Anderson',label:'EN ANCHOR',
+      hairStyle:'short',features:'western'
+    },
+    female:{
+      skin:'#f0c8a0',skinD:'#d8a878',skinS:'#ffe0c8',skinM:'#e8b890',
+      hair:'#5a2810',eye:'#2a6040',lip:'#d04060',suit:'#2a0838',tie:'#ff6090',shirt:'#fff0f5',
+      brow:'#3a1808',blush:'rgba(255,160,130,0.18)',name:'Emily',label:'EN ANCHOR',
+      hairStyle:'long',features:'western'
+    }
   },
   ml:{
-    male:{skin:'#b07030',skinD:'#8a5018',skinS:'#d09050',hair:'#080402',eye:'#2a1808',lip:'#7a3820',suit:'#0a1e0e',tie:'#ff9900',shirt:'#ffffff',brow:'#040200',blush:'rgba(140,80,40,0.18)',name:'Vishnu',label:'ML ANCHOR'},
-    female:{skin:'#b87840',skinD:'#905828',skinS:'#d89860',hair:'#040200',eye:'#1e1008',lip:'#c02848',suit:'#1a0030',tie:'#ff3366',shirt:'#ffe8f0',brow:'#040200',blush:'rgba(180,100,60,0.2)',name:'Divya',label:'ML ANCHOR'}
+    male:{
+      skin:'#a07040',skinD:'#7a5020',skinS:'#c09060',skinM:'#8a6028',
+      hair:'#080402',eye:'#1a1008',lip:'#6a3018',suit:'#0a1e12',tie:'#ff8800',shirt:'#ffffff',
+      brow:'#040200',blush:'rgba(130,70,30,0.15)',name:'Vishnu',label:'ML ANCHOR',
+      hairStyle:'short',features:'malayali'
+    },
+    female:{
+      skin:'#b07848',skinD:'#905828',skinS:'#d09868',skinM:'#a06838',
+      hair:'#040200',eye:'#1a1008',lip:'#b02848',suit:'#1a0030',tie:'#ff3366',shirt:'#ffe8f0',
+      brow:'#040200',blush:'rgba(180,100,50,0.18)',name:'Divya',label:'ML ANCHOR',
+      hairStyle:'long',features:'malayali'
+    }
   },
   hi:{
-    male:{skin:'#c88050',skinD:'#a06030',skinS:'#e0a070',hair:'#100804',eye:'#201408',lip:'#883020',suit:'#1a1032',tie:'#ff6600',shirt:'#ffffff',brow:'#100804',blush:'rgba(160,90,50,0.15)',name:'Arjun',label:'HI ANCHOR'},
-    female:{skin:'#d09060',skinD:'#a87040',skinS:'#e8b080',hair:'#0c0804',eye:'#1e1208',lip:'#cc2050',suit:'#200830',tie:'#ff4488',shirt:'#fff0f8',brow:'#0c0804',blush:'rgba(200,120,80,0.2)',name:'Priya',label:'HI ANCHOR'}
+    male:{
+      skin:'#c08050',skinD:'#a06030',skinS:'#e0a070',skinM:'#b07040',
+      hair:'#100804',eye:'#201408',lip:'#783018',suit:'#1a1030',tie:'#ff6600',shirt:'#ffffff',
+      brow:'#100804',blush:'rgba(160,90,50,0.12)',name:'Arjun',label:'HI ANCHOR',
+      hairStyle:'short',features:'southasian'
+    },
+    female:{
+      skin:'#d09060',skinD:'#a87040',skinS:'#e8b080',skinM:'#c08050',
+      hair:'#0c0804',eye:'#1e1208',lip:'#c02050',suit:'#200830',tie:'#ff4488',shirt:'#fff0f8',
+      brow:'#0c0804',blush:'rgba(200,120,80,0.15)',name:'Priya',label:'HI ANCHOR',
+      hairStyle:'long',features:'southasian'
+    }
   },
   ar:{
-    male:{skin:'#c09060',skinD:'#a07040',skinS:'#d8b080',hair:'#060402',eye:'#181008',lip:'#804030',suit:'#f0f0f0',tie:'#006600',shirt:'#ffffff',brow:'#060402',blush:'rgba(150,100,60,0.15)',name:'Khalid',label:'AR ANCHOR'},
-    female:{skin:'#c8a070',skinD:'#a07848',skinS:'#e0c090',hair:'#060402',eye:'#1e1008',lip:'#b02848',suit:'#0e0e0e',tie:'#cc4060',shirt:'#f8e8e0',brow:'#060402',blush:'rgba(190,120,70,0.2)',name:'Fatima',label:'AR ANCHOR'}
+    male:{
+      skin:'#c09060',skinD:'#a07040',skinS:'#d8b080',skinM:'#b08050',
+      hair:'#060402',eye:'#181008',lip:'#784030',suit:'#e8e8e8',tie:'#006600',shirt:'#ffffff',
+      brow:'#060402',blush:'rgba(150,100,60,0.12)',name:'Khalid',label:'AR ANCHOR',
+      hairStyle:'keffiyeh',features:'arab'
+    },
+    female:{
+      skin:'#c8a070',skinD:'#a07848',skinS:'#e0c090',skinM:'#b89060',
+      hair:'#060402',eye:'#1e1008',lip:'#a02848',suit:'#0e0e0e',tie:'#cc4060',shirt:'#f8e8e0',
+      brow:'#060402',blush:'rgba(190,120,70,0.15)',name:'Fatima',label:'AR ANCHOR',
+      hairStyle:'hijab',features:'arab'
+    }
   }
 };
 
 let currentLang='en', currentGender='male', isTalking=false;
-let mouthOpen=false, mouthInterval=null, newsImageEl=null;
+let mouthOpen=false, mouthInterval=null, newsImageEl=null, nextImageEl=null;
 let blinkTimer=null, blinkState=false, breathPhase=0, breathTimer=null;
+let imageTransition=0, currentImageAlpha=1, nextImageAlpha=0;
+let kenBurnsOffset={x:0,y:0,scale:1}, kenBurnsTarget={x:0,y:0,scale:1};
 
 // ═══════════════════════════════════════
 // CANVAS SETUP
@@ -189,14 +370,29 @@ const ctx = canvas.getContext('2d');
 function resizeCanvas(){
   const screen = document.getElementById('newsScreen');
   canvas.width = screen.clientWidth;
-  // height = available space minus controls and subtitle
-  canvas.height = window.innerHeight - 48 - 26;
-  canvas.style.height = canvas.height + 'px'; // below ticker
+  canvas.height = screen.clientHeight - 28;
+  canvas.style.height = canvas.height + 'px';
   canvas.style.width = '100%';
-  canvas.style.height = (screen.clientHeight - 26) + 'px';
 }
-
 window.addEventListener('resize', ()=>{ resizeCanvas(); drawStudio(); });
+
+// ═══════════════════════════════════════
+// COLOR HELPERS
+// ═══════════════════════════════════════
+function shade(hex, amt){
+  if(!hex || !hex.startsWith('#')) return hex || '#888';
+  const n=parseInt(hex.replace('#',''),16);
+  const r=Math.max(0,Math.min(255,(n>>16)+amt));
+  const g=Math.max(0,Math.min(255,((n>>8)&0xff)+amt));
+  const b=Math.max(0,Math.min(255,(n&0xff)+amt));
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function lighten(hex,amt){return shade(hex,amt);}
+function hexToRgba(hex,a){
+  if(!hex || !hex.startsWith('#')) return `rgba(128,128,128,${a})`;
+  const n=parseInt(hex.replace('#',''),16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
 
 // ═══════════════════════════════════════
 // MAIN DRAW FUNCTION
@@ -208,20 +404,54 @@ function drawStudio(){
   const isArab = currentLang==='ar';
   ctx.clearRect(0,0,W,H);
 
-  // ── NEWS IMAGE BG (top 55% of canvas)
-  const bgH = H * 0.55;
+  // ── NEWS IMAGE BG with Ken Burns & Crossfade
+  const bgH = H * 0.58;
+  drawNewsBackground(W, H, bgH);
+
+  // ── STUDIO FLOOR
+  const studioTop = H * 0.45;
+  drawStudioFloor(W, H, studioTop);
+
+  // ── STUDIO SCREEN (World Map)
+  drawStudioScreen(W, H, studioTop);
+
+  // ── STUDIO LIGHTING (before anchor)
+  drawStudioLighting(W, H, studioTop);
+
+  // ── NEWS DESK
+  drawDesk(W, H);
+
+  // ── ANCHOR
+  const anchorCX = W/2;
+  const anchorBaseY = H * 0.82;
+  const breathOff = Math.sin(breathPhase) * 1.5;
+  drawAnchor(anchorCX, anchorBaseY + breathOff, W, H, p, isFemale, isArab);
+
+  // ── DESK FOREGROUND
+  drawDeskForeground(W, H);
+
+  // ── CAMERA OVERLAY (subtle vignette)
+  drawCameraOverlay(W, H);
+}
+
+// ── NEWS BACKGROUND with Ken Burns & Crossfade
+function drawNewsBackground(W, H, bgH){
+  ctx.save();
+
+  // Current image
   if(newsImageEl && newsImageEl.complete && newsImageEl.naturalWidth>0){
-    ctx.save();
-    ctx.drawImage(newsImageEl, 0, 0, W, bgH);
-    // gradient fade bottom
-    const imgFade = ctx.createLinearGradient(0, bgH*0.4, 0, bgH);
-    imgFade.addColorStop(0,'rgba(0,0,0,0)');
-    imgFade.addColorStop(1,'rgba(0,0,0,0.98)');
-    ctx.fillStyle = imgFade;
-    ctx.fillRect(0, bgH*0.4, W, bgH*0.6);
-    ctx.restore();
+    const kb = kenBurnsOffset;
+    const imgW = newsImageEl.naturalWidth;
+    const imgH = newsImageEl.naturalHeight;
+    const scale = Math.max(W/imgW, bgH/imgH) * kb.scale;
+    const dw = imgW * scale;
+    const dh = imgH * scale;
+    const dx = (W - dw)/2 + kb.x;
+    const dy = (bgH - dh)/2 + kb.y;
+
+    ctx.globalAlpha = currentImageAlpha;
+    ctx.drawImage(newsImageEl, dx, dy, dw, dh);
   } else {
-    // fallback — dark bg
     const fallGrad = ctx.createLinearGradient(0,0,0,bgH);
     fallGrad.addColorStop(0,'#050810');
     fallGrad.addColorStop(1,'#000000');
@@ -229,311 +459,341 @@ function drawStudio(){
     ctx.fillRect(0,0,W,bgH);
   }
 
-  // ── STUDIO FLOOR (bottom portion)
-  const studioTop = H * 0.42;
+  // Next image (crossfade)
+  if(nextImageEl && nextImageEl.complete && nextImageEl.naturalWidth>0 && nextImageAlpha>0){
+    const imgW = nextImageEl.naturalWidth;
+    const imgH = nextImageEl.naturalHeight;
+    const scale = Math.max(W/imgW, bgH/imgH);
+    const dw = imgW * scale;
+    const dh = imgH * scale;
+    const dx = (W - dw)/2;
+    const dy = (bgH - dh)/2;
+
+    ctx.globalAlpha = nextImageAlpha;
+    ctx.drawImage(nextImageEl, dx, dy, dw, dh);
+  }
+  ctx.globalAlpha = 1;
+
+  // Gradient fade bottom
+  const imgFade = ctx.createLinearGradient(0, bgH*0.35, 0, bgH);
+  imgFade.addColorStop(0,'rgba(0,0,0,0)');
+  imgFade.addColorStop(0.5,'rgba(0,0,0,0.6)');
+  imgFade.addColorStop(1,'rgba(0,0,0,0.98)');
+  ctx.fillStyle = imgFade;
+  ctx.fillRect(0, bgH*0.35, W, bgH*0.65);
+
+  ctx.restore();
+}
+
+// ── STUDIO FLOOR
+function drawStudioFloor(W, H, studioTop){
   const floorGrad = ctx.createLinearGradient(0, studioTop, 0, H);
-  floorGrad.addColorStop(0,'#050a14');
-  floorGrad.addColorStop(0.4,'#080e1c');
-  floorGrad.addColorStop(1,'#020408');
+  floorGrad.addColorStop(0,'#040a14');
+  floorGrad.addColorStop(0.4,'#070e1c');
+  floorGrad.addColorStop(1,'#010408');
   ctx.fillStyle = floorGrad;
   ctx.fillRect(0, studioTop, W, H - studioTop);
 
-  // studio floor reflection line
-  ctx.strokeStyle = 'rgba(0,100,200,0.15)';
+  // Reflection line
+  ctx.strokeStyle = 'rgba(0,100,200,0.12)';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0, studioTop+2); ctx.lineTo(W, studioTop+2); ctx.stroke();
 
-  // ── STUDIO SCREEN BEHIND ANCHOR (world map style)
-  drawStudioScreen(W, H, studioTop);
-
-  // ── NEWS DESK
-  drawDesk(W, H);
-
-  // ── ANCHOR (sitting behind desk)
-  const anchorCX = W/2;
-  const anchorBaseY = H * 0.82; // feet/waist at desk level
-  const breathOff = Math.sin(breathPhase) * 1.5;
-  drawAnchor(anchorCX, anchorBaseY + breathOff, W, H, p, isFemale, isArab);
-
-  // ── DESK FOREGROUND GLOW
-  drawDeskForeground(W, H);
-
-  // ── STUDIO LIGHTS
-  drawStudioLights(W, H, studioTop);
+  // Floor grid perspective
+  ctx.strokeStyle = 'rgba(40,80,160,0.06)';
+  ctx.lineWidth = 0.5;
+  for(let i=0;i<8;i++){
+    const x = W/2 + (i-3.5)*W*0.12;
+    ctx.beginPath(); ctx.moveTo(x, studioTop); ctx.lineTo(x + (x-W/2)*0.3, H); ctx.stroke();
+  }
 }
 
-// ── STUDIO BACK SCREEN
+// ── STUDIO SCREEN (World Map)
 function drawStudioScreen(W, H, studioTop){
-  const sw = W * 0.78, sh = H * 0.32;
-  const sx = (W-sw)/2, sy = studioTop - sh * 0.1;
+  const sw = W * 0.82, sh = H * 0.30;
+  const sx = (W-sw)/2, sy = studioTop - sh * 0.08;
 
-  // screen bg
   ctx.save();
   ctx.beginPath();
-  ctx.roundRect(sx, sy, sw, sh, 8);
+  ctx.roundRect(sx, sy, sw, sh, 10);
   ctx.clip();
 
-  // blue world map gradient
+  // Deep blue gradient
   const scGrad = ctx.createLinearGradient(sx, sy, sx+sw, sy+sh);
-  scGrad.addColorStop(0,'#020c28');
-  scGrad.addColorStop(0.3,'#04184a');
+  scGrad.addColorStop(0,'#020a24');
+  scGrad.addColorStop(0.3,'#041850');
   scGrad.addColorStop(0.6,'#0a2260');
-  scGrad.addColorStop(1,'#020c28');
+  scGrad.addColorStop(1,'#020a24');
   ctx.fillStyle = scGrad;
   ctx.fillRect(sx, sy, sw, sh);
 
-  // grid lines (world map feel)
-  ctx.strokeStyle = 'rgba(40,120,255,0.12)';
-  ctx.lineWidth = 0.8;
-  for(let gx=0; gx<sw; gx+=sw/10){
+  // Grid lines
+  ctx.strokeStyle = 'rgba(40,120,255,0.10)';
+  ctx.lineWidth = 0.6;
+  for(let gx=0; gx<sw; gx+=sw/12){
     ctx.beginPath(); ctx.moveTo(sx+gx,sy); ctx.lineTo(sx+gx,sy+sh); ctx.stroke();
   }
-  for(let gy=0; gy<sh; gy+=sh/5){
+  for(let gy=0; gy<sh; gy+=sh/6){
     ctx.beginPath(); ctx.moveTo(sx,sy+gy); ctx.lineTo(sx+sw,sy+gy); ctx.stroke();
   }
 
-  // curved meridian lines (globe feel)
-  ctx.strokeStyle = 'rgba(60,140,255,0.18)';
+  // Globe meridians
+  ctx.strokeStyle = 'rgba(60,140,255,0.15)';
   ctx.lineWidth = 1;
-  for(let ci=-2;ci<=2;ci++){
+  for(let ci=-3;ci<=3;ci++){
     ctx.beginPath();
-    ctx.ellipse(sx+sw/2 + ci*(sw/5), sy+sh/2, sw*0.06, sh*0.46, 0, 0, Math.PI*2);
+    ctx.ellipse(sx+sw/2 + ci*(sw/6), sy+sh/2, sw*0.05, sh*0.48, 0, 0, Math.PI*2);
     ctx.stroke();
   }
-  // horizontal curves
-  for(let ri=-1;ri<=1;ri++){
+  for(let ri=-2;ri<=2;ri++){
     ctx.beginPath();
-    ctx.ellipse(sx+sw/2, sy+sh/2 + ri*(sh/3), sw*0.45, sh*0.08, 0, 0, Math.PI*2);
+    ctx.ellipse(sx+sw/2, sy+sh/2 + ri*(sh/4), sw*0.48, sh*0.07, 0, 0, Math.PI*2);
     ctx.stroke();
   }
 
-  // glow dots (cities)
-  const dots = [[0.2,0.3],[0.4,0.45],[0.55,0.35],[0.7,0.5],[0.35,0.6],[0.6,0.65],[0.8,0.4]];
+  // City glow dots
+  const dots = [
+    [0.15,0.25],[0.35,0.40],[0.50,0.30],[0.68,0.45],[0.32,0.55],[0.58,0.60],[0.78,0.35],[0.45,0.70],[0.22,0.65]
+  ];
   dots.forEach(([dx,dy])=>{
     const dotX = sx+sw*dx, dotY = sy+sh*dy;
-    const dg = ctx.createRadialGradient(dotX,dotY,0,dotX,dotY,6);
-    dg.addColorStop(0,'rgba(100,200,255,0.9)');
+    const dg = ctx.createRadialGradient(dotX,dotY,0,dotX,dotY,7);
+    dg.addColorStop(0,'rgba(100,200,255,0.8)');
     dg.addColorStop(1,'transparent');
     ctx.fillStyle = dg;
-    ctx.beginPath(); ctx.arc(dotX,dotY,6,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = 'rgba(200,240,255,0.95)';
+    ctx.beginPath(); ctx.arc(dotX,dotY,7,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(220,240,255,0.9)';
     ctx.beginPath(); ctx.arc(dotX,dotY,2,0,Math.PI*2); ctx.fill();
   });
 
-  // DDOTT NEWS watermark on screen
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  ctx.font = `bold ${sw*0.11}px Orbitron,monospace`;
+  // DDOTT NEWS watermark
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.font = `bold ${sw*0.10}px Orbitron,monospace`;
   ctx.textAlign = 'center';
-  ctx.fillText('DDOTT NEWS', sx+sw/2, sy+sh*0.58);
+  ctx.fillText('DDOTT NEWS', sx+sw/2, sy+sh*0.55);
 
   ctx.restore();
 
-  // screen border/bezel
-  ctx.strokeStyle = 'rgba(30,80,160,0.6)';
+  // Screen bezel
+  ctx.strokeStyle = 'rgba(30,80,160,0.5)';
   ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.roundRect(sx, sy, sw, sh, 8);
-  ctx.stroke();
+  ctx.beginPath(); ctx.roundRect(sx, sy, sw, sh, 10); ctx.stroke();
 
-  // screen glow edge
-  ctx.shadowColor = 'rgba(20,80,255,0.4)';
-  ctx.shadowBlur = 16;
-  ctx.strokeStyle = 'rgba(40,100,255,0.3)';
+  // Screen glow
+  ctx.shadowColor = 'rgba(20,80,255,0.35)';
+  ctx.shadowBlur = 20;
+  ctx.strokeStyle = 'rgba(40,100,255,0.25)';
   ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.roundRect(sx,sy,sw,sh,8); ctx.stroke();
+  ctx.beginPath(); ctx.roundRect(sx,sy,sw,sh,10); ctx.stroke();
   ctx.shadowBlur = 0;
+}
+
+// ── STUDIO LIGHTING
+function drawStudioLighting(W, H, studioTop){
+  // Key light (left, cool)
+  const keyGrad = ctx.createRadialGradient(W*0.15, studioTop*0.4, 0, W*0.15, studioTop*0.4, W*0.45);
+  keyGrad.addColorStop(0,'rgba(180,210,255,0.06)');
+  keyGrad.addColorStop(1,'transparent');
+  ctx.fillStyle = keyGrad;
+  ctx.fillRect(0,0,W,H);
+
+  // Fill light (right, warm)
+  const fillGrad = ctx.createRadialGradient(W*0.85, studioTop*0.35, 0, W*0.85, studioTop*0.35, W*0.40);
+  fillGrad.addColorStop(0,'rgba(255,200,160,0.04)');
+  fillGrad.addColorStop(1,'transparent');
+  ctx.fillStyle = fillGrad;
+  ctx.fillRect(0,0,W,H);
+
+  // Rim light (top, subtle)
+  const rimGrad = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, W*0.6);
+  rimGrad.addColorStop(0,'rgba(255,255,255,0.03)');
+  rimGrad.addColorStop(1,'transparent');
+  ctx.fillStyle = rimGrad;
+  ctx.fillRect(0,0,W,H);
 }
 
 // ── NEWS DESK
 function drawDesk(W, H){
   const deskTop = H * 0.76;
   const deskH = H * 0.14;
-  const deskW = W * 0.9;
+  const deskW = W * 0.92;
   const dx = (W-deskW)/2;
 
-  // desk body
   ctx.save();
-  const deskGrad = ctx.createLinearGradient(0, deskTop, 0, deskTop+deskH);
-  deskGrad.addColorStop(0,'#1a2a40');
-  deskGrad.addColorStop(0.3,'#243550');
-  deskGrad.addColorStop(1,'#0a1220');
-  ctx.fillStyle = deskGrad;
+  // Desk body
+  const bodyGrad = ctx.createLinearGradient(0, deskTop, 0, deskTop+deskH);
+  bodyGrad.addColorStop(0,'#1a2e48');
+  bodyGrad.addColorStop(0.3,'#243a58');
+  bodyGrad.addColorStop(1,'#0a1420');
+  ctx.fillStyle = bodyGrad;
   ctx.beginPath();
-  ctx.roundRect(dx, deskTop, deskW, deskH, [6,6,4,4]);
+  ctx.roundRect(dx, deskTop, deskW, deskH, [8,8,4,4]);
   ctx.fill();
 
-  // desk top surface shine
-  const deskShine = ctx.createLinearGradient(dx, deskTop, dx+deskW, deskTop+8);
-  deskShine.addColorStop(0,'rgba(60,120,200,0.15)');
-  deskShine.addColorStop(0.5,'rgba(100,180,255,0.25)');
-  deskShine.addColorStop(1,'rgba(60,120,200,0.1)');
-  ctx.fillStyle = deskShine;
+  // Desk surface shine
+  const shineGrad = ctx.createLinearGradient(dx, deskTop, dx+deskW, deskTop+10);
+  shineGrad.addColorStop(0,'rgba(60,130,220,0.12)');
+  shineGrad.addColorStop(0.5,'rgba(100,190,255,0.22)');
+  shineGrad.addColorStop(1,'rgba(60,130,220,0.08)');
+  ctx.fillStyle = shineGrad;
   ctx.beginPath();
-  ctx.roundRect(dx, deskTop, deskW, 8, [6,6,0,0]);
+  ctx.roundRect(dx, deskTop, deskW, 10, [8,8,0,0]);
   ctx.fill();
 
-  // red accent stripe
+  // Red accent
   ctx.fillStyle = '#ff0040';
-  ctx.fillRect(dx+deskW*0.04, deskTop+2, deskW*0.92, 3);
+  ctx.fillRect(dx+deskW*0.03, deskTop+2, deskW*0.94, 3);
 
-  // desk reflection
-  const reflGrad = ctx.createLinearGradient(0, deskTop+deskH*0.3, 0, deskTop+deskH);
-  reflGrad.addColorStop(0,'rgba(40,80,160,0.12)');
+  // Reflection
+  const reflGrad = ctx.createLinearGradient(0, deskTop+deskH*0.25, 0, deskTop+deskH);
+  reflGrad.addColorStop(0,'rgba(40,80,160,0.10)');
   reflGrad.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle = reflGrad;
   ctx.beginPath();
-  ctx.roundRect(dx, deskTop+deskH*0.3, deskW, deskH*0.7, [0,0,4,4]);
+  ctx.roundRect(dx, deskTop+deskH*0.25, deskW, deskH*0.75, [0,0,4,4]);
   ctx.fill();
 
-  // DDOTT NEWS logo on desk
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.font = `bold ${deskW*0.055}px Orbitron,monospace`;
+  // Logo
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  ctx.font = `bold ${deskW*0.05}px Orbitron,monospace`;
   ctx.textAlign = 'center';
   ctx.fillText('DDOTT NEWS', W/2, deskTop + deskH*0.55);
   ctx.restore();
 }
 
-// ── DESK FOREGROUND (hides anchor legs)
+// ── DESK FOREGROUND
 function drawDeskForeground(W, H){
   const deskTop = H * 0.76;
-  const fgGrad = ctx.createLinearGradient(0, deskTop+H*0.04, 0, H);
-  fgGrad.addColorStop(0,'rgba(8,14,28,0.0)');
-  fgGrad.addColorStop(0.3,'rgba(5,10,20,0.7)');
-  fgGrad.addColorStop(1,'rgba(2,5,10,1)');
+  const fgGrad = ctx.createLinearGradient(0, deskTop+H*0.03, 0, H);
+  fgGrad.addColorStop(0,'rgba(6,12,24,0.0)');
+  fgGrad.addColorStop(0.3,'rgba(4,8,18,0.65)');
+  fgGrad.addColorStop(1,'rgba(2,4,10,1)');
   ctx.fillStyle = fgGrad;
-  ctx.fillRect(0, deskTop+H*0.04, W, H - (deskTop+H*0.04));
+  ctx.fillRect(0, deskTop+H*0.03, W, H - (deskTop+H*0.03));
 }
 
-// ── STUDIO LIGHTS (top corners, colored)
-function drawStudioLights(W, H, studioTop){
-  // left light
-  const lg = ctx.createRadialGradient(W*0.05, studioTop*0.3, 0, W*0.05, studioTop*0.3, W*0.35);
-  lg.addColorStop(0,'rgba(180,210,255,0.07)');
-  lg.addColorStop(1,'transparent');
-  ctx.fillStyle=lg; ctx.fillRect(0,0,W,H);
-  // right light
-  const rg = ctx.createRadialGradient(W*0.95, studioTop*0.3, 0, W*0.95, studioTop*0.3, W*0.35);
-  rg.addColorStop(0,'rgba(255,180,160,0.05)');
-  rg.addColorStop(1,'transparent');
-  ctx.fillStyle=rg; ctx.fillRect(0,0,W,H);
+// ── CAMERA OVERLAY (Vignette)
+function drawCameraOverlay(W, H){
+  const vig = ctx.createRadialGradient(W/2, H/2, W*0.3, W/2, H/2, W*0.85);
+  vig.addColorStop(0,'transparent');
+  vig.addColorStop(1,'rgba(0,0,0,0.25)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0,0,W,H);
 }
 
 // ═══════════════════════════════════════
-// DRAW ANCHOR (upper body, sitting)
+// DRAW ANCHOR — Enhanced Realistic
 // ═══════════════════════════════════════
 function drawAnchor(cx, baseY, W, H, p, isFemale, isArab){
-  // Scale anchor based on canvas size
   const scale = Math.min(W, H) / 420;
   const S = (v)=> v * scale;
 
-  const headR = S(38);
-  const headY = baseY - S(170);
-  const bodyTopY = headY + headR + S(5);
-  const shoulderW = S(isFemale?62:72);
+  const headR = S(40);
+  const headY = baseY - S(175);
+  const bodyTopY = headY + headR + S(6);
+  const shoulderW = S(isFemale?58:68);
 
-  // ── SHADOW under anchor
+  // ── SHADOW
   ctx.save();
-  const shadowGrad = ctx.createRadialGradient(cx, baseY-S(10), 0, cx, baseY-S(10), shoulderW*1.2);
-  shadowGrad.addColorStop(0,'rgba(0,0,0,0.5)');
+  const shadowGrad = ctx.createRadialGradient(cx, baseY-S(8), 0, cx, baseY-S(8), shoulderW*1.3);
+  shadowGrad.addColorStop(0,'rgba(0,0,0,0.45)');
   shadowGrad.addColorStop(1,'transparent');
-  ctx.fillStyle=shadowGrad;
-  ctx.fillRect(cx-shoulderW*1.5, baseY-S(20), shoulderW*3, S(25));
+  ctx.fillStyle = shadowGrad;
+  ctx.fillRect(cx-shoulderW*1.6, baseY-S(18), shoulderW*3.2, S(22));
   ctx.restore();
 
   // ── SUIT / BODY
   ctx.save();
-  // body shape
-  const bodyGrad = ctx.createLinearGradient(cx-shoulderW, bodyTopY, cx+shoulderW, bodyTopY+S(140));
-  bodyGrad.addColorStop(0, shade(p.suit, 15));
+  const bodyGrad = ctx.createLinearGradient(cx-shoulderW, bodyTopY, cx+shoulderW, bodyTopY+S(145));
+  bodyGrad.addColorStop(0, shade(p.suit, 12));
   bodyGrad.addColorStop(0.5, p.suit);
-  bodyGrad.addColorStop(1, shade(p.suit, -25));
-  ctx.fillStyle=bodyGrad;
+  bodyGrad.addColorStop(1, shade(p.suit, -22));
+  ctx.fillStyle = bodyGrad;
   ctx.beginPath();
-  ctx.moveTo(cx-shoulderW-S(8), bodyTopY+S(10));
-  ctx.quadraticCurveTo(cx-shoulderW-S(12), bodyTopY+S(30), cx-shoulderW-S(16), baseY);
-  ctx.lineTo(cx+shoulderW+S(16), baseY);
-  ctx.quadraticCurveTo(cx+shoulderW+S(12), bodyTopY+S(30), cx+shoulderW+S(8), bodyTopY+S(10));
-  ctx.quadraticCurveTo(cx, bodyTopY-S(6), cx-shoulderW-S(8), bodyTopY+S(10));
+  ctx.moveTo(cx-shoulderW-S(6), bodyTopY+S(8));
+  ctx.quadraticCurveTo(cx-shoulderW-S(10), bodyTopY+S(28), cx-shoulderW-S(14), baseY);
+  ctx.lineTo(cx+shoulderW+S(14), baseY);
+  ctx.quadraticCurveTo(cx+shoulderW+S(10), bodyTopY+S(28), cx+shoulderW+S(6), bodyTopY+S(8));
+  ctx.quadraticCurveTo(cx, bodyTopY-S(4), cx-shoulderW-S(6), bodyTopY+S(8));
   ctx.closePath();
   ctx.fill();
 
-  // lapels
-  ctx.fillStyle = shade(p.suit, 20);
+  // Lapels
+  ctx.fillStyle = shade(p.suit, 18);
   ctx.beginPath();
-  ctx.moveTo(cx, bodyTopY+S(8));
-  ctx.lineTo(cx-S(18), bodyTopY+S(22));
-  ctx.lineTo(cx-S(12), baseY);
-  ctx.lineTo(cx, baseY-S(10));
+  ctx.moveTo(cx, bodyTopY+S(6));
+  ctx.lineTo(cx-S(16), bodyTopY+S(20));
+  ctx.lineTo(cx-S(10), baseY);
+  ctx.lineTo(cx, baseY-S(8));
   ctx.closePath(); ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(cx, bodyTopY+S(8));
-  ctx.lineTo(cx+S(18), bodyTopY+S(22));
-  ctx.lineTo(cx+S(12), baseY);
-  ctx.lineTo(cx, baseY-S(10));
+  ctx.moveTo(cx, bodyTopY+S(6));
+  ctx.lineTo(cx+S(16), bodyTopY+S(20));
+  ctx.lineTo(cx+S(10), baseY);
+  ctx.lineTo(cx, baseY-S(8));
   ctx.closePath(); ctx.fill();
 
-  // shirt collar
+  // Shirt collar
   ctx.fillStyle = p.shirt;
   ctx.beginPath();
-  ctx.moveTo(cx-S(14), bodyTopY+S(4));
+  ctx.moveTo(cx-S(12), bodyTopY+S(2));
+  ctx.lineTo(cx, bodyTopY+S(12));
+  ctx.lineTo(cx+S(12), bodyTopY+S(2));
+  ctx.lineTo(cx+S(8), bodyTopY+S(20));
   ctx.lineTo(cx, bodyTopY+S(14));
-  ctx.lineTo(cx+S(14), bodyTopY+S(4));
-  ctx.lineTo(cx+S(9), bodyTopY+S(22));
-  ctx.lineTo(cx, bodyTopY+S(16));
-  ctx.lineTo(cx-S(9), bodyTopY+S(22));
+  ctx.lineTo(cx-S(8), bodyTopY+S(20));
   ctx.closePath(); ctx.fill();
 
-  // tie / accessory
+  // Tie / Accessory
   if(!isFemale){
     ctx.fillStyle = p.tie;
     ctx.beginPath();
-    ctx.moveTo(cx-S(5), bodyTopY+S(16));
-    ctx.lineTo(cx+S(5), bodyTopY+S(16));
-    ctx.lineTo(cx+S(7), bodyTopY+S(40));
-    ctx.lineTo(cx, bodyTopY+S(80));
-    ctx.lineTo(cx-S(7), bodyTopY+S(40));
+    ctx.moveTo(cx-S(4), bodyTopY+S(14));
+    ctx.lineTo(cx+S(4), bodyTopY+S(14));
+    ctx.lineTo(cx+S(6), bodyTopY+S(38));
+    ctx.lineTo(cx, bodyTopY+S(78));
+    ctx.lineTo(cx-S(6), bodyTopY+S(38));
     ctx.closePath(); ctx.fill();
-    ctx.fillStyle=shade(p.tie,-20);
-    ctx.beginPath(); ctx.ellipse(cx,bodyTopY+S(18),S(6),S(5),0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = shade(p.tie,-18);
+    ctx.beginPath(); ctx.ellipse(cx,bodyTopY+S(16),S(5.5),S(4.5),0,0,Math.PI*2); ctx.fill();
   } else {
-    // necklace
-    ctx.strokeStyle='#ffd700'; ctx.lineWidth=S(1.5);
-    ctx.beginPath(); ctx.arc(cx, bodyTopY+S(22), S(12), 0.15*Math.PI, 0.85*Math.PI); ctx.stroke();
-    ctx.fillStyle='#ffd700';
-    ctx.beginPath(); ctx.arc(cx, bodyTopY+S(34), S(3), 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#e8c040'; ctx.lineWidth = S(1.2);
+    ctx.beginPath(); ctx.arc(cx, bodyTopY+S(20), S(11), 0.12*Math.PI, 0.88*Math.PI); ctx.stroke();
+    ctx.fillStyle = '#e8c040';
+    ctx.beginPath(); ctx.arc(cx, bodyTopY+S(31), S(2.5), 0, Math.PI*2); ctx.fill();
   }
   ctx.restore();
 
   // ── NECK
   ctx.save();
-  const nkGrad=ctx.createLinearGradient(cx-S(12),bodyTopY-S(18),cx+S(12),bodyTopY-S(18));
-  nkGrad.addColorStop(0,shade(p.skin,-20));
+  const nkGrad = ctx.createLinearGradient(cx-S(10),bodyTopY-S(20),cx+S(10),bodyTopY-S(20));
+  nkGrad.addColorStop(0,shade(p.skin,-18));
   nkGrad.addColorStop(0.5,p.skin);
-  nkGrad.addColorStop(1,shade(p.skin,-20));
-  ctx.fillStyle=nkGrad;
-  ctx.beginPath(); ctx.roundRect(cx-S(12), bodyTopY-S(22), S(24), S(26), S(8)); ctx.fill();
+  nkGrad.addColorStop(1,shade(p.skin,-18));
+  ctx.fillStyle = nkGrad;
+  ctx.beginPath(); ctx.roundRect(cx-S(10), bodyTopY-S(24), S(20), S(24), S(6)); ctx.fill();
   ctx.restore();
 
   // ── HEAD
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,0.55)'; ctx.shadowBlur=S(18); ctx.shadowOffsetY=S(6);
-  const headGrad=ctx.createRadialGradient(cx-S(8),headY-S(8),0,cx,headY,headR*1.1);
+  ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = S(16); ctx.shadowOffsetY = S(5);
+  const headGrad = ctx.createRadialGradient(cx-S(6),headY-S(6),0,cx,headY,headR*1.08);
   headGrad.addColorStop(0,p.skinS);
   headGrad.addColorStop(0.6,p.skin);
   headGrad.addColorStop(1,p.skinD);
-  ctx.fillStyle=headGrad;
+  ctx.fillStyle = headGrad;
   ctx.beginPath();
-  ctx.ellipse(cx, headY, headR*(isFemale?0.95:1), headR*(isFemale?1.08:1.1), 0, 0, Math.PI*2);
+  ctx.ellipse(cx, headY, headR*(isFemale?0.94:1), headR*(isFemale?1.06:1.08), 0, 0, Math.PI*2);
   ctx.fill();
   ctx.restore();
 
-  // face light
+  // Face highlight
   ctx.save();
-  const faceL=ctx.createRadialGradient(cx-S(6),headY-S(12),0,cx,headY,headR);
-  faceL.addColorStop(0,'rgba(255,255,255,0.14)');
+  const faceL = ctx.createRadialGradient(cx-S(4),headY-S(10),0,cx,headY,headR);
+  faceL.addColorStop(0,'rgba(255,255,255,0.12)');
   faceL.addColorStop(1,'transparent');
-  ctx.fillStyle=faceL;
-  ctx.beginPath(); ctx.ellipse(cx,headY,headR*(isFemale?0.95:1),headR*(isFemale?1.08:1.1),0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = faceL;
+  ctx.beginPath(); ctx.ellipse(cx,headY,headR*(isFemale?0.94:1),headR*(isFemale?1.06:1.08),0,0,Math.PI*2); ctx.fill();
   ctx.restore();
 
   // ── HAIR
@@ -541,398 +801,596 @@ function drawAnchor(cx, baseY, W, H, p, isFemale, isArab){
 
   // ── EARS
   [-1,1].forEach(side=>{
-    const ex = cx + side*(headR*(isFemale?0.93:0.97));
-    const ey = headY + S(4);
+    const ex = cx + side*(headR*(isFemale?0.90:0.95));
+    const ey = headY + S(3);
     ctx.save();
-    const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,S(9));
-    eg.addColorStop(0,p.skin); eg.addColorStop(1,shade(p.skin,-18));
-    ctx.fillStyle=eg;
-    ctx.beginPath(); ctx.ellipse(ex,ey,S(7),S(10),0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(0,0,0,0.1)';
-    ctx.beginPath(); ctx.ellipse(ex,ey,S(4),S(6),0,0,Math.PI*2); ctx.fill();
+    const eg = ctx.createRadialGradient(ex,ey,0,ex,ey,S(8));
+    eg.addColorStop(0,p.skin); eg.addColorStop(1,shade(p.skin,-16));
+    ctx.fillStyle = eg;
+    ctx.beginPath(); ctx.ellipse(ex,ey,S(6),S(9),0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.beginPath(); ctx.ellipse(ex,ey,S(3.5),S(5.5),0,0,Math.PI*2); ctx.fill();
     if(isFemale){
-      ctx.fillStyle='#ffd700';
-      ctx.beginPath(); ctx.arc(ex,ey+S(10),S(3.5),0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#e8c040';
+      ctx.beginPath(); ctx.arc(ex,ey+S(9),S(3),0,Math.PI*2); ctx.fill();
     }
     ctx.restore();
   });
 
   // ── EYEBROWS
-  const browY = headY - S(12);
+  const browY = headY - S(10);
   ctx.save();
-  ctx.strokeStyle=p.brow; ctx.lineWidth=S(isFemale?3.5:3); ctx.lineCap='round';
+  ctx.strokeStyle = p.brow; ctx.lineWidth = S(isFemale?3.2:2.8); ctx.lineCap = 'round';
   [-1,1].forEach(side=>{
     ctx.beginPath();
-    const bx1=cx+side*(S(8)), bx2=cx+side*(S(22)), bx3=cx+side*(S(30));
-    if(isFemale){ ctx.moveTo(bx1,browY); ctx.quadraticCurveTo(bx2,browY-S(9),bx3,browY-S(3)); }
-    else { ctx.moveTo(bx1,browY+S(1)); ctx.quadraticCurveTo(bx2,browY-S(6),bx3,browY); }
+    const bx1 = cx+side*(S(7)), bx2 = cx+side*(S(20)), bx3 = cx+side*(S(28));
+    if(isFemale){ ctx.moveTo(bx1,browY); ctx.quadraticCurveTo(bx2,browY-S(8),bx3,browY-S(2)); }
+    else { ctx.moveTo(bx1,browY+S(1)); ctx.quadraticCurveTo(bx2,browY-S(5),bx3,browY+S(1)); }
     ctx.stroke();
   });
   ctx.restore();
 
   // ── EYES
-  const eyeY = headY + S(4);
+  const eyeY = headY + S(3);
   [-1,1].forEach(side=>{
-    const ex=cx+side*S(20);
-    // white
+    const ex = cx+side*S(18);
     ctx.save();
-    const sc=ctx.createRadialGradient(ex,eyeY,0,ex,eyeY,S(12));
-    sc.addColorStop(0,'#ffffff'); sc.addColorStop(1,'#eeeeec');
-    ctx.fillStyle=sc;
-    ctx.beginPath(); ctx.ellipse(ex,eyeY,S(12),S(8),0,0,Math.PI*2); ctx.fill();
-    // lid shadow
-    ctx.fillStyle='rgba(0,0,0,0.1)';
-    ctx.beginPath(); ctx.ellipse(ex,eyeY-S(3),S(12),S(5),0,0,Math.PI); ctx.fill();
-    // iris
-    const ig=ctx.createRadialGradient(ex-S(1),eyeY-S(1),0,ex,eyeY,S(7));
-    ig.addColorStop(0,lighten(p.eye,40)); ig.addColorStop(0.5,p.eye); ig.addColorStop(1,shade(p.eye,-30));
-    ctx.fillStyle=ig;
-    ctx.beginPath(); ctx.arc(ex,eyeY,S(7),0,Math.PI*2); ctx.fill();
-    // pupil (blink)
+    // White
+    const sc = ctx.createRadialGradient(ex,eyeY,0,ex,eyeY,S(11));
+    sc.addColorStop(0,'#ffffff'); sc.addColorStop(1,'#ecece8');
+    ctx.fillStyle = sc;
+    ctx.beginPath(); ctx.ellipse(ex,eyeY,S(11),S(7.5),0,0,Math.PI*2); ctx.fill();
+    // Lid shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.beginPath(); ctx.ellipse(ex,eyeY-S(2.5),S(11),S(4.5),0,0,Math.PI); ctx.fill();
+    // Iris
+    const ig = ctx.createRadialGradient(ex-S(1),eyeY-S(1),0,ex,eyeY,S(6.5));
+    ig.addColorStop(0,lighten(p.eye,35)); ig.addColorStop(0.5,p.eye); ig.addColorStop(1,shade(p.eye,-28));
+    ctx.fillStyle = ig;
+    ctx.beginPath(); ctx.arc(ex,eyeY,S(6.5),0,Math.PI*2); ctx.fill();
+    // Pupil
     if(!blinkState){
-      ctx.fillStyle='#050304';
-      ctx.beginPath(); ctx.arc(ex,eyeY,S(3.5),0,Math.PI*2); ctx.fill();
-      // shine
-      ctx.fillStyle='rgba(255,255,255,0.9)';
-      ctx.beginPath(); ctx.arc(ex+S(2),eyeY-S(2),S(2.2),0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,0.35)';
-      ctx.beginPath(); ctx.arc(ex-S(2),eyeY+S(1),S(1),0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#080404';
+      ctx.beginPath(); ctx.arc(ex,eyeY,S(3.2),0,Math.PI*2); ctx.fill();
+      // Shine
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.beginPath(); ctx.arc(ex+S(1.8),eyeY-S(1.8),S(2),0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.beginPath(); ctx.arc(ex-S(1.8),eyeY+S(0.8),S(0.9),0,Math.PI*2); ctx.fill();
     } else {
-      // blink — closed eye
-      ctx.fillStyle=shade(p.skin,-5);
-      ctx.beginPath(); ctx.ellipse(ex,eyeY,S(12),S(3),0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = shade(p.skin,-4);
+      ctx.beginPath(); ctx.ellipse(ex,eyeY,S(11),S(2.8),0,0,Math.PI*2); ctx.fill();
     }
-    // lashes
+    // Lashes
     if(isFemale && !blinkState){
-      ctx.strokeStyle=shade(p.brow,0); ctx.lineWidth=S(1.3); ctx.lineCap='round';
-      for(let a=-0.65;a<=0.65;a+=0.26){
-        const lx=ex+Math.cos(a-Math.PI/2)*S(11), ly=eyeY+Math.sin(a-Math.PI/2)*S(8);
-        const lx2=ex+Math.cos(a-Math.PI/2)*S(15), ly2=eyeY+Math.sin(a-Math.PI/2)*S(13);
+      ctx.strokeStyle = shade(p.brow,0); ctx.lineWidth = S(1.1); ctx.lineCap = 'round';
+      for(let a=-0.6;a<=0.6;a+=0.22){
+        const lx = ex+Math.cos(a-Math.PI/2)*S(10), ly = eyeY+Math.sin(a-Math.PI/2)*S(7.5);
+        const lx2 = ex+Math.cos(a-Math.PI/2)*S(14), ly2 = eyeY+Math.sin(a-Math.PI/2)*S(12);
         ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx2,ly2); ctx.stroke();
       }
     }
-    // eyelid line
-    ctx.strokeStyle='rgba(0,0,0,0.2)'; ctx.lineWidth=S(0.8);
-    ctx.beginPath(); ctx.ellipse(ex,eyeY,S(12),S(8),0,0,Math.PI*2); ctx.stroke();
+    // Eyelid line
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = S(0.7);
+    ctx.beginPath(); ctx.ellipse(ex,eyeY,S(11),S(7.5),0,0,Math.PI*2); ctx.stroke();
     ctx.restore();
   });
 
   // ── NOSE
-  const noseY = headY + S(20);
+  const noseY = headY + S(18);
   ctx.save();
-  ctx.strokeStyle=shade(p.skinD,-15); ctx.lineWidth=S(1.8); ctx.lineCap='round';
+  ctx.strokeStyle = shade(p.skinD,-12); ctx.lineWidth = S(1.6); ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(cx-S(4), noseY-S(12));
-  ctx.quadraticCurveTo(cx-S(8), noseY, cx-S(5), noseY+S(3));
-  ctx.quadraticCurveTo(cx, noseY+S(6), cx+S(5), noseY+S(3));
-  ctx.quadraticCurveTo(cx+S(8), noseY, cx+S(4), noseY-S(12));
+  ctx.moveTo(cx-S(3), noseY-S(10));
+  ctx.quadraticCurveTo(cx-S(7), noseY, cx-S(4), noseY+S(2));
+  ctx.quadraticCurveTo(cx, noseY+S(5), cx+S(4), noseY+S(2));
+  ctx.quadraticCurveTo(cx+S(7), noseY, cx+S(3), noseY-S(10));
   ctx.stroke();
-  ctx.fillStyle='rgba(0,0,0,0.15)';
-  ctx.beginPath(); ctx.ellipse(cx-S(7),noseY+S(3),S(4.5),S(2.8),-0.3,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(cx+S(7),noseY+S(3),S(4.5),S(2.8),0.3,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.beginPath(); ctx.ellipse(cx-S(6),noseY+S(2),S(4),S(2.5),-0.25,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx+S(6),noseY+S(2),S(4),S(2.5),0.25,0,Math.PI*2); ctx.fill();
   ctx.restore();
 
-  // blush
-  ctx.fillStyle=p.blush;
-  ctx.beginPath(); ctx.ellipse(cx-S(28),noseY+S(4),S(13),S(8),-0.2,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(cx+S(28),noseY+S(4),S(13),S(8),0.2,0,Math.PI*2); ctx.fill();
+  // Blush
+  ctx.fillStyle = p.blush;
+  ctx.beginPath(); ctx.ellipse(cx-S(26),noseY+S(3),S(12),S(7),-0.15,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx+S(26),noseY+S(3),S(12),S(7),0.15,0,Math.PI*2); ctx.fill();
 
   // ── MOUTH
-  const mouthY = headY + S(36);
-  const mW=S(20), mOpen=isTalking&&mouthOpen;
+  const mouthY = headY + S(34);
+  const mW = S(18), mOpen = isTalking && mouthOpen;
   ctx.save();
   if(isFemale){
-    // cupid bow
-    ctx.fillStyle=p.lip;
+    ctx.fillStyle = p.lip;
     ctx.beginPath();
     ctx.moveTo(cx-mW,mouthY);
-    ctx.quadraticCurveTo(cx-S(8),mouthY-S(6),cx,mouthY-S(3));
-    ctx.quadraticCurveTo(cx+S(8),mouthY-S(6),cx+mW,mouthY);
-    ctx.quadraticCurveTo(cx,mouthY-S(2),cx-mW,mouthY);
+    ctx.quadraticCurveTo(cx-S(7),mouthY-S(5),cx,mouthY-S(2));
+    ctx.quadraticCurveTo(cx+S(7),mouthY-S(5),cx+mW,mouthY);
+    ctx.quadraticCurveTo(cx,mouthY-S(1),cx-mW,mouthY);
     ctx.fill();
     ctx.beginPath();
     ctx.moveTo(cx-mW,mouthY);
-    ctx.quadraticCurveTo(cx,mouthY+(mOpen?S(12):S(3)),cx+mW,mouthY);
-    ctx.quadraticCurveTo(cx,mouthY+S(1),cx-mW,mouthY);
+    ctx.quadraticCurveTo(cx,mouthY+(mOpen?S(10):S(2.5)),cx+mW,mouthY);
+    ctx.quadraticCurveTo(cx,mouthY+S(0.5),cx-mW,mouthY);
     ctx.fill();
   } else {
-    ctx.fillStyle=p.lip;
+    ctx.fillStyle = p.lip;
     ctx.beginPath();
     ctx.moveTo(cx-mW,mouthY);
-    ctx.quadraticCurveTo(cx,mouthY-(mOpen?S(2):S(4)),cx+mW,mouthY);
-    ctx.quadraticCurveTo(cx,mouthY+(mOpen?S(12):S(3)),cx-mW,mouthY);
+    ctx.quadraticCurveTo(cx,mouthY-(mOpen?S(1):S(3.5)),cx+mW,mouthY);
+    ctx.quadraticCurveTo(cx,mouthY+(mOpen?S(10):S(2.5)),cx-mW,mouthY);
     ctx.fill();
   }
   if(mOpen){
-    // teeth
-    ctx.fillStyle='#f4f4f0';
+    ctx.fillStyle = '#f2f2ee';
     ctx.beginPath();
-    ctx.moveTo(cx-mW+S(4),mouthY);
-    ctx.quadraticCurveTo(cx,mouthY+S(10),cx+mW-S(4),mouthY);
-    ctx.quadraticCurveTo(cx,mouthY+S(4),cx-mW+S(4),mouthY);
+    ctx.moveTo(cx-mW+S(3),mouthY);
+    ctx.quadraticCurveTo(cx,mouthY+S(8),cx+mW-S(3),mouthY);
+    ctx.quadraticCurveTo(cx,mouthY+S(3.5),cx-mW+S(3),mouthY);
     ctx.fill();
-    // tongue / dark
-    ctx.fillStyle='rgba(50,10,10,0.65)';
+    ctx.fillStyle = 'rgba(45,8,8,0.6)';
     ctx.beginPath();
-    ctx.moveTo(cx-mW+S(7),mouthY+S(2));
-    ctx.quadraticCurveTo(cx,mouthY+S(10),cx+mW-S(7),mouthY+S(2));
-    ctx.quadraticCurveTo(cx,mouthY+S(6),cx-mW+S(7),mouthY+S(2));
+    ctx.moveTo(cx-mW+S(6),mouthY+S(1.5));
+    ctx.quadraticCurveTo(cx,mouthY+S(8),cx+mW-S(6),mouthY+S(1.5));
+    ctx.quadraticCurveTo(cx,mouthY+S(5),cx-mW+S(6),mouthY+S(1.5));
     ctx.fill();
   }
-  // lip highlight
-  ctx.fillStyle='rgba(255,255,255,0.2)';
-  ctx.beginPath(); ctx.ellipse(cx,mouthY+(isFemale?S(1):S(0)),S(10),S(2.5),0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.beginPath(); ctx.ellipse(cx,mouthY+(isFemale?S(0.5):S(-0.5)),S(9),S(2.2),0,0,Math.PI*2); ctx.fill();
   ctx.restore();
 
-  // chin shadow
-  ctx.fillStyle='rgba(0,0,0,0.1)';
-  ctx.beginPath(); ctx.ellipse(cx, headY+headR-S(4), S(16), S(6), 0, 0, Math.PI*2); ctx.fill();
+  // Chin
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.beginPath(); ctx.ellipse(cx, headY+headR-S(3), S(15), S(5.5), 0, 0, Math.PI*2); ctx.fill();
 
-  // ── NAME TAG on desk area
+  // ── NAME TAG
   ctx.save();
-  ctx.fillStyle='rgba(255,0,64,0.9)';
-  ctx.beginPath(); ctx.roundRect(cx-S(38), H*0.785, S(76), S(16), 3); ctx.fill();
-  ctx.fillStyle='#ffffff';
-  ctx.font=`bold ${S(9)}px Orbitron,monospace`;
-  ctx.textAlign='center';
-  ctx.fillText(ANCHORS[currentLang][currentGender].name.toUpperCase(), cx, H*0.785+S(11));
+  ctx.fillStyle = 'rgba(255,0,64,0.85)';
+  ctx.beginPath(); ctx.roundRect(cx-S(36), H*0.788, S(72), S(15), 3); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${S(8.5)}px Orbitron,monospace`;
+  ctx.textAlign = 'center';
+  ctx.fillText(ANCHORS[currentLang][currentGender].name.toUpperCase(), cx, H*0.788+S(10.5));
   ctx.restore();
 }
 
-// ── HAIR DRAW
+// ── HAIR
 function drawHair(cx, headY, headR, p, isFemale, isArab, S){
   ctx.save();
-  ctx.fillStyle=p.hair;
+
   if(isArab && !isFemale){
-    // white keffiyeh
-    ctx.fillStyle='rgba(245,245,245,0.92)';
-    ctx.beginPath(); ctx.ellipse(cx,headY-S(4),headR*1.08,headR*0.7,0,0,Math.PI*2); ctx.fill();
-    ctx.fillRect(cx-headR*1.05, headY-S(8), headR*2.1, S(35));
-    // red pattern stripes
-    ctx.strokeStyle='rgba(180,0,0,0.4)'; ctx.lineWidth=S(2);
-    for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(cx-headR+i*headR*0.4,headY-S(8));ctx.lineTo(cx-headR+i*headR*0.4,headY+S(30));ctx.stroke();}
-    // agal (black ring)
-    ctx.strokeStyle='#111'; ctx.lineWidth=S(5);
-    ctx.beginPath(); ctx.ellipse(cx,headY-S(6),headR*0.7,headR*0.28,0,0,Math.PI*2); ctx.stroke();
-    // face-exposing oval
-    ctx.fillStyle=p.skin;
-    ctx.beginPath(); ctx.ellipse(cx,headY+S(4),headR*0.75,headR*0.85,0,0,Math.PI*2); ctx.fill();
+    // Keffiyeh
+    ctx.fillStyle = 'rgba(240,240,240,0.9)';
+    ctx.beginPath(); ctx.ellipse(cx,headY-S(3),headR*1.06,headR*0.68,0,0,Math.PI*2); ctx.fill();
+    ctx.fillRect(cx-headR*1.02, headY-S(6), headR*2.04, S(32));
+    ctx.strokeStyle = 'rgba(170,0,0,0.35)'; ctx.lineWidth = S(1.8);
+    for(let i=0;i<5;i++){
+      ctx.beginPath(); ctx.moveTo(cx-headR+i*headR*0.38,headY-S(6)); ctx.lineTo(cx-headR+i*headR*0.38,headY+S(28)); ctx.stroke();
+    }
+    ctx.strokeStyle = '#0f0f0f'; ctx.lineWidth = S(4.5);
+    ctx.beginPath(); ctx.ellipse(cx,headY-S(5),headR*0.68,headR*0.26,0,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = p.skin;
+    ctx.beginPath(); ctx.ellipse(cx,headY+S(3),headR*0.72,headR*0.82,0,0,Math.PI*2); ctx.fill();
     ctx.restore(); return;
   }
+
+  if(isArab && isFemale){
+    // Hijab
+    ctx.fillStyle = p.suit;
+    ctx.beginPath(); ctx.ellipse(cx,headY+S(5),headR*1.15,headR*1.2,0,0,Math.PI*2); ctx.fill();
+    ctx.fillRect(cx-headR*1.1, headY-S(25), headR*2.2, headR*1.4);
+    ctx.fillStyle = shade(p.suit,15);
+    ctx.beginPath(); ctx.ellipse(cx,headY-S(18),headR*1.05,headR*0.55,0,0,Math.PI*2); ctx.fill();
+    // Face oval
+    ctx.fillStyle = p.skin;
+    ctx.beginPath(); ctx.ellipse(cx,headY+S(2),headR*0.78,headR*0.88,0,0,Math.PI*2); ctx.fill();
+    ctx.restore(); return;
+  }
+
+  ctx.fillStyle = p.hair;
   if(isFemale){
-    // back hair (long)
-    ctx.fillStyle=p.hair;
-    ctx.beginPath(); ctx.ellipse(cx,headY+S(10),headR*1.1,headR*1.28,0,0,Math.PI*2); ctx.fill();
-    // side strands
+    // Long back hair
+    ctx.beginPath(); ctx.ellipse(cx,headY+S(8),headR*1.08,headR*1.22,0,0,Math.PI*2); ctx.fill();
     [-1,1].forEach(s=>{
       ctx.beginPath();
-      ctx.moveTo(cx+s*headR*0.95,headY-S(18));
-      ctx.quadraticCurveTo(cx+s*(headR*1.28),headY+S(30),cx+s*(headR*1.15),headY+S(90));
-      ctx.quadraticCurveTo(cx+s*(headR*0.9),headY+S(30),cx+s*headR*0.9,headY-S(18));
+      ctx.moveTo(cx+s*headR*0.92,headY-S(16));
+      ctx.quadraticCurveTo(cx+s*(headR*1.22),headY+S(25),cx+s*(headR*1.1),headY+S(85));
+      ctx.quadraticCurveTo(cx+s*(headR*0.88),headY+S(25),cx+s*headR*0.88,headY-S(16));
       ctx.closePath(); ctx.fill();
     });
   }
-  // hair top cap
-  ctx.fillStyle=p.hair;
-  ctx.beginPath(); ctx.ellipse(cx,headY-headR*0.35,headR*(isFemale?0.96:1.02),headR*0.78,0,0,Math.PI*2); ctx.fill();
-  ctx.fillRect(cx-headR*(isFemale?0.96:1.02),headY-headR*0.35,headR*(isFemale?1.92:2.04),headR*0.4);
-  // hairline
-  ctx.fillStyle=p.hair;
+  // Top cap
+  ctx.beginPath(); ctx.ellipse(cx,headY-headR*0.32,headR*(isFemale?0.94:1),headR*0.75,0,0,Math.PI*2); ctx.fill();
+  ctx.fillRect(cx-headR*(isFemale?0.94:1),headY-headR*0.32,headR*(isFemale?1.88:2),headR*0.38);
+  // Hairline
   ctx.beginPath();
-  ctx.moveTo(cx-headR*(isFemale?0.94:0.98), headY+headR*0.38);
-  if(!isFemale) ctx.quadraticCurveTo(cx, headY+headR*0.52, cx+headR*0.98, headY+headR*0.38);
-  else ctx.quadraticCurveTo(cx, headY+headR*0.44, cx+headR*0.94, headY+headR*0.38);
-  ctx.quadraticCurveTo(cx, headY+headR*0.42, cx-headR*(isFemale?0.94:0.98), headY+headR*0.38);
+  ctx.moveTo(cx-headR*(isFemale?0.92:0.96), headY+headR*0.36);
+  if(!isFemale) ctx.quadraticCurveTo(cx, headY+headR*0.50, cx+headR*0.96, headY+headR*0.36);
+  else ctx.quadraticCurveTo(cx, headY+headR*0.42, cx+headR*0.92, headY+headR*0.36);
+  ctx.quadraticCurveTo(cx, headY+headR*0.40, cx-headR*(isFemale?0.92:0.96), headY+headR*0.36);
   ctx.fill();
   ctx.restore();
 }
-
-// ── COLOR HELPERS
-function shade(hex, amt){
-  if(!hex.startsWith('#')) return hex;
-  const n=parseInt(hex.replace('#',''),16);
-  const r=Math.max(0,Math.min(255,(n>>16)+amt));
-  const g=Math.max(0,Math.min(255,((n>>8)&0xff)+amt));
-  const b=Math.max(0,Math.min(255,(n&0xff)+amt));
-  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-}
-function lighten(hex,amt){return shade(hex,amt);}
 
 // ═══════════════════════════════════════
 // ANIMATION LOOPS
 // ═══════════════════════════════════════
 function startTalking(){
-  isTalking=true;
-  document.querySelectorAll('.abar').forEach(b=>b.classList.add('talking'));
+  isTalking = true;
   clearInterval(mouthInterval);
-  mouthInterval=setInterval(()=>{ mouthOpen=!mouthOpen; drawStudio(); },120);
+  mouthInterval = setInterval(()=>{ mouthOpen = !mouthOpen; drawStudio(); }, 110);
 }
 function stopTalking(){
-  isTalking=false; mouthOpen=false;
-  document.querySelectorAll('.abar').forEach(b=>b.classList.remove('talking'));
+  isTalking = false; mouthOpen = false;
   clearInterval(mouthInterval);
   drawStudio();
 }
 
-// breath animation
 function startBreath(){
-  breathTimer=setInterval(()=>{
-    breathPhase+=0.06;
+  breathTimer = setInterval(()=>{
+    breathPhase += 0.05;
     if(!isTalking) drawStudio();
-  },60);
+  }, 60);
 }
 
-// natural blink
 function startBlink(){
   function doBlink(){
-    blinkState=true; drawStudio();
-    setTimeout(()=>{ blinkState=false; drawStudio(); },120);
-    const next=3000+Math.random()*4000;
-    blinkTimer=setTimeout(doBlink,next);
+    blinkState = true; drawStudio();
+    setTimeout(()=>{ blinkState = false; drawStudio(); }, 100);
+    const next = 2500 + Math.random() * 3500;
+    blinkTimer = setTimeout(doBlink, next);
   }
-  blinkTimer=setTimeout(doBlink,2000+Math.random()*3000);
+  blinkTimer = setTimeout(doBlink, 1500 + Math.random() * 2500);
+}
+
+function startKenBurns(){
+  setInterval(()=>{
+    kenBurnsTarget = {
+      x: (Math.random() - 0.5) * 30,
+      y: (Math.random() - 0.5) * 20,
+      scale: 1 + Math.random() * 0.08
+    };
+  }, 6000);
+  setInterval(()=>{
+    kenBurnsOffset.x += (kenBurnsTarget.x - kenBurnsOffset.x) * 0.008;
+    kenBurnsOffset.y += (kenBurnsTarget.y - kenBurnsOffset.y) * 0.008;
+    kenBurnsOffset.scale += (kenBurnsTarget.scale - kenBurnsOffset.scale) * 0.008;
+    if(!isTalking) drawStudio();
+  }, 50);
 }
 
 function switchGender(g){
-  currentGender=g;
-  document.getElementById('btnMale').classList.toggle('active',g==='male');
-  document.getElementById('btnFemale').classList.toggle('active',g==='female');
+  currentGender = g;
+  document.getElementById('btnMale').classList.toggle('active', g==='male');
+  document.getElementById('btnFemale').classList.toggle('active', g==='female');
+  updateLowerThirds();
   drawStudio();
 }
 
 // ═══════════════════════════════════════
-// NEWS LOGIC
+// TIMECODE
 // ═══════════════════════════════════════
-const WORKER='https://ddott-news.meradivin.workers.dev/news';
-const VOICES={en:'en-US',ml:'ml-IN',hi:'hi-IN',ar:'ar-SA'};
-let news=[],idx=0,playing=false,speed=1,muted=false,lang='en';
-let speaking=false,progressTimer=null,autoTimer=null;
-const synth=window.speechSynthesis||null;
+function updateTimecode(){
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  const f = String(Math.floor(now.getMilliseconds()/40)).padStart(2,'0');
+  document.getElementById('timecode').textContent = `${h}:${m}:${s}:${f}`;
+}
+setInterval(updateTimecode, 40);
 
-async function loadNews(l,btn){
-  lang=l; currentLang=l;
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  hardStop();
-  document.getElementById('loader').style.display='flex';
-  try{
-    const res=await fetch(WORKER+'?lang='+lang);
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    news=data.articles||[];
-    if(!news.length) throw new Error('empty');
-    idx=0;
-    document.getElementById('loader').style.display='none';
-    buildDots(); renderNews(0);
-    document.getElementById('tickerText').textContent=news.map(n=>n.title).join('   •   ');
-  }catch(e){
-    document.getElementById('loader').style.display='none';
-    news=[{title:'Welcome to Ddott News — Live coverage from around the world. Stay tuned.',description:'Your multilingual AI news experience powered by Ddott TV and EmoCoins.',image:null,source:{name:'DDOTT NEWS'}}];
-    buildDots(); renderNews(0);
-    document.getElementById('tickerText').textContent='Could not reach news server — showing demo content';
+// ═══════════════════════════════════════
+// TELEPROMPTER
+// ═══════════════════════════════════════
+function updateTeleprompter(title, desc){
+  const container = document.getElementById('tpLine');
+  const words = (title + '. ' + (desc||'')).split(' ').filter(w=>w.length>0);
+  container.innerHTML = words.map((w,i)=>`<span class="tp-word" id="tpw${i}">${w}</span>`).join(' ');
+}
+
+function highlightTeleprompterWord(index){
+  document.querySelectorAll('.tp-word').forEach((el,i)=>{
+    el.classList.remove('active','done','upcoming');
+    if(i < index) el.classList.add('done');
+    else if(i === index) el.classList.add('active');
+    else el.classList.add('upcoming');
+  });
+  // Auto scroll
+  const active = document.getElementById('tpw'+index);
+  if(active){
+    const glass = document.getElementById('tpGlass');
+    const offset = active.offsetTop - glass.clientHeight/2;
+    glass.scrollTo({top:offset,behavior:'smooth'});
   }
 }
 
+// ═══════════════════════════════════════
+// LOWER THIRDS
+// ═══════════════════════════════════════
+function updateLowerThirds(){
+  const p = ANCHORS[currentLang][currentGender];
+  document.getElementById('ltName').textContent = p.name.toUpperCase();
+  document.getElementById('ltTitle').textContent = p.label;
+}
+function showLowerThirds(show){
+  document.getElementById('lowerThirds').classList.toggle('show', show);
+}
+
+// ═══════════════════════════════════════
+// NEWS SYSTEM
+// ═══════════════════════════════════════
+const WORKER = 'https://ddott-news.meradivin.workers.dev/news';
+const GEMINI_API_KEY = ''; // ADD YOUR GEMINI API KEY HERE OR USE ENV
+const VOICES = {en:'en-US', ml:'ml-IN', hi:'hi-IN', ar:'ar-SA'};
+let news=[], idx=0, playing=false, speed=1, muted=false, lang='en';
+let speaking=false, progressTimer=null, autoTimer=null;
+const synth = window.speechSynthesis || null;
+
+async function loadNews(l, btn){
+  lang = l; currentLang = l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else document.querySelector(`[data-lang="${l}"]`)?.classList.add('active');
+
+  hardStop();
+  document.getElementById('loader').style.display = 'flex';
+  document.getElementById('loaderText').textContent = 'LOADING NEWS...';
+
+  try{
+    const res = await fetch(WORKER + '?lang=' + lang);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    news = data.articles || [];
+
+    // If no news or Gemini key available, try Gemini translation/summarization
+    if(!news.length && GEMINI_API_KEY){
+      news = await fetchGeminiNews(lang);
+    }
+
+    if(!news.length) throw new Error('empty');
+
+    idx = 0;
+    document.getElementById('loader').style.display = 'none';
+    buildDots();
+    renderNews(0);
+    document.getElementById('tickerText').textContent = news.map(n=>n.title).join('   •   ');
+    updateLowerThirds();
+    showLowerThirds(true);
+  } catch(e){
+    document.getElementById('loader').style.display = 'none';
+    const demoTitles = {
+      en:'Welcome to Ddott News — AI-powered global coverage. Stay informed.',
+      ml:'ഡോട്ട് ന്യൂസിലേക്ക് സ്വാഗതം — എഐ പവർഡ് വാർത്താ വിശകലനം.',
+      hi:'डॉट न्यूज़ में आपका स्वागत है — AI-संचालित समाचार विश्लेषण।',
+      ar:'مرحباً بكم في دوت نيوز — تغطية إخبارية مدعومة بالذكاء الاصطناعي.'
+    };
+    news = [{
+      title: demoTitles[lang] || demoTitles.en,
+      description: 'Your multilingual AI news experience powered by Ddott TV. Real-time updates from around the world.',
+      image: null,
+      source: {name: 'DDOTT NEWS'}
+    }];
+    buildDots();
+    renderNews(0);
+    document.getElementById('tickerText').textContent = 'News server unavailable — showing demo content';
+    updateLowerThirds();
+    showLowerThirds(true);
+  }
+}
+
+async function fetchGeminiNews(targetLang){
+  try{
+    const prompt = `Generate 5 realistic latest news headlines and brief descriptions in ${targetLang} language. Format as JSON array with fields: title, description, source.name. Make them sound like real breaking news.`;
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+    });
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Try to extract JSON
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if(jsonMatch) return JSON.parse(jsonMatch[0]);
+  }catch(e){ console.log('Gemini fallback failed', e); }
+  return [];
+}
+
 function buildDots(){
-  document.getElementById('storyDots').innerHTML=
+  document.getElementById('storyDots').innerHTML =
     news.slice(0,10).map((_,i)=>`<div class="dot${i===0?' active':''}" onclick="jumpTo(${i})"></div>`).join('');
 }
 
 function renderNews(i){
-  if(i<0||i>=news.length) return;
-  idx=i;
-  const n=news[idx];
-  // load bg image for canvas
-  if(n.image&&n.image.startsWith('http')){
-    newsImageEl=new Image();
-    newsImageEl.crossOrigin='anonymous';
-    newsImageEl.onload=()=>drawStudio();
-    newsImageEl.onerror=()=>{ newsImageEl=null; drawStudio(); };
-    newsImageEl.src=n.image;
-  } else { newsImageEl=null; drawStudio(); }
-  const src=document.getElementById('tpSource');
-  src.textContent=n.source?.name||'DDOTT NEWS';
-  src.style.display='inline-flex';
-  document.getElementById('newsCounter').textContent=(idx+1)+' / '+news.length;
-  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===idx));
-  document.getElementById('tpHeadline').innerHTML=
-    n.title.split(' ').map((w,wi)=>`<span class="word" id="w${wi}">${w} </span>`).join('');
-  document.getElementById('subtitleBar').innerHTML=
-    (n.description||'').split(' ').map((w,wi)=>`<span class="sw" id="sw${wi}">${w} </span>`).join('');
-  document.getElementById('progressFill').style.width='0%';
+  if(i<0 || i>=news.length) return;
+  idx = i;
+  const n = news[idx];
+
+  // Image transition
+  if(n.image && n.image.startsWith('http')){
+    nextImageEl = new Image();
+    nextImageEl.crossOrigin = 'anonymous';
+    nextImageEl.onload = ()=>{
+      imageTransition = 0;
+      animateImageTransition();
+    };
+    nextImageEl.onerror = ()=>{ nextImageEl = null; newsImageEl = null; drawStudio(); };
+    nextImageEl.src = n.image;
+  } else {
+    newsImageEl = null; nextImageEl = null;
+    drawStudio();
+  }
+
+  document.getElementById('ltSource').textContent = n.source?.name || 'DDOTT NEWS';
+  document.getElementById('ltHeadline').textContent = n.title;
+  document.getElementById('newsCounter').textContent = (idx+1) + ' / ' + news.length;
+  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active', j===idx));
+
+  updateTeleprompter(n.title, n.description);
+
+  // Breaking banner for first 3 stories
+  const banner = document.getElementById('breakingBanner');
+  if(idx < 3) banner.classList.add('show');
+  else banner.classList.remove('show');
+}
+
+function animateImageTransition(){
+  if(!nextImageEl) return;
+  const interval = setInterval(()=>{
+    imageTransition += 0.04;
+    currentImageAlpha = 1 - imageTransition;
+    nextImageAlpha = imageTransition;
+    drawStudio();
+    if(imageTransition >= 1){
+      clearInterval(interval);
+      newsImageEl = nextImageEl;
+      nextImageEl = null;
+      currentImageAlpha = 1;
+      nextImageAlpha = 0;
+      imageTransition = 0;
+      drawStudio();
+    }
+  }, 30);
 }
 
 function speakCurrent(){
   if(speaking) return;
-  const n=news[idx]; if(!n||!synth) return;
-  if(muted){scheduleNext();return;}
-  speaking=true;
-  const fullText=n.title+'. '+(n.description||'');
-  const tWords=n.title.split(' ');
-  const utt=new SpeechSynthesisUtterance(fullText);
-  utt.lang=VOICES[lang]||'en-US'; utt.rate=speed;
-  let wIdx=0,inDesc=false,dIdx=0;
-  utt.onboundary=e=>{
-    if(e.name!=='word') return;
-    if(!inDesc&&wIdx<tWords.length){
-      document.querySelectorAll('.word').forEach(el=>el.classList.remove('active'));
-      const el=document.getElementById('w'+wIdx);
-      if(el)el.classList.add('active');
-      if(wIdx>0){const pv=document.getElementById('w'+(wIdx-1));if(pv){pv.classList.remove('active');pv.classList.add('done');}}
-      wIdx++; if(wIdx>=tWords.length)inDesc=true;
-    }else{
-      document.querySelectorAll('.sw').forEach(el=>el.classList.remove('sub-active'));
-      const sel=document.getElementById('sw'+dIdx);
-      if(sel)sel.classList.add('sub-active');
-      dIdx++;
+  const n = news[idx]; if(!n || !synth) return;
+  if(muted){ scheduleNext(); return; }
+
+  speaking = true;
+  const fullText = n.title + '. ' + (n.description || '');
+  const allWords = fullText.split(' ').filter(w=>w.length>0);
+  const titleWords = n.title.split(' ').filter(w=>w.length>0);
+
+  const utt = new SpeechSynthesisUtterance(fullText);
+  utt.lang = VOICES[lang] || 'en-US';
+  utt.rate = speed;
+  utt.pitch = currentGender==='female' ? 1.05 : 0.95;
+
+  let wIdx = 0, inDesc = false, tpIdx = 0;
+
+  utt.onboundary = e=>{
+    if(e.name !== 'word') return;
+    if(!inDesc && wIdx < titleWords.length){
+      highlightTeleprompterWord(tpIdx);
+      wIdx++;
+      if(wIdx >= titleWords.length) inDesc = true;
+    } else {
+      highlightTeleprompterWord(tpIdx);
     }
+    tpIdx++;
   };
-  utt.onstart=()=>{animateProgress();startTalking();};
-  utt.onend=()=>{stopTalking();speaking=false;clearWords();if(playing)scheduleNext();};
-  utt.onerror=()=>{stopTalking();speaking=false;if(playing)scheduleNext();};
+
+  utt.onstart = ()=>{ animateProgress(); startTalking(); };
+  utt.onend = ()=>{ stopTalking(); speaking = false; clearTeleprompter(); if(playing) scheduleNext(); };
+  utt.onerror = ()=>{ stopTalking(); speaking = false; if(playing) scheduleNext(); };
+
   synth.speak(utt);
 }
 
-function clearWords(){
-  document.querySelectorAll('.word').forEach(el=>el.classList.remove('active','done'));
-  document.querySelectorAll('.sw').forEach(el=>el.classList.remove('sub-active'));
+function clearTeleprompter(){
+  document.querySelectorAll('.tp-word').forEach(el=>el.classList.remove('active','done'));
 }
+
 function scheduleNext(){
   clearTimeout(autoTimer);
-  autoTimer=setTimeout(()=>{
-    if(!playing)return;
-    if(idx<news.length-1){renderNews(idx+1);speakCurrent();}
-    else{playing=false;document.getElementById('playBtn').textContent='▶';}
-  },1500);
+  autoTimer = setTimeout(()=>{
+    if(!playing) return;
+    if(idx < news.length-1){ renderNews(idx+1); speakCurrent(); }
+    else { playing = false; document.getElementById('playBtn').textContent = '▶'; }
+  }, 2000);
 }
+
 function animateProgress(){
-  let w=0; clearInterval(progressTimer);
-  progressTimer=setInterval(()=>{
-    if(!playing){clearInterval(progressTimer);return;}
-    w=Math.min(w+0.3,95);
-    document.getElementById('progressFill').style.width=w+'%';
-  },200);
+  let w = 0; clearInterval(progressTimer);
+  progressTimer = setInterval(()=>{
+    if(!playing){ clearInterval(progressTimer); return; }
+    w = Math.min(w + 0.25, 95);
+    document.getElementById('progressFill').style.width = w + '%';
+  }, 200);
 }
+
 function togglePlay(){
-  playing=!playing;
-  document.getElementById('playBtn').textContent=playing?'⏸':'▶';
-  if(playing)speakCurrent(); else hardStop();
+  playing = !playing;
+  document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
+  if(playing) speakCurrent();
+  else hardStop();
 }
-function jumpTo(i){hardStop();renderNews(i);if(playing){playing=true;speakCurrent();}}
-function nextNews(){hardStop();if(idx<news.length-1){renderNews(idx+1);if(playing)speakCurrent();}}
-function prevNews(){hardStop();if(idx>0){renderNews(idx-1);if(playing)speakCurrent();}}
-function hardStop(){stopTalking();speaking=false;if(synth)synth.cancel();clearTimeout(autoTimer);clearInterval(progressTimer);}
-function cycleSpeed(){const s=[0.75,1,1.25,1.5,2];const i=s.indexOf(speed);speed=s[(i+1)%s.length];document.getElementById('speedBtn').textContent=speed+'x';}
-function toggleMute(){muted=!muted;document.getElementById('volBtn').textContent=muted?'🔇':'🔊';}
 
-// swipe
-let tx=0;
-document.querySelector('.news-screen').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;});
-document.querySelector('.news-screen').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){if(dx<0)nextNews();else prevNews();}});
+function jumpTo(i){ hardStop(); renderNews(i); if(playing){ playing = true; speakCurrent(); }}
+function nextNews(){ hardStop(); if(idx < news.length-1){ renderNews(idx+1); if(playing) speakCurrent(); }}
+function prevNews(){ hardStop(); if(idx > 0){ renderNews(idx-1); if(playing) speakCurrent(); }}
 
-// ── INIT
+function hardStop(){
+  stopTalking(); speaking = false;
+  if(synth) synth.cancel();
+  clearTimeout(autoTimer);
+  clearInterval(progressTimer);
+  document.getElementById('progressFill').style.width = '0%';
+  clearTeleprompter();
+}
+
+function cycleSpeed(){
+  const s = [0.75, 1, 1.25, 1.5, 1.75, 2];
+  const i = s.indexOf(speed);
+  speed = s[(i+1) % s.length];
+  document.getElementById('speedBtn').textContent = speed.toFixed(2).replace(/0+$/,'').replace(/\.$/,'') + 'x';
+}
+
+function toggleMute(){
+  muted = !muted;
+  document.getElementById('volBtn').textContent = muted ? '🔇' : '🔊';
+}
+
+// Swipe
+let tx = 0;
+document.querySelector('.news-screen').addEventListener('touchstart', e=>{ tx = e.touches[0].clientX; }, {passive:true});
+document.querySelector('.news-screen').addEventListener('touchend', e=>{
+  const dx = e.changedTouches[0].clientX - tx;
+  if(Math.abs(dx) > 60){ if(dx < 0) nextNews(); else prevNews(); }
+}, {passive:true});
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
 resizeCanvas();
 drawStudio();
 startBreath();
 startBlink();
-document.addEventListener('DOMContentLoaded',()=>loadNews('en',document.querySelector('.lang-btn')));
+startKenBurns();
+updateLowerThirds();
+
+// Load saved preference
+const savedLang = localStorage.getItem('ddott-news-lang');
+const savedGender = localStorage.getItem('ddott-news-gender');
+if(savedGender){ currentGender = savedGender; }
+if(savedLang){ currentLang = savedLang; }
+
+// Update UI to match saved prefs
+document.getElementById('btnMale').classList.toggle('active', currentGender==='male');
+document.getElementById('btnFemale').classList.toggle('active', currentGender==='female');
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadNews(currentLang, document.querySelector(`[data-lang="${currentLang}"]`));
+});
+
+// Save preferences on change
+const origSwitchGender = switchGender;
+switchGender = function(g){
+  currentGender = g;
+  localStorage.setItem('ddott-news-gender', g);
+  document.getElementById('btnMale').classList.toggle('active', g==='male');
+  document.getElementById('btnFemale').classList.toggle('active', g==='female');
+  updateLowerThirds();
+  drawStudio();
+};
+
+const origLoadNews = loadNews;
+loadNews = async function(l, btn){
+  localStorage.setItem('ddott-news-lang', l);
+  await origLoadNews(l, btn);
+};
+</script>
+</body>
+</html>
