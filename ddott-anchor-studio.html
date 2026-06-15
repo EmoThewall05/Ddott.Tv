@@ -1284,6 +1284,24 @@ document.getElementById('btn-stop').addEventListener('click', function() {
 });
 
 // Worker URL change listener
+async function checkWorker() {
+  const statusEl = document.getElementById('worker-status');
+  try {
+    const res = await fetch(config.workerUrl + '?lang=en&q=test', {signal: AbortSignal.timeout(5000)});
+    if (res.ok) {
+      statusEl.textContent = 'Worker connected ✓';
+      statusEl.style.color = '#00ff88';
+    } else {
+      statusEl.textContent = 'Worker error: ' + res.status;
+      statusEl.style.color = '#ff4444';
+    }
+  } catch(e) {
+    statusEl.textContent = 'Worker not connected';
+    statusEl.style.color = '#ff4444';
+  }
+}
+window.addEventListener('load', () => setTimeout(checkWorker, 1200));
+
 document.getElementById('worker-url').addEventListener('change', function(e) {
     config.workerUrl = e.target.value;
 });
