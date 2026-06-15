@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DDOTT NEWS Studio v4.0 - AI News Anchor</title>
+    <title>DDOTT NEWS Studio v4.1 - AI News Anchor</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -174,7 +174,7 @@
             font-size: 13px;
             letter-spacing: 2px;
         }
-        #api-panel {
+        #worker-panel {
             position: fixed;
             top: 80px;
             right: 30px;
@@ -185,23 +185,33 @@
             padding: 16px;
             width: 280px;
         }
-        #api-panel h3 {
+        #worker-panel h3 {
             color: #88aaff;
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 10px;
         }
-        #api-panel input {
+        #worker-panel input {
             width: 100%;
             margin-bottom: 8px;
             font-size: 11px;
         }
-        #api-panel .hint {
+        #worker-panel .hint {
             color: #6688aa;
             font-size: 10px;
             margin-top: 4px;
         }
+        #status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-online { background: #00ff88; }
+        .status-offline { background: #ff4444; }
+        .status-loading { background: #ffaa00; animation: pulse 1s infinite; }
     </style>
 <base target="_blank">
 </head>
@@ -217,11 +227,13 @@
         <div class="live-dot"></div>
         <span>LIVE</span>
     </div>
-    <div id="api-panel">
-        <h3>⚙️ API Configuration</h3>
-        <input type="password" id="gemini-api-key" placeholder="Gemini API Key" value="">
-        <input type="text" id="worker-url" placeholder="Worker URL" value="https://ddott-news.meradivin.workers.dev">
-        <div class="hint">🔑 Add your Gemini API key to enable AI news generation</div>
+    <div id="worker-panel">
+        <h3>⚙️ Worker Config</h3>
+        <input type="text" id="worker-url" value="https://ddott-news.meradivin.workers.dev" placeholder="Worker URL">
+        <div class="hint">
+            <span id="status-indicator" class="status-offline"></span>
+            <span id="worker-status">Worker not connected</span>
+        </div>
     </div>
     <div id="studio-container">
         <canvas id="anchor-canvas"></canvas>
@@ -230,40 +242,40 @@
         <div class="control-group">
             <span class="control-label">Language</span>
             <select id="lang-select">
-                <option value="en">🇺🇸 English</option>
-                <option value="ml">🇮🇳 Malayalam</option>
-                <option value="hi">🇮🇳 Hindi</option>
-                <option value="ar">🇸🇦 Arabic</option>
+                <option value="en">English</option>
+                <option value="ml">Malayalam</option>
+                <option value="hi">Hindi</option>
+                <option value="ar">Arabic</option>
             </select>
         </div>
         <div class="control-group">
             <span class="control-label">Anchor</span>
             <select id="gender-select">
-                <option value="female">👩 Female</option>
-                <option value="male">👨 Male</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
             </select>
         </div>
         <div class="control-group">
             <span class="control-label">News</span>
-            <button class="primary" id="btn-generate">🎙️ Generate News</button>
+            <button class="primary" id="btn-generate">Generate News</button>
         </div>
         <div class="control-group">
             <span class="control-label">Speech</span>
-            <button id="btn-speak">🔊 Speak</button>
+            <button id="btn-speak">Speak</button>
         </div>
         <div class="control-group">
             <span class="control-label">Stop</span>
-            <button class="danger" id="btn-stop">⏹️ Stop</button>
+            <button class="danger" id="btn-stop">Stop</button>
         </div>
     </div>
     <div id="news-ticker">
-        <div id="ticker-text">🦋 DDOTT NEWS — Your AI-Powered News Network — Breaking News Updates 24/7 — Technology | World | Sports | Entertainment | Politics | Science | Health | Business — DDOTT NEWS ♾️</div>
+        <div id="ticker-text">DDOTT NEWS - Your AI-Powered News Network - Breaking News Updates 24/7 - Technology | World | Sports | Entertainment | Politics | Science | Health | Business - DDOTT NEWS</div>
     </div>
 
 <script>
 // ============================================================
-// DDOTT NEWS STUDIO v4.0 - AI News Anchor System
-// Realistic Canvas-based Live2D-style Character
+// DDOTT NEWS STUDIO v4.1 - AI News Anchor System
+// Worker-only architecture - No Gemini key needed in frontend
 // ============================================================
 
 const canvas = document.getElementById('anchor-canvas');
@@ -273,15 +285,7 @@ const ctx = canvas.getContext('2d');
 let config = {
     language: 'en',
     gender: 'female',
-    skinTone: '#e8c4a0',
-    hairColor: '#2a1810',
-    eyeColor: '#3d5a80',
-    lipColor: '#c44d56',
-    suitColor: '#1a2744',
-    shirtColor: '#ffffff',
-    tieColor: '#c41e3a',
-    deskColor: '#2a1a0a',
-    studioTheme: 'blue'
+    workerUrl: 'https://ddott-news.meradivin.workers.dev'
 };
 
 // Animation states
@@ -299,7 +303,6 @@ let animState = {
     eyeLookY: 0,
     handGesture: 0,
     isSpeaking: false,
-    currentChar: '',
     speechQueue: [],
     speechIndex: 0
 };
@@ -348,7 +351,6 @@ const characters = {
     }
 };
 
-// Resize canvas
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -356,18 +358,16 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// Utility functions
 function lerp(a, b, t) { return a + (b - a) * t; }
 function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 function sin01(t) { return (Math.sin(t) + 1) / 2; }
 
-// Color utilities
 function darken(color, amount) {
     const num = parseInt(color.replace('#', ''), 16);
     const r = clamp(Math.floor((num >> 16) * (1 - amount)), 0, 255);
     const g = clamp(Math.floor(((num >> 8) & 0xFF) * (1 - amount)), 0, 255);
     const b = clamp(Math.floor((num & 0xFF) * (1 - amount)), 0, 255);
-    return `rgb(${r},${g},${b})`;
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
 }
 
 function lighten(color, amount) {
@@ -375,7 +375,7 @@ function lighten(color, amount) {
     const r = clamp(Math.floor((num >> 16) + (255 - (num >> 16)) * amount), 0, 255);
     const g = clamp(Math.floor(((num >> 8) & 0xFF) + (255 - ((num >> 8) & 0xFF)) * amount), 0, 255);
     const b = clamp(Math.floor((num & 0xFF) + (255 - (num & 0xFF)) * amount), 0, 255);
-    return `rgb(${r},${g},${b})`;
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
 }
 
 // ============================================================
@@ -385,7 +385,6 @@ function lighten(color, amount) {
 function drawStudioBackground() {
     const w = canvas.width, h = canvas.height;
 
-    // Deep blue gradient background
     const grad = ctx.createRadialGradient(w/2, h/3, 0, w/2, h/2, w);
     grad.addColorStop(0, '#0a1a3a');
     grad.addColorStop(0.5, '#050d1f');
@@ -393,7 +392,6 @@ function drawStudioBackground() {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
-    // Studio lights (top)
     for (let i = 0; i < 5; i++) {
         const lx = w * (0.15 + i * 0.175);
         const lightGrad = ctx.createRadialGradient(lx, -50, 0, lx, 150, 200);
@@ -403,7 +401,6 @@ function drawStudioBackground() {
         ctx.fillRect(lx - 200, 0, 400, 300);
     }
 
-    // World map silhouette (subtle)
     ctx.save();
     ctx.globalAlpha = 0.06;
     ctx.strokeStyle = '#4488ff';
@@ -419,7 +416,6 @@ function drawStudioBackground() {
     }
     ctx.restore();
 
-    // Grid floor
     ctx.save();
     ctx.globalAlpha = 0.08;
     ctx.strokeStyle = '#4488ff';
@@ -440,7 +436,6 @@ function drawStudioBackground() {
     }
     ctx.restore();
 
-    // Screen behind anchor
     const screenW = w * 0.5;
     const screenH = h * 0.35;
     const screenX = (w - screenW) / 2;
@@ -491,7 +486,7 @@ function drawStudioBackground() {
 
     ctx.fillStyle = 'rgba(255, 50, 50, 0.8)';
     ctx.font = 'bold 14px monospace';
-    ctx.fillText('● LIVE DATA', screenX + 15, screenY + 25);
+    ctx.fillText('LIVE DATA', screenX + 15, screenY + 25);
 
     ctx.restore();
 }
@@ -528,7 +523,7 @@ function drawDesk() {
     ctx.fillText('AI-POWERED NEWS NETWORK', w / 2, deskY + 75);
     ctx.restore();
 
-    ctx.fillStyle = `rgba(68, 136, 255, ${0.3 + sin01(animState.time * 2) * 0.2})`;
+    ctx.fillStyle = 'rgba(68, 136, 255,' + (0.3 + sin01(animState.time * 2) * 0.2) + ')';
     ctx.fillRect(w * 0.15, deskY + 5, w * 0.7, 3);
 }
 
@@ -587,7 +582,6 @@ function drawRealisticFace(cx, cy, scale, char) {
     ctx.save();
     ctx.translate(cx, cy);
 
-    // Neck
     ctx.fillStyle = skinDark;
     ctx.beginPath();
     ctx.moveTo(-25 * s, 60 * s);
@@ -602,7 +596,6 @@ function drawRealisticFace(cx, cy, scale, char) {
     ctx.ellipse(0, 75 * s, 22 * s, 8 * s, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Face base
     ctx.fillStyle = skin;
     ctx.beginPath();
     ctx.moveTo(-45 * s, -30 * s);
@@ -615,7 +608,6 @@ function drawRealisticFace(cx, cy, scale, char) {
     ctx.closePath();
     ctx.fill();
 
-    // Face shading
     ctx.fillStyle = darken(skin, 0.08);
     ctx.beginPath();
     ctx.moveTo(-45 * s, -30 * s);
@@ -626,7 +618,6 @@ function drawRealisticFace(cx, cy, scale, char) {
     ctx.closePath();
     ctx.fill();
 
-    // Forehead highlight
     ctx.fillStyle = skinLight;
     ctx.globalAlpha = 0.3;
     ctx.beginPath();
@@ -634,7 +625,6 @@ function drawRealisticFace(cx, cy, scale, char) {
     ctx.fill();
     ctx.globalAlpha = 1;
 
-    // Cheekbones
     ctx.fillStyle = skinLight;
     ctx.globalAlpha = 0.2;
     ctx.beginPath();
@@ -645,7 +635,6 @@ function drawRealisticFace(cx, cy, scale, char) {
     ctx.fill();
     ctx.globalAlpha = 1;
 
-    // Nose
     const noseY = 15 * s;
     ctx.fillStyle = darken(skin, 0.12);
     ctx.beginPath();
@@ -671,16 +660,9 @@ function drawRealisticFace(cx, cy, scale, char) {
     ctx.ellipse(4 * s, noseY + 6 * s, 2.5 * s, 1.5 * s, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eyes
     drawRealisticEyes(0, -5 * s, s, char);
-
-    // Eyebrows
     drawEyebrows(0, -22 * s, s, char);
-
-    // Mouth
     drawRealisticMouth(0, 38 * s, s, char);
-
-    // Ears
     drawEars(0, 5 * s, s, char);
 
     ctx.restore();
@@ -697,7 +679,7 @@ function drawRealisticEyes(cx, cy, s, char) {
     const lookX = animState.eyeLookX * 4 * s;
     const lookY = animState.eyeLookY * 2 * s;
 
-    [-1, 1].forEach(side => {
+    [-1, 1].forEach(function(side) {
         const ex = cx + side * eyeSpacing;
 
         ctx.fillStyle = darken(char.skinTone, 0.1);
@@ -772,7 +754,7 @@ function drawEyebrows(cx, cy, s, char) {
     const browSpacing = 22 * s;
     const browY = cy;
 
-    [-1, 1].forEach(side => {
+    [-1, 1].forEach(function(side) {
         const bx = cx + side * browSpacing;
         ctx.strokeStyle = char.hairColor;
         ctx.lineWidth = 2.5 * s;
@@ -848,7 +830,7 @@ function drawRealisticMouth(cx, cy, s, char) {
 }
 
 function drawEars(cx, cy, s, char) {
-    [-1, 1].forEach(side => {
+    [-1, 1].forEach(function(side) {
         const ex = cx + side * 48 * s;
         ctx.fillStyle = char.skinTone;
         ctx.beginPath();
@@ -1121,9 +1103,9 @@ function updateAnimation() {
     animState.handGesture = sin01(animState.time * 0.5) * 0.3;
 
     if (animState.isSpeaking && animState.speechQueue.length > 0) {
-        const char = animState.speechQueue[animState.speechIndex] || ' ';
-        const isVowel = /[aeiouAEIOUàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ]/.test(char);
-        const isConsonant = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]/.test(char);
+        const ch = animState.speechQueue[animState.speechIndex] || ' ';
+        const isVowel = /[aeiouAEIOUàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ]/.test(ch);
+        const isConsonant = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]/.test(ch);
 
         if (isVowel) {
             animState.mouthTarget = 0.7 + Math.sin(animState.time * 15) * 0.2;
@@ -1150,7 +1132,7 @@ function updateAnimation() {
 
 function render() {
     const w = canvas.width, h = canvas.height;
-    const char = characters[`${config.language}-${config.gender}`];
+    const char = characters[config.language + '-' + config.gender];
 
     ctx.clearRect(0, 0, w, h);
 
@@ -1208,13 +1190,13 @@ function speakText(text, lang) {
     animState.speechIndex = 0;
     animState.isSpeaking = true;
 
-    utterance.onend = () => {
+    utterance.onend = function() {
         animState.isSpeaking = false;
         animState.speechQueue = [];
         animState.mouthTarget = 0;
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = function() {
         animState.isSpeaking = false;
         animState.speechQueue = [];
     };
@@ -1223,106 +1205,118 @@ function speakText(text, lang) {
 }
 
 // ============================================================
-// AI NEWS GENERATION (Gemini API)
+// WORKER API - All AI calls go through Cloudflare Worker
 // ============================================================
 
 async function generateNews() {
-    const apiKey = document.getElementById('gemini-api-key').value.trim();
     const workerUrl = document.getElementById('worker-url').value.trim();
 
-    if (!apiKey) {
-        alert('Please add your Gemini API key in the API Configuration panel (top right)');
+    if (!workerUrl) {
+        alert('Please add your Cloudflare Worker URL');
         return;
     }
 
     const btn = document.getElementById('btn-generate');
-    btn.textContent = '⏳ Generating...';
+    btn.textContent = 'Generating...';
     btn.disabled = true;
 
-    try {
-        const prompts = {
-            'en': 'Generate a short news briefing (3-4 sentences) about the latest global technology and world news. Make it sound like a professional news anchor.',
-            'ml': 'ഏറ്റവും പുതിയ ലോക വാർത്തകളുടെ ഒരു ചെറിയ സമാഹാരം (3-4 വാക്യങ്ങൾ) മലയാളത്തിൽ തയ്യാറാക്കുക. ഒരു പ്രൊഫഷണൽ ന്യൂസ് ആങ്കർ പോലെ എഴുതുക.',
-            'hi': 'नवीनतम विश्व समाचारों का एक संक्षिप्त सारांश (3-4 वाक्य) हिंदी में तैयार करें। एक पेशेवर समाचार एंकर की तरह लिखें।',
-            'ar': 'قم بإعداد ملخص إخباري قصير (3-4 جمل) عن آخر الأخبار العالمية باللغة العربية. اكتب كمذيع أخبار محترف.'
-        };
+    updateWorkerStatus('loading', 'Generating news...');
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+    try {
+        const response = await fetch(workerUrl + '/news', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompts[config.language] || prompts['en'] }]
-                }]
+                language: config.language,
+                gender: config.gender,
+                category: 'general'
             })
         });
 
+        if (!response.ok) {
+            throw new Error('Worker response: ' + response.status);
+        }
+
         const data = await response.json();
 
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            const newsText = data.candidates[0].content.parts[0].text;
-
-            document.getElementById('ticker-text').textContent = newsText.replace(/\n/g, ' — ');
-
-            speakText(newsText, config.language);
-
-            if (workerUrl && workerUrl !== 'https://ddott-news.meradivin.workers.dev') {
-                try {
-                    await fetch(workerUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            text: newsText,
-                            language: config.language,
-                            timestamp: new Date().toISOString()
-                        })
-                    });
-                } catch (e) {}
-            }
+        if (data.news) {
+            document.getElementById('ticker-text').textContent = data.news.replace(/
+/g, ' - ');
+            speakText(data.news, config.language);
+            updateWorkerStatus('online', 'Worker connected');
+        } else if (data.text) {
+            document.getElementById('ticker-text').textContent = data.text.replace(/
+/g, ' - ');
+            speakText(data.text, config.language);
+            updateWorkerStatus('online', 'Worker connected');
         } else {
-            throw new Error('Invalid response from Gemini API');
+            throw new Error('Invalid worker response');
         }
     } catch (error) {
         console.error('News generation error:', error);
-        alert('Error generating news. Please check your API key and try again.');
+        updateWorkerStatus('offline', 'Worker error: ' + error.message);
+
+        // Fallback demo text
+        const fallback = {
+            'en': 'Welcome to DDOTT News. This is a demonstration of our AI-powered news anchor system. Please configure your Cloudflare Worker to enable live news generation.',
+            'ml': 'ഡോട്ട് ന്യൂസിലേക്ക് സ്വാഗതം. ഇത് ഞങ്ങളുടെ എഐ-പവർഡ് ന്യൂസ് ആങ്കർ സിസ്റ്റത്തിന്റെ പ്രദർശനമാണ്. ലൈവ് ന്യൂസ് ജനറേഷൻ സജീവമാക്കാൻ നിങ്ങളുടെ ക്ലൗഡ്ഫ്ലെയർ വർക്കർ കോൺഫിഗർ ചെയ്യുക.',
+            'hi': 'डॉट न्यूज़ में आपका स्वागत है। यह हमारी AI-संचालित समाचार एंकर प्रणाली का प्रदर्शन है। लाइव समाचार जनरेशन सक्षम करने के लिए कृपया अपने क्लाउडफ्लेयर वर्कर को कॉन्फ़िगर करें।',
+            'ar': 'أهلاً بكم في قناة دوت نيوز. هذا عرض لنظام مذيع الأخبار المدعوم بالذكاء الاصطناعي. يرجى تكوين Cloudflare Worker الخاص بك لتمكين توليد الأخبار المباشرة.'
+        };
+        const text = fallback[config.language] || fallback['en'];
+        document.getElementById('ticker-text').textContent = text;
+        speakText(text, config.language);
     } finally {
-        btn.textContent = '🎙️ Generate News';
+        btn.textContent = 'Generate News';
         btn.disabled = false;
     }
+}
+
+function updateWorkerStatus(status, message) {
+    const indicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('worker-status');
+
+    indicator.className = 'status-' + status;
+    statusText.textContent = message;
 }
 
 // ============================================================
 // EVENT HANDLERS
 // ============================================================
 
-document.getElementById('lang-select').addEventListener('change', (e) => {
+document.getElementById('lang-select').addEventListener('change', function(e) {
     config.language = e.target.value;
 });
 
-document.getElementById('gender-select').addEventListener('change', (e) => {
+document.getElementById('gender-select').addEventListener('change', function(e) {
     config.gender = e.target.value;
 });
 
 document.getElementById('btn-generate').addEventListener('click', generateNews);
 
-document.getElementById('btn-speak').addEventListener('click', () => {
+document.getElementById('btn-speak').addEventListener('click', function() {
     const tickerText = document.getElementById('ticker-text').textContent;
     speakText(tickerText, config.language);
 });
 
-document.getElementById('btn-stop').addEventListener('click', () => {
+document.getElementById('btn-stop').addEventListener('click', function() {
     window.speechSynthesis.cancel();
     animState.isSpeaking = false;
     animState.speechQueue = [];
     animState.mouthTarget = 0;
 });
 
+// Worker URL change listener
+document.getElementById('worker-url').addEventListener('change', function(e) {
+    config.workerUrl = e.target.value;
+});
+
 // Demo speech on load
-setTimeout(() => {
+setTimeout(function() {
     const demos = {
         'en': 'Welcome to DDOTT News. I am your AI news anchor, bringing you the latest updates from around the world.',
         'ml': 'ഡോട്ട് ന്യൂസിലേക്ക് സ്വാഗതം. ഞാൻ നിങ്ങളുടെ എഐ ന്യൂസ് ആങ്കർ ആണ്, ലോകത്തെ ഏറ്റവും പുതിയ വാർത്തകൾ നിങ്ങളിലേക്ക് എത്തിക്കുന്നു.',
-        'hi': 'डॉट न्यूज़ में आपका स्वागत है। मैं आपका एआई समाचार एंकर हूँ, दुनिया भर की ताज़ा खबरें आप तक पहुँचा रहा हूँ।',
+        'hi': 'डॉट न्यूज़ में आपका स्वागत है। मैं आपका AI समाचार एंकर हूँ, दुनिया भर की ताज़ा खबरें आप तक पहुँचा रहा हूँ।',
         'ar': 'أهلاً بكم في قناة دوت نيوز. أنا مذيع الأخبار الذكي، أحضر لكم آخر التحديثات من حول العالم.'
     };
     speakText(demos[config.language], config.language);
