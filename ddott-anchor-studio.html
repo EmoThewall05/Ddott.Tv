@@ -1240,6 +1240,7 @@ async function generateNews() {
             document.getElementById('ticker-text').textContent = newsText.replace(/\n/g, ' - ');
             speakText(newsText, config.language);
             updateWorkerStatus('online', 'News loaded - ' + config.language.toUpperCase());
+        }
     } catch (error) {
         console.error('News generation error:', error);
         updateWorkerStatus('offline', 'Worker error: ' + error.message);
