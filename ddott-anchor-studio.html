@@ -1211,46 +1211,33 @@ function speakText(text, lang) {
 
 async function generateNews() {
     const workerUrl = document.getElementById('worker-url').value.trim();
-
     if (!workerUrl) {
         alert('Please add your Cloudflare Worker URL');
         return;
     }
-
     const btn = document.getElementById('btn-generate');
     btn.textContent = 'Generating...';
     btn.disabled = true;
-
-    updateWorkerStatus('loading', 'Generating news...');
-
+    updateWorkerStatus('loading', 'Fetching news...');
     try {
-        // Matches your worker: POST /news with {language, gender, category}
         const response = await fetch(workerUrl + '?lang=' + config.language);
-
-        if (!response.ok) {
-            throw new Error('Worker response: ' + response.status);
-        }
-
+        if (!response.ok) throw new Error('Worker response: ' + response.status);
         const data = await response.json();
-
         const articles = data.articles || [];
         if (!articles.length) throw new Error('No articles');
         const newsText = articles.slice(0,3).map(a => a.title + '. ' + (a.description||'')).join(' | ');
-        if (newsText) {
-            document.getElementById('ticker-text').textContent = newsText.replace(/\n/g, ' - ');
-            speakText(newsText, config.language);
-            updateWorkerStatus('online', 'News loaded - ' + config.language.toUpperCase());
-        }
+        document.getElementById('ticker-text').textContent = newsText.replace(/
+/g, ' - ');
+        speakText(newsText, config.language);
+        updateWorkerStatus('online', 'News loaded - ' + config.language.toUpperCase());
     } catch (error) {
-        console.error('News generation error:', error);
-        updateWorkerStatus('offline', 'Worker error: ' + error.message);
-
-        // Fallback demo text when worker fails
+        console.error('News error:', error);
+        updateWorkerStatus('offline', 'Error: ' + error.message);
         const fallback = {
-            'en': 'Welcome to DDOTT News. This is a demonstration of our AI-powered news anchor system. Please configure your Cloudflare Worker to enable live news generation.',
-            'ml': 'ഡോട്ട് ന്യൂസിലേക്ക് സ്വാഗതം. ഇത് ഞങ്ങളുടെ എഐ-പവർഡ് ന്യൂസ് ആങ്കർ സിസ്റ്റത്തിന്റെ പ്രദർശനമാണ്. ലൈവ് ന്യൂസ് ജനറേഷൻ സജീവമാക്കാൻ നിങ്ങളുടെ ക്ലൗഡ്ഫ്ലെയർ വർക്കർ കോൺഫിഗർ ചെയ്യുക.',
-            'hi': 'डॉट न्यूज़ में आपका स्वागत है। यह हमारी AI-संचालित समाचार एंकर प्रणाली का प्रदर्शन है। लाइव समाचार जनरेशन सक्षम करने के लिए कृपया अपने क्लाउडफ्लेयर वर्कर को कॉन्फ़िगर करें।',
-            'ar': 'أهلاً بكم في قناة دوت نيوز. هذا عرض لنظام مذيع الأخبار المدعوم بالذكاء الاصطناعي. يرجى تكوين Cloudflare Worker الخاص بك لتمكين توليد الأخبار المباشرة.'
+            'en': 'Welcome to DDOTT News. Your AI-powered news anchor is ready.',
+            'ml': 'ഡോട്ട് ന്യൂസിലേക്ക് സ്വാഗതം.',
+            'hi': 'डॉट न्यूज़ में आपका स्वागत है।',
+            'ar': 'أهلاً بكم في قناة دوت نيوز.'
         };
         const text = fallback[config.language] || fallback['en'];
         document.getElementById('ticker-text').textContent = text;
@@ -1260,6 +1247,7 @@ async function generateNews() {
         btn.disabled = false;
     }
 }
+
 
 function updateWorkerStatus(status, message) {
     const indicator = document.getElementById('status-indicator');
