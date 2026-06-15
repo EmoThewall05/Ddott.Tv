@@ -430,32 +430,22 @@ async function translateText() {
   document.getElementById('subtitlePreview').classList.remove('show');
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://ddott-translate.meradivin.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: `You are a professional translator. Translate the given text accurately to ${selectedLang.name}. 
-Rules:
-- Return ONLY the translated text, nothing else
-- No explanations, no labels, no preamble
-- Keep proper nouns, brand names, and technical terms as-is unless they have a common translation
-- Maintain the original tone and style
-- If the text is already in ${selectedLang.name}, return it as-is`,
-        messages: [{ role: 'user', content: text }]
+        text: text,
+        source: 'auto',
+        target: selectedLang.code
       })
     });
 
     const data = await response.json();
-
-    if (data.content && data.content[0]) {
-      translatedText = data.content[0].text.trim();
+    if (data.translated) {
+      translatedText = data.translated.trim();
       resultTextEl.textContent = translatedText;
       resultBox.classList.add('show');
       updateResultBadge();
-
-      // Show subtitle preview
       showSubtitlePreview(translatedText);
       showToast('✅ TRANSLATED!');
     } else {
