@@ -1,7 +1,7 @@
 // Load real user data
 async function loadUser() {
   const user = await getUser();
-  if (!user) { window.location.href = 'ddott-login.html'; return; }
+  if (!user) { console.log('Guest mode'); return; } // Allow anonymous viewing
   const profile = await getProfile(user.id);
   if (profile) {
     document.getElementById('coin-amt').textContent = profile.emo_coins || 0;
