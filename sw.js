@@ -1,28 +1,28 @@
-const CACHE = 'ddott-tv-v11';
+const CACHE = 'ddott-tv-v22';
 const FILES = [
   '/',
   '/index.html',
-  '/ddott-home-v2.html',
-  '/ddott-player-v2.html',
-  '/ddott-player-v3.html',
-  '/ddott-shorts.html',
-  '/ddott-creator-channel.html',
-  '/ddott-messaging.html',
-  '/ddott-emo-coins.html',
-  '/ddott-ai-butterfly.html',
-  '/ddott-creator-studio.html',
-  '/ddott-landing-v2.html',
-  '/supabase-config.js',
-  '/auth.js',
-  '/ddott-anchor-studio.html',
-  '/ddott-auto-translate.html',
-  '/ddott-login.html',
-  '/ddott-news-reader.html',
-  '/ddott-advertiser.html',
-  '/ddott-community.html',
+  '/home/index.html',
+  '/player/player-v2.html',
+  '/player/player-v3.html',
+  '/player/shorts.html',
+  '/creator/channel.html',
+  '/messaging/index.html',
+  '/coins/index.html',
+  '/ai/index.html',
+  '/creator/studio.html',
+  '/home/landing.html',
+  '/config/auth.js',
+  '/config/cloudinary-config.js',
+  '/community/studio/index.html',
+  '/community/translate/index.html',
+  '/auth/login.html',
+  '/community/news/index.html',
+  '/advertiser/index.html',
+  '/community/index.html',
   '/home-script.js',
   '/studio-script.js',
-  '/cloudinary-config.js'
+  '/supabase-config.js'
 ];
 
 self.addEventListener('install', e => {

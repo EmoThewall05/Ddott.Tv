@@ -646,21 +646,30 @@
         }
 
         // ===== VIDEO DATABASE / LOOKUP =====
-        // Add your video IDs and URLs here, or fetch from API
         const VIDEO_DB = {};
 
         function resolveVideoById(id) {
-            // Check local database first
-            if (VIDEO_DB[id]) {
-                return VIDEO_DB[id];
-            }
-
-            // If ID looks like a URL itself, use it
-            if (id.startsWith('http://') || id.startsWith('https://')) {
-                return id;
-            }
-
+            if (VIDEO_DB[id]) return VIDEO_DB[id];
+            if (id.startsWith('http://') || id.startsWith('https://')) return id;
             return null;
+        }
+
+        // Fetch video from Supabase by ID
+        async function fetchVideoFromDB(id) {
+            try {
+                const { data, error } = await db.from('videos').select('video_url,title,description').eq('id', id).single();
+                if (error || !data) return null;
+                VIDEO_DB[id] = data.video_url;
+                // Update title if available
+                if (data.title) {
+                    const titleEl = document.getElementById('videoTitle') || document.querySelector('.video-title');
+                    if (titleEl) titleEl.textContent = data.title;
+                }
+                return data.video_url;
+            } catch(e) {
+                console.error('DB fetch error:', e);
+                return null;
+            }
         }
 
         // ===== LOAD VIDEO =====

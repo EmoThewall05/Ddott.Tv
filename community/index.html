@@ -457,8 +457,16 @@ function loadAIFeatures() {
 
 // ============================================
 function openAIFeature(name) {
-  if(name === 'AI News Reader') window.location.href = 'ddott-news-reader.html';
-  else if(name === 'AI Human Talk') window.location.href = 'ddott-ai-butterfly.html';
+  if(name === 'AI News Reader') {
+    if(window.parent && window.parent.nav) window.parent.nav('news');
+    else window.location.href = 'ddott-news-reader.html';
+  } else if(name === 'AI Human Talk') {
+    if(window.parent && window.parent.nav) window.parent.nav('ai');
+    else window.location.href = 'ddott-ai-butterfly.html';
+  } else if(name === 'Auto Translation') {
+    if(window.parent && window.parent.nav) window.parent.nav('translate');
+    else window.location.href = 'ddott-auto-translate.html';
+  }
 }
 // LOAD COLLABS FROM DATABASE
 // ============================================
