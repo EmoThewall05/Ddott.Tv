@@ -318,6 +318,7 @@
     document.getElementById('iframeWrapper').classList.remove('show');
     document.getElementById('pageFrame').src='';
     setTab('t-home');
+    document.getElementById('homeScreen').scrollTop=0;
   }
 
   document.querySelector('.logo').addEventListener('click',()=>{ if(current) goHome(); });
