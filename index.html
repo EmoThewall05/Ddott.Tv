@@ -200,7 +200,7 @@
       <div class="page-card" onclick="nav('studio')">
         <div class="pc-icon">🎬</div><div class="pc-title">Creator Studio</div><div class="pc-desc">Upload, spot pay & script AI</div>
       </div>
-      <div class="page-card" onclick="window.location.href='ddott-shorts.html'">
+      <div class="page-card" onclick="window.location.href='/player/shorts.html'">
         <div class="pc-icon">⚡</div><div class="pc-title">Shorts</div><div class="pc-desc">Vertical short videos</div>
       </div>
       <div class="page-card" onclick="nav('anchor-studio')">
@@ -248,9 +248,9 @@
 
 <script>
   const pages = {
-    home:'ddott-home-v2.html', feed:'ddott-home-v2.html', community:'ddott-community.html', player:'ddott-player-v3.html',
-    channel:'ddott-creator-channel.html', messages:'ddott-messaging.html',
-    coins:'ddott-emo-coins.html', ai:'ddott-ai-butterfly.html',
+    home:'/', feed:'/', community:'/community/', player:'/player/player-v3.html',
+    channel:'/creator/channel.html', messages:'/messaging/',
+    coins:'/coins/', ai:'/ai/',
     studio:'/studio', 'anchor-studio':'/community/studio/', landing:'/home/landing.html', advertiser:'/advertiser/', translate:'/community/translate/', news:'/community/news/', login:'/auth/login.html'
   };
   const tabMap = { feed:'t-feed', player:'t-feed', channel:'t-home', messages:'t-home', coins:'t-coins', ai:'t-home', studio:'t-studio', 'anchor-studio':'t-studio', landing:'t-home', translate:'t-home', news:'t-home' };
@@ -408,7 +408,7 @@ async function loadVideoFeed() {
 function navToVideo(videoId, videoUrl, videoTitle) {
   const frame = document.getElementById('pageFrame');
   const wrapper = document.getElementById('iframeWrapper');
-  let src = 'ddott-player-v2.html?id=' + videoId;
+  let src = '/player/player-v2.html?id=' + videoId;
   if (videoUrl) src += '&url=' + encodeURIComponent(videoUrl);
   if (videoTitle) src += '&title=' + encodeURIComponent(videoTitle);
   frame.src = src;

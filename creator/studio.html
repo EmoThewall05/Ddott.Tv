@@ -334,7 +334,7 @@ function playVideo(id, url, title) {
     creator: encodeURIComponent('Divin')
   });
 
-  window.location.href = 'ddott-player-v2.html?' + params.toString();
+  window.location.href = '/player/player-v2.html?' + params.toString();
 }
 
 function formatDate(dateString) {
@@ -461,7 +461,7 @@ async function publishVideo() {
 </script>
 
 <div class="bottom-nav">
-  <a href="ddott-home-v2.html" class="nav-item">
+  <a href="/" class="nav-item">
     <span class="nav-icon">🏠</span>
     <span>HOME</span>
   </a>
@@ -469,15 +469,15 @@ async function publishVideo() {
     <span class="nav-icon">📺</span>
     <span>FEED</span>
   </a>
-  <a href="ddott-community.html" class="nav-item">
+  <a href="/community/" class="nav-item">
     <span class="nav-icon">🌐</span>
     <span>COMMUNITY</span>
   </a>
-  <a href="ddott-emo-coins.html" class="nav-item">
+  <a href="/coins/" class="nav-item">
     <span class="nav-icon">🪙</span>
     <span>COINS</span>
   </a>
-  <a href="ddott-creator-studio.html" class="nav-item active">
+  <a href="/creator/studio.html" class="nav-item active">
     <span class="nav-icon">🎬</span>
     <span>STUDIO</span>
   </a>

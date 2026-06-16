@@ -263,10 +263,10 @@
 <!-- BOTTOM TABS -->
 <div class="tab-bar">
   <div class="tab-item" onclick="window.location='ddott-tv-app.html'"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
-  <div class="tab-item" onclick="window.location='ddott-home-v2.html'"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
+  <div class="tab-item" onclick="window.location='/'"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
   <div class="tab-item active"><div class="tab-icon">🌐</div><div class="tab-label">COMMUNITY</div></div>
-  <div class="tab-item" onclick="window.location='ddott-emo-coins.html'"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
-  <div class="tab-item" onclick="window.location='ddott-creator-studio.html'"><div class="tab-icon">🎬</div><div class="tab-label">STUDIO</div></div>
+  <div class="tab-item" onclick="window.location='/coins/'"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
+  <div class="tab-item" onclick="window.location='/creator/studio.html'"><div class="tab-icon">🎬</div><div class="tab-label">STUDIO</div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -314,9 +314,9 @@ function updateNav(user) {
     loadUserCoins(user.id);
   } else {
     avatar.textContent = '?';
-    avatar.onclick = () => window.location = 'ddott-login.html';
+    avatar.onclick = () => window.location = '/auth/login.html';
     coin.textContent = '🪙 Login';
-    coin.onclick = () => window.location = 'ddott-login.html';
+    coin.onclick = () => window.location = '/auth/login.html';
   }
 }
 
@@ -459,13 +459,13 @@ function loadAIFeatures() {
 function openAIFeature(name) {
   if(name === 'AI News Reader') {
     if(window.parent && window.parent.nav) window.parent.nav('news');
-    else window.location.href = 'ddott-news-reader.html';
+    else window.location.href = '/community/news/';
   } else if(name === 'AI Human Talk') {
     if(window.parent && window.parent.nav) window.parent.nav('ai');
-    else window.location.href = 'ddott-ai-butterfly.html';
+    else window.location.href = '/ai/';
   } else if(name === 'Auto Translation') {
     if(window.parent && window.parent.nav) window.parent.nav('translate');
-    else window.location.href = 'ddott-auto-translate.html';
+    else window.location.href = '/community/translate/';
   }
 }
 // LOAD COLLABS FROM DATABASE
@@ -564,7 +564,7 @@ function setcat(el) {
 // MODAL FUNCTIONS
 // ============================================
 function showCreate() { 
-  if (!currentUser) { window.location = 'ddott-login.html'; return; }
+  if (!currentUser) { window.location = '/auth/login.html'; return; }
   document.getElementById('createModal').classList.add('show'); 
 }
 
@@ -618,7 +618,7 @@ async function createCollab() {
 }
 
 function joinCollab(id) {
-  if (!currentUser) { window.location = 'ddott-login.html'; return; }
+  if (!currentUser) { window.location = '/auth/login.html'; return; }
   showToast('🎵 JOINED COLLAB!');
   // Implement actual join logic
 }

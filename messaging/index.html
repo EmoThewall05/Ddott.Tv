@@ -177,15 +177,15 @@ body { background: #000; color: #fff; font-family: 'Segoe UI', system-ui, sans-s
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
-  <a href="ddott-home-v2.html" class="nav-item">
+  <a href="/" class="nav-item">
     <span class="nav-icon">🏠</span>
     <span>Home</span>
   </a>
-  <a href="ddott-home-v2.html" class="nav-item">
+  <a href="/" class="nav-item">
     <span class="nav-icon">🔍</span>
     <span>Explore</span>
   </a>
-  <a href="ddott-creator-studio.html" class="nav-item">
+  <a href="/creator/studio.html" class="nav-item">
     <span class="nav-icon">➕</span>
     <span>Create</span>
   </a>
@@ -193,7 +193,7 @@ body { background: #000; color: #fff; font-family: 'Segoe UI', system-ui, sans-s
     <span class="nav-icon">💬</span>
     <span>Messages</span>
   </a>
-  <a href="ddott-creator-studio.html" class="nav-item">
+  <a href="/creator/studio.html" class="nav-item">
     <span class="nav-icon">👤</span>
     <span>Profile</span>
   </a>
@@ -259,7 +259,7 @@ function isUserOnline(lastSeen) {
 async function init() {
   try {
     const { data: { user } } = await db.auth.getUser()
-    if (!user) { window.location.href = 'ddott-login.html'; return }
+    if (!user) { window.location.href = '/auth/login.html'; return }
     currentUser = user
 
     // Ping last_seen immediately
