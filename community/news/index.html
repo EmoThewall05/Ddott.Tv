@@ -229,9 +229,13 @@ async function loadNews(l, btn) {
   hardStop();
   document.getElementById('loader').style.display='flex';
   try {
-    const res = await fetch(WORKER+'?lang='+lang);
+    const res = await fetch(WORKER, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ language: lang, gender: currentAnchor })
+});
     const data = await res.json();
-    news = data.articles || [];
+    news = [{ title: data.text, description: '', source: { name: 'DDOTT AI' }, image: null }];
     idx=0;
     document.getElementById('loader').style.display='none';
     buildDots();
