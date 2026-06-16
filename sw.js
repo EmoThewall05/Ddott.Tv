@@ -1,4 +1,4 @@
-const CACHE = 'ddott-tv-v10';
+const CACHE = 'ddott-tv-v11';
 const FILES = [
   '/',
   '/index.html',
@@ -19,7 +19,10 @@ const FILES = [
   '/ddott-login.html',
   '/ddott-news-reader.html',
   '/ddott-advertiser.html',
-  '/ddott-community.html'
+  '/ddott-community.html',
+  '/home-script.js',
+  '/studio-script.js',
+  '/cloudinary-config.js'
 ];
 
 self.addEventListener('install', e => {
