@@ -11,6 +11,14 @@ export default {
 
     const url = new URL(request.url);
 
+    // Health check
+    if (url.pathname === '/' || url.pathname === '/health') {
+      return new Response(JSON.stringify({ status: 'ok', worker: 'ddott-news' }), {
+        headers: { ...cors, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // AI News generation
     if (url.pathname === '/news' && request.method === 'POST') {
       try {
         const body = await request.json();
@@ -39,11 +47,30 @@ export default {
       }
     }
 
-    const lang = url.searchParams.get('lang') || 'en';
-    const res = await fetch(`https://gnews.io/api/v4/top-headlines?lang=${lang}&max=10&apikey=${env.GNEWS_API_KEY}`);
-    const data = await res.json();
-    return new Response(JSON.stringify(data), {
-      headers: { ...cors, 'Content-Type': 'application/json' }
+    // GNews headlines (only if API key exists)
+    if (url.pathname === '/headlines') {
+      if (!env.GNEWS_API_KEY) {
+        return new Response(JSON.stringify({ error: 'GNews API key not configured' }), {
+          status: 503, headers: { ...cors, 'Content-Type': 'application/json' }
+        });
+      }
+      try {
+        const lang = url.searchParams.get('lang') || 'en';
+        const res = await fetch(`https://gnews.io/api/v4/top-headlines?lang=${lang}&max=10&apikey=${env.GNEWS_API_KEY}`);
+        const data = await res.json();
+        return new Response(JSON.stringify(data), {
+          headers: { ...cors, 'Content-Type': 'application/json' }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
+          status: 500, headers: { ...cors, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    // 404
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404, headers: { ...cors, 'Content-Type': 'application/json' }
     });
   }
 }
