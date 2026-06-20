@@ -1226,8 +1226,7 @@ async function generateNews() {
         const articles = data.articles || [];
         if (!articles.length) throw new Error('No articles');
         const newsText = articles.slice(0,3).map(a => a.title + '. ' + (a.description||'')).join(' | ');
-        document.getElementById('ticker-text').textContent = newsText.replace(/
-/g, ' - ');
+        document.getElementById('ticker-text').textContent = newsText.replace(/\n/g, ' - ');
         speakText(newsText, config.language);
         updateWorkerStatus('online', 'News loaded - ' + config.language.toUpperCase());
     } catch (error) {
