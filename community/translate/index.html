@@ -606,19 +606,18 @@ async function translateVideo(btn, title) {
   detectLang();
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://ddott-translate.meradivin.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 200,
-        system: `Translate to ${selectedLang.name}. Return ONLY the translation, nothing else.`,
-        messages: [{ role: 'user', content: title }]
+        text: title,
+        source: 'auto',
+        target: selectedLang.code
       })
     });
     const data = await response.json();
-    if (data.content && data.content[0]) {
-      translatedText = data.content[0].text.trim();
+    if (data.translated) {
+      translatedText = data.translated.trim();
       document.getElementById('resultText').textContent = translatedText;
       document.getElementById('resultBox').classList.add('show');
       updateResultBadge();
