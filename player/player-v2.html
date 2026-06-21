@@ -615,6 +615,24 @@ let currentVideoUrl = '';
 // ===== SUPABASE LOOKUP CACHE =====
 const VIDEO_DB = {};
 
+// Safely decode a URL param that may have been encoded once or twice.
+// Keeps decoding while it still looks percent-encoded and the result is a valid URL.
+function safeDecodeUrl(raw) {
+    let val = raw;
+    for (let i = 0; i < 3; i++) {
+        if (!/%[0-9A-Fa-f]{2}/.test(val)) break;
+        try {
+            const decoded = decodeURIComponent(val);
+            if (decoded === val) break;
+            val = decoded;
+        } catch (e) {
+            console.warn('decodeURIComponent failed at pass', i, val);
+            break;
+        }
+    }
+    return val;
+}
+
 // Fetch video from Supabase by ID (now actually awaited before play)
 async function fetchVideoFromDB(id) {
     try {
@@ -654,12 +672,7 @@ async function getVideoUrl() {
     // 1. Direct ?url= parameter (highest priority)
     const directUrl = params.get('url');
     if (directUrl && directUrl.trim() !== '' && directUrl !== 'undefined' && directUrl !== 'null') {
-        try {
-            return decodeURIComponent(directUrl);
-        } catch (e) {
-            console.warn('URL decode failed, using raw:', directUrl);
-            return directUrl;
-        }
+        return safeDecodeUrl(directUrl);
     }
 
     // 2. ?id= parameter — resolve via Supabase (awaited!)
@@ -876,6 +889,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // Expose for debugging
 window.ddottPlayer = { loadVideo, getVideoUrl, video };
 
-    </script>
+ </script>
 </body>
 </html>
