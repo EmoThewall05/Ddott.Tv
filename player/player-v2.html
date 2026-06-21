@@ -591,290 +591,291 @@
 
     <script>
         // ============================================
-        // DDOTT TV PLAYER V2 — FIXED VIDEO LOADER
-        // ============================================
+// DDOTT TV PLAYER V2 — FIXED VIDEO LOADER
+// Replace the corresponding section in player-v2.html with this.
+// ============================================
 
-        const FALLBACK_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+const FALLBACK_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
 
-        const video = document.getElementById('mainVideo');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const loadingText = document.getElementById('loadingText');
-        const tapOverlay = document.getElementById('tapOverlay');
-        const errorState = document.getElementById('errorState');
-        const errorText = document.getElementById('errorText');
-        const playBtn = document.getElementById('playBtn');
-        const progressFill = document.getElementById('progressFill');
-        const progressContainer = document.getElementById('progressContainer');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const playerContainer = document.getElementById('playerContainer');
+const video = document.getElementById('mainVideo');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loadingText = document.getElementById('loadingText');
+const tapOverlay = document.getElementById('tapOverlay');
+const errorState = document.getElementById('errorState');
+const errorText = document.getElementById('errorText');
+const playBtn = document.getElementById('playBtn');
+const progressFill = document.getElementById('progressFill');
+const progressContainer = document.getElementById('progressContainer');
+const timeDisplay = document.getElementById('timeDisplay');
+const playerContainer = document.getElementById('playerContainer');
 
-        let isPlaying = false;
-        let currentVideoUrl = '';
+let isPlaying = false;
+let currentVideoUrl = '';
 
-        // ===== URL PARAMETER PARSER =====
-        function getVideoUrl() {
-            const params = new URLSearchParams(window.location.search);
+// ===== SUPABASE LOOKUP CACHE =====
+const VIDEO_DB = {};
 
-            // 1. Direct ?url= parameter (highest priority)
-            const directUrl = params.get('url');
-            if (directUrl && directUrl.trim() !== '' && directUrl !== 'undefined' && directUrl !== 'null') {
-                try {
-                    return decodeURIComponent(directUrl);
-                } catch(e) {
-                    console.warn('URL decode failed, using raw:', directUrl);
-                    return directUrl;
-                }
-            }
+// Fetch video from Supabase by ID (now actually awaited before play)
+async function fetchVideoFromDB(id) {
+    try {
+        const { data, error } = await db
+            .from('videos')
+            .select('video_url,title,description')
+            .eq('id', id)
+            .single();
 
-            // 2. ?id= parameter — resolve via lookup
-            const videoId = params.get('id');
-            if (videoId && videoId.trim() !== '') {
-                const resolved = resolveVideoById(videoId);
-                if (resolved) return resolved;
-            }
-
-            // 3. ?v= parameter (YouTube-style alias)
-            const v = params.get('v');
-            if (v && v.trim() !== '') {
-                const resolved = resolveVideoById(v);
-                if (resolved) return resolved;
-            }
-
-            // 4. Fallback
-            console.log('⚠️ No video param found, using fallback');
-            return FALLBACK_VIDEO;
-        }
-
-        // ===== VIDEO DATABASE / LOOKUP =====
-        const VIDEO_DB = {};
-
-        function resolveVideoById(id) {
-            if (VIDEO_DB[id]) return VIDEO_DB[id];
-            if (id.startsWith('http://') || id.startsWith('https://')) return id;
+        if (error || !data) {
+            console.error('❌ Supabase fetch failed for id', id, error);
             return null;
         }
 
-        // Fetch video from Supabase by ID
-        async function fetchVideoFromDB(id) {
-            try {
-                const { data, error } = await db.from('videos').select('video_url,title,description').eq('id', id).single();
-                if (error || !data) return null;
-                VIDEO_DB[id] = data.video_url;
-                // Update title if available
-                if (data.title) {
-                    const titleEl = document.getElementById('videoTitle') || document.querySelector('.video-title');
-                    if (titleEl) titleEl.textContent = data.title;
-                }
-                return data.video_url;
-            } catch(e) {
-                console.error('DB fetch error:', e);
-                return null;
-            }
+        VIDEO_DB[id] = data.video_url;
+
+        if (data.title) {
+            const titleEl = document.getElementById('videoTitle');
+            if (titleEl) titleEl.textContent = data.title;
+        }
+        if (data.description) {
+            const descEl = document.getElementById('videoDescription');
+            if (descEl) descEl.textContent = data.description;
         }
 
-        // ===== LOAD VIDEO =====
-        function loadVideo() {
+        return data.video_url;
+    } catch (e) {
+        console.error('DB fetch error:', e);
+        return null;
+    }
+}
+
+// ===== URL PARAMETER PARSER (now async) =====
+async function getVideoUrl() {
+    const params = new URLSearchParams(window.location.search);
+
+    // 1. Direct ?url= parameter (highest priority)
+    const directUrl = params.get('url');
+    if (directUrl && directUrl.trim() !== '' && directUrl !== 'undefined' && directUrl !== 'null') {
+        try {
+            return decodeURIComponent(directUrl);
+        } catch (e) {
+            console.warn('URL decode failed, using raw:', directUrl);
+            return directUrl;
+        }
+    }
+
+    // 2. ?id= parameter — resolve via Supabase (awaited!)
+    const videoId = params.get('id');
+    if (videoId && videoId.trim() !== '') {
+        if (VIDEO_DB[videoId]) return VIDEO_DB[videoId];
+        const resolved = await fetchVideoFromDB(videoId);
+        if (resolved) return resolved;
+        console.warn('⚠️ Could not resolve video for id:', videoId);
+    }
+
+    // 3. ?v= parameter (YouTube-style alias) — same treatment
+    const v = params.get('v');
+    if (v && v.trim() !== '') {
+        if (VIDEO_DB[v]) return VIDEO_DB[v];
+        const resolved = await fetchVideoFromDB(v);
+        if (resolved) return resolved;
+    }
+
+    // 4. Fallback — only reached if nothing else resolved
+    console.log('⚠️ No video param found or DB lookup failed, using fallback');
+    return FALLBACK_VIDEO;
+}
+
+// ===== LOAD VIDEO (now async) =====
+async function loadVideo() {
+    errorState.classList.remove('visible');
+    loadingOverlay.classList.remove('hidden');
+    loadingText.textContent = 'Loading video...';
+
+    currentVideoUrl = await getVideoUrl();
+    console.log('🎬 Loading video URL:', currentVideoUrl);
+
+    if (!currentVideoUrl || currentVideoUrl === 'undefined') {
+        console.error('❌ Invalid video URL, using fallback');
+        currentVideoUrl = FALLBACK_VIDEO;
+    }
+
+    // Reset video element
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+
+    // Fix Cloudinary URL for mobile compatibility
+    if (currentVideoUrl && currentVideoUrl.includes('cloudinary.com') && currentVideoUrl.includes('/upload/') && !currentVideoUrl.includes('f_mp4')) {
+        currentVideoUrl = currentVideoUrl.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
+    }
+    video.src = currentVideoUrl;
+    video.load();
+
+    // Try autoplay
+    attemptPlay();
+}
+
+// ===== PLAYBACK ATTEMPT =====
+async function attemptPlay() {
+    try {
+        await video.play();
+        isPlaying = true;
+        playBtn.textContent = '⏸';
+        tapOverlay.classList.remove('visible');
+        console.log('✅ Autoplay successful');
+    } catch (err) {
+        console.log('⚠️ Autoplay blocked:', err.name);
+        isPlaying = false;
+        playBtn.textContent = '▶';
+
+        if (err.name === 'NotAllowedError') {
+            tapOverlay.classList.add('visible');
+        }
+    }
+}
+
+// ===== EVENT LISTENERS =====
+
+video.addEventListener('loadeddata', () => {
+    console.log('✅ Video loaded');
+    loadingOverlay.classList.add('hidden');
+    errorState.classList.remove('visible');
+
+    const duration = formatTime(video.duration || 0);
+    document.getElementById('videoDuration').textContent = duration;
+    updateTimeDisplay();
+});
+
+video.addEventListener('canplaythrough', () => {
+    loadingOverlay.classList.add('hidden');
+});
+
+video.addEventListener('error', (e) => {
+    console.error('❌ Video error:', video.error);
+    loadingOverlay.classList.add('hidden');
+
+    const errorMsg = video.error ?
+        `Error ${video.error.code}: ${video.error.message || 'Unknown'}` :
+        'Video failed to load';
+
+    errorText.textContent = errorMsg;
+    errorState.classList.add('visible');
+
+    // Auto-retry with fallback if not already fallback
+    if (currentVideoUrl !== FALLBACK_VIDEO) {
+        console.log('🔄 Auto-retrying with fallback...');
+        setTimeout(() => {
+            currentVideoUrl = FALLBACK_VIDEO;
+            video.src = FALLBACK_VIDEO;
+            video.load();
+            attemptPlay();
             errorState.classList.remove('visible');
             loadingOverlay.classList.remove('hidden');
-            loadingText.textContent = 'Loading video...';
+        }, 1500);
+    }
+});
 
-            currentVideoUrl = getVideoUrl();
-            console.log('🎬 Loading video URL:', currentVideoUrl);
+video.addEventListener('timeupdate', () => {
+    updateTimeDisplay();
+    updateProgress();
+});
 
-            if (!currentVideoUrl || currentVideoUrl === 'undefined') {
-                console.error('❌ Invalid video URL, using fallback');
-                currentVideoUrl = FALLBACK_VIDEO;
-            }
+video.addEventListener('ended', () => {
+    isPlaying = false;
+    playBtn.textContent = '▶';
+});
 
-            // Reset video element
-            video.pause();
-            video.removeAttribute('src');
-            video.load();
+playBtn.addEventListener('click', () => {
+    if (video.paused) {
+        video.play();
+        isPlaying = true;
+        playBtn.textContent = '⏸';
+        tapOverlay.classList.remove('visible');
+    } else {
+        video.pause();
+        isPlaying = false;
+        playBtn.textContent = '▶';
+    }
+});
 
-            // Set new source
-            // Fix Cloudinary URL for mobile compatibility
-            if (currentVideoUrl && currentVideoUrl.includes('cloudinary.com') && currentVideoUrl.includes('/upload/') && !currentVideoUrl.includes('f_mp4')) {
-                currentVideoUrl = currentVideoUrl.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
-            }
-            video.src = currentVideoUrl;
-            video.load();
+tapOverlay.addEventListener('click', () => {
+    video.play();
+    isPlaying = true;
+    playBtn.textContent = '⏸';
+    tapOverlay.classList.remove('visible');
+});
 
-            // Try autoplay
-            attemptPlay();
-        }
+playerContainer.addEventListener('click', (e) => {
+    if (e.target === playerContainer || e.target === video || e.target === tapOverlay) {
+        playerContainer.classList.toggle('touched');
+    }
+});
 
-        // ===== PLAYBACK ATTEMPT =====
-        async function attemptPlay() {
-            try {
-                await video.play();
-                isPlaying = true;
-                playBtn.textContent = '⏸';
-                tapOverlay.classList.remove('visible');
-                console.log('✅ Autoplay successful');
-            } catch (err) {
-                console.log('⚠️ Autoplay blocked:', err.name);
-                isPlaying = false;
-                playBtn.textContent = '▶';
+progressContainer.addEventListener('click', (e) => {
+    const rect = progressContainer.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    video.currentTime = pos * video.duration;
+});
 
-                // Show tap overlay on mobile
-                if (err.name === 'NotAllowedError') {
-                    tapOverlay.classList.add('visible');
-                }
-            }
-        }
+// ===== HELPERS =====
+function formatTime(seconds) {
+    if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
 
-        // ===== EVENT LISTENERS =====
+function updateTimeDisplay() {
+    const current = formatTime(video.currentTime || 0);
+    const duration = formatTime(video.duration || 0);
+    timeDisplay.textContent = `${current} / ${duration}`;
+}
 
-        // Video loaded successfully
-        video.addEventListener('loadeddata', () => {
-            console.log('✅ Video loaded');
-            loadingOverlay.classList.add('hidden');
-            errorState.classList.remove('visible');
+function updateProgress() {
+    if (video.duration && isFinite(video.duration)) {
+        const pct = (video.currentTime / video.duration) * 100;
+        progressFill.style.width = pct + '%';
+    }
+}
 
-            // Update duration display
-            const duration = formatTime(video.duration || 0);
-            document.getElementById('videoDuration').textContent = duration;
-            updateTimeDisplay();
-        });
+// ===== URL PARAM TO UI =====
+function populateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
 
-        // Video can play through
-        video.addEventListener('canplaythrough', () => {
-            loadingOverlay.classList.add('hidden');
-        });
+    const title = params.get('title');
+    if (title) {
+        document.getElementById('videoTitle').textContent = decodeURIComponent(title);
+    }
 
-        // Video error
-        video.addEventListener('error', (e) => {
-            console.error('❌ Video error:', video.error);
-            loadingOverlay.classList.add('hidden');
+    const creator = params.get('creator');
+    if (creator) {
+        document.getElementById('creatorName').textContent = decodeURIComponent(creator);
+    }
 
-            const errorMsg = video.error ? 
-                `Error ${video.error.code}: ${video.error.message || 'Unknown'}` : 
-                'Video failed to load';
+    const desc = params.get('desc');
+    if (desc) {
+        document.getElementById('videoDescription').textContent = decodeURIComponent(desc);
+    }
 
-            errorText.textContent = errorMsg;
-            errorState.classList.add('visible');
+    const views = params.get('views');
+    if (views) {
+        document.getElementById('viewCount').textContent = views + ' views';
+    }
 
-            // Auto-retry with fallback if not already fallback
-            if (currentVideoUrl !== FALLBACK_VIDEO) {
-                console.log('🔄 Auto-retrying with fallback...');
-                setTimeout(() => {
-                    currentVideoUrl = FALLBACK_VIDEO;
-                    video.src = FALLBACK_VIDEO;
-                    video.load();
-                    attemptPlay();
-                    errorState.classList.remove('visible');
-                    loadingOverlay.classList.remove('hidden');
-                }, 1500);
-            }
-        });
+    const likes = params.get('likes');
+    if (likes) {
+        document.getElementById('likeCount').textContent = likes;
+    }
+}
 
-        // Time update
-        video.addEventListener('timeupdate', () => {
-            updateTimeDisplay();
-            updateProgress();
-        });
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+    populateFromUrl();
+    loadVideo(); // now async internally, but we don't need to await it here
+});
 
-        // Video ended
-        video.addEventListener('ended', () => {
-            isPlaying = false;
-            playBtn.textContent = '▶';
-        });
+// Expose for debugging
+window.ddottPlayer = { loadVideo, getVideoUrl, video };
 
-        // Play/Pause toggle
-        playBtn.addEventListener('click', () => {
-            if (video.paused) {
-                video.play();
-                isPlaying = true;
-                playBtn.textContent = '⏸';
-                tapOverlay.classList.remove('visible');
-            } else {
-                video.pause();
-                isPlaying = false;
-                playBtn.textContent = '▶';
-            }
-        });
-
-        // Tap overlay click
-        tapOverlay.addEventListener('click', () => {
-            video.play();
-            isPlaying = true;
-            playBtn.textContent = '⏸';
-            tapOverlay.classList.remove('visible');
-        });
-
-        // Player container click (toggle controls)
-        playerContainer.addEventListener('click', (e) => {
-            if (e.target === playerContainer || e.target === video || e.target === tapOverlay) {
-                playerContainer.classList.toggle('touched');
-            }
-        });
-
-        // Progress bar click
-        progressContainer.addEventListener('click', (e) => {
-            const rect = progressContainer.getBoundingClientRect();
-            const pos = (e.clientX - rect.left) / rect.width;
-            video.currentTime = pos * video.duration;
-        });
-
-        // ===== HELPERS =====
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return '0:00';
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function updateTimeDisplay() {
-            const current = formatTime(video.currentTime || 0);
-            const duration = formatTime(video.duration || 0);
-            timeDisplay.textContent = `${current} / ${duration}`;
-        }
-
-        function updateProgress() {
-            if (video.duration) {
-                const pct = (video.currentTime / video.duration) * 100;
-                progressFill.style.width = pct + '%';
-            }
-        }
-
-        // ===== URL PARAM TO UI =====
-        function populateFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-
-            const title = params.get('title');
-            if (title) {
-                document.getElementById('videoTitle').textContent = decodeURIComponent(title);
-            }
-
-            const creator = params.get('creator');
-            if (creator) {
-                document.getElementById('creatorName').textContent = decodeURIComponent(creator);
-            }
-
-            const desc = params.get('desc');
-            if (desc) {
-                document.getElementById('videoDescription').textContent = decodeURIComponent(desc);
-            }
-
-            const views = params.get('views');
-            if (views) {
-                document.getElementById('viewCount').textContent = views + ' views';
-            }
-
-            const likes = params.get('likes');
-            if (likes) {
-                document.getElementById('likeCount').textContent = likes;
-            }
-        }
-
-        // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', () => {
-            populateFromUrl();
-            loadVideo();
-        });
-
-        // Expose for debugging
-        window.ddottPlayer = { loadVideo, getVideoUrl, video };
     </script>
 </body>
 </html>
