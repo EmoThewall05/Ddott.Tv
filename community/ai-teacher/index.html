@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Teacher Live - Ddott TV</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-primary: #0a0a1a;
@@ -41,7 +42,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Animated background particles */
         .bg-particles {
             position: fixed;
             top: 0;
@@ -70,7 +70,6 @@
             75% { transform: translateY(-40px) translateX(10px); opacity: 0.5; }
         }
 
-        /* Header */
         .header {
             position: fixed;
             top: 0;
@@ -162,20 +161,6 @@
             50% { opacity: 0.5; transform: scale(1.2); }
         }
 
-        .lang-selector {
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        /* Main Content */
         .main-content {
             padding-top: 70px;
             padding-bottom: 100px;
@@ -183,7 +168,6 @@
             z-index: 1;
         }
 
-        /* Hero Section */
         .hero-section {
             padding: 20px 16px;
             text-align: center;
@@ -255,6 +239,123 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .mode-btn.active {
+            background: var(--gradient-primary);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* Video Select Section */
+        .video-select-section {
+            padding: 0 16px 20px;
+            display: none;
+        }
+
+        .video-select-section.active {
+            display: block;
+        }
+
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .video-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-item:hover, .video-item.selected {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+        }
+
+        .video-thumb {
+            width: 64px;
+            height: 44px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .video-info-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+
+        .video-info-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .video-loading, .video-empty {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .selected-video-banner {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            margin: 0 16px 12px;
+            border-radius: 14px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            font-size: 12px;
+        }
+
+        .selected-video-banner.active {
+            display: flex;
+        }
+
+        .selected-video-banner .change-btn {
+            margin-left: auto;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            cursor: pointer;
         }
 
         /* Subject Cards */
@@ -438,31 +539,6 @@
             text-align: right;
         }
 
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 12px 16px;
-            align-self: flex-start;
-        }
-
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent-cyan);
-            border-radius: 50%;
-            animation: typingBounce 1.4s infinite ease-in-out both;
-        }
-
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typingBounce {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Input Area */
         .chat-input-area {
             padding: 12px 16px;
             border-top: 1px solid var(--border-color);
@@ -536,6 +612,11 @@
             box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
 
+        .send-btn:disabled, .chat-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Quick Questions */
         .quick-questions {
             padding: 0 16px 20px;
@@ -577,77 +658,6 @@
             color: var(--text-primary);
         }
 
-        /* Features Section */
-        .features-section {
-            padding: 0 16px 20px;
-        }
-
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(168, 85, 247, 0.3);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .feature-info h4 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .feature-info p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .feature-badge {
-            margin-left: auto;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .badge-free {
-            background: rgba(251, 191, 36, 0.15);
-            color: var(--accent-gold);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-        }
-
-        .badge-new {
-            background: rgba(34, 197, 94, 0.15);
-            color: var(--accent-green);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        .badge-beta {
-            background: rgba(168, 85, 247, 0.15);
-            color: var(--accent-purple);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-        }
-
         /* Bottom Nav */
         .bottom-nav {
             position: fixed;
@@ -680,15 +690,10 @@
             color: var(--accent-cyan);
         }
 
-        .nav-item.active .nav-icon {
-            filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.5));
-        }
-
         .nav-icon {
             font-size: 22px;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -702,7 +707,6 @@
             border-radius: 2px;
         }
 
-        /* Responsive */
         @media (min-width: 768px) {
             .subjects-grid {
                 grid-template-columns: repeat(4, 1fr);
@@ -714,7 +718,6 @@
             }
         }
 
-        /* Loading animation for AI response */
         .ai-thinking {
             display: flex;
             align-items: center;
@@ -756,10 +759,8 @@
 <base target="_blank">
 </head>
 <body>
-    <!-- Background Particles -->
     <div class="bg-particles" id="particles"></div>
 
-    <!-- Header -->
     <header class="header">
         <div class="header-left">
             <button class="back-btn" onclick="goBack()">←</button>
@@ -773,34 +774,46 @@
                 <div class="status-dot"></div>
                 <span>ONLINE</span>
             </div>
-            <select class="lang-selector" id="langSelector" onchange="changeLanguage()">
-                <option value="en">🇬🇧 EN</option>
-                <option value="ml">🇮🇳 മലയാളം</option>
-                <option value="hi">🇮🇳 हिंदी</option>
-                <option value="ar">🇦🇪 عربي</option>
-                <option value="ta">🇮🇳 தமிழ்</option>
-            </select>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Hero Section -->
         <section class="hero-section">
             <div class="teacher-avatar">
                 <div class="teacher-avatar-ring"></div>
                 <div class="teacher-avatar-inner">🦋</div>
             </div>
             <h1 class="hero-title">Your AI Teacher</h1>
-            <p class="hero-subtitle">Real-time teaching for any subject — math, coding, language, science</p>
+            <p class="hero-subtitle">Ask about any video, or pick a subject to learn</p>
             <div class="free-badge">
                 <span>⚡</span>
                 <span>FREE FOREVER</span>
             </div>
         </section>
 
+        <!-- Mode Toggle -->
+        <div class="mode-toggle" id="modeToggle">
+            <div class="mode-btn active" id="modeVideoBtn" onclick="setMode('video')">📹 Ask About a Video</div>
+            <div class="mode-btn" id="modeSubjectBtn" onclick="setMode('subject')">📚 Ask by Subject</div>
+        </div>
+
+        <!-- Selected Video Banner -->
+        <div class="selected-video-banner" id="selectedVideoBanner">
+            <span>📹</span>
+            <span id="selectedVideoTitle"></span>
+            <span class="change-btn" onclick="showVideoList()">Change</span>
+        </div>
+
+        <!-- Video Select Section -->
+        <section class="video-select-section active" id="videoSelectSection">
+            <h2 class="section-title">Select a Video</h2>
+            <div class="video-list" id="videoList">
+                <div class="video-loading">Loading videos…</div>
+            </div>
+        </section>
+
         <!-- Subjects Grid -->
-        <section class="subjects-section" id="subjectsSection">
+        <section class="subjects-section" id="subjectsSection" style="display:none;">
             <h2 class="section-title">Choose Subject</h2>
             <div class="subjects-grid">
                 <div class="subject-card" onclick="selectSubject('math')">
@@ -840,22 +853,17 @@
         <section class="chat-section" id="chatSection">
             <div class="chat-container">
                 <div class="chat-header">
-                    <div class="chat-header-icon" id="chatHeaderIcon">🔢</div>
+                    <div class="chat-header-icon" id="chatHeaderIcon">📹</div>
                     <div class="chat-header-info">
-                        <h3 id="chatSubjectName">Mathematics</h3>
-                        <p>AI Teacher • Ready to help</p>
+                        <h3 id="chatSubjectName">Video Q&A</h3>
+                        <p id="chatSubjectStatus">AI Teacher • Ready to help</p>
                     </div>
                 </div>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai">
-                        <div>Hello! I'm your AI Teacher. What would you like to learn today? Ask me anything about <strong>Mathematics</strong>! 📚</div>
-                        <div class="message-time">Just now</div>
-                    </div>
-                </div>
+                <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
                     <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎤</button>
                     <input type="text" class="chat-input" id="chatInput" placeholder="Ask your question..." onkeypress="handleKeyPress(event)">
-                    <button class="send-btn" onclick="sendMessage()">➤</button>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
                 </div>
             </div>
         </section>
@@ -863,45 +871,10 @@
         <!-- Quick Questions -->
         <section class="quick-questions" id="quickQuestions">
             <div class="quick-questions-title">Quick Questions</div>
-            <div class="quick-chips" id="quickChips">
-                <div class="quick-chip" onclick="askQuick('What is algebra?')">What is algebra?</div>
-                <div class="quick-chip" onclick="askQuick('Solve x² + 5x + 6 = 0')">Solve x² + 5x + 6 = 0</div>
-                <div class="quick-chip" onclick="askQuick('Explain Pythagoras theorem')">Explain Pythagoras theorem</div>
-                <div class="quick-chip" onclick="askQuick('What is calculus?')">What is calculus?</div>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="features-section">
-            <h2 class="section-title">More Learning Tools</h2>
-            <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(0, 212, 255, 0.15);">📺</div>
-                <div class="feature-info">
-                    <h4>Video Lessons</h4>
-                    <p>Watch AI-generated video explanations</p>
-                </div>
-                <div class="feature-badge badge-free">FREE</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(168, 85, 247, 0.15);">📝</div>
-                <div class="feature-info">
-                    <h4>Practice Tests</h4>
-                    <p>Auto-generated quizzes with instant feedback</p>
-                </div>
-                <div class="feature-badge badge-new">NEW</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(34, 197, 94, 0.15);">🎯</div>
-                <div class="feature-info">
-                    <h4>Learning Checkpoints</h4>
-                    <p>Complete tasks, earn Emo Coins</p>
-                </div>
-                <div class="feature-badge badge-beta">BETA</div>
-            </div>
+            <div class="quick-chips" id="quickChips"></div>
         </section>
     </main>
 
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <a href="#" class="nav-item">
             <span class="nav-icon">🏠</span>
@@ -925,8 +898,16 @@
         </a>
     </nav>
 
+    <script src="../../supabase-config.js"></script>
     <script>
-        // Create background particles
+        // ============================================
+        // Config
+        // ============================================
+        const AI_TEACHER_WORKER_URL = "https://ddott-ai-teacher.meradivin.workers.dev";
+
+        // ============================================
+        // Background particles
+        // ============================================
         function createParticles() {
             const container = document.getElementById('particles');
             for (let i = 0; i < 20; i++) {
@@ -941,94 +922,169 @@
         }
         createParticles();
 
-        // Subject data
-        const subjects = {
-            math: { name: 'Mathematics', icon: '🔢', color: 'rgba(0, 212, 255, 0.15)', questions: [
-                'What is algebra?',
-                'Solve x² + 5x + 6 = 0',
-                'Explain Pythagoras theorem',
-                'What is calculus?'
-            ]},
-            coding: { name: 'Coding', icon: '💻', color: 'rgba(168, 85, 247, 0.15)', questions: [
-                'What is JavaScript?',
-                'Explain functions in Python',
-                'What is Web3?',
-                'How to build a website?'
-            ]},
-            language: { name: 'Language', icon: '🗣️', color: 'rgba(236, 72, 153, 0.15)', questions: [
-                'English grammar basics',
-                'Malayalam alphabets',
-                'How to improve vocabulary?',
-                'Difference between noun and verb'
-            ]},
-            science: { name: 'Science', icon: '🔬', color: 'rgba(34, 197, 94, 0.15)', questions: [
-                'What is photosynthesis?',
-                'Explain Newton's laws',
-                'What is an atom?',
-                'How does electricity work?'
-            ]},
-            crypto: { name: 'Crypto & Web3', icon: '₿', color: 'rgba(251, 191, 36, 0.15)', questions: [
-                'What is blockchain?',
-                'How does Bitcoin work?',
-                'What is a smart contract?',
-                'Explain DeFi'
-            ]},
-            general: { name: 'General Knowledge', icon: '🧠', color: 'rgba(239, 68, 68, 0.15)', questions: [
-                'History of India',
-                'World geography basics',
-                'Famous scientists',
-                'Current affairs today'
-            ]}
-        };
-
+        // ============================================
+        // State
+        // ============================================
+        let currentMode = 'video'; // 'video' | 'subject'
+        let selectedVideo = null;  // { id, title, video_url }
         let currentSubject = 'math';
         let isRecording = false;
         let recognition = null;
+        let isSending = false;
 
-        // Initialize speech recognition
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
+        const subjects = {
+            math: { name: 'Mathematics', icon: '🔢', questions: [
+                'What is algebra?', 'Solve x² + 5x + 6 = 0', 'Explain Pythagoras theorem', 'What is calculus?'
+            ]},
+            coding: { name: 'Coding', icon: '💻', questions: [
+                'What is JavaScript?', 'Explain functions in Python', 'What is Web3?', 'How to build a website?'
+            ]},
+            language: { name: 'Language', icon: '🗣️', questions: [
+                'English grammar basics', 'Malayalam alphabets', 'How to improve vocabulary?', 'Difference between noun and verb'
+            ]},
+            science: { name: 'Science', icon: '🔬', questions: [
+                'What is photosynthesis?', "Explain Newton's laws", 'What is an atom?', 'How does electricity work?'
+            ]},
+            crypto: { name: 'Crypto & Web3', icon: '₿', questions: [
+                'What is blockchain?', 'How does Bitcoin work?', 'What is a smart contract?', 'Explain DeFi'
+            ]},
+            general: { name: 'General Knowledge', icon: '🧠', questions: [
+                'History of India', 'World geography basics', 'Famous scientists', 'Current affairs today'
+            ]}
+        };
 
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('chatInput').value = transcript;
-                sendMessage();
-            };
+        // ============================================
+        // Mode switching
+        // ============================================
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeVideoBtn').classList.toggle('active', mode === 'video');
+            document.getElementById('modeSubjectBtn').classList.toggle('active', mode === 'subject');
 
-            recognition.onerror = function(event) {
-                console.error('Speech recognition error:', event.error);
-                isRecording = false;
-                updateVoiceButton();
-            };
+            document.getElementById('chatSection').classList.remove('active');
+            document.getElementById('quickQuestions').classList.remove('active');
 
-            recognition.onend = function() {
-                isRecording = false;
-                updateVoiceButton();
-            };
+            if (mode === 'video') {
+                document.getElementById('subjectsSection').style.display = 'none';
+                if (selectedVideo) {
+                    openVideoChat(selectedVideo);
+                } else {
+                    showVideoList();
+                }
+            } else {
+                document.getElementById('videoSelectSection').classList.remove('active');
+                document.getElementById('selectedVideoBanner').classList.remove('active');
+                document.getElementById('subjectsSection').style.display = 'block';
+            }
         }
 
+        function showVideoList() {
+            document.getElementById('chatSection').classList.remove('active');
+            document.getElementById('quickQuestions').classList.remove('active');
+            document.getElementById('selectedVideoBanner').classList.remove('active');
+            document.getElementById('videoSelectSection').classList.add('active');
+        }
+
+        function goBack() {
+            document.getElementById('chatSection').classList.remove('active');
+            document.getElementById('quickQuestions').classList.remove('active');
+            document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
+            if (currentMode === 'video') {
+                showVideoList();
+            } else {
+                document.getElementById('subjectsSection').style.display = 'block';
+            }
+        }
+
+        // ============================================
+        // Load videos from Supabase
+        // ============================================
+        async function loadVideos() {
+            const listEl = document.getElementById('videoList');
+            try {
+                const { data, error } = await window.db
+                    .from('videos')
+                    .select('id, title, thumbnail_url, video_url, views, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(30);
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    listEl.innerHTML = '<div class="video-empty">No videos found yet.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = '';
+                data.forEach(video => {
+                    const item = document.createElement('div');
+                    item.className = 'video-item';
+                    item.onclick = () => openVideoChat(video);
+
+                    const thumb = video.thumbnail_url
+                        ? `<img class="video-thumb" src="${video.thumbnail_url}" alt="">`
+                        : `<div class="video-thumb" style="display:flex;align-items:center;justify-content:center;">🎬</div>`;
+
+                    item.innerHTML = `
+                        ${thumb}
+                        <div>
+                            <div class="video-info-title">${escapeHtml(video.title || 'Untitled')}</div>
+                            <div class="video-info-meta">${video.views || 0} views</div>
+                        </div>
+                    `;
+                    listEl.appendChild(item);
+                });
+            } catch (err) {
+                console.error('Failed to load videos:', err);
+                listEl.innerHTML = '<div class="video-empty">Could not load videos. Please try again later.</div>';
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // Open chat for a selected video
+        // ============================================
+        function openVideoChat(video) {
+            selectedVideo = video;
+
+            document.getElementById('videoSelectSection').classList.remove('active');
+            document.getElementById('selectedVideoBanner').classList.add('active');
+            document.getElementById('selectedVideoTitle').textContent = video.title || 'Untitled video';
+
+            document.getElementById('chatHeaderIcon').textContent = '📹';
+            document.getElementById('chatSubjectName').textContent = video.title || 'Video Q&A';
+            document.getElementById('chatSubjectStatus').textContent = 'AI Teacher • Ask about this video';
+
+            document.getElementById('chatMessages').innerHTML = '';
+            addMessage('ai', `I've got this video ready. Ask me anything about it — I'll answer based on what's said in the video! 📹`);
+
+            document.getElementById('chatSection').classList.add('active');
+            document.getElementById('quickQuestions').classList.remove('active');
+        }
+
+        // ============================================
+        // Subject mode
+        // ============================================
         function selectSubject(subjectKey) {
             currentSubject = subjectKey;
             const subject = subjects[subjectKey];
 
-            // Update active state
             document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
 
-            // Show chat section
             document.getElementById('subjectsSection').style.display = 'none';
             document.getElementById('chatSection').classList.add('active');
             document.getElementById('quickQuestions').classList.add('active');
 
-            // Update chat header
             document.getElementById('chatHeaderIcon').textContent = subject.icon;
             document.getElementById('chatSubjectName').textContent = subject.name;
+            document.getElementById('chatSubjectStatus').textContent = 'AI Teacher • Ready to help';
 
-            // Update quick questions
             const chipsContainer = document.getElementById('quickChips');
             chipsContainer.innerHTML = '';
             subject.questions.forEach(q => {
@@ -1039,31 +1095,19 @@
                 chipsContainer.appendChild(chip);
             });
 
-            // Add welcome message
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = '';
-            addMessage('ai', `Hello! I'm your AI Teacher for <strong>${subject.name}</strong>. What would you like to learn today? Ask me anything! 📚`);
+            document.getElementById('chatMessages').innerHTML = '';
+            addMessage('ai', `Hello! I'm your AI Teacher for <strong>${subject.name}</strong>. What would you like to learn today? 📚`);
         }
 
-        function goBack() {
-            document.getElementById('subjectsSection').style.display = 'block';
-            document.getElementById('chatSection').classList.remove('active');
-            document.getElementById('quickQuestions').classList.remove('active');
-            document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
-        }
-
+        // ============================================
+        // Chat UI helpers
+        // ============================================
         function addMessage(type, content) {
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
-
             const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-            messageDiv.innerHTML = `
-                <div>${content}</div>
-                <div class="message-time">${time}</div>
-            `;
-
+            messageDiv.innerHTML = `<div>${content}</div><div class="message-time">${time}</div>`;
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -1090,22 +1134,64 @@
             if (typingIndicator) typingIndicator.remove();
         }
 
-        function sendMessage() {
+        function setSending(state) {
+            isSending = state;
+            document.getElementById('sendBtn').disabled = state;
+            document.getElementById('chatInput').disabled = state;
+        }
+
+        // ============================================
+        // Send message — routes to worker (video mode) or local responder (subject mode)
+        // ============================================
+        async function sendMessage() {
+            if (isSending) return;
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
 
             addMessage('user', text);
             input.value = '';
-
             showTyping();
+            setSending(true);
 
-            // Simulate AI response (replace with actual API call)
-            setTimeout(() => {
+            try {
+                if (currentMode === 'video' && selectedVideo) {
+                    const answer = await askAiTeacherWorker(selectedVideo, text);
+                    hideTyping();
+                    addMessage('ai', answer);
+                } else {
+                    // Subject mode — local canned responder (no backend yet)
+                    await new Promise(r => setTimeout(r, 800 + Math.random() * 700));
+                    hideTyping();
+                    addMessage('ai', generateSubjectResponse(text, currentSubject));
+                }
+            } catch (err) {
+                console.error('AI Teacher error:', err);
                 hideTyping();
-                const response = generateAIResponse(text, currentSubject);
-                addMessage('ai', response);
-            }, 1500 + Math.random() * 1000);
+                addMessage('ai', `Sorry, something went wrong: ${err.message || 'please try again.'} 🙏`);
+            } finally {
+                setSending(false);
+            }
+        }
+
+        async function askAiTeacherWorker(video, question) {
+            const res = await fetch(AI_TEACHER_WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    video_id: video.id,
+                    video_url: video.video_url,
+                    question: question
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || `Worker error (${res.status})`);
+            }
+
+            return data.answer || "Sorry, I couldn't generate an answer right now.";
         }
 
         function askQuick(question) {
@@ -1114,24 +1200,43 @@
         }
 
         function handleKeyPress(event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter') sendMessage();
+        }
+
+        // ============================================
+        // Voice input
+        // ============================================
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chatInput').value = transcript;
                 sendMessage();
-            }
+            };
+            recognition.onerror = function() {
+                isRecording = false;
+                updateVoiceButton();
+            };
+            recognition.onend = function() {
+                isRecording = false;
+                updateVoiceButton();
+            };
         }
 
         function toggleVoice() {
             if (!recognition) {
-                alert('Speech recognition is not supported in your browser. Try Chrome or Safari.');
+                alert('Speech recognition is not supported in your browser. Try Chrome.');
                 return;
             }
-
             if (isRecording) {
                 recognition.stop();
                 isRecording = false;
             } else {
-                const lang = document.getElementById('langSelector').value;
-                const langMap = { 'en': 'en-US', 'ml': 'ml-IN', 'hi': 'hi-IN', 'ar': 'ar-SA', 'ta': 'ta-IN' };
-                recognition.lang = langMap[lang] || 'en-US';
                 recognition.start();
                 isRecording = true;
             }
@@ -1140,91 +1245,63 @@
 
         function updateVoiceButton() {
             const btn = document.getElementById('voiceBtn');
-            if (isRecording) {
-                btn.classList.add('recording');
-                btn.textContent = '⏹';
-            } else {
-                btn.classList.remove('recording');
-                btn.textContent = '🎤';
-            }
+            btn.classList.toggle('recording', isRecording);
+            btn.textContent = isRecording ? '⏹' : '🎤';
         }
 
-        function changeLanguage() {
-            const lang = document.getElementById('langSelector').value;
-            // Update speech recognition language
-            if (recognition) {
-                const langMap = { 'en': 'en-US', 'ml': 'ml-IN', 'hi': 'hi-IN', 'ar': 'ar-SA', 'ta': 'ta-IN' };
-                recognition.lang = langMap[lang] || 'en-US';
-            }
-
-            // You can add translation logic here
-            console.log('Language changed to:', lang);
-        }
-
-        // Simple AI response generator (replace with actual API)
-        function generateAIResponse(question, subject) {
+        // ============================================
+        // Subject mode fallback responder (kept from original demo)
+        // ============================================
+        function generateSubjectResponse(question, subject) {
             const responses = {
                 math: {
-                    'algebra': 'Algebra is a branch of mathematics that uses symbols (usually letters) to represent numbers and quantities in equations and formulas. It helps us solve problems with unknown values! 🧮',
-                    'pythagoras': 'The Pythagorean Theorem states that in a right-angled triangle, a² + b² = c², where c is the hypotenuse. It's one of the most important theorems in mathematics! 📐',
-                    'calculus': 'Calculus is the study of continuous change. It has two main branches: Differential Calculus (rates of change) and Integral Calculus (accumulation). It's used in physics, engineering, and economics! 📊',
-                    'solve': 'To solve x² + 5x + 6 = 0, we factor it as (x + 2)(x + 3) = 0. So x = -2 or x = -3. ✅'
+                    'algebra': 'Algebra is a branch of mathematics that uses symbols to represent numbers and quantities in equations. 🧮',
+                    'pythagoras': 'The Pythagorean Theorem states a² + b² = c² for right-angled triangles. 📐',
+                    'calculus': 'Calculus studies continuous change — differential (rates of change) and integral (accumulation). 📊',
+                    'solve': 'x² + 5x + 6 = 0 factors as (x + 2)(x + 3) = 0, so x = -2 or x = -3. ✅'
                 },
                 coding: {
-                    'javascript': 'JavaScript is a programming language that runs in web browsers. It makes websites interactive! You can use it for animations, forms, games, and even backend servers with Node.js. 💻',
-                    'python': 'Python is a beginner-friendly programming language known for its simple syntax. It's used in web development, data science, AI, and automation. Functions in Python are defined using the `def` keyword! 🐍',
-                    'web3': 'Web3 is the next generation of the internet built on blockchain technology. It enables decentralized applications (dApps), smart contracts, and gives users ownership of their data! ⛓️'
+                    'javascript': 'JavaScript runs in browsers and makes websites interactive — also used server-side with Node.js. 💻',
+                    'python': "Python is beginner-friendly with simple syntax, used in web dev, data science, and AI. 🐍",
+                    'web3': 'Web3 is the blockchain-based internet enabling dApps and smart contracts. ⛓️'
                 },
                 language: {
-                    'grammar': 'English grammar is the set of rules that govern how words are used in sentences. The basic parts of speech are: Nouns, Verbs, Adjectives, Adverbs, Pronouns, Prepositions, Conjunctions, and Interjections! 📖',
-                    'vocabulary': 'To improve vocabulary: 1) Read daily, 2) Use flashcards, 3) Learn word roots, 4) Practice using new words in sentences, 5) Play word games! 📝'
+                    'grammar': 'Basic parts of speech: Nouns, Verbs, Adjectives, Adverbs, Pronouns, Prepositions, Conjunctions. 📖',
+                    'vocabulary': 'Improve vocabulary by reading daily, using flashcards, and learning word roots. 📝'
                 },
                 science: {
-                    'photosynthesis': 'Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to create oxygen and energy in the form of sugar. It's essential for life on Earth! 🌱',
-                    'newton': 'Newton's Three Laws of Motion: 1) An object stays at rest unless acted upon by a force. 2) Force equals mass times acceleration (F=ma). 3) Every action has an equal and opposite reaction! 🍎'
+                    'photosynthesis': 'Photosynthesis: plants use sunlight, water, and CO2 to make oxygen and energy. 🌱',
+                    'newton': "Newton's laws: 1) inertia, 2) F=ma, 3) action-reaction. 🍎"
                 },
                 crypto: {
-                    'blockchain': 'A blockchain is a distributed digital ledger that records transactions across many computers. It's secure, transparent, and decentralized — no single entity controls it! 🔗',
-                    'bitcoin': 'Bitcoin is the first cryptocurrency, created in 2009 by Satoshi Nakamoto. It uses blockchain technology and has a limited supply of 21 million coins. It's often called "digital gold"! ₿',
-                    'smart contract': 'Smart contracts are self-executing programs stored on a blockchain. They automatically enforce agreements when conditions are met — no intermediaries needed! 📜'
+                    'blockchain': 'A blockchain is a distributed, transparent, decentralized digital ledger. 🔗',
+                    'bitcoin': 'Bitcoin, created in 2009, uses blockchain with a 21 million coin supply cap. ₿',
+                    'smart contract': 'Smart contracts are self-executing programs on a blockchain. 📜'
                 },
                 general: {
-                    'history': 'India has a rich history spanning over 5,000 years. From the Indus Valley Civilization to the Mughal Empire, and finally independence in 1947 — it's a story of resilience and diversity! 🇮🇳',
-                    'geography': 'The world has 7 continents and 5 oceans. India is located in South Asia, bordered by the Himalayas to the north and the Indian Ocean to the south! 🌍'
+                    'history': "India's history spans 5,000+ years, from the Indus Valley to independence in 1947. 🇮🇳",
+                    'geography': '7 continents, 5 oceans. India is in South Asia. 🌍'
                 }
             };
 
             const lowerQ = question.toLowerCase();
             const subjectResponses = responses[subject] || responses.general;
-
             for (const key in subjectResponses) {
-                if (lowerQ.includes(key)) {
-                    return subjectResponses[key];
-                }
+                if (lowerQ.includes(key)) return subjectResponses[key];
             }
 
-            // Default responses
             const defaults = [
-                `Great question about ${subjects[subject].name}! Let me explain that in detail...`,
-                `That's an interesting topic in ${subjects[subject].name}! Here's what you need to know...`,
-                `I'd love to help you learn about that! In ${subjects[subject].name}, this is how it works...`,
-                `Excellent question! Let me break this down for you step by step...`
+                `Great question about ${subjects[subject].name}! Let me explain...`,
+                `That's interesting in ${subjects[subject].name}! Here's what you need to know...`,
+                `Let me break that down step by step...`
             ];
-
-            return defaults[Math.floor(Math.random() * defaults.length)] + ' (Connect to an AI API like Claude or OpenAI for real intelligent responses!)';
+            return defaults[Math.floor(Math.random() * defaults.length)];
         }
 
-        // Text-to-speech for AI responses
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                const lang = document.getElementById('langSelector').value;
-                const langMap = { 'en': 'en-US', 'ml': 'ml-IN', 'hi': 'hi-IN', 'ar': 'ar-SA', 'ta': 'ta-IN' };
-                utterance.lang = langMap[lang] || 'en-US';
-                utterance.rate = 0.9;
-                speechSynthesis.speak(utterance);
-            }
-        }
+        // ============================================
+        // Init
+        // ============================================
+        loadVideos();
     </script>
 </body>
-  </html>
+</html>
