@@ -466,6 +466,9 @@ function openAIFeature(name) {
   } else if(name === 'Auto Translation') {
     if(window.parent && window.parent.nav) window.parent.nav('translate');
     else window.location.href = '/community/translate/';
+  } else if(name === 'AI Teacher Live') {
+    if(window.parent && window.parent.nav) window.parent.nav('ai-teacher');
+    else window.location.href = '/community/ai-teacher/';
   }
 }
 // LOAD COLLABS FROM DATABASE
