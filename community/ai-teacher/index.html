@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Teacher Live - Ddott TV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-card: #1a1a3e;
+            --bg-card-hover: #222250;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-gold: #fbbf24;
+            --accent-green: #22c55e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --text-muted: #6b6b8a;
+            --border-color: rgba(255,255,255,0.08);
+            --gradient-primary: linear-gradient(135deg, #00d4ff, #a855f7);
+            --gradient-gold: linear-gradient(135deg, #fbbf24, #f59e0b);
+            --shadow-glow: 0 0 30px rgba(0,212,255,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-30px) translateX(15px); opacity: 0.6; }
+            50% { transform: translateY(-15px) translateX(-20px); opacity: 0.2; }
+            75% { transform: translateY(-40px) translateX(10px); opacity: 0.5; }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .lang-selector {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 70px;
+            padding-bottom: 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .teacher-avatar {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .teacher-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .teacher-avatar-ring {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .free-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: var(--gradient-gold);
+            color: #000;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Subject Cards */
+        .subjects-section {
+            padding: 0 16px 20px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .subject-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .subject-card:hover::before,
+        .subject-card.active::before {
+            opacity: 1;
+        }
+
+        .subject-card:hover,
+        .subject-card.active {
+            background: var(--bg-card-hover);
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .subject-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .subject-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .subject-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Chat Area */
+        .chat-section {
+            padding: 0 16px 20px;
+            display: none;
+        }
+
+        .chat-section.active {
+            display: block;
+        }
+
+        .chat-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 14px 16px;
+            background: rgba(0, 212, 255, 0.05);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .chat-header-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .chat-header-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--gradient-primary);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            align-self: flex-start;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 12px 18px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .voice-btn, .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .voice-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .voice-btn:hover, .voice-btn.recording {
+            background: rgba(236, 72, 153, 0.2);
+            border-color: var(--accent-pink);
+            color: var(--accent-pink);
+        }
+
+        .voice-btn.recording {
+            animation: recordPulse 1s infinite;
+        }
+
+        @keyframes recordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .send-btn {
+            background: var(--gradient-primary);
+            color: #fff;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Quick Questions */
+        .quick-questions {
+            padding: 0 16px 20px;
+            display: none;
+        }
+
+        .quick-questions.active {
+            display: block;
+        }
+
+        .quick-questions-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .quick-chip {
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-chip:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 0 16px 20px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .feature-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .feature-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .feature-badge {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-free {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-gold);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .badge-new {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-beta {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 4px 12px;
+        }
+
+        .nav-item.active {
+            color: var(--accent-cyan);
+        }
+
+        .nav-item.active .nav-icon {
+            filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.5));
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .main-content {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Loading animation for AI response */
+        .ai-thinking {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            max-width: 85%;
+        }
+
+        .thinking-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .thinking-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .thinking-dot {
+            width: 5px;
+            height: 5px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            animation: thinkingBlink 1.4s infinite ease-in-out both;
+        }
+
+        .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+        .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes thinkingBlink {
+            0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- Background Particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div>
+                <div class="header-title">AI TEACHER LIVE</div>
+                <div class="header-subtitle">Ddott TV Learning</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>ONLINE</span>
+            </div>
+            <select class="lang-selector" id="langSelector" onchange="changeLanguage()">
+                <option value="en">🇬🇧 EN</option>
+                <option value="ml">🇮🇳 മലയാളം</option>
+                <option value="hi">🇮🇳 हिंदी</option>
+                <option value="ar">🇦🇪 عربي</option>
+                <option value="ta">🇮🇳 தமிழ்</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="teacher-avatar">
+                <div class="teacher-avatar-ring"></div>
+                <div class="teacher-avatar-inner">🦋</div>
+            </div>
+            <h1 class="hero-title">Your AI Teacher</h1>
+            <p class="hero-subtitle">Real-time teaching for any subject — math, coding, language, science</p>
+            <div class="free-badge">
+                <span>⚡</span>
+                <span>FREE FOREVER</span>
+            </div>
+        </section>
+
+        <!-- Subjects Grid -->
+        <section class="subjects-section" id="subjectsSection">
+            <h2 class="section-title">Choose Subject</h2>
+            <div class="subjects-grid">
+                <div class="subject-card" onclick="selectSubject('math')">
+                    <div class="subject-icon" style="background: rgba(0, 212, 255, 0.15);">🔢</div>
+                    <div class="subject-name">Mathematics</div>
+                    <div class="subject-desc">Algebra to Calculus</div>
+                </div>
+                <div class="subject-card" onclick="selectSubject('coding')">
+                    <div class="subject-icon" style="background: rgba(168, 85, 247, 0.15);">💻</div>
+                    <div class="subject-name">Coding</div>
+                    <div class="subject-desc">Python, JS, Web3</div>
+                </div>
+                <div class="subject-card" onclick="selectSubject('language')">
+                    <div class="subject-icon" style="background: rgba(236, 72, 153, 0.15);">🗣️</div>
+                    <div class="subject-name">Language</div>
+                    <div class="subject-desc">English, Malayalam</div>
+                </div>
+                <div class="subject-card" onclick="selectSubject('science')">
+                    <div class="subject-icon" style="background: rgba(34, 197, 94, 0.15);">🔬</div>
+                    <div class="subject-name">Science</div>
+                    <div class="subject-desc">Physics, Chemistry</div>
+                </div>
+                <div class="subject-card" onclick="selectSubject('crypto')">
+                    <div class="subject-icon" style="background: rgba(251, 191, 36, 0.15);">₿</div>
+                    <div class="subject-name">Crypto & Web3</div>
+                    <div class="subject-desc">Blockchain, DeFi</div>
+                </div>
+                <div class="subject-card" onclick="selectSubject('general')">
+                    <div class="subject-icon" style="background: rgba(239, 68, 68, 0.15);">🧠</div>
+                    <div class="subject-name">General Knowledge</div>
+                    <div class="subject-desc">History, Geography</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section class="chat-section" id="chatSection">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-header-icon" id="chatHeaderIcon">🔢</div>
+                    <div class="chat-header-info">
+                        <h3 id="chatSubjectName">Mathematics</h3>
+                        <p>AI Teacher • Ready to help</p>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai">
+                        <div>Hello! I'm your AI Teacher. What would you like to learn today? Ask me anything about <strong>Mathematics</strong>! 📚</div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎤</button>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Ask your question..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Questions -->
+        <section class="quick-questions" id="quickQuestions">
+            <div class="quick-questions-title">Quick Questions</div>
+            <div class="quick-chips" id="quickChips">
+                <div class="quick-chip" onclick="askQuick('What is algebra?')">What is algebra?</div>
+                <div class="quick-chip" onclick="askQuick('Solve x² + 5x + 6 = 0')">Solve x² + 5x + 6 = 0</div>
+                <div class="quick-chip" onclick="askQuick('Explain Pythagoras theorem')">Explain Pythagoras theorem</div>
+                <div class="quick-chip" onclick="askQuick('What is calculus?')">What is calculus?</div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <h2 class="section-title">More Learning Tools</h2>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(0, 212, 255, 0.15);">📺</div>
+                <div class="feature-info">
+                    <h4>Video Lessons</h4>
+                    <p>Watch AI-generated video explanations</p>
+                </div>
+                <div class="feature-badge badge-free">FREE</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(168, 85, 247, 0.15);">📝</div>
+                <div class="feature-info">
+                    <h4>Practice Tests</h4>
+                    <p>Auto-generated quizzes with instant feedback</p>
+                </div>
+                <div class="feature-badge badge-new">NEW</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(34, 197, 94, 0.15);">🎯</div>
+                <div class="feature-info">
+                    <h4>Learning Checkpoints</h4>
+                    <p>Complete tasks, earn Emo Coins</p>
+                </div>
+                <div class="feature-badge badge-beta">BETA</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>HOME</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📺</span>
+            <span>FEED</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <span class="nav-icon">🌐</span>
+            <span>COMMUNITY</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🪙</span>
+            <span>COINS</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🎬</span>
+            <span>STUDIO</span>
+        </a>
+    </nav>
+
+    <script>
+        // Create background particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Subject data
+        const subjects = {
+            math: { name: 'Mathematics', icon: '🔢', color: 'rgba(0, 212, 255, 0.15)', questions: [
+                'What is algebra?',
+                'Solve x² + 5x + 6 = 0',
+                'Explain Pythagoras theorem',
+                'What is calculus?'
+            ]},
+            coding: { name: 'Coding', icon: '💻', color: 'rgba(168, 85, 247, 0.15)', questions: [
+                'What is JavaScript?',
+                'Explain functions in Python',
+                'What is Web3?',
+                'How to build a website?'
+            ]},
+            language: { name: 'Language', icon: '🗣️', color: 'rgba(236, 72, 153, 0.15)', questions: [
+                'English grammar basics',
+                'Malayalam alphabets',
+                'How to improve vocabulary?',
+                'Difference between noun and verb'
+            ]},
+            science: { name: 'Science', icon: '🔬', color: 'rgba(34, 197, 94, 0.15)', questions: [
+                'What is photosynthesis?',
+                'Explain Newton's laws',
+                'What is an atom?',
+                'How does electricity work?'
+            ]},
+            crypto: { name: 'Crypto & Web3', icon: '₿', color: 'rgba(251, 191, 36, 0.15)', questions: [
+                'What is blockchain?',
+                'How does Bitcoin work?',
+                'What is a smart contract?',
+                'Explain DeFi'
+            ]},
+            general: { name: 'General Knowledge', icon: '🧠', color: 'rgba(239, 68, 68, 0.15)', questions: [
+                'History of India',
+                'World geography basics',
+                'Famous scientists',
+                'Current affairs today'
+            ]}
+        };
+
+        let currentSubject = 'math';
+        let isRecording = false;
+        let recognition = null;
+
+        // Initialize speech recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chatInput').value = transcript;
+                sendMessage();
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                isRecording = false;
+                updateVoiceButton();
+            };
+
+            recognition.onend = function() {
+                isRecording = false;
+                updateVoiceButton();
+            };
+        }
+
+        function selectSubject(subjectKey) {
+            currentSubject = subjectKey;
+            const subject = subjects[subjectKey];
+
+            // Update active state
+            document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Show chat section
+            document.getElementById('subjectsSection').style.display = 'none';
+            document.getElementById('chatSection').classList.add('active');
+            document.getElementById('quickQuestions').classList.add('active');
+
+            // Update chat header
+            document.getElementById('chatHeaderIcon').textContent = subject.icon;
+            document.getElementById('chatSubjectName').textContent = subject.name;
+
+            // Update quick questions
+            const chipsContainer = document.getElementById('quickChips');
+            chipsContainer.innerHTML = '';
+            subject.questions.forEach(q => {
+                const chip = document.createElement('div');
+                chip.className = 'quick-chip';
+                chip.textContent = q;
+                chip.onclick = () => askQuick(q);
+                chipsContainer.appendChild(chip);
+            });
+
+            // Add welcome message
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            addMessage('ai', `Hello! I'm your AI Teacher for <strong>${subject.name}</strong>. What would you like to learn today? Ask me anything! 📚`);
+        }
+
+        function goBack() {
+            document.getElementById('subjectsSection').style.display = 'block';
+            document.getElementById('chatSection').classList.remove('active');
+            document.getElementById('quickQuestions').classList.remove('active');
+            document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
+        }
+
+        function addMessage(type, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            messageDiv.innerHTML = `
+                <div>${content}</div>
+                <div class="message-time">${time}</div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'ai-thinking';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <span class="thinking-text">AI Teacher is thinking</span>
+                <div class="thinking-dots">
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) typingIndicator.remove();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addMessage('user', text);
+            input.value = '';
+
+            showTyping();
+
+            // Simulate AI response (replace with actual API call)
+            setTimeout(() => {
+                hideTyping();
+                const response = generateAIResponse(text, currentSubject);
+                addMessage('ai', response);
+            }, 1500 + Math.random() * 1000);
+        }
+
+        function askQuick(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function toggleVoice() {
+            if (!recognition) {
+                alert('Speech recognition is not supported in your browser. Try Chrome or Safari.');
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+                isRecording = false;
+            } else {
+                const lang = document.getElementById('langSelector').value;
+                const langMap = { 'en': 'en-US', 'ml': 'ml-IN', 'hi': 'hi-IN', 'ar': 'ar-SA', 'ta': 'ta-IN' };
+                recognition.lang = langMap[lang] || 'en-US';
+                recognition.start();
+                isRecording = true;
+            }
+            updateVoiceButton();
+        }
+
+        function updateVoiceButton() {
+            const btn = document.getElementById('voiceBtn');
+            if (isRecording) {
+                btn.classList.add('recording');
+                btn.textContent = '⏹';
+            } else {
+                btn.classList.remove('recording');
+                btn.textContent = '🎤';
+            }
+        }
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSelector').value;
+            // Update speech recognition language
+            if (recognition) {
+                const langMap = { 'en': 'en-US', 'ml': 'ml-IN', 'hi': 'hi-IN', 'ar': 'ar-SA', 'ta': 'ta-IN' };
+                recognition.lang = langMap[lang] || 'en-US';
+            }
+
+            // You can add translation logic here
+            console.log('Language changed to:', lang);
+        }
+
+        // Simple AI response generator (replace with actual API)
+        function generateAIResponse(question, subject) {
+            const responses = {
+                math: {
+                    'algebra': 'Algebra is a branch of mathematics that uses symbols (usually letters) to represent numbers and quantities in equations and formulas. It helps us solve problems with unknown values! 🧮',
+                    'pythagoras': 'The Pythagorean Theorem states that in a right-angled triangle, a² + b² = c², where c is the hypotenuse. It's one of the most important theorems in mathematics! 📐',
+                    'calculus': 'Calculus is the study of continuous change. It has two main branches: Differential Calculus (rates of change) and Integral Calculus (accumulation). It's used in physics, engineering, and economics! 📊',
+                    'solve': 'To solve x² + 5x + 6 = 0, we factor it as (x + 2)(x + 3) = 0. So x = -2 or x = -3. ✅'
+                },
+                coding: {
+                    'javascript': 'JavaScript is a programming language that runs in web browsers. It makes websites interactive! You can use it for animations, forms, games, and even backend servers with Node.js. 💻',
+                    'python': 'Python is a beginner-friendly programming language known for its simple syntax. It's used in web development, data science, AI, and automation. Functions in Python are defined using the `def` keyword! 🐍',
+                    'web3': 'Web3 is the next generation of the internet built on blockchain technology. It enables decentralized applications (dApps), smart contracts, and gives users ownership of their data! ⛓️'
+                },
+                language: {
+                    'grammar': 'English grammar is the set of rules that govern how words are used in sentences. The basic parts of speech are: Nouns, Verbs, Adjectives, Adverbs, Pronouns, Prepositions, Conjunctions, and Interjections! 📖',
+                    'vocabulary': 'To improve vocabulary: 1) Read daily, 2) Use flashcards, 3) Learn word roots, 4) Practice using new words in sentences, 5) Play word games! 📝'
+                },
+                science: {
+                    'photosynthesis': 'Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to create oxygen and energy in the form of sugar. It's essential for life on Earth! 🌱',
+                    'newton': 'Newton's Three Laws of Motion: 1) An object stays at rest unless acted upon by a force. 2) Force equals mass times acceleration (F=ma). 3) Every action has an equal and opposite reaction! 🍎'
+                },
+                crypto: {
+                    'blockchain': 'A blockchain is a distributed digital ledger that records transactions across many computers. It's secure, transparent, and decentralized — no single entity controls it! 🔗',
+                    'bitcoin': 'Bitcoin is the first cryptocurrency, created in 2009 by Satoshi Nakamoto. It uses blockchain technology and has a limited supply of 21 million coins. It's often called "digital gold"! ₿',
+                    'smart contract': 'Smart contracts are self-executing programs stored on a blockchain. They automatically enforce agreements when conditions are met — no intermediaries needed! 📜'
+                },
+                general: {
+                    'history': 'India has a rich history spanning over 5,000 years. From the Indus Valley Civilization to the Mughal Empire, and finally independence in 1947 — it's a story of resilience and diversity! 🇮🇳',
+                    'geography': 'The world has 7 continents and 5 oceans. India is located in South Asia, bordered by the Himalayas to the north and the Indian Ocean to the south! 🌍'
+                }
+            };
+
+            const lowerQ = question.toLowerCase();
+            const subjectResponses = responses[subject] || responses.general;
+
+            for (const key in subjectResponses) {
+                if (lowerQ.includes(key)) {
+                    return subjectResponses[key];
+                }
+            }
+
+            // Default responses
+            const defaults = [
+                `Great question about ${subjects[subject].name}! Let me explain that in detail...`,
+                `That's an interesting topic in ${subjects[subject].name}! Here's what you need to know...`,
+                `I'd love to help you learn about that! In ${subjects[subject].name}, this is how it works...`,
+                `Excellent question! Let me break this down for you step by step...`
+            ];
+
+            return defaults[Math.floor(Math.random() * defaults.length)] + ' (Connect to an AI API like Claude or OpenAI for real intelligent responses!)';
+        }
+
+        // Text-to-speech for AI responses
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                const lang = document.getElementById('langSelector').value;
+                const langMap = { 'en': 'en-US', 'ml': 'ml-IN', 'hi': 'hi-IN', 'ar': 'ar-SA', 'ta': 'ta-IN' };
+                utterance.lang = langMap[lang] || 'en-US';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+  </html>
