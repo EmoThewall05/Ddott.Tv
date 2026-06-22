@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Podcasts - Ddott TV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-card: #1a1a3e;
+            --bg-card-hover: #222250;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-gold: #fbbf24;
+            --accent-green: #22c55e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --text-muted: #6b6b8a;
+            --border-color: rgba(255,255,255,0.08);
+            --gradient-primary: linear-gradient(135deg, #00d4ff, #a855f7);
+            --gradient-green: linear-gradient(135deg, #22c55e, #00d4ff);
+            --shadow-glow: 0 0 30px rgba(0,212,255,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .bg-particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-30px) translateX(15px); opacity: 0.6; }
+            50% { transform: translateY(-15px) translateX(-20px); opacity: 0.2; }
+            75% { transform: translateY(-40px) translateX(10px); opacity: 0.5; }
+        }
+
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+
+        .back-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-cyan); }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            background: var(--gradient-green);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .status-dot {
+            width: 6px; height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .main-content {
+            padding-top: 70px;
+            padding-bottom: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section { padding: 20px 16px; text-align: center; }
+
+        .mic-avatar {
+            width: 90px; height: 90px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: var(--gradient-green);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 38px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .new-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--accent-green);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        /* Form */
+        .form-section { padding: 0 16px 20px; }
+
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .topic-input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .topic-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .topic-input::placeholder { color: var(--text-muted); }
+
+        .select-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .select-group { flex: 1; }
+
+        .select-input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            background: var(--gradient-green);
+            color: #000;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .generate-btn:hover { transform: scale(1.02); box-shadow: 0 0 24px rgba(34, 197, 94, 0.3); }
+        .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Status / Loading */
+        .status-section {
+            padding: 0 16px 20px;
+            display: none;
+        }
+        .status-section.active { display: block; }
+
+        .status-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px 18px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 40px; height: 40px;
+            margin: 0 auto 14px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-green);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .status-text { font-size: 13px; color: var(--text-secondary); }
+        .status-step { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+        .error-text {
+            color: #f87171;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Result */
+        .result-section {
+            padding: 0 16px 20px;
+            display: none;
+        }
+        .result-section.active { display: block; }
+
+        .player-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .player-topic {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .player-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        audio {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .transcript-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .transcript-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .transcript-title::before {
+            content: '';
+            width: 4px; height: 16px;
+            background: var(--gradient-green);
+            border-radius: 2px;
+        }
+
+        .dialogue-line {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            align-items: flex-start;
+        }
+
+        .dialogue-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .dialogue-line.host .dialogue-avatar {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        .dialogue-line.guest .dialogue-avatar {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--accent-purple);
+        }
+
+        .dialogue-content { flex: 1; }
+
+        .dialogue-speaker {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .dialogue-line.host .dialogue-speaker { color: var(--accent-cyan); }
+        .dialogue-line.guest .dialogue-speaker { color: var(--accent-purple); }
+
+        .dialogue-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .new-podcast-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 14px;
+        }
+        .new-podcast-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-cyan); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 2px; }
+
+        @media (min-width: 768px) {
+            .main-content { max-width: 600px; margin: 0 auto; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="history.back()">←</button>
+            <div>
+                <div class="header-title">AI PODCASTS</div>
+                <div class="header-subtitle">Ddott TV Studio</div>
+            </div>
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>ONLINE</span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero-section">
+            <div class="mic-avatar">🎙️</div>
+            <h1 class="hero-title">AI Podcast Generator</h1>
+            <p class="hero-subtitle">Type a topic — get a Host & Guest discussion, instantly</p>
+            <div class="new-badge">⚡ NEW</div>
+        </section>
+
+        <!-- Form -->
+        <section class="form-section" id="formSection">
+            <div class="form-card">
+                <label class="form-label">Topic</label>
+                <input type="text" class="topic-input" id="topicInput" placeholder="e.g. Is AI good for students?" maxlength="200">
+
+                <div class="select-row">
+                    <div class="select-group">
+                        <label class="form-label">Length</label>
+                        <select class="select-input" id="lengthSelect">
+                            <option value="short">Short (2-3 min)</option>
+                            <option value="medium">Medium (5-8 min)</option>
+                            <option value="long">Long (10-15 min)</option>
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label class="form-label">Language</label>
+                        <select class="select-input" id="languageSelect">
+                            <option value="en">🇬🇧 English</option>
+                            <option value="ml">🇮🇳 Malayalam</option>
+                            <option value="hi">🇮🇳 Hindi</option>
+                            <option value="ar">🇦🇪 Arabic</option>
+                            <option value="ta">🇮🇳 Tamil</option>
+                            <option value="es">🇪🇸 Spanish</option>
+                            <option value="fr">🇫🇷 French</option>
+                            <option value="de">🇩🇪 German</option>
+                            <option value="zh">🇨🇳 Chinese</option>
+                            <option value="ja">🇯🇵 Japanese</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="generate-btn" id="generateBtn" onclick="generatePodcast()">
+                    <span>🎙️</span>
+                    <span>Generate Podcast</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Status / Loading -->
+        <section class="status-section" id="statusSection">
+            <div class="status-card">
+                <div class="loading-spinner" id="loadingSpinner"></div>
+                <div class="status-text" id="statusText">Writing the script…</div>
+                <div class="status-step" id="statusStep">This can take up to a minute</div>
+            </div>
+        </section>
+
+        <!-- Result -->
+        <section class="result-section" id="resultSection">
+            <div class="player-card">
+                <div class="player-topic" id="resultTopic">Topic</div>
+                <div class="player-meta" id="resultMeta">Host & Guest • AI Generated</div>
+                <audio id="audioPlayer" controls></audio>
+            </div>
+
+            <div class="transcript-card">
+                <div class="transcript-title">Transcript</div>
+                <div id="transcriptList"></div>
+            </div>
+
+            <button class="new-podcast-btn" onclick="resetForm()">🔄 Generate Another Podcast</button>
+        </section>
+    </main>
+
+    <script>
+        const PODCAST_WORKER_URL = "https://ddott-podcast.meradivin.workers.dev";
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        async function generatePodcast() {
+            const topic = document.getElementById('topicInput').value.trim();
+            const length = document.getElementById('lengthSelect').value;
+            const language = document.getElementById('languageSelect').value;
+
+            if (!topic) {
+                alert('Please enter a topic for your podcast.');
+                return;
+            }
+
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('statusSection').classList.add('active');
+            document.getElementById('statusText').textContent = 'Writing the script…';
+            document.getElementById('statusStep').textContent = 'Host & Guest are getting ready';
+
+            try {
+                // Update status mid-flight for a better feel (script -> audio takes longer)
+                const statusTimer = setTimeout(() => {
+                    document.getElementById('statusText').textContent = 'Recording the audio…';
+                    document.getElementById('statusStep').textContent = 'Almost there';
+                }, 4000);
+
+                const res = await fetch(PODCAST_WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic, length, language })
+                });
+
+                clearTimeout(statusTimer);
+                const data = await res.json();
+
+                if (!res.ok && !data.script) {
+                    throw new Error(data.error || `Server error (${res.status})`);
+                }
+
+                showResult(topic, length, data);
+            } catch (err) {
+                console.error('Podcast generation error:', err);
+                document.getElementById('statusSection').classList.remove('active');
+                document.getElementById('formSection').style.display = 'block';
+                alert(`Could not generate podcast: ${err.message || 'please try again.'}`);
+            }
+        }
+
+        function showResult(topic, length, data) {
+            document.getElementById('statusSection').classList.remove('active');
+
+            document.getElementById('resultTopic').textContent = topic;
+
+            const lengthLabels = { short: 'Short', medium: 'Medium', long: 'Long' };
+            const lineCount = (data.script || []).length;
+            document.getElementById('resultMeta').textContent =
+                `Host & Guest • ${lengthLabels[length] || length} • ${lineCount} lines`;
+
+            const audioPlayer = document.getElementById('audioPlayer');
+            if (data.audio_base64) {
+                audioPlayer.src = `data:audio/mp3;base64,${data.audio_base64}`;
+                audioPlayer.style.display = 'block';
+            } else {
+                audioPlayer.style.display = 'none';
+            }
+
+            const transcriptList = document.getElementById('transcriptList');
+            transcriptList.innerHTML = '';
+            (data.script || []).forEach(line => {
+                const isHost = (line.speaker || '').toLowerCase() === 'host';
+                const div = document.createElement('div');
+                div.className = `dialogue-line ${isHost ? 'host' : 'guest'}`;
+                div.innerHTML = `
+                    <div class="dialogue-avatar">${isHost ? '🎤' : '💬'}</div>
+                    <div class="dialogue-content">
+                        <div class="dialogue-speaker">${isHost ? 'Host' : 'Guest'}</div>
+                        <div class="dialogue-text">${escapeHtml(line.text || '')}</div>
+                    </div>
+                `;
+                transcriptList.appendChild(div);
+            });
+
+            if (data.warning) {
+                const warnDiv = document.createElement('div');
+                warnDiv.className = 'error-text';
+                warnDiv.textContent = data.warning;
+                transcriptList.prepend(warnDiv);
+            }
+
+            document.getElementById('resultSection').classList.add('active');
+        }
+
+        function resetForm() {
+            document.getElementById('topicInput').value = '';
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('audioPlayer').pause();
+            document.getElementById('audioPlayer').src = '';
+        }
+    </script>
+</body>
+</html>
