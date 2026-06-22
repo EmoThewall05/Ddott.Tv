@@ -502,7 +502,10 @@
             <div class="player-card">
                 <div class="player-topic" id="resultTopic">Topic</div>
                 <div class="player-meta" id="resultMeta">Host & Guest • AI Generated</div>
-                <audio id="audioPlayer" controls></audio>
+                <audio id="audioPlayer" controls style="display:none;"></audio>
+                <div id="audioLoadingNote" style="display:none; font-size:12px; color:var(--text-muted); padding:10px; text-align:center;">
+                    🎧 Generating audio… this can take up to a minute. The transcript below is ready to read now.
+                </div>
             </div>
 
             <div class="transcript-card">
@@ -554,26 +557,50 @@
             document.getElementById('statusStep').textContent = 'Host & Guest are getting ready';
 
             try {
-                // Update status mid-flight for a better feel (script -> audio takes longer)
-                const statusTimer = setTimeout(() => {
-                    document.getElementById('statusText').textContent = 'Recording the audio…';
-                    document.getElementById('statusStep').textContent = 'Almost there';
-                }, 4000);
-
-                const res = await fetch(PODCAST_WORKER_URL, {
+                // Step 1: generate the script (fast)
+                const scriptRes = await fetch(PODCAST_WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic, length, language })
+                    body: JSON.stringify({ mode: 'script', topic, length, language })
                 });
 
-                clearTimeout(statusTimer);
-                const data = await res.json();
+                const scriptData = await scriptRes.json();
 
-                if (!res.ok && !data.script) {
-                    throw new Error(data.error || `Server error (${res.status})`);
+                if (!scriptRes.ok || !scriptData.script) {
+                    throw new Error(scriptData.error || `Server error (${scriptRes.status})`);
                 }
 
-                showResult(topic, length, data);
+                // Show the transcript immediately so the user has something to read
+                showResult(topic, length, { script: scriptData.script, audio_base64: null });
+                document.getElementById('statusSection').classList.remove('active');
+                document.getElementById('resultSection').classList.add('active');
+
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.style.display = 'none';
+                const audioLoadingNote = document.getElementById('audioLoadingNote');
+                audioLoadingNote.style.display = 'block';
+
+                // Step 2: generate the audio in the background (slower)
+                try {
+                    const audioRes = await fetch(PODCAST_WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mode: 'audio', script: scriptData.script, language })
+                    });
+
+                    const audioData = await audioRes.json();
+
+                    if (audioRes.ok && audioData.audio_base64) {
+                        audioPlayer.src = `data:audio/mp3;base64,${audioData.audio_base64}`;
+                        audioPlayer.style.display = 'block';
+                        audioLoadingNote.style.display = 'none';
+                    } else {
+                        audioLoadingNote.textContent = '⚠️ Audio could not be generated, but the transcript is ready above.';
+                    }
+                } catch (audioErr) {
+                    console.error('Audio generation error:', audioErr);
+                    audioLoadingNote.textContent = '⚠️ Audio could not be generated, but the transcript is ready above.';
+                }
             } catch (err) {
                 console.error('Podcast generation error:', err);
                 document.getElementById('statusSection').classList.remove('active');
