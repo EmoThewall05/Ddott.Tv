@@ -72,6 +72,25 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
 .cost-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;opacity:0.8;}
 .cost-total{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#ffd700;padding-top:8px;border-top:1px solid rgba(255,200,0,0.2);}
 
+/* BUY COINS */
+.buy-section{padding:16px;}
+.balance-box{background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:20px;}
+.balance-label{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.balance-amount{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;color:#ffd700;}
+.balance-usd{font-size:11px;color:#888;margin-top:4px;}
+.packages-title{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.packages-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.pkg-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.pkg-card:active{transform:scale(0.97);}
+.pkg-card.popular{border-color:rgba(255,0,64,0.5);background:rgba(255,0,64,0.05);}
+.pkg-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#ff0040;color:#fff;font-size:8px;font-family:'Orbitron',monospace;padding:2px 8px;border-radius:4px;white-space:nowrap;}
+.pkg-coins{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:#ffd700;margin-bottom:4px;}
+.pkg-coins-label{font-size:9px;color:#888;margin-bottom:8px;}
+.pkg-price{font-size:14px;font-weight:700;color:#fff;}
+.pkg-price-sub{font-size:9px;color:#888;margin-top:2px;}
+.buy-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#ff0040,#ff6600);color:#fff;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-bottom:10px;}
+.buy-btn:active{opacity:0.85;}
+.pay-info{text-align:center;font-size:10px;color:#555;margin-top:8px;}
 /* RULES TAGS */
 .rules-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
 .rule-tag{padding:4px 10px;border-radius:12px;background:rgba(255,0,64,0.15);border:1px solid rgba(255,0,64,0.3);font-size:11px;cursor:pointer;transition:all 0.2s;}
@@ -99,6 +118,7 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
 .nav-item.active{opacity:1;color:#ff0040;}
 .nav-icon{font-size:20px;}
 </style>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
@@ -113,6 +133,7 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
   <div class="tab" onclick="switchTab('ai')">🤖 AI GUIDE</div>
   <div class="tab" onclick="switchTab('rules')">⚙️ RULES</div>
   <div class="tab" onclick="switchTab('stats')">📊 STATS</div>
+  <div class="tab" onclick="switchTab('buy')">🪙 BUY</div>
 </div>
 
 <!-- UPLOAD TAB -->
@@ -587,6 +608,111 @@ async function loadStats() {
     `).join('');
   } catch(e) {}
 }
+</script>
+
+<!-- BUY COINS TAB -->
+<div class="section" id="tab-buy">
+<div class="buy-section">
+  <div class="balance-box">
+    <div class="balance-label">YOUR BALANCE</div>
+    <div class="balance-amount" id="buyTabBalance">0</div>
+    <div class="balance-usd">EMO COINS · 10 EMO = ₹1</div>
+  </div>
+  <div class="packages-title">SELECT PACKAGE</div>
+  <div class="packages-grid">
+    <div class="pkg-card" onclick="selectPkg(this,100,10)">
+      <div class="pkg-coins">100</div>
+      <div class="pkg-coins-label">EMO COINS</div>
+      <div class="pkg-price">₹10</div>
+      <div class="pkg-price-sub">Starter</div>
+    </div>
+    <div class="pkg-card popular" onclick="selectPkg(this,500,45)">
+      <div class="pkg-badge">POPULAR</div>
+      <div class="pkg-coins">500</div>
+      <div class="pkg-coins-label">EMO COINS</div>
+      <div class="pkg-price">₹45</div>
+      <div class="pkg-price-sub">Save ₹5</div>
+    </div>
+    <div class="pkg-card" onclick="selectPkg(this,1000,85)">
+      <div class="pkg-coins">1000</div>
+      <div class="pkg-coins-label">EMO COINS</div>
+      <div class="pkg-price">₹85</div>
+      <div class="pkg-price-sub">Save ₹15</div>
+    </div>
+    <div class="pkg-card" onclick="selectPkg(this,5000,400)">
+      <div class="pkg-badge" style="background:#ffd700;color:#000;">BEST VALUE</div>
+      <div class="pkg-coins">5000</div>
+      <div class="pkg-coins-label">EMO COINS</div>
+      <div class="pkg-price">₹400</div>
+      <div class="pkg-price-sub">Save ₹100</div>
+    </div>
+  </div>
+  <button class="buy-btn" id="buyNowBtn" onclick="buyCoins()">🪙 BUY NOW — SELECT A PACKAGE</button>
+  <div class="pay-info">Powered by Razorpay · Secure Payment · Instant Credit</div>
+</div>
+</div>
+
+<script>
+let selectedPkg = null;
+
+function selectPkg(el, coins, price) {
+  document.querySelectorAll('.pkg-card').forEach(c => c.style.boxShadow = '');
+  el.style.boxShadow = '0 0 0 2px #ff0040';
+  selectedPkg = { coins, price };
+  document.getElementById('buyNowBtn').textContent = '🪙 BUY ' + coins + ' EMO FOR ₹' + price;
+}
+
+function buyCoins() {
+  if (!selectedPkg) {
+    alert('Please select a package first');
+    return;
+  }
+  const options = {
+    key: 'YOUR_RAZORPAY_KEY_ID',
+    amount: selectedPkg.price * 100,
+    currency: 'INR',
+    name: 'Ddott TV',
+    description: selectedPkg.coins + ' EMO Coins',
+    image: 'https://emothewall.online/favicon.ico',
+    handler: async function(response) {
+      await creditCoins(response.razorpay_payment_id, selectedPkg.coins, selectedPkg.price);
+    },
+    prefill: { name: '', email: '', contact: '' },
+    theme: { color: '#ff0040' }
+  };
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
+
+async function creditCoins(paymentId, coins, price) {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+  await db.from('emo_transactions').insert({
+    user_id: user.id,
+    amount: coins,
+    type: 'purchase',
+    description: 'Bought ' + coins + ' EMO Coins · Payment: ' + paymentId
+  });
+  await db.rpc('increment_coins', { uid: user.id, amt: coins });
+  document.getElementById('buyTabBalance').textContent = parseInt(document.getElementById('buyTabBalance').textContent || 0) + coins;
+  document.getElementById('coinBalance').textContent = parseInt(document.getElementById('coinBalance').textContent || 0) + coins;
+  alert('✅ ' + coins + ' EMO Coins credited!');
+}
+
+// Load balance in buy tab
+async function loadBuyBalance() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+  const { data } = await db.from('profiles').select('emo_coins').eq('id', user.id).single();
+  if (data) document.getElementById('buyTabBalance').textContent = data.emo_coins || 0;
+}
+
+// Patch switchTab to load balance
+const _origSwitch = window.switchTab;
+window.switchTab = function(tab) {
+  if (_origSwitch) _origSwitch(tab);
+  if (tab === 'buy') loadBuyBalance();
+};
 </script>
 </body>
 </html>
