@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feed - Ddott TV</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/supabase-config.js"></script>
+<style>
+:root{--cyan:#00f5ff;--purple:#b400ff;--pink:#ff00c8;--gold:#ffd700;--dark:#04000f;--darker:#020008;--surface:#0a0020;--text:#e8d5ff;--muted:#6b4d8a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;background:var(--darker);color:var(--text);font-family:'Rajdhani',sans-serif;}
+body{padding:12px 16px 20px;}
+.filter-bar{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px;padding-bottom:4px;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid rgba(0,245,255,0.2);background:var(--surface);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer;}
+.filter-btn.active{background:rgba(0,245,255,0.1);border-color:var(--cyan);color:var(--cyan);}
+.feed-list{display:flex;flex-direction:column;gap:12px;}
+.video-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;cursor:pointer;}
+.video-card:active{transform:scale(0.98);}
+.thumb{background:linear-gradient(135deg,#0a0a1a,#1a0a2e);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;}
+.thumb img{width:100%;height:100%;object-fit:cover;}
+.short-badge{position:absolute;top:6px;left:8px;background:rgba(180,0,255,0.8);padding:2px 7px;border-radius:4px;font-size:9px;font-family:'Orbitron',monospace;color:#fff;}
+.card-info{padding:10px 12px;}
+.card-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:5px;}
+.card-meta{font-size:11px;color:rgba(255,255,255,0.4);display:flex;gap:12px;}
+.creator-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.creator-avatar{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.creator-name{font-size:11px;color:var(--muted);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-state .big{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:1px;}
+.loading-state{text-align:center;padding:40px;color:var(--cyan);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;}
+</style>
+</head>
+<body>
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="setFilter(this,'all')">⭐ All</button>
+  <button class="filter-btn" onclick="setFilter(this,'video')">🎬 Videos</button>
+  <button class="filter-btn" onclick="setFilter(this,'short')">⚡ Shorts</button>
+</div>
+<div class="feed-list" id="feedList"><div class="loading-state">LOADING FEED...</div></div>
+<script>
+let allVideos = [];
+let currentFilter = 'all';
+function setFilter(btn, filter) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = filter;
+  renderFeed();
+}
+function renderFeed() {
+  const list = document.getElementById('feedList');
+  let vids = allVideos;
+  if (currentFilter === 'short') vids = allVideos.filter(v => v.is_short);
+  if (currentFilter === 'video') vids = allVideos.filter(v => !v.is_short);
+  if (!vids.length) {
+    list.innerHTML = '<div class="empty-state"><div class="big">📭</div><p>NO VIDEOS YET</p></div>';
+    return;
+  }
+  list.innerHTML = vids.map(v => {
+    const views = v.views >= 1000 ? (v.views/1000).toFixed(1)+'K' : (v.views||0);
+    const date = new Date(v.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    const creator = (v.profiles && v.profiles.username) ? v.profiles.username : 'Creator';
+    const initial = creator[0].toUpperCase();
+    return '<div class="video-card" onclick="openVideo(this)" data-id="'+v.id+'" data-url="'+encodeURIComponent(v.video_url||'')+'" data-title="'+encodeURIComponent(v.title||'')+'">'
+      +'<div class="thumb">'
+      +(v.thumbnail_url ? '<img src="'+v.thumbnail_url+'" onerror="this.style.display=\'none\'">' : '🎬')
+      +(v.is_short ? '<div class="short-badge">⚡ SHORT</div>' : '')
+      +'</div>'
+      +'<div class="card-info">'
+      +'<div class="creator-row"><div class="creator-avatar">'+initial+'</div><span class="creator-name">'+creator+'</span></div>'
+      +'<div class="card-title">'+(v.title||'Untitled')+'</div>'
+      +'<div class="card-meta"><span>👁 '+views+'</span><span>👍 '+(v.likes||0)+'</span><span>📅 '+date+'</span></div>'
+      +'</div></div>';
+  }).join('');
+}
+function openVideo(el) {
+  var id = el.dataset.id;
+  var url = el.dataset.url;
+  var title = el.dataset.title;
+  var href = '/player/player-v2.html?id='+id;
+  if (url) href += '&url='+url;
+  if (title) href += '&title='+title;
+  window.top.location.href = href;
+}
+async function loadFeed() {
+  try {
+    const res = await db.from('videos').select('*, profiles(username)').order('created_at',{ascending:false}).limit(50);
+    allVideos = res.data || [];
+    renderFeed();
+  } catch(e) {
+    document.getElementById('feedList').innerHTML = '<div class="empty-state"><div class="big">⚠️</div><p>LOAD ERROR</p></div>';
+  }
+}
+document.addEventListener('DOMContentLoaded', loadFeed);
+</script>
+</body>
+</html>
