@@ -616,35 +616,35 @@ async function loadStats() {
   <div class="balance-box">
     <div class="balance-label">YOUR BALANCE</div>
     <div class="balance-amount" id="buyTabBalance">0</div>
-    <div class="balance-usd">EMO COINS · 10 EMO = ₹1</div>
+    <div class="balance-usd">EMO COINS · 1 EMO = ₹10</div>
   </div>
   <div class="packages-title">SELECT PACKAGE</div>
   <div class="packages-grid">
-    <div class="pkg-card" onclick="selectPkg(this,100,10)">
+    <div class="pkg-card" onclick="selectPkg(this,100,1000)">
       <div class="pkg-coins">100</div>
       <div class="pkg-coins-label">EMO COINS</div>
-      <div class="pkg-price">₹10</div>
+      <div class="pkg-price">₹1,000</div>
       <div class="pkg-price-sub">Starter</div>
     </div>
-    <div class="pkg-card popular" onclick="selectPkg(this,500,45)">
+    <div class="pkg-card popular" onclick="selectPkg(this,500,4500)">
       <div class="pkg-badge">POPULAR</div>
       <div class="pkg-coins">500</div>
       <div class="pkg-coins-label">EMO COINS</div>
-      <div class="pkg-price">₹45</div>
-      <div class="pkg-price-sub">Save ₹5</div>
+      <div class="pkg-price">₹4,500</div>
+      <div class="pkg-price-sub">Save ₹500</div>
     </div>
-    <div class="pkg-card" onclick="selectPkg(this,1000,85)">
+    <div class="pkg-card" onclick="selectPkg(this,1000,9000)">
       <div class="pkg-coins">1000</div>
       <div class="pkg-coins-label">EMO COINS</div>
-      <div class="pkg-price">₹85</div>
-      <div class="pkg-price-sub">Save ₹15</div>
+      <div class="pkg-price">₹9,000</div>
+      <div class="pkg-price-sub">Save ₹1,000</div>
     </div>
-    <div class="pkg-card" onclick="selectPkg(this,5000,400)">
+    <div class="pkg-card" onclick="selectPkg(this,5000,45000)">
       <div class="pkg-badge" style="background:#ffd700;color:#000;">BEST VALUE</div>
       <div class="pkg-coins">5000</div>
       <div class="pkg-coins-label">EMO COINS</div>
-      <div class="pkg-price">₹400</div>
-      <div class="pkg-price-sub">Save ₹100</div>
+      <div class="pkg-price">₹45,000</div>
+      <div class="pkg-price-sub">Save ₹5,000</div>
     </div>
   </div>
   <button class="buy-btn" id="buyNowBtn" onclick="buyCoins()">🪙 BUY NOW — SELECT A PACKAGE</button>
