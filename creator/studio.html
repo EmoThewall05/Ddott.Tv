@@ -132,6 +132,17 @@ select option { background: #0d0d0d; }
   </div>
 
   <div class="input-group">
+    <div class="input-label">CONTENT LICENCE</div>
+    <select id="videoLicence">
+      <option value="CC BY-NC-ND">🔒 CC BY-NC-ND — Share only, no changes, no commercial</option>
+      <option value="CC BY-NC">🎓 CC BY-NC — Non-commercial use only</option>
+      <option value="CC BY-SA">🔄 CC BY-SA — Share with same licence</option>
+      <option value="CC BY">🌍 CC BY — Full open (credit required)</option>
+      <option value="All Rights Reserved">⛔ All Rights Reserved</option>
+    </select>
+  </div>
+
+  <div class="input-group">
     <div class="input-label">TAGS</div>
     <div class="tags-input" id="tagsContainer">
       <input class="tag-input" id="tagInput" placeholder="Add tag..." onkeypress="addTag(event)">
@@ -423,6 +434,7 @@ async function publishVideo() {
       title: title,
       description: document.getElementById('videoDesc').value,
       category: document.getElementById('videoCategory').value,
+      licence: document.getElementById('videoLicence').value,
       video_url: cloudData.secure_url,
       thumbnail_url: cloudData.secure_url.replace('/video/upload/', '/video/upload/so_0/'),
       views: 0,
