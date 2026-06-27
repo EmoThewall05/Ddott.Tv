@@ -826,6 +826,7 @@ function buildShortCard(s, i) {
   el.innerHTML = `
     <div class="short-thumb">
       <div class="short-thumb-bg" style="background:${grad}"></div>
+      ${s.thumbnail_url ? `<img src="${s.thumbnail_url}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1;">` : ''}
     </div>
     <div class="short-overlay"></div>
     <div class="short-play">▶</div>

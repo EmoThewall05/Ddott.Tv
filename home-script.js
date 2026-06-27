@@ -14,6 +14,7 @@ async function loadUser() {
 async function loadVideos() {
   const { data: videos, error } = await db.from('videos')
     .select('*, profiles(username, avatar_url)')
+    .eq('is_short', false)
     .order('created_at', { ascending: false })
     .limit(6);
 
@@ -24,12 +25,13 @@ async function loadVideos() {
   }
 
   grid.innerHTML = videos.map(v => `
-    <div class="vcard" onclick="openPlayer('${v.id}')">
+    <div class="vcard" onclick="${v.is_short ? `location.href='/player/shorts.html'` : `openPlayer('${v.id}')`}">
       <div class="vc-thumb">
         <div class="vc-inner" style="background:linear-gradient(135deg,#0a0015,#1a0030)">
           ${v.thumbnail_url ? `<img src="${v.thumbnail_url}" style="width:100%;height:100%;object-fit:cover;">` : '🎬'}
         </div>
         <div class="vc-earn">+5🪙</div>
+        ${v.is_short ? `<div style="position:absolute;top:6px;left:6px;background:#7c3aed;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px;">⚡ SHORT</div>` : `<div style="position:absolute;top:6px;left:6px;background:#0e7490;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px;">🎬 VIDEO</div>`}
       </div>
       <div class="vc-info">
         <div class="vc-top">
