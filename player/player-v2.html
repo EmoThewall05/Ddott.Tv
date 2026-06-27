@@ -544,7 +544,13 @@
 </style>
 <base target="_blank">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/config/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_FInfsWgHml8s9dAwiAKQ4Q_Tf79f3G8';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const db = supabaseClient;
+    </script>
 </head>
 <body>
 
