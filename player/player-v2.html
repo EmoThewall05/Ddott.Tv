@@ -541,6 +541,15 @@
         }
         .quiz-earn-btn.visible { display: block; }
         .quiz-skip { color: #8892a4; font-size: 12px; text-align: center; margin-top: 10px; cursor: pointer; }
+
+        .quiz-timer {
+            text-align: center;
+            font-size: 13px;
+            color: #00e676;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .quiz-timer.warning { color: #ff5500; }
 </style>
 <base target="_blank">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -936,6 +945,31 @@ function showVideoQuiz() {
     });
 
     document.getElementById('quizOverlay').classList.add('active');
+    startQuizTimer();
+}
+
+let quizTimerInterval = null;
+
+function startQuizTimer() {
+    let timeLeft = 90;
+    const timerEl = document.getElementById('quizTimer');
+    clearInterval(quizTimerInterval);
+    quizTimerInterval = setInterval(() => {
+        timeLeft--;
+        if (timerEl) {
+            timerEl.textContent = '⏱ ' + timeLeft + 's';
+            if (timeLeft <= 20) timerEl.classList.add('warning');
+        }
+        if (timeLeft <= 0) {
+            clearInterval(quizTimerInterval);
+            // Disable all options
+            document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+            document.getElementById('quizResult').textContent = '😔 Sorry! Time up. You lost the coins.';
+            document.getElementById('quizResult').style.color = '#ff5500';
+            document.getElementById('quizEarnBtn').classList.remove('visible');
+            setTimeout(closeQuiz, 2000);
+        }
+    }, 1000);
 }
 
 function shuffle(arr) {
@@ -963,7 +997,11 @@ function claimQuizCoins() {
 }
 
 function closeQuiz() {
+    clearInterval(quizTimerInterval);
     document.getElementById('quizOverlay').classList.remove('active');
+    document.getElementById('quizResult').style.color = '#00e676';
+    const timerEl = document.getElementById('quizTimer');
+    if (timerEl) timerEl.classList.remove('warning');
 }
 
 playBtn.addEventListener('click', () => {
@@ -1065,6 +1103,7 @@ window.ddottPlayer = { loadVideo, getVideoUrl, video };
         <div class="quiz-box">
             <div class="quiz-title">🎬 Proof of Watch</div>
             <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
+            <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
             <div class="quiz-question" id="quizQuestion"></div>
             <div id="quizOptions"></div>
             <div class="quiz-result" id="quizResult"></div>
@@ -1078,6 +1117,7 @@ window.ddottPlayer = { loadVideo, getVideoUrl, video };
         <div class="quiz-box">
             <div class="quiz-title">🎬 Proof of Watch</div>
             <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
+            <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
             <div class="quiz-question" id="quizQuestion"></div>
             <div id="quizOptions"></div>
             <div class="quiz-result" id="quizResult"></div>
