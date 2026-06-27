@@ -14,13 +14,13 @@
 
 | Page | URL |
 |---|---|
-| **Platform** | https://emothewall.online |
-| **Login** | https://emothewall.online/ddott-login.html |
-| **Home** | https://emothewall.online/ddott-home-v2.html |
-| **Video Player** | https://emothewall.online/ddott-player-v2.html?id=<video_id> |
-| **Messages** | https://emothewall.online/ddott-messages.html |
-| **Creator Channel** | https://emothewall.online/ddott-creator-channel.html |
-| **Landing Page** | https://emothewall.online/ddott-landing-v2.html |
+| **Platform** | https://ddott.live |
+| **Login** | https://ddott.live/ddott-login.html |
+| **Home** | https://ddott.live/ddott-home-v2.html |
+| **Video Player** | https://ddott.live/ddott-player-v2.html?id=<video_id> |
+| **Messages** | https://ddott.live/ddott-messages.html |
+| **Creator Channel** | https://ddott.live/ddott-creator-channel.html |
+| **Landing Page** | https://ddott.live/ddott-landing-v2.html |
 | **TheWall (Web3)** | https://thewall-web3-iie7.vercel.app |
 
 ---

@@ -673,7 +673,7 @@ function buyCoins() {
     currency: 'INR',
     name: 'Ddott TV',
     description: selectedPkg.coins + ' EMO Coins',
-    image: 'https://emothewall.online/favicon.ico',
+    image: 'https://ddott.live/favicon.ico',
     handler: async function(response) {
       await creditCoins(response.razorpay_payment_id, selectedPkg.coins, selectedPkg.price);
     },
