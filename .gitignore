@@ -10,3 +10,4 @@ supabase-config.js
 .vercel/
 vercel.json
 .vercel.json
+*.zip\n*.py\ndeploy.sh\nnode_modules/
