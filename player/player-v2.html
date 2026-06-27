@@ -451,7 +451,97 @@
             font-weight: 700;
             cursor: pointer;
         }
-    </style>
+    
+        /* Quiz Overlay */
+        .quiz-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .quiz-overlay.active { display: flex; }
+        .quiz-box {
+            background: #0d1117;
+            border: 1px solid #00e676;
+            border-radius: 20px;
+            padding: 28px 20px;
+            max-width: 420px;
+            width: 100%;
+        }
+        .quiz-title { color: #00e676; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        .quiz-subtitle { color: #8892a4; font-size: 12px; margin-bottom: 20px; }
+        .quiz-question { color: #fff; font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+        .quiz-option {
+            display: block; width: 100%;
+            background: #161b22; border: 1px solid #30363d;
+            color: #fff; font-size: 14px;
+            padding: 12px 16px; border-radius: 10px;
+            margin-bottom: 10px; cursor: pointer; text-align: left;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover { border-color: #00e676; background: #0d2818; }
+        .quiz-option.correct { border-color: #00e676; background: #0d2818; color: #00e676; }
+        .quiz-option.wrong { border-color: #ff5500; background: #1a0a00; color: #ff5500; }
+        .quiz-result { text-align: center; margin-top: 16px; font-size: 14px; color: #00e676; font-weight: 700; }
+        .quiz-earn-btn {
+            display: none; width: 100%;
+            background: linear-gradient(135deg, #00e676, #00b0ff);
+            color: #000; font-weight: 800; font-size: 15px;
+            padding: 14px; border-radius: 12px;
+            border: none; cursor: pointer; margin-top: 14px;
+        }
+        .quiz-earn-btn.visible { display: block; }
+        .quiz-skip { color: #8892a4; font-size: 12px; text-align: center; margin-top: 10px; cursor: pointer; }
+
+        /* Quiz Overlay */
+        .quiz-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .quiz-overlay.active { display: flex; }
+        .quiz-box {
+            background: #0d1117;
+            border: 1px solid #00e676;
+            border-radius: 20px;
+            padding: 28px 20px;
+            max-width: 420px;
+            width: 100%;
+        }
+        .quiz-title { color: #00e676; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        .quiz-subtitle { color: #8892a4; font-size: 12px; margin-bottom: 20px; }
+        .quiz-question { color: #fff; font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+        .quiz-option {
+            display: block; width: 100%;
+            background: #161b22; border: 1px solid #30363d;
+            color: #fff; font-size: 14px;
+            padding: 12px 16px; border-radius: 10px;
+            margin-bottom: 10px; cursor: pointer; text-align: left;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover { border-color: #00e676; background: #0d2818; }
+        .quiz-option.correct { border-color: #00e676; background: #0d2818; color: #00e676; }
+        .quiz-option.wrong { border-color: #ff5500; background: #1a0a00; color: #ff5500; }
+        .quiz-result { text-align: center; margin-top: 16px; font-size: 14px; color: #00e676; font-weight: 700; }
+        .quiz-earn-btn {
+            display: none; width: 100%;
+            background: linear-gradient(135deg, #00e676, #00b0ff);
+            color: #000; font-weight: 800; font-size: 15px;
+            padding: 14px; border-radius: 12px;
+            border: none; cursor: pointer; margin-top: 14px;
+        }
+        .quiz-earn-btn.visible { display: block; }
+        .quiz-skip { color: #8892a4; font-size: 12px; text-align: center; margin-top: 10px; cursor: pointer; }
+</style>
 <base target="_blank">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
@@ -795,7 +885,80 @@ video.addEventListener('timeupdate', () => {
 video.addEventListener('ended', () => {
     isPlaying = false;
     playBtn.textContent = '▶';
+    showVideoQuiz();
 });
+
+function showVideoQuiz() {
+    const title = document.getElementById('videoTitle').textContent || 'this video';
+    const dur = video.duration;
+    const mins = Math.floor(dur / 60);
+    const secs = Math.floor(dur % 60);
+    const durStr = mins > 0 ? `${mins} min ${secs} sec` : `${secs} sec`;
+
+    // Wrong options
+    const wrong1 = mins > 0 ? `${mins - 1} min ${secs} sec` : `${secs + 15} sec`;
+    const wrong2 = mins > 0 ? `${mins + 1} min ${secs} sec` : `${Math.max(secs - 10, 5)} sec`;
+
+    const questions = [
+        {
+            q: `Q1. How long was this video?`,
+            options: shuffle([durStr, wrong1, wrong2]),
+            answer: durStr
+        },
+        {
+            q: `Q2. What is the title of this video?`,
+            options: shuffle([title, 'Ddott TV Short', 'Creator Studio Guide']),
+            answer: title
+        }
+    ];
+
+    const idx = Math.floor(Math.random() * questions.length);
+    const quiz = questions[idx];
+
+    document.getElementById('quizQuestion').textContent = quiz.q;
+    document.getElementById('quizResult').textContent = '';
+    document.getElementById('quizEarnBtn').classList.remove('visible');
+
+    const optDiv = document.getElementById('quizOptions');
+    optDiv.innerHTML = '';
+    quiz.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = opt;
+        btn.onclick = () => checkQuizAnswer(btn, opt, quiz.answer, optDiv);
+        optDiv.appendChild(btn);
+    });
+
+    document.getElementById('quizOverlay').classList.add('active');
+}
+
+function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
+}
+
+function checkQuizAnswer(btn, selected, answer, optDiv) {
+    const btns = optDiv.querySelectorAll('.quiz-option');
+    btns.forEach(b => b.disabled = true);
+    if (selected === answer) {
+        btn.classList.add('correct');
+        document.getElementById('quizResult').textContent = '✅ Correct! You earned Emo Coins!';
+        document.getElementById('quizEarnBtn').classList.add('visible');
+    } else {
+        btn.classList.add('wrong');
+        btns.forEach(b => { if (b.textContent === answer) b.classList.add('correct'); });
+        document.getElementById('quizResult').textContent = '❌ Wrong! Better luck next time.';
+    }
+}
+
+function claimQuizCoins() {
+    document.getElementById('quizResult').textContent = '🎉 +10 Emo Coins added to your wallet!';
+    document.getElementById('quizEarnBtn').classList.remove('visible');
+    setTimeout(closeQuiz, 1500);
+}
+
+function closeQuiz() {
+    document.getElementById('quizOverlay').classList.remove('active');
+}
 
 playBtn.addEventListener('click', () => {
     if (video.paused) {
@@ -890,5 +1053,31 @@ document.addEventListener('DOMContentLoaded', () => {
 window.ddottPlayer = { loadVideo, getVideoUrl, video };
 
  </script>
+
+    <!-- Quiz Overlay -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-box">
+            <div class="quiz-title">🎬 Proof of Watch</div>
+            <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult"></div>
+            <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
+            <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
+        </div>
+    </div>
+
+    <!-- Quiz Overlay -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-box">
+            <div class="quiz-title">🎬 Proof of Watch</div>
+            <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult"></div>
+            <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
+            <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
+        </div>
+    </div>
 </body>
 </html>
