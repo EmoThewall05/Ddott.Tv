@@ -574,7 +574,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         <div class="verified-badge" id="verifiedBadge" style="display:none;">✓</div>
       </div>
       <div class="profile-actions">
-        <div class="icon-btn" title="Share">↗</div>
+        <div class="icon-btn" title="Edit Profile" onclick="openEdit()">✏️</div>
         <div class="icon-btn" title="More">⋯</div>
         <button class="sub-btn" id="subBtn" onclick="toggleSub()">SUBSCRIBE</button>
       </div>
@@ -895,5 +895,137 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   });
 </script>
 
+
+<!-- Edit Profile Modal -->
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;overflow-y:auto;padding:20px;">
+  <div style="background:#0a0020;border:1px solid rgba(0,245,255,0.2);border-radius:16px;padding:20px;max-width:500px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:Orbitron;color:#00f5ff;font-size:14px;">EDIT PROFILE</div>
+      <div onclick="closeEdit()" style="cursor:pointer;color:#fff;font-size:20px;">✕</div>
+    </div>
+
+    <!-- Profile Pic Upload -->
+    <div style="text-align:center;margin-bottom:20px;">
+      <div id="editPfp" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#b400ff,#00f5ff);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 10px;cursor:pointer;border:2px solid #00f5ff;" onclick="document.getElementById('pfpInput').click()">🦋</div>
+      <input type="file" id="pfpInput" accept="image/*" style="display:none" onchange="uploadPfp(this)">
+      <div style="font-size:11px;color:#6b4d8a;">Tap to change profile picture</div>
+    </div>
+
+    <!-- Banner Upload -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:#6b4d8a;margin-bottom:6px;">BANNER IMAGE</div>
+      <div onclick="document.getElementById('bannerInput').click()" style="height:60px;background:linear-gradient(135deg,#000510,#1a0040);border:1px dashed rgba(0,245,255,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#00f5ff;">📸 Upload Banner</div>
+      <input type="file" id="bannerInput" accept="image/*" style="display:none" onchange="uploadBanner(this)">
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;color:#6b4d8a;margin-bottom:6px;">DISPLAY NAME</div>
+      <input id="editName" type="text" style="width:100%;background:#110030;border:1px solid rgba(0,245,255,0.2);border-radius:8px;padding:10px;color:#fff;font-size:14px;outline:none;" placeholder="Your name">
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;color:#6b4d8a;margin-bottom:6px;">BIO</div>
+      <textarea id="editBio" style="width:100%;background:#110030;border:1px solid rgba(0,245,255,0.2);border-radius:8px;padding:10px;color:#fff;font-size:14px;outline:none;resize:vertical;min-height:70px;" placeholder="Tell your story..."></textarea>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;color:#6b4d8a;margin-bottom:6px;">PHONE <span style="color:#b400ff">(toggle visibility)</span></div>
+      <div style="display:flex;gap:8px;">
+        <input id="editPhone" type="tel" style="flex:1;background:#110030;border:1px solid rgba(0,245,255,0.2);border-radius:8px;padding:10px;color:#fff;font-size:14px;outline:none;" placeholder="+971...">
+        <button onclick="toggleField('phone')" id="phoneToggle" style="padding:8px 12px;background:rgba(180,0,255,0.2);border:1px solid rgba(180,0,255,0.4);border-radius:8px;color:#b400ff;font-size:11px;cursor:pointer;">HIDE</button>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;color:#6b4d8a;margin-bottom:6px;">INSTAGRAM</div>
+      <div style="display:flex;gap:8px;">
+        <input id="editInsta" type="text" style="flex:1;background:#110030;border:1px solid rgba(0,245,255,0.2);border-radius:8px;padding:10px;color:#fff;font-size:14px;outline:none;" placeholder="@username">
+        <button onclick="toggleField('instagram')" id="instaToggle" style="padding:8px 12px;background:rgba(180,0,255,0.2);border:1px solid rgba(180,0,255,0.4);border-radius:8px;color:#b400ff;font-size:11px;cursor:pointer;">HIDE</button>
+      </div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="font-size:11px;color:#6b4d8a;margin-bottom:6px;">LOCATION</div>
+      <input id="editLocation" type="text" style="width:100%;background:#110030;border:1px solid rgba(0,245,255,0.2);border-radius:8px;padding:10px;color:#fff;font-size:14px;outline:none;" placeholder="Dubai, UAE">
+    </div>
+    <button onclick="saveProfile()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00f5ff,#b400ff);border:none;border-radius:10px;color:#000;font-weight:bold;font-size:14px;cursor:pointer;">💾 SAVE PROFILE</button>
+  </div>
+</div>
+
+<script>
+let fieldVisibility = { phone: false, instagram: false };
+
+function openEdit() {
+  document.getElementById('editModal').style.display = 'block';
+  // Pre-fill
+  document.getElementById('editName').value = document.getElementById('creatorName').textContent || '';
+  document.getElementById('editBio').value = document.getElementById('creatorBio').textContent || '';
+}
+
+function closeEdit() {
+  document.getElementById('editModal').style.display = 'none';
+}
+
+function toggleField(field) {
+  fieldVisibility[field] = !fieldVisibility[field];
+  const btn = document.getElementById(field === 'phone' ? 'phoneToggle' : 'instaToggle');
+  btn.textContent = fieldVisibility[field] ? 'SHOW' : 'HIDE';
+}
+
+async function uploadPfp(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'ddott-tv-upload');
+  formData.append('folder', 'profiles');
+  try {
+    const res = await fetch('https://api.cloudinary.com/v1_1/dggip9tpp/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.secure_url) {
+      document.getElementById('editPfp').innerHTML = '<img src="' + data.secure_url + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+      document.getElementById('pfpEmoji').innerHTML = '<img src="' + data.secure_url + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+      window._pfpUrl = data.secure_url;
+    }
+  } catch(e) { alert('Upload failed'); }
+}
+
+async function uploadBanner(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'ddott-tv-upload');
+  const res = await fetch('https://api.cloudinary.com/v1_1/dggip9tpp/image/upload', { method: 'POST', body: formData });
+  const data = await res.json();
+  if (data.secure_url) {
+    document.querySelector('.banner').style.backgroundImage = 'url(' + data.secure_url + ')';
+    document.querySelector('.banner').style.backgroundSize = 'cover';
+    window._bannerUrl = data.secure_url;
+  }
+}
+
+async function saveProfile() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+  const updates = {
+    display_name: document.getElementById('editName').value,
+    bio: document.getElementById('editBio').value,
+    location: document.getElementById('editLocation').value,
+    phone_visible: fieldVisibility.phone,
+    instagram_visible: fieldVisibility.instagram,
+  };
+  if (document.getElementById('editPhone').value) updates.phone = document.getElementById('editPhone').value;
+  if (document.getElementById('editInsta').value) updates.instagram = document.getElementById('editInsta').value;
+  if (window._pfpUrl) updates.avatar_url = window._pfpUrl;
+  if (window._bannerUrl) updates.banner_url = window._bannerUrl;
+
+  const { error } = await db.from('profiles').update(updates).eq('id', user.id);
+  if (!error) {
+    document.getElementById('creatorName').textContent = updates.display_name;
+    document.getElementById('creatorBio').textContent = updates.bio;
+    closeEdit();
+    alert('✅ Profile saved!');
+  } else {
+    alert('❌ Error: ' + error.message);
+  }
+}
+</script>
 </body>
 </html>
