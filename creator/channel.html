@@ -811,10 +811,15 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
   function playVideo(id) {
+    const url = '/player/player-v2.html?id=' + id;
     if (window.parent !== window) {
-      window.parent.postMessage({type:'navigate', page:'player', videoId: id}, '*');
+      try {
+        window.top.location.href = url;
+      } catch(e) {
+        window.location.href = url;
+      }
     } else {
-      window.location.href = '/player/player-v2.html?id=' + id;
+      window.location.href = url;
     }
   }
   function openPlaylist(id) {
