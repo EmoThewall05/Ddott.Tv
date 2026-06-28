@@ -1130,11 +1130,7 @@ function toggleDislike() {
 }
 
 function goBack() {
-  if (document.referrer && document.referrer.includes('ddott.live')) {
-    history.back();
-  } else {
-    window.location.href = '/';
-  }
+  history.length > 1 ? history.back() : window.location.href = '/';
 }
 
 // ===== INIT =====
