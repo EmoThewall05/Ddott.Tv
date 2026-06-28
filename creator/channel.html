@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ddott TV — Creator Channel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/config/auth.js"></script>
+<script>
+const SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FInfsWgHml8s9dAwiAKQ4Q_Tf79f3G8';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
