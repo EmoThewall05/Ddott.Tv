@@ -24,6 +24,8 @@ async function loadVideos() {
     return;
   }
 
+  // Only show video grid on dedicated video page, not home
+  if (!document.getElementById('videoGrid') || window.location.pathname === '/' || window.location.pathname === '/index.html') return;
   grid.innerHTML = videos.map(v => `
     <div class="vcard" onclick="${v.is_short ? `location.href='/player/shorts.html'` : `openPlayer('${v.id}')`}">
       <div class="vc-thumb">
