@@ -56,3 +56,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadUser();
   loadVideos();
 });
+
+function openPlayer(id) {
+  window.location.href = '/player/player-v2.html?id=' + id;
+}
