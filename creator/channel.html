@@ -867,8 +867,16 @@
   document.addEventListener('DOMContentLoaded', () => {
     // Initialize with creator ID from URL or context
     const params = new URLSearchParams(window.location.search);
-    const creatorId = params.get('id') || 'self';
-    loadChannel(creatorId);
+    const creatorId = params.get('id');
+    if (creatorId) {
+      loadChannel(creatorId);
+    } else {
+      // Load own channel
+      db.auth.getUser().then(({ data: { user } }) => {
+        if (user) loadChannel(user.id);
+        else window.location.href = '/auth/login.html';
+      });
+    }
   });
 </script>
 
