@@ -977,6 +977,12 @@ async function loadCoins() {
 
 function updateCoins() {
   coinDisplay.textContent = fmtNum(coins);
+  // Save to Supabase
+  if (typeof db !== 'undefined') {
+    db.auth.getUser().then(({ data: { user } }) => {
+      if (user) db.from('profiles').update({ emo_coins: coins }).eq('id', user.id).catch(() => {});
+    });
+  }
 }
 
 // ── UTILS ──
