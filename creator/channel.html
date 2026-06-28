@@ -811,7 +811,11 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
   function playVideo(id) {
-    window.parent.postMessage({type:'navigate', page:'player', videoId: id}, '*');
+    if (window.parent !== window) {
+      window.parent.postMessage({type:'navigate', page:'player', videoId: id}, '*');
+    } else {
+      window.location.href = '/player/player-v2.html?id=' + id;
+    }
   }
   function openPlaylist(id) {
     window.parent.postMessage({type:'navigate', page:'playlist', playlistId: id}, '*');
@@ -873,12 +877,6 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   document.addEventListener('DOMContentLoaded', () => {
     // Initialize with creator ID from URL or context
     const params = new URLSearchParams(window.location.search);
-    const debugEl = document.createElement('div');
-    debugEl.style = 'position:fixed;top:50px;left:10px;right:10px;background:#111;color:#0f0;padding:10px;z-index:9999;font-size:11px;border-radius:8px;';
-    document.body.appendChild(debugEl);
-    db.auth.getUser().then(({data:{user}}) => {
-      debugEl.textContent = user ? 'USER: ' + user.id : 'NOT LOGGED IN';
-    }).catch(e => debugEl.textContent = 'ERROR: ' + e.message);
     const creatorId = params.get('id');
     if (creatorId) {
       loadChannel(creatorId);
