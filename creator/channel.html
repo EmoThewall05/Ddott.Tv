@@ -845,6 +845,15 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       document.getElementById('statViews').textContent = fmtNum(profile.total_views || 0);
       document.getElementById('emoCoins').textContent = fmtNum(profile.emo_coins || 0);
       if (profile.is_verified) document.getElementById('verifiedBadge').style.display = 'flex';
+      if (profile.avatar_url) {
+        document.getElementById('pfpEmoji').innerHTML = '<img src="' + profile.avatar_url + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+      }
+      if (profile.banner_url) {
+        const banner = document.querySelector('.banner');
+        banner.style.backgroundImage = 'url(' + profile.banner_url + ')';
+        banner.style.backgroundSize = 'cover';
+        banner.style.backgroundPosition = 'center';
+      }
       document.getElementById('bannerText').textContent = profile.username || '';
       renderAbout({
         bio: profile.bio,
