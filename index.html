@@ -162,7 +162,7 @@
       </div>
     </div>
 
-    <div id="videoFeed" style="padding:0 16px;margin-top:12px;display:flex;flex-direction:column;gap:12px;"></div>
+    <div id="videoFeed" style="display:none"></div>
 
     <div class="stats-strip">
       <div class="stat-pill"><div class="sp-val" style="color:var(--cyan)" id="statViews">...</div><div class="sp-lbl">Views</div></div>
@@ -247,8 +247,8 @@
 </div>
 
 <div class="tab-bar">
-  <div class="tab-item active" id="t-home" onclick="goHome()"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
   <div class="tab-item" id="t-feed" onclick="nav('feed')"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
+  <div class="tab-item active" id="t-home" onclick="goHome()"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
   <div class="tab-item" id="t-community" onclick="nav('community')"><div class="tab-icon">🌐</div><div class="tab-label">COMMUNITY</div></div>
   <div class="tab-item" id="t-coins" onclick="nav('coins')"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
   <div class="tab-item" id="t-studio" onclick="nav('studio')"><div class="tab-icon">🎬</div><div class="tab-label">STUDIO</div></div>
