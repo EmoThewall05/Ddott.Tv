@@ -176,10 +176,6 @@
     <div class="sec-title">DDOTT TV</div>
 
     <div class="pages-grid">
-      <div class="page-card" onclick="goHome()" style="border-color:rgba(0,245,255,0.15)">
-        <div class="pc-badge b-live">LIVE</div>
-        <div class="pc-icon">🏠</div><div class="pc-title">Home Feed</div><div class="pc-desc">Videos, trending & live streams</div>
-      </div>
       <div class="page-card" onclick="nav('player')" style="border-color:rgba(180,0,255,0.15)">
         <div class="pc-badge b-new">V2</div>
         <div class="pc-icon">📺</div><div class="pc-title">Video Player</div><div class="pc-desc">Neon player + stickers & comments</div>
@@ -247,8 +243,8 @@
 </div>
 
 <div class="tab-bar">
-  <div class="tab-item" id="t-feed" onclick="nav('feed')"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
-  <div class="tab-item active" id="t-home" onclick="goHome()"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
+  <div class="tab-item active" id="t-feed" onclick="nav('feed')"><div class="tab-icon">📺</div><div class="tab-label">FEED</div></div>
+  <div class="tab-item" id="t-home" onclick="goHome()"><div class="tab-icon">🏠</div><div class="tab-label">HOME</div></div>
   <div class="tab-item" id="t-community" onclick="nav('community')"><div class="tab-icon">🌐</div><div class="tab-label">COMMUNITY</div></div>
   <div class="tab-item" id="t-coins" onclick="nav('coins')"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
   <div class="tab-item" id="t-studio" onclick="nav('studio')"><div class="tab-icon">🎬</div><div class="tab-label">STUDIO</div></div>
@@ -322,6 +318,8 @@
   }
 
   document.querySelector('.logo').addEventListener('click',()=>{ if(current) goHome(); });
+
+  document.addEventListener('DOMContentLoaded', () => { nav('feed'); });
 </script>
 <script>if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").then(()=>console.log("SW registered")).catch(e=>console.log(e));}</script>
 <script>
