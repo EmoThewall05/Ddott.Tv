@@ -842,7 +842,8 @@ function toggleSub() {
   }
 
   function playVideo(id) {
-    const url = '/player/player-v2.html?id=' + id;
+    const vid = allVideos.find(v => v.id === id);
+    const url = (vid && vid.is_short) ? '/player/shorts.html?id=' + id : '/player/player-v2.html?id=' + id;
     if (window.parent !== window) {
       try {
         window.top.location.href = url;
