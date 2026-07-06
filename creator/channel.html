@@ -588,6 +588,9 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       <div class="creator-handle" id="creatorHandle">—</div>
       <div class="creator-bio" id="creatorBio"></div>
       <div class="creator-tags" id="creatorTags"></div>
+      <button class="logout-btn" id="logoutBtn" onclick="doLogout()" style="margin-top:14px;width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,60,60,0.4);background:rgba(255,60,60,0.1);color:#ff3c3c;font-weight:700;font-size:13px;letter-spacing:0.5px;cursor:pointer;">
+        🚪 LOGOUT
+      </button>
     </div>
 
     <div class="stats-bar">
@@ -684,7 +687,18 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
   let subscribed = false;
-  function toggleSub() {
+  async function doLogout(){
+  if(confirm('Logout cheyyano?')){
+    try {
+      await db.auth.signOut();
+    } catch(e) { console.error('Signout error:', e); }
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/auth/login.html';
+  }
+}
+
+function toggleSub() {
     subscribed = !subscribed;
     const btn = document.getElementById('subBtn');
     btn.textContent = subscribed ? '✓ SUBSCRIBED' : 'SUBSCRIBE';
