@@ -684,9 +684,26 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   function setFilter(el) {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
+    const filterType = el.textContent.trim().toLowerCase();
+    let filtered = [...allVideos];
+
+    if (filterType === 'recent') {
+      filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (filterType === 'popular') {
+      filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+    } else if (filterType === 'web3') {
+      filtered = filtered.filter(v => v.category === 'web3');
+    } else if (filterType === 'ai') {
+      filtered = filtered.filter(v => v.tags?.some(t => t.toLowerCase() === 'ai'));
+    } else if (filterType === 'shorts') {
+      filtered = filtered.filter(v => v.duration && v.duration <= 60);
+    }
+
+    renderVideos(filtered);
   }
 
   let subscribed = false;
+  let allVideos = [];
   async function doLogout(){
   if(confirm('Logout cheyyano?')){
     try {
@@ -883,6 +900,7 @@ function toggleSub() {
       .order('created_at', { ascending: false });
 
     if (videos) {
+      allVideos = videos;
       document.getElementById('statVideos').textContent = fmtNum(videos.length);
       renderVideos(videos);
       if (videos[0]) {
