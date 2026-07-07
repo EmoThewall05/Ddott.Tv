@@ -396,6 +396,58 @@ function removeTag(tag) {
   renderTags();
 }
 
+const MODERATION_WORKER_URL = 'https://creator-studio-script-ai.meradivin.workers.dev/';
+
+function extractVideoFrames(file, frameCount) {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.src = URL.createObjectURL(file);
+
+    const frames = [];
+    let capturedCount = 0;
+
+    video.onloadedmetadata = () => {
+      const duration = video.duration || 1;
+      const times = [];
+      for (let i = 0; i < frameCount; i++) {
+        times.push((duration / (frameCount + 1)) * (i + 1));
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 320;
+      canvas.height = 180;
+      const ctx = canvas.getContext('2d');
+
+      function captureNext() {
+        if (capturedCount >= times.length) {
+          URL.revokeObjectURL(video.src);
+          resolve(frames);
+          return;
+        }
+        video.currentTime = times[capturedCount];
+      }
+
+      video.onseeked = () => {
+        try {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          frames.push(dataUrl.split(',')[1]);
+        } catch (e) {
+          console.error('Frame capture error', e);
+        }
+        capturedCount++;
+        captureNext();
+      };
+
+      captureNext();
+    };
+
+    video.onerror = () => reject(new Error('Could not load video for frame extraction'));
+  });
+}
+
 async function publishVideo() {
   if (!selectedFile) { alert('Please select a video first!'); return; }
   const title = document.getElementById('videoTitle').value.trim();
@@ -403,9 +455,46 @@ async function publishVideo() {
 
   const btn = document.getElementById('publishBtn');
   const statusMsg = document.getElementById('statusMsg');
-  btn.textContent = '⏳ Uploading to Cloudinary...';
+  btn.textContent = '🔍 Checking content...';
   btn.disabled = true;
   statusMsg.style.display = 'block';
+  statusMsg.style.color = '#00f5ff';
+  statusMsg.textContent = '🔍 Running safety check...';
+
+  try {
+    const frames = await extractVideoFrames(selectedFile, 3);
+    const { data: { user: modUser } } = await db.auth.getUser();
+
+    const modRes = await fetch(MODERATION_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        images: frames,
+        title: title,
+        description: document.getElementById('videoDesc').value,
+        creatorName: modUser?.email || 'Unknown',
+        videoId: 'pending_' + Date.now()
+      })
+    });
+    const modData = await modRes.json();
+
+    if (!modData.safe) {
+      statusMsg.style.color = '#ff4444';
+      statusMsg.textContent = '🚫 Upload blocked: content violates guidelines. This has been reported for review.';
+      btn.textContent = '🚀 PUBLISH VIDEO';
+      btn.disabled = false;
+      return;
+    }
+  } catch (modErr) {
+    console.error('Moderation check failed', modErr);
+    statusMsg.style.color = '#ff4444';
+    statusMsg.textContent = '❌ Safety check failed. Please try again.';
+    btn.textContent = '🚀 PUBLISH VIDEO';
+    btn.disabled = false;
+    return;
+  }
+
+  btn.textContent = '⏳ Uploading to Cloudinary...';
   statusMsg.style.color = '#00f5ff';
   statusMsg.textContent = '📤 Uploading video...';
 
