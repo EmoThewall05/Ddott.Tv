@@ -662,20 +662,60 @@ function selectPkg(el, coins, price) {
   document.getElementById('buyNowBtn').textContent = '🪙 BUY ' + coins + ' EMO FOR ₹' + price;
 }
 
-function buyCoins() {
+const PAYMENT_WORKER_URL = 'https://ddott-add-ai-chat.meradivin.workers.dev';
+
+async function buyCoins() {
   if (!selectedPkg) {
     alert('Please select a package first');
     return;
   }
+
+  let order;
+  try {
+    const orderRes = await fetch(PAYMENT_WORKER_URL + '/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: selectedPkg.price, coins: selectedPkg.coins })
+    });
+    const orderData = await orderRes.json();
+    if (!orderData.order) {
+      alert('❌ Could not start payment. Try again.');
+      return;
+    }
+    order = orderData.order;
+  } catch (e) {
+    alert('❌ Network error. Try again.');
+    return;
+  }
+
   const options = {
     key: 'rzp_live_T7hoFzwN2P77Mf',
-    amount: selectedPkg.price * 100,
+    amount: order.amount,
     currency: 'INR',
     name: 'Ddott TV',
     description: selectedPkg.coins + ' EMO Coins',
     image: 'https://ddott.live/favicon.ico',
+    order_id: order.id,
     handler: async function(response) {
-      await creditCoins(response.razorpay_payment_id, selectedPkg.coins, selectedPkg.price);
+      try {
+        const verifyRes = await fetch(PAYMENT_WORKER_URL + '/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature
+          })
+        });
+        const verifyData = await verifyRes.json();
+        if (verifyData.verified) {
+          await creditCoins(response.razorpay_payment_id, selectedPkg.coins, selectedPkg.price);
+        } else {
+          alert('❌ Payment verification failed. Contact support with payment ID: ' + response.razorpay_payment_id);
+        }
+      } catch (e) {
+        alert('❌ Verification error. Contact support with payment ID: ' + response.razorpay_payment_id);
+      }
     },
     prefill: { name: '', email: '', contact: '' },
     theme: { color: '#ff0040' }
