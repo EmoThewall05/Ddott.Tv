@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback - DDOTT.TV</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/supabase-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --cyan:#00f5ff; --purple:#b400ff; --pink:#ff00c8; --dark:#04000f; --surface:#0a0020; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--dark); color:#e8d5ff; font-family:'Rajdhani',sans-serif; padding:20px 16px 60px; }
+  .header { font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:900; background:linear-gradient(90deg,var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:20px; }
+  .type-toggle { display:flex; gap:10px; margin-bottom:20px; }
+  .type-btn { flex:1; padding:14px; border-radius:10px; border:1px solid #333; background:var(--surface); text-align:center; cursor:pointer; }
+  .type-btn.active[data-type="bug"] { border-color:#ff4444; background:#ff444422; color:#ff6666; }
+  .type-btn.active[data-type="feature"] { border-color:var(--cyan); background:#00f5ff22; color:var(--cyan); }
+  .input-group { margin-bottom:16px; }
+  .input-label { font-size:0.75rem; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  input[type=text], textarea { width:100%; background:var(--surface); border:1px solid #222; border-radius:10px; padding:14px; color:#fff; font-size:0.95rem; outline:none; font-family:inherit; }
+  textarea { min-height:100px; resize:vertical; }
+  .submit-btn { width:100%; padding:16px; background:linear-gradient(90deg,var(--cyan),var(--purple)); border:none; border-radius:12px; color:#000; font-weight:bold; font-size:1rem; cursor:pointer; margin-top:10px; }
+  .submit-btn:disabled { opacity:0.5; }
+  .status-msg { text-align:center; padding:12px; border-radius:10px; margin-bottom:15px; display:none; }
+  .status-msg.show { display:block; }
+  .status-msg.success { background:#00ff8811; color:#00ff88; }
+  .status-msg.error { background:#ff444411; color:#ff4444; }
+</style>
+</head>
+<body>
+
+<div class="header">🐛 REPORT BUG / SUGGEST FEATURE</div>
+
+<div class="status-msg" id="statusMsg"></div>
+
+<div class="type-toggle">
+  <div class="type-btn active" data-type="bug" onclick="setType('bug', this)">🐛 Bug Report</div>
+  <div class="type-btn" data-type="feature" onclick="setType('feature', this)">💡 Feature Idea</div>
+</div>
+
+<div class="input-group">
+  <div class="input-label">TITLE</div>
+  <input type="text" id="fbTitle" placeholder="Short summary...">
+</div>
+
+<div class="input-group">
+  <div class="input-label">DESCRIPTION</div>
+  <textarea id="fbDesc" placeholder="Describe the issue or idea in detail..."></textarea>
+</div>
+
+<button class="submit-btn" id="submitBtn" onclick="submitFeedback()">🚀 SUBMIT</button>
+
+<script>
+const NOTIFY_WORKER_URL = 'https://creator-studio-script-ai.meradivin.workers.dev/notify-feedback';
+let currentType = 'bug';
+
+function setType(type, el) {
+  currentType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function submitFeedback() {
+  const title = document.getElementById('fbTitle').value.trim();
+  const description = document.getElementById('fbDesc').value.trim();
+  const statusMsg = document.getElementById('statusMsg');
+  const btn = document.getElementById('submitBtn');
+
+  if (!title) { alert('Please add a title!'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Submitting...';
+  statusMsg.className = 'status-msg show';
+  statusMsg.textContent = 'Submitting...';
+
+  try {
+    const { data: { user } } = await db.auth.getUser();
+
+    const { error } = await db.from('bug_reports').insert({
+      user_id: user?.id || null,
+      type: currentType,
+      title: title,
+      description: description
+    });
+
+    if (error) throw error;
+
+    // Notify Telegram/Discord
+    await fetch(NOTIFY_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: currentType,
+        title: title,
+        description: description,
+        userEmail: user?.email || 'Anonymous'
+      })
+    });
+
+    statusMsg.className = 'status-msg show success';
+    statusMsg.textContent = '✅ Thank you! Your ' + (currentType === 'bug' ? 'bug report' : 'feature idea') + ' has been submitted.';
+    document.getElementById('fbTitle').value = '';
+    document.getElementById('fbDesc').value = '';
+    btn.textContent = '🚀 SUBMIT';
+    btn.disabled = false;
+
+  } catch (err) {
+    console.error(err);
+    statusMsg.className = 'status-msg show error';
+    statusMsg.textContent = '❌ Submission failed: ' + err.message;
+    btn.textContent = '🚀 SUBMIT';
+    btn.disabled = false;
+  }
+}
+</script>
+
+</body>
+</html>
