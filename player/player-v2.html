@@ -23,7 +23,6 @@
             min-height: 100vh;
         }
 
-        /* ===== VIDEO PLAYER SECTION ===== */
         .player-container {
             position: relative;
             width: 100%;
@@ -39,7 +38,6 @@
             display: block;
         }
 
-        /* Loading Overlay */
         .loading-overlay {
             position: absolute;
             inset: 0;
@@ -76,7 +74,6 @@
             letter-spacing: 1px;
         }
 
-        /* Tap to Play Overlay (for autoplay blocked) */
         .tap-overlay {
             position: absolute;
             inset: 0;
@@ -103,7 +100,6 @@
             border: 2px solid rgba(255,255,255,0.3);
         }
 
-        /* Controls Bar */
         .controls-bar {
             position: absolute;
             bottom: 0;
@@ -168,7 +164,6 @@
             font-weight: 600;
         }
 
-        /* ===== VIDEO INFO SECTION ===== */
         .info-section {
             padding: 16px;
         }
@@ -191,7 +186,6 @@
 
         .meta-dot { width: 3px; height: 3px; background: rgba(255,255,255,0.4); border-radius: 50%; }
 
-        /* Action Buttons */
         .actions-row {
             display: flex;
             gap: 10px;
@@ -223,7 +217,6 @@
             font-weight: 600;
         }
 
-        /* EMO Coins Bar */
         .coins-bar {
             background: linear-gradient(135deg, rgba(179, 0, 255, 0.2), rgba(255, 0, 255, 0.2));
             border: 1px solid rgba(179, 0, 255, 0.3);
@@ -262,7 +255,6 @@
             font-size: 13px;
         }
 
-        /* Creator Card */
         .creator-card {
             display: flex;
             align-items: center;
@@ -284,7 +276,9 @@
             justify-content: center;
             font-size: 20px;
             flex-shrink: 0;
+            overflow: hidden;
         }
+        .creator-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
         .creator-info { flex: 1; }
 
@@ -310,7 +304,6 @@
             cursor: pointer;
         }
 
-        /* Description */
         .description {
             font-size: 14px;
             line-height: 1.6;
@@ -338,7 +331,6 @@
             margin-bottom: 20px;
         }
 
-        /* Comments */
         .section-header {
             font-size: 16px;
             font-weight: 700;
@@ -367,7 +359,6 @@
 
         .comment-input::placeholder { color: rgba(255,255,255,0.4); }
 
-        /* Up Next / Live Chat Tabs */
         .tabs-row {
             display: flex;
             gap: 16px;
@@ -390,7 +381,6 @@
             border-bottom-color: var(--neon-cyan);
         }
 
-        /* Bottom Nav */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -422,7 +412,6 @@
 
         .safe-bottom { height: 70px; }
 
-        /* Error State */
         .error-state {
             position: absolute;
             inset: 0;
@@ -451,53 +440,7 @@
             font-weight: 700;
             cursor: pointer;
         }
-    
-        /* Quiz Overlay */
-        .quiz-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.92);
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        .quiz-overlay.active { display: flex; }
-        .quiz-box {
-            background: #0d1117;
-            border: 1px solid #00e676;
-            border-radius: 20px;
-            padding: 28px 20px;
-            max-width: 420px;
-            width: 100%;
-        }
-        .quiz-title { color: #00e676; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-        .quiz-subtitle { color: #8892a4; font-size: 12px; margin-bottom: 20px; }
-        .quiz-question { color: #fff; font-size: 15px; font-weight: 600; margin-bottom: 16px; }
-        .quiz-option {
-            display: block; width: 100%;
-            background: #161b22; border: 1px solid #30363d;
-            color: #fff; font-size: 14px;
-            padding: 12px 16px; border-radius: 10px;
-            margin-bottom: 10px; cursor: pointer; text-align: left;
-            transition: all 0.2s;
-        }
-        .quiz-option:hover { border-color: #00e676; background: #0d2818; }
-        .quiz-option.correct { border-color: #00e676; background: #0d2818; color: #00e676; }
-        .quiz-option.wrong { border-color: #ff5500; background: #1a0a00; color: #ff5500; }
-        .quiz-result { text-align: center; margin-top: 16px; font-size: 14px; color: #00e676; font-weight: 700; }
-        .quiz-earn-btn {
-            display: none; width: 100%;
-            background: linear-gradient(135deg, #00e676, #00b0ff);
-            color: #000; font-weight: 800; font-size: 15px;
-            padding: 14px; border-radius: 12px;
-            border: none; cursor: pointer; margin-top: 14px;
-        }
-        .quiz-earn-btn.visible { display: block; }
-        .quiz-skip { color: #8892a4; font-size: 12px; text-align: center; margin-top: 10px; cursor: pointer; }
 
-        /* Quiz Overlay */
         .quiz-overlay {
             display: none;
             position: fixed;
@@ -541,6 +484,7 @@
         }
         .quiz-earn-btn.visible { display: block; }
         .quiz-skip { color: #8892a4; font-size: 12px; text-align: center; margin-top: 10px; cursor: pointer; }
+        .quiz-earn-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .quiz-timer {
             text-align: center;
@@ -550,9 +494,7 @@
             margin-bottom: 12px;
         }
         .quiz-timer.warning { color: #ff5500; }
-</style>
-<base target="_blank">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co';
@@ -563,30 +505,25 @@
 </head>
 <body>
 
-    <!-- VIDEO PLAYER -->
     <div class="player-container" id="playerContainer">
         <video id="mainVideo" playsinline webkit-playsinline preload="metadata">
             Your browser does not support the video tag.
         </video>
 
-        <!-- Loading Overlay -->
         <div class="loading-overlay" id="loadingOverlay">
             <div class="spinner"></div>
             <div class="loading-text" id="loadingText">Loading video...</div>
         </div>
 
-        <!-- Tap to Play Overlay -->
         <div class="tap-overlay" id="tapOverlay">
             <div class="tap-icon">▶</div>
         </div>
 
-        <!-- Error State -->
         <div class="error-state" id="errorState">
             <div class="error-text" id="errorText">Video failed to load</div>
             <button class="retry-btn" onclick="loadVideo()">Retry</button>
         </div>
 
-        <!-- Controls -->
         <div class="controls-bar" id="controlsBar">
             <button class="ctrl-btn" id="playBtn">▶</button>
             <button class="ctrl-btn">⏮</button>
@@ -600,12 +537,11 @@
         </div>
     </div>
 
-    <!-- INFO SECTION -->
     <div class="info-section">
         <div style="display:flex;align-items:center;gap:12px;padding:12px 16px 0;">
-        <button onclick="goBack()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;">← Back</button>
-      </div>
-      <h1 class="video-title" id="videoTitle">Ddott TV Video</h1>
+          <button onclick="goBack()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;">← Back</button>
+        </div>
+        <h1 class="video-title" id="videoTitle">Ddott TV Video</h1>
 
         <div class="video-meta">
             <span id="viewCount">0 views</span>
@@ -615,56 +551,46 @@
             <span id="videoDuration">0:00</span>
         </div>
 
-        <!-- Actions -->
         <div class="actions-row">
             <button class="action-btn primary" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span></button>
-            <button class="action-btn" id="dislikeBtn" onclick="toggleDislike()">👎</button>
+            <button class="action-btn" id="dislikeBtn" onclick="toggleDislike()">👎 <span id="dislikeCount">0</span></button>
             <button class="action-btn">↗ Share</button>
             <button class="action-btn">+ Save</button>
             <button class="action-btn">✂ Clip</button>
         </div>
 
-        <!-- EMO Coins -->
         <div class="coins-bar">
             <div>
                 <div class="coins-label">EMO COINS</div>
-                <div class="coins-value">🪙 450</div>
+                <div class="coins-value">🪙 <span id="userCoins">0</span></div>
             </div>
             <button class="tip-btn">TIP CREATOR</button>
         </div>
 
-        <!-- Creator -->
         <div class="creator-card">
-            <div class="creator-avatar">🦋</div>
+            <div class="creator-avatar" id="creatorAvatar">🦋</div>
             <div class="creator-info">
-                <div class="creator-name" id="creatorName">Divin</div>
-                <div class="creator-handle" id="creatorHandle">Emobies05 · 0 subscribers · Dwin Universe</div>
+                <div class="creator-name" id="creatorName">Ddott Creator</div>
+                <div class="creator-handle" id="creatorHandle">Loading...</div>
             </div>
             <button class="follow-btn">FOLLOW</button>
         </div>
 
-        <!-- Description -->
         <div class="description" id="videoDescription">
-            Building an entire Web3 wallet from a phone — no laptop, no desktop. Just Termux, Acode, and sheer will. This is the full build session for TheWall — 5-chain crypto wallet powered by Alchemy + Claude AI. 🔥
+            Loading description...
         </div>
 
         <div class="hashtags" id="hashtags">
             <span class="hashtag">#DwinUniverse</span>
-            <span class="hashtag">#TheWall</span>
-            <span class="hashtag">#Web3</span>
-            <span class="hashtag">#BuildInPublic</span>
-            <span class="hashtag">#MobileDev</span>
         </div>
 
         <div class="show-more">▼ Show more</div>
 
-        <!-- Comments -->
         <div class="section-header">💬 Comments (<span id="commentCount">0</span>)</div>
         <div class="comment-box">
             <input type="text" class="comment-input" placeholder="Add a comment...">
         </div>
 
-        <!-- Tabs -->
         <div class="tabs-row">
             <div class="tab active">📺 Up Next</div>
             <div class="tab">⚡ Live Chat</div>
@@ -673,7 +599,6 @@
 
     <div class="safe-bottom"></div>
 
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <a href="/" class="nav-item">
             <span class="nav-icon">🏠</span>
@@ -697,486 +622,564 @@
         </a>
     </nav>
 
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-box">
+            <div class="quiz-title">🎬 Proof of Watch</div>
+            <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
+            <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult"></div>
+            <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
+            <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
+        </div>
+    </div>
+
     <script>
-        // ============================================
-// DDOTT TV PLAYER V2 — FIXED VIDEO LOADER
-// Replace the corresponding section in player-v2.html with this.
-// ============================================
+    // ============================================
+    // DDOTT TV PLAYER V2 — FIXED VERSION 2
+    // Fixes added this pass: removed <base target="_blank"> (nav no longer opens
+    // new tabs), real view count increment, per-video/per-user duplicate-claim
+    // guard for quiz coins, and like/dislike state restored on reload via
+    // localStorage so refresh doesn't double count.
+    // ============================================
 
-const FALLBACK_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    const FALLBACK_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
 
-const video = document.getElementById('mainVideo');
-const loadingOverlay = document.getElementById('loadingOverlay');
-const loadingText = document.getElementById('loadingText');
-const tapOverlay = document.getElementById('tapOverlay');
-const errorState = document.getElementById('errorState');
-const errorText = document.getElementById('errorText');
-const playBtn = document.getElementById('playBtn');
-const progressFill = document.getElementById('progressFill');
-const progressContainer = document.getElementById('progressContainer');
-const timeDisplay = document.getElementById('timeDisplay');
-const playerContainer = document.getElementById('playerContainer');
+    const video = document.getElementById('mainVideo');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const tapOverlay = document.getElementById('tapOverlay');
+    const errorState = document.getElementById('errorState');
+    const errorText = document.getElementById('errorText');
+    const playBtn = document.getElementById('playBtn');
+    const progressFill = document.getElementById('progressFill');
+    const progressContainer = document.getElementById('progressContainer');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const playerContainer = document.getElementById('playerContainer');
 
-let isPlaying = false;
-let currentVideoUrl = '';
+    let isPlaying = false;
+    let currentVideoUrl = '';
+    let currentVideoId = null;
+    let currentUser = null;
+    let quizCoinsClaimed = false;
+    let viewCounted = false;
 
-// ===== SUPABASE LOOKUP CACHE =====
-const VIDEO_DB = {};
-
-// Safely decode a URL param that may have been encoded once or twice.
-// Keeps decoding while it still looks percent-encoded and the result is a valid URL.
-function safeDecodeUrl(raw) {
-    let val = raw;
-    for (let i = 0; i < 3; i++) {
-        if (!/%[0-9A-Fa-f]{2}/.test(val)) break;
-        try {
-            const decoded = decodeURIComponent(val);
-            if (decoded === val) break;
-            val = decoded;
-        } catch (e) {
-            console.warn('decodeURIComponent failed at pass', i, val);
-            break;
+    function safeDecodeUrl(raw) {
+        let val = raw;
+        for (let i = 0; i < 3; i++) {
+            if (!/%[0-9A-Fa-f]{2}/.test(val)) break;
+            try {
+                const decoded = decodeURIComponent(val);
+                if (decoded === val) break;
+                val = decoded;
+            } catch (e) { break; }
         }
+        return val;
     }
-    return val;
-}
 
-// Fetch video from Supabase by ID (now actually awaited before play)
-async function fetchVideoFromDB(id) {
-    try {
-        const { data, error } = await db
-            .from('videos')
-            .select('video_url,title,description')
-            .eq('id', id)
-            .single();
-
-        if (error || !data) {
-            console.error('❌ Supabase fetch failed for id', id, error);
+    async function getCurrentUser() {
+        try {
+            const { data, error } = await db.auth.getUser();
+            if (error || !data || !data.user) return null;
+            return data.user;
+        } catch (e) {
+            console.warn('No active session:', e);
             return null;
         }
+    }
 
-        VIDEO_DB[id] = data.video_url;
-
-        if (data.title) {
-            const titleEl = document.getElementById('videoTitle');
-            if (titleEl) titleEl.textContent = data.title;
+    async function loadUserCoins() {
+        if (!currentUser) {
+            document.getElementById('userCoins').textContent = '0';
+            return;
         }
-        if (data.description) {
-            const descEl = document.getElementById('videoDescription');
-            if (descEl) descEl.textContent = data.description;
-        }
-
-        return data.video_url;
-    } catch (e) {
-        console.error('DB fetch error:', e);
-        return null;
-    }
-}
-
-// ===== URL PARAMETER PARSER (now async) =====
-async function getVideoUrl() {
-    const params = new URLSearchParams(window.location.search);
-
-    // 1. Direct ?url= parameter (highest priority)
-    const directUrl = params.get('url');
-    if (directUrl && directUrl.trim() !== '' && directUrl !== 'undefined' && directUrl !== 'null') {
-        return safeDecodeUrl(directUrl);
-    }
-
-    // 2. ?id= parameter — resolve via Supabase (awaited!)
-    const videoId = params.get('id');
-    if (videoId && videoId.trim() !== '') {
-        if (VIDEO_DB[videoId]) return VIDEO_DB[videoId];
-        const resolved = await fetchVideoFromDB(videoId);
-        if (resolved) return resolved;
-        console.warn('⚠️ Could not resolve video for id:', videoId);
-    }
-
-    // 3. ?v= parameter (YouTube-style alias) — same treatment
-    const v = params.get('v');
-    if (v && v.trim() !== '') {
-        if (VIDEO_DB[v]) return VIDEO_DB[v];
-        const resolved = await fetchVideoFromDB(v);
-        if (resolved) return resolved;
-    }
-
-    // 4. Fallback — only reached if nothing else resolved
-    console.log('⚠️ No video param found or DB lookup failed, using fallback');
-    return FALLBACK_VIDEO;
-}
-
-// ===== LOAD VIDEO (now async) =====
-async function loadVideo() {
-    errorState.classList.remove('visible');
-    loadingOverlay.classList.remove('hidden');
-    loadingText.textContent = 'Loading video...';
-
-    currentVideoUrl = await getVideoUrl();
-    console.log('🎬 Loading video URL:', currentVideoUrl);
-
-    if (!currentVideoUrl || currentVideoUrl === 'undefined') {
-        console.error('❌ Invalid video URL, using fallback');
-        currentVideoUrl = FALLBACK_VIDEO;
-    }
-
-    // Reset video element
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
-
-    // Fix Cloudinary URL for mobile compatibility
-    if (currentVideoUrl && currentVideoUrl.includes('cloudinary.com') && currentVideoUrl.includes('/upload/') && !currentVideoUrl.includes('f_mp4')) {
-        currentVideoUrl = currentVideoUrl.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
-    }
-    video.src = currentVideoUrl;
-    video.load();
-
-    // Try autoplay
-    attemptPlay();
-}
-
-// ===== PLAYBACK ATTEMPT =====
-async function attemptPlay() {
-    try {
-        await video.play();
-        isPlaying = true;
-        playBtn.textContent = '⏸';
-        tapOverlay.classList.remove('visible');
-        console.log('✅ Autoplay successful');
-    } catch (err) {
-        console.log('⚠️ Autoplay blocked:', err.name);
-        isPlaying = false;
-        playBtn.textContent = '▶';
-
-        if (err.name === 'NotAllowedError') {
-            tapOverlay.classList.add('visible');
+        try {
+            const { data, error } = await db
+                .from('profiles')
+                .select('emo_coins')
+                .eq('id', currentUser.id)
+                .single();
+            if (!error && data) {
+                document.getElementById('userCoins').textContent = data.emo_coins ?? 0;
+            }
+        } catch (e) {
+            console.error('Could not load coins:', e);
         }
     }
-}
 
-// ===== EVENT LISTENERS =====
+    async function refreshUserCoins() {
+        await loadUserCoins();
+    }
 
-video.addEventListener('loadeddata', () => {
-    console.log('✅ Video loaded');
-    loadingOverlay.classList.add('hidden');
-    errorState.classList.remove('visible');
+    async function fetchVideoFromDB(id) {
+        try {
+            const { data, error } = await db
+                .from('videos')
+                .select('video_url,title,description,creator_id,likes,dislikes,views')
+                .eq('id', id)
+                .single();
 
-    const duration = formatTime(video.duration || 0);
-    document.getElementById('videoDuration').textContent = duration;
-    updateTimeDisplay();
-});
+            if (error || !data) {
+                console.error('❌ Supabase fetch failed for id', id, error);
+                return null;
+            }
 
-video.addEventListener('canplaythrough', () => {
-    loadingOverlay.classList.add('hidden');
-});
+            currentVideoId = id;
 
-video.addEventListener('error', (e) => {
-    console.error('❌ Video error:', video.error);
-    loadingOverlay.classList.add('hidden');
+            if (data.title) document.getElementById('videoTitle').textContent = data.title;
+            if (data.description) document.getElementById('videoDescription').textContent = data.description;
+            document.getElementById('viewCount').textContent = (data.views || 0) + ' views';
 
-    const errorMsg = video.error ?
-        `Error ${video.error.code}: ${video.error.message || 'Unknown'}` :
-        'Video failed to load';
+            likeCountVal = data.likes || 0;
+            dislikeCountVal = data.dislikes || 0;
 
-    errorText.textContent = errorMsg;
-    errorState.classList.add('visible');
+            // Restore this user's like/dislike state so refresh doesn't double-count
+            liked = localStorage.getItem('liked_' + id) === '1';
+            disliked = localStorage.getItem('disliked_' + id) === '1';
+            if (liked) document.getElementById('likeBtn').style.background = 'linear-gradient(135deg, #00f3ff, #bf00ff)';
+            if (disliked) document.getElementById('dislikeBtn').style.background = 'rgba(255,100,100,0.3)';
 
-    // Auto-retry with fallback if not already fallback
-    if (currentVideoUrl !== FALLBACK_VIDEO) {
-        console.log('🔄 Auto-retrying with fallback...');
-        setTimeout(() => {
+            document.getElementById('likeCount').textContent = likeCountVal;
+            document.getElementById('dislikeCount').textContent = dislikeCountVal;
+
+            if (data.creator_id) loadCreatorInfo(data.creator_id);
+
+            return data.video_url;
+        } catch (e) {
+            console.error('DB fetch error:', e);
+            return null;
+        }
+    }
+
+    async function loadCreatorInfo(creatorId) {
+        try {
+            const { data, error } = await db
+                .from('profiles')
+                .select('display_name,avatar_url,subscribers')
+                .eq('id', creatorId)
+                .single();
+            if (error || !data) return;
+
+            document.getElementById('creatorName').textContent = data.display_name || 'Ddott Creator';
+            document.getElementById('creatorHandle').textContent =
+                (data.subscribers || 0) + ' subscribers · Dwin Universe';
+
+            if (data.avatar_url) {
+                document.getElementById('creatorAvatar').innerHTML =
+                    '<img src="' + data.avatar_url + '" alt="avatar">';
+            }
+        } catch (e) {
+            console.error('Creator info fetch error:', e);
+        }
+    }
+
+    async function incrementViewCount() {
+        if (viewCounted || !currentVideoId) return;
+        viewCounted = true;
+        try {
+            const { data, error } = await db.from('videos').select('views').eq('id', currentVideoId).single();
+            if (error || !data) return;
+            const newViews = (data.views || 0) + 1;
+            const { error: updErr } = await db.from('videos').update({ views: newViews }).eq('id', currentVideoId);
+            if (!updErr) document.getElementById('viewCount').textContent = newViews + ' views';
+        } catch (e) {
+            console.error('View increment failed:', e);
+        }
+    }
+
+    async function getVideoUrl() {
+        const params = new URLSearchParams(window.location.search);
+
+        const directUrl = params.get('url');
+        if (directUrl && directUrl.trim() !== '' && directUrl !== 'undefined' && directUrl !== 'null') {
+            return safeDecodeUrl(directUrl);
+        }
+
+        const videoId = params.get('id');
+        if (videoId && videoId.trim() !== '') {
+            const resolved = await fetchVideoFromDB(videoId);
+            if (resolved) return resolved;
+            console.warn('⚠️ Could not resolve video for id:', videoId);
+        }
+
+        const v = params.get('v');
+        if (v && v.trim() !== '') {
+            const resolved = await fetchVideoFromDB(v);
+            if (resolved) return resolved;
+        }
+
+        console.log('⚠️ No video param found or DB lookup failed, using fallback');
+        return FALLBACK_VIDEO;
+    }
+
+    async function loadVideo() {
+        errorState.classList.remove('visible');
+        loadingOverlay.classList.remove('hidden');
+        loadingText.textContent = 'Loading video...';
+
+        currentVideoUrl = await getVideoUrl();
+        console.log('🎬 Loading video URL:', currentVideoUrl);
+
+        if (!currentVideoUrl || currentVideoUrl === 'undefined') {
             currentVideoUrl = FALLBACK_VIDEO;
-            video.src = FALLBACK_VIDEO;
-            video.load();
-            attemptPlay();
-            errorState.classList.remove('visible');
-            loadingOverlay.classList.remove('hidden');
-        }, 1500);
-    }
-});
-
-video.addEventListener('timeupdate', () => {
-    updateTimeDisplay();
-    updateProgress();
-});
-
-video.addEventListener('ended', () => {
-    isPlaying = false;
-    playBtn.textContent = '▶';
-    showVideoQuiz();
-});
-
-function showVideoQuiz() {
-    const title = document.getElementById('videoTitle').textContent || 'this video';
-    const dur = video.duration;
-    const mins = Math.floor(dur / 60);
-    const secs = Math.floor(dur % 60);
-    const durStr = mins > 0 ? `${mins} min ${secs} sec` : `${secs} sec`;
-
-    // Wrong options
-    const wrong1 = mins > 0 ? `${mins - 1} min ${secs} sec` : `${secs + 15} sec`;
-    const wrong2 = mins > 0 ? `${mins + 1} min ${secs} sec` : `${Math.max(secs - 10, 5)} sec`;
-
-    const questions = [
-        {
-            q: `Q1. How long was this video?`,
-            options: shuffle([durStr, wrong1, wrong2]),
-            answer: durStr
-        },
-        {
-            q: `Q2. What is the title of this video?`,
-            options: shuffle([title, 'Ddott TV Short', 'Creator Studio Guide']),
-            answer: title
         }
-    ];
 
-    const idx = Math.floor(Math.random() * questions.length);
-    const quiz = questions[idx];
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
 
-    document.getElementById('quizQuestion').textContent = quiz.q;
-    document.getElementById('quizResult').textContent = '';
-    document.getElementById('quizEarnBtn').classList.remove('visible');
+        if (currentVideoUrl && currentVideoUrl.includes('cloudinary.com') && currentVideoUrl.includes('/upload/') && !currentVideoUrl.includes('f_mp4')) {
+            currentVideoUrl = currentVideoUrl.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
+        }
+        video.src = currentVideoUrl;
+        video.load();
 
-    const optDiv = document.getElementById('quizOptions');
-    optDiv.innerHTML = '';
-    quiz.options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option';
-        btn.textContent = opt;
-        btn.onclick = () => checkQuizAnswer(btn, opt, quiz.answer, optDiv);
-        optDiv.appendChild(btn);
+        attemptPlay();
+    }
+
+    async function attemptPlay() {
+        try {
+            await video.play();
+            isPlaying = true;
+            playBtn.textContent = '⏸';
+            tapOverlay.classList.remove('visible');
+        } catch (err) {
+            isPlaying = false;
+            playBtn.textContent = '▶';
+            if (err.name === 'NotAllowedError') {
+                tapOverlay.classList.add('visible');
+            }
+        }
+    }
+
+    video.addEventListener('loadeddata', () => {
+        loadingOverlay.classList.add('hidden');
+        errorState.classList.remove('visible');
+        document.getElementById('videoDuration').textContent = formatTime(video.duration || 0);
+        updateTimeDisplay();
+        incrementViewCount();
     });
 
-    document.getElementById('quizOverlay').classList.add('active');
-    startQuizTimer();
-}
+    video.addEventListener('canplaythrough', () => {
+        loadingOverlay.classList.add('hidden');
+    });
 
-let quizTimerInterval = null;
+    video.addEventListener('error', (e) => {
+        loadingOverlay.classList.add('hidden');
+        const errorMsg = video.error ?
+            `Error ${video.error.code}: ${video.error.message || 'Unknown'}` :
+            'Video failed to load';
+        errorText.textContent = errorMsg;
+        errorState.classList.add('visible');
 
-function startQuizTimer() {
-    let timeLeft = 90;
-    const timerEl = document.getElementById('quizTimer');
-    clearInterval(quizTimerInterval);
-    quizTimerInterval = setInterval(() => {
-        timeLeft--;
-        if (timerEl) {
-            timerEl.textContent = '⏱ ' + timeLeft + 's';
-            if (timeLeft <= 20) timerEl.classList.add('warning');
+        if (currentVideoUrl !== FALLBACK_VIDEO) {
+            setTimeout(() => {
+                currentVideoUrl = FALLBACK_VIDEO;
+                video.src = FALLBACK_VIDEO;
+                video.load();
+                attemptPlay();
+                errorState.classList.remove('visible');
+                loadingOverlay.classList.remove('hidden');
+            }, 1500);
         }
-        if (timeLeft <= 0) {
-            clearInterval(quizTimerInterval);
-            // Disable all options
-            document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
-            document.getElementById('quizResult').textContent = '😔 Sorry! Time up. You lost the coins.';
-            document.getElementById('quizResult').style.color = '#ff5500';
-            document.getElementById('quizEarnBtn').classList.remove('visible');
-            setTimeout(closeQuiz, 2000);
-        }
-    }, 1000);
-}
+    });
 
-function shuffle(arr) {
-    return arr.sort(() => Math.random() - 0.5);
-}
+    video.addEventListener('timeupdate', () => {
+        updateTimeDisplay();
+        updateProgress();
+    });
 
-function checkQuizAnswer(btn, selected, answer, optDiv) {
-    const btns = optDiv.querySelectorAll('.quiz-option');
-    btns.forEach(b => b.disabled = true);
-    if (selected === answer) {
-        btn.classList.add('correct');
-        document.getElementById('quizResult').textContent = '✅ Correct! You earned Emo Coins!';
-        document.getElementById('quizEarnBtn').classList.add('visible');
-    } else {
-        btn.classList.add('wrong');
-        btns.forEach(b => { if (b.textContent === answer) b.classList.add('correct'); });
-        document.getElementById('quizResult').textContent = '❌ Wrong! Better luck next time.';
+    video.addEventListener('ended', () => {
+        isPlaying = false;
+        playBtn.textContent = '▶';
+        showVideoQuiz();
+    });
+
+    function showVideoQuiz() {
+        quizCoinsClaimed = false;
+        const title = document.getElementById('videoTitle').textContent || 'this video';
+        const dur = video.duration;
+        const mins = Math.floor(dur / 60);
+        const secs = Math.floor(dur % 60);
+        const durStr = mins > 0 ? `${mins} min ${secs} sec` : `${secs} sec`;
+
+        const wrong1 = mins > 0 ? `${mins - 1} min ${secs} sec` : `${secs + 15} sec`;
+        const wrong2 = mins > 0 ? `${mins + 1} min ${secs} sec` : `${Math.max(secs - 10, 5)} sec`;
+
+        const questions = [
+            { q: `Q1. How long was this video?`, options: shuffle([durStr, wrong1, wrong2]), answer: durStr },
+            { q: `Q2. What is the title of this video?`, options: shuffle([title, 'Ddott TV Short', 'Creator Studio Guide']), answer: title }
+        ];
+
+        const idx = Math.floor(Math.random() * questions.length);
+        const quiz = questions[idx];
+
+        document.getElementById('quizQuestion').textContent = quiz.q;
+        document.getElementById('quizResult').textContent = '';
+        document.getElementById('quizEarnBtn').classList.remove('visible');
+
+        const optDiv = document.getElementById('quizOptions');
+        optDiv.innerHTML = '';
+        quiz.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.textContent = opt;
+            btn.onclick = () => checkQuizAnswer(btn, opt, quiz.answer, optDiv);
+            optDiv.appendChild(btn);
+        });
+
+        document.getElementById('quizOverlay').classList.add('active');
+        startQuizTimer();
     }
-}
 
-function claimQuizCoins() {
-    document.getElementById('quizResult').textContent = '🎉 +10 Emo Coins added to your wallet!';
-    document.getElementById('quizEarnBtn').classList.remove('visible');
-    setTimeout(closeQuiz, 1500);
-}
+    let quizTimerInterval = null;
 
-function closeQuiz() {
-    clearInterval(quizTimerInterval);
-    document.getElementById('quizOverlay').classList.remove('active');
-    document.getElementById('quizResult').style.color = '#00e676';
-    const timerEl = document.getElementById('quizTimer');
-    if (timerEl) timerEl.classList.remove('warning');
-}
+    function startQuizTimer() {
+        let timeLeft = 90;
+        const timerEl = document.getElementById('quizTimer');
+        clearInterval(quizTimerInterval);
+        quizTimerInterval = setInterval(() => {
+            timeLeft--;
+            if (timerEl) {
+                timerEl.textContent = '⏱ ' + timeLeft + 's';
+                if (timeLeft <= 20) timerEl.classList.add('warning');
+            }
+            if (timeLeft <= 0) {
+                clearInterval(quizTimerInterval);
+                document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+                document.getElementById('quizResult').textContent = '😔 Sorry! Time up. You lost the coins.';
+                document.getElementById('quizResult').style.color = '#ff5500';
+                document.getElementById('quizEarnBtn').classList.remove('visible');
+                setTimeout(closeQuiz, 2000);
+            }
+        }, 1000);
+    }
 
-playBtn.addEventListener('click', () => {
-    if (video.paused) {
+    function shuffle(arr) {
+        return arr.sort(() => Math.random() - 0.5);
+    }
+
+    function checkQuizAnswer(btn, selected, answer, optDiv) {
+        const btns = optDiv.querySelectorAll('.quiz-option');
+        btns.forEach(b => b.disabled = true);
+        if (selected === answer) {
+            btn.classList.add('correct');
+            document.getElementById('quizResult').textContent = '✅ Correct! Claim your Emo Coins below.';
+            document.getElementById('quizEarnBtn').classList.add('visible');
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => { if (b.textContent === answer) b.classList.add('correct'); });
+            document.getElementById('quizResult').textContent = '❌ Wrong! Better luck next time.';
+        }
+    }
+
+    // ===== REAL COIN CLAIM (writes to Supabase, one claim per user per video) =====
+    async function claimQuizCoins() {
+        if (quizCoinsClaimed) return;
+        const earnBtn = document.getElementById('quizEarnBtn');
+        earnBtn.disabled = true;
+
+        if (!currentUser) {
+            document.getElementById('quizResult').textContent = '⚠️ Please log in to earn Emo Coins.';
+            earnBtn.classList.remove('visible');
+            setTimeout(closeQuiz, 1800);
+            return;
+        }
+
+        const claimKey = 'quiz_claimed_' + currentVideoId + '_' + currentUser.id;
+        if (localStorage.getItem(claimKey)) {
+            document.getElementById('quizResult').textContent = '⚠️ Already claimed for this video.';
+            earnBtn.classList.remove('visible');
+            setTimeout(closeQuiz, 1500);
+            return;
+        }
+
+        try {
+            const { data: profile, error: fetchErr } = await db
+                .from('profiles')
+                .select('emo_coins')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (fetchErr) throw fetchErr;
+
+            const newBalance = (profile?.emo_coins || 0) + 10;
+
+            const { error: updateErr } = await db
+                .from('profiles')
+                .update({ emo_coins: newBalance })
+                .eq('id', currentUser.id);
+
+            if (updateErr) throw updateErr;
+
+            localStorage.setItem(claimKey, '1');
+            quizCoinsClaimed = true;
+            document.getElementById('quizResult').textContent = '🎉 +10 Emo Coins added to your wallet!';
+            document.getElementById('userCoins').textContent = newBalance;
+            earnBtn.classList.remove('visible');
+            setTimeout(closeQuiz, 1500);
+        } catch (e) {
+            console.error('Coin claim failed:', e);
+            document.getElementById('quizResult').textContent = '⚠️ Failed to add coins. Try again.';
+            earnBtn.disabled = false;
+        }
+    }
+
+    function closeQuiz() {
+        clearInterval(quizTimerInterval);
+        document.getElementById('quizOverlay').classList.remove('active');
+        document.getElementById('quizResult').style.color = '#00e676';
+        const timerEl = document.getElementById('quizTimer');
+        if (timerEl) timerEl.classList.remove('warning');
+    }
+
+    playBtn.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+            isPlaying = true;
+            playBtn.textContent = '⏸';
+            tapOverlay.classList.remove('visible');
+        } else {
+            video.pause();
+            isPlaying = false;
+            playBtn.textContent = '▶';
+        }
+    });
+
+    tapOverlay.addEventListener('click', () => {
         video.play();
         isPlaying = true;
         playBtn.textContent = '⏸';
         tapOverlay.classList.remove('visible');
-    } else {
-        video.pause();
-        isPlaying = false;
-        playBtn.textContent = '▶';
-    }
-});
+    });
 
-tapOverlay.addEventListener('click', () => {
-    video.play();
-    isPlaying = true;
-    playBtn.textContent = '⏸';
-    tapOverlay.classList.remove('visible');
-});
+    playerContainer.addEventListener('click', (e) => {
+        if (e.target === playerContainer || e.target === video || e.target === tapOverlay) {
+            playerContainer.classList.toggle('touched');
+        }
+    });
 
-playerContainer.addEventListener('click', (e) => {
-    if (e.target === playerContainer || e.target === video || e.target === tapOverlay) {
-        playerContainer.classList.toggle('touched');
-    }
-});
+    progressContainer.addEventListener('click', (e) => {
+        const rect = progressContainer.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        video.currentTime = pos * video.duration;
+    });
 
-progressContainer.addEventListener('click', (e) => {
-    const rect = progressContainer.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
-    video.currentTime = pos * video.duration;
-});
-
-// ===== HELPERS =====
-function formatTime(seconds) {
-    if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
-function updateTimeDisplay() {
-    const current = formatTime(video.currentTime || 0);
-    const duration = formatTime(video.duration || 0);
-    timeDisplay.textContent = `${current} / ${duration}`;
-}
-
-function updateProgress() {
-    if (video.duration && isFinite(video.duration)) {
-        const pct = (video.currentTime / video.duration) * 100;
-        progressFill.style.width = pct + '%';
-    }
-}
-
-// ===== URL PARAM TO UI =====
-function populateFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-
-    const title = params.get('title');
-    if (title) {
-        document.getElementById('videoTitle').textContent = decodeURIComponent(title);
+    function formatTime(seconds) {
+        if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
-    const creator = params.get('creator');
-    if (creator) {
-        document.getElementById('creatorName').textContent = decodeURIComponent(creator);
+    function updateTimeDisplay() {
+        const current = formatTime(video.currentTime || 0);
+        const duration = formatTime(video.duration || 0);
+        timeDisplay.textContent = `${current} / ${duration}`;
     }
 
-    const desc = params.get('desc');
-    if (desc) {
-        document.getElementById('videoDescription').textContent = decodeURIComponent(desc);
+    function updateProgress() {
+        if (video.duration && isFinite(video.duration)) {
+            const pct = (video.currentTime / video.duration) * 100;
+            progressFill.style.width = pct + '%';
+        }
     }
 
-    const views = params.get('views');
-    if (views) {
-        document.getElementById('viewCount').textContent = views + ' views';
+    function populateFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+
+        const title = params.get('title');
+        if (title) document.getElementById('videoTitle').textContent = decodeURIComponent(title);
+
+        const desc = params.get('desc');
+        if (desc) document.getElementById('videoDescription').textContent = decodeURIComponent(desc);
     }
 
-    const likes = params.get('likes');
-    if (likes) {
-        document.getElementById('likeCount').textContent = likes;
+    let liked = false;
+    let disliked = false;
+    let likeCountVal = 0;
+    let dislikeCountVal = 0;
+
+    async function toggleLike() {
+        const btn = document.getElementById('likeBtn');
+        const disBtn = document.getElementById('dislikeBtn');
+
+        if (disliked) {
+            disliked = false;
+            dislikeCountVal = Math.max(0, dislikeCountVal - 1);
+            disBtn.style.background = '';
+        }
+
+        liked = !liked;
+        if (liked) {
+            likeCountVal++;
+            btn.style.background = 'linear-gradient(135deg, #00f3ff, #bf00ff)';
+        } else {
+            likeCountVal = Math.max(0, likeCountVal - 1);
+            btn.style.background = '';
+        }
+
+        document.getElementById('likeCount').textContent = likeCountVal;
+        document.getElementById('dislikeCount').textContent = dislikeCountVal;
+
+        if (currentVideoId) {
+            localStorage.setItem('liked_' + currentVideoId, liked ? '1' : '0');
+            localStorage.setItem('disliked_' + currentVideoId, disliked ? '1' : '0');
+            db.from('videos').update({ likes: likeCountVal, dislikes: dislikeCountVal }).eq('id', currentVideoId)
+                .then(({ error }) => { if (error) console.error('Like update failed:', error); });
+        }
     }
-}
 
-// ===== LIKE / DISLIKE =====
-let liked = false;
-let disliked = false;
-let likeCountVal = 0;
+    async function toggleDislike() {
+        const btn = document.getElementById('dislikeBtn');
+        const likeBtn = document.getElementById('likeBtn');
 
-function toggleLike() {
-  const btn = document.getElementById('likeBtn');
-  const disBtn = document.getElementById('dislikeBtn');
-  liked = !liked;
-  if (liked) {
-    disliked = false;
-    disBtn.style.background = '';
-    likeCountVal++;
-    btn.style.background = 'linear-gradient(135deg, #00f3ff, #bf00ff)';
-  } else {
-    likeCountVal = Math.max(0, likeCountVal - 1);
-    btn.style.background = '';
-  }
-  document.getElementById('likeCount').textContent = likeCountVal;
+        if (liked) {
+            liked = false;
+            likeCountVal = Math.max(0, likeCountVal - 1);
+            likeBtn.style.background = '';
+        }
 
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  if (id && typeof db !== 'undefined') {
-    db.from('videos').update({ likes: likeCountVal }).eq('id', id).catch(() => {});
-  }
-}
+        disliked = !disliked;
+        if (disliked) {
+            dislikeCountVal++;
+            btn.style.background = 'rgba(255,100,100,0.3)';
+        } else {
+            dislikeCountVal = Math.max(0, dislikeCountVal - 1);
+            btn.style.background = '';
+        }
 
-function toggleDislike() {
-  const btn = document.getElementById('dislikeBtn');
-  disliked = !disliked;
-  if (disliked) {
-    liked = false;
-    document.getElementById('likeBtn').style.background = '';
-    btn.style.background = 'rgba(255,100,100,0.3)';
-  } else {
-    btn.style.background = '';
-  }
-}
+        document.getElementById('likeCount').textContent = likeCountVal;
+        document.getElementById('dislikeCount').textContent = dislikeCountVal;
 
-function goBack() {
-  const ref = document.referrer;
-  if (ref && ref.includes('channel')) {
-    window.location.href = '/creator/channel.html';
-  } else if (ref && ref.includes('ddott.live')) {
-    history.back();
-  } else {
-    window.location.href = '/';
-  }
-}
+        if (currentVideoId) {
+            localStorage.setItem('liked_' + currentVideoId, liked ? '1' : '0');
+            localStorage.setItem('disliked_' + currentVideoId, disliked ? '1' : '0');
+            db.from('videos').update({ likes: likeCountVal, dislikes: dislikeCountVal }).eq('id', currentVideoId)
+                .then(({ error }) => { if (error) console.error('Dislike update failed:', error); });
+        }
+    }
 
-// ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
-    populateFromUrl();
-    loadVideo(); // now async internally, but we don't need to await it here
-});
+    function goBack() {
+        const ref = document.referrer;
+        if (ref && ref.includes('channel')) {
+            window.location.href = '/creator/channel.html';
+        } else if (ref && ref.includes('ddott.live')) {
+            history.back();
+        } else {
+            window.location.href = '/';
+        }
+    }
 
-// Expose for debugging
-window.ddottPlayer = { loadVideo, getVideoUrl, video };
+    document.addEventListener('DOMContentLoaded', async () => {
+        populateFromUrl();
+        currentUser = await getCurrentUser();
+        await loadUserCoins();
+        loadVideo();
+    });
 
- </script>
-
-    <!-- Quiz Overlay -->
-    <div class="quiz-overlay" id="quizOverlay">
-        <div class="quiz-box">
-            <div class="quiz-title">🎬 Proof of Watch</div>
-            <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
-            <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
-            <div class="quiz-question" id="quizQuestion"></div>
-            <div id="quizOptions"></div>
-            <div class="quiz-result" id="quizResult"></div>
-            <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
-            <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
-        </div>
-    </div>
-
-    <!-- Quiz Overlay -->
-    <div class="quiz-overlay" id="quizOverlay">
-        <div class="quiz-box">
-            <div class="quiz-title">🎬 Proof of Watch</div>
-            <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
-            <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
-            <div class="quiz-question" id="quizQuestion"></div>
-            <div id="quizOptions"></div>
-            <div class="quiz-result" id="quizResult"></div>
-            <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
-            <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
-        </div>
-    </div>
+    window.ddottPlayer = { loadVideo, getVideoUrl, video, refreshUserCoins };
+    </script>
 </body>
 </html>
