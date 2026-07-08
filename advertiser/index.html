@@ -222,17 +222,12 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">COINS PER WATCH</label>
-      <div class="range-wrap">
-        <input type="range" class="form-range" id="watchCoins" min="2" max="20" value="5" oninput="updateCost()">
-        <div class="range-val" id="watchCoinsVal">5</div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">COINS PER SHARE</label>
-      <div class="range-wrap">
-        <input type="range" class="form-range" id="shareCoins" min="5" max="50" value="10" oninput="updateCost()">
-        <div class="range-val" id="shareCoinsVal">10</div>
+      <label class="form-label">AD PRICING TIER</label>
+      <div class="rules-wrap" id="tierButtons">
+        <div class="rule-tag" data-tier="normal" onclick="selectTier(this)">Normal (0-5K views)</div>
+        <div class="rule-tag" data-tier="mid" onclick="selectTier(this)">Mid (5K-10K views)</div>
+        <div class="rule-tag" data-tier="viral" onclick="selectTier(this)">Viral (10K+ views)</div>
+        <div class="rule-tag" data-tier="share" onclick="selectTier(this)">Share (min 3 ads)</div>
       </div>
     </div>
   </div>
@@ -312,7 +307,7 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
 
 <script>
 const SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q';
 const CF_AI_WORKER = 'https://ddott-add-ai-chat.meradivin.workers.dev';
 const CLOUDINARY_CLOUD = 'dggip9tpp';
 const CLOUDINARY_PRESET = 'ddott-tv-upload';
@@ -324,7 +319,7 @@ let chatHistory = [];
 
 // Init
 window.onload = async () => {
-  updateCost();
+  await loadTiers();
   loadStats();
 };
 
@@ -477,23 +472,58 @@ function applyAISuggestions() {
   switchTab('rules');
 }
 
-// COST CALCULATOR
+// TIER DATA + COST CALCULATOR
+let tierData = [];
+let selectedTier = null;
+
+async function loadTiers() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/ad_pricing_tiers?select=*&is_active=eq.true`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    tierData = await res.json();
+    if(Array.isArray(tierData) && tierData.length) {
+      const defaultTier = tierData.find(t => t.tier_name === 'normal') || tierData[0];
+      selectedTier = defaultTier;
+      const defaultBtn = document.querySelector(`#tierButtons [data-tier="${defaultTier.tier_name}"]`);
+      if(defaultBtn) defaultBtn.classList.add('active');
+    }
+  } catch(e) {}
+  updateCost();
+}
+
+function selectTier(el) {
+  document.querySelectorAll('#tierButtons .rule-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const tierName = el.getAttribute('data-tier');
+  selectedTier = tierData.find(t => t.tier_name === tierName);
+  updateCost();
+}
+
 function updateCost() {
   const views = parseInt(document.getElementById('viewsRange').value);
-  const watchC = parseInt(document.getElementById('watchCoins').value);
-  const shareC = parseInt(document.getElementById('shareCoins').value);
-  const base = views * watchC;
-  const fee = Math.floor(base * 0.1);
+  document.getElementById('viewsVal').textContent = views;
+  document.getElementById('costViews').textContent = views;
+
+  if(!selectedTier) {
+    document.getElementById('costWatch').textContent = '—';
+    document.getElementById('costShare').textContent = '—';
+    document.getElementById('costFee').textContent = '—';
+    document.getElementById('costTotal').textContent = '—';
+    return;
+  }
+
+  const userCoin = parseFloat(selectedTier.user_watch_coin);
+  const rate = parseFloat(selectedTier.rate_per_view);
+  const minAds = selectedTier.min_ads_required;
+  const base = views * rate;
+  const fee = base * 0.1;
   const total = base + fee;
 
-  document.getElementById('viewsVal').textContent = views;
-  document.getElementById('watchCoinsVal').textContent = watchC;
-  document.getElementById('shareCoinsVal').textContent = shareC;
-  document.getElementById('costViews').textContent = views;
-  document.getElementById('costWatch').textContent = watchC + ' 🪙';
-  document.getElementById('costShare').textContent = shareC + ' 🪙';
-  document.getElementById('costFee').textContent = fee.toLocaleString() + ' 🪙';
-  document.getElementById('costTotal').textContent = total.toLocaleString() + ' 🪙';
+  document.getElementById('costWatch').textContent = userCoin + ' 🪙 (per genuine watch)';
+  document.getElementById('costShare').textContent = minAds > 1 ? ('Min ' + minAds + ' ads required') : '1 ad';
+  document.getElementById('costFee').textContent = '₹' + fee.toFixed(2);
+  document.getElementById('costTotal').textContent = '₹' + total.toFixed(2);
 }
 
 // RULES TOGGLE
@@ -520,9 +550,16 @@ async function publishAd() {
   btn.textContent = 'PUBLISHING...';
 
   const views = parseInt(document.getElementById('viewsRange').value);
-  const watchCoins = parseInt(document.getElementById('watchCoins').value);
-  const shareCoins = parseInt(document.getElementById('shareCoins').value);
-  const costTotal = views * watchCoins + Math.floor(views * watchCoins * 0.1);
+  if(!selectedTier) {
+    alert('Please select a pricing tier!');
+    btn.disabled = false;
+    btn.textContent = '🚀 PUBLISH AD CAMPAIGN';
+    return;
+  }
+  const watchCoins = parseFloat(selectedTier.user_watch_coin);
+  const tierName = selectedTier.tier_name;
+  const minAdsRequired = selectedTier.min_ads_required;
+  const costTotal = views * parseFloat(selectedTier.rate_per_view) * 1.1;
 
   const langs = [...document.querySelectorAll('#langRules .rule-tag.active')].map(t=>t.textContent);
   const afterCats = [...document.querySelectorAll('#afterRules .rule-tag.active')].map(t=>t.textContent);
@@ -545,8 +582,10 @@ async function publishAd() {
         views_purchased: views,
         views_delivered: 0,
         coins_per_watch: watchCoins,
-        coins_per_share: shareCoins,
+        coins_per_share: 0,
         coins_spent: costTotal,
+        tier_name: tierName,
+        min_ads_required: minAdsRequired,
         target_languages: langs,
         show_after: afterCats,
         skip_after_seconds: parseInt(skipAfter),
