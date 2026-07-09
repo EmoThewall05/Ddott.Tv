@@ -470,15 +470,10 @@ video.main-vid {
       </div>
 
       <!-- Side Actions -->
-      <!-- NOTE: no inline onclick for the like button anymore — the
-           DWIN Like System (tap / double-tap / long-press) attaches its
-           own listeners in JS via initDwinLikeSystem(). This avoids the
-           old bug where the inline onclick and the tap/press listeners
-           would both fire for the same interaction. -->
+      <!-- Simple like button — no coin system for shorts-player main video -->
       <div class="vid-actions">
-        <div class="vact-btn" id="mainLikeBtn" onclick="event.stopPropagation()">
+        <div class="vact-btn" onclick="event.stopPropagation(); mainLike()">
           <div class="vact-icon" id="mainLikeIcon">
-            <div class="v-charge-ring"></div>
             <span id="mainLikeEmoji">🤍</span>
           </div>
           <span class="vact-lbl" id="mainLikeCount">0</span>
@@ -583,7 +578,6 @@ async function init() {
   await loadShorts();
   bindProgress();
   bindCtrlAutoHide();
-  initDwinLikeSystem(); // was defined before but never called — now wired up
 }
 
 // ── URL PARAMS ──
@@ -697,119 +691,11 @@ function bindProgress() {
   });
 }
 
-// ══════════════════════════════════
-// DWIN LIKE SYSTEM™ (main video)
-//  - single tap        -> normal like     (+1 coin)
-//  - double tap         -> heart burst     (+2 coins)
-//  - long press (600ms) -> super like      (+5 coins)
-//
-// Fixed: previously this function existed but was never called, and the
-// like button had a conflicting inline onclick="mainLike()" which would
-// have double-fired alongside these listeners. Now the button has no
-// inline handler — everything routes through here, and a `longPressFired`
-// flag stops the click handler from also firing right after a long press
-// release (pointerup naturally triggers a click on most browsers).
-// ══════════════════════════════════
-let tapTimer = null;
-let pressTimer = null;
-let tapCount = 0;
-let longPressFired = false;
-
-function initDwinLikeSystem() {
-  const likeBtn = document.getElementById('mainLikeBtn');
-  if (!likeBtn) return;
-
-  // Tap / double-tap detection
-  likeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-
-    if (longPressFired) {
-      // This click is the trailing click event from a long-press release.
-      // Super like already fired from pointerdown's timer — ignore it.
-      longPressFired = false;
-      return;
-    }
-
-    tapCount++;
-    if (tapCount === 1) {
-      tapTimer = setTimeout(() => {
-        tapCount = 0;
-        mainLike(); // single tap
-      }, 300);
-    } else if (tapCount === 2) {
-      clearTimeout(tapTimer);
-      tapCount = 0;
-      mainHeartBurst(); // double tap
-    }
-  });
-
-  // Long press 600ms = Super Like
-  likeBtn.addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    likeBtn.classList.add('charging');
-    pressTimer = setTimeout(() => {
-      longPressFired = true;
-      likeBtn.classList.remove('charging');
-      mainSuperLike();
-    }, 600);
-  });
-  likeBtn.addEventListener('pointerup', () => {
-    clearTimeout(pressTimer);
-    likeBtn.classList.remove('charging');
-  });
-  likeBtn.addEventListener('pointerleave', () => {
-    clearTimeout(pressTimer);
-    likeBtn.classList.remove('charging');
-  });
-}
-
 function mainLike() {
   mainLiked = !mainLiked;
   mainLikeCountVal += mainLiked ? 1 : -1;
-  document.getElementById('mainLikeEmoji').textContent = mainLiked ? '💜' : '🤍';
+  document.getElementById('mainLikeEmoji').textContent = mainLiked ? ' 💜' : '🤍';
   document.getElementById('mainLikeCount').textContent = fmtNum(mainLikeCountVal);
-  if (mainLiked) {
-    coins += 1; updateCoins();
-    showCoinBurst(document.getElementById('mainLikeIcon'));
-    showToast('+1 🪙 Liked!');
-  }
-  if (currentVideoId && typeof db !== 'undefined') {
-    db.from('videos').update({ likes: mainLikeCountVal }).eq('id', currentVideoId).catch(() => {});
-  }
-}
-
-function mainHeartBurst() {
-  mainLiked = true;
-  mainLikeCountVal += 1;
-  document.getElementById('mainLikeEmoji').textContent = '❤️';
-  document.getElementById('mainLikeCount').textContent = fmtNum(mainLikeCountVal);
-  coins += 2; updateCoins();
-  showCoinBurst(document.getElementById('mainLikeIcon'));
-  showToast('❤️ Heart Burst! +2 🪙');
-  // animate
-  const el = document.getElementById('mainLikeIcon');
-  el.style.transform = 'scale(1.8)';
-  setTimeout(() => el.style.transform = 'scale(1)', 400);
-  if (currentVideoId && typeof db !== 'undefined') {
-    db.from('videos').update({ likes: mainLikeCountVal }).eq('id', currentVideoId).catch(() => {});
-  }
-}
-
-function mainSuperLike() {
-  mainLiked = true;
-  mainLikeCountVal += 1;
-  document.getElementById('mainLikeEmoji').textContent = '💛';
-  document.getElementById('mainLikeCount').textContent = fmtNum(mainLikeCountVal);
-  coins += 5; updateCoins();
-  showCoinBurst(document.getElementById('mainLikeIcon'));
-  showToast('💛 Super Like! +5 🪙');
-  // haptic
-  if (navigator.vibrate) navigator.vibrate([50, 30, 100]);
-  // charge ring animation
-  const el = document.getElementById('mainLikeIcon');
-  el.style.transform = 'scale(2.2)';
-  el.style.transition = 'transform 0.6s';
-  setTimeout(() => { el.style.transform = 'scale(1)'; }, 600);
   if (currentVideoId && typeof db !== 'undefined') {
     db.from('videos').update({ likes: mainLikeCountVal }).eq('id', currentVideoId).catch(() => {});
   }
