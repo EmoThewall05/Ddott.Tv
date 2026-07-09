@@ -64,7 +64,7 @@ function renderFeed() {
     const date = new Date(v.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
     const creator = (v.profiles && v.profiles.username) ? v.profiles.username : 'Creator';
     const initial = creator[0].toUpperCase();
-    return '<div class="video-card" onclick="openVideo(this)" data-id="'+v.id+'" data-url="'+encodeURIComponent(v.video_url||'')+'" data-title="'+encodeURIComponent(v.title||'')+'">'
+    return '<div class="video-card" onclick="openVideo(this)" data-id="'+v.id+'" data-url="'+encodeURIComponent(v.video_url||'')+'" data-title="'+encodeURIComponent(v.title||'')+'" data-short="'+(v.is_short?'1':'0')+'">'
       +'<div class="thumb">'
       +(v.thumbnail_url ? '<img src="'+v.thumbnail_url+'" onerror="this.style.display=\'none\'">' : '🎬')
       +(v.is_short ? '<div class="short-badge">⚡ SHORT</div>' : '')
@@ -80,7 +80,9 @@ function openVideo(el) {
   var id = el.dataset.id;
   var url = el.dataset.url;
   var title = el.dataset.title;
-  var href = '/player/player-v2.html?id='+id;
+  var isShort = el.dataset.short === '1';
+  var base = isShort ? '/player/shorts.html' : '/player/player-v2.html';
+  var href = base + '?id='+id;
   if (url) href += '&url='+url;
   if (title) href += '&title='+title;
   window.top.location.href = href;
