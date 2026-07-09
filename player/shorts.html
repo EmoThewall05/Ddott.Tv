@@ -120,7 +120,7 @@
 
     <!-- HEADER -->
     <div class="header">
-        <div class="logo">DDOTT.TV</div>
+        <button onclick="goBack()" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:24px;cursor:pointer;padding:0 10px 0 0;line-height:1;-webkit-tap-highlight-color:transparent;">←</button><div class="logo">DDOTT.TV</div>
         <div class="header-right">
             <div class="coin-badge"><div class="coin-icon">E</div><span id="coinCount">0</span></div>
             <div class="view-toggle" id="viewToggle" title="Toggle View">⊞</div>
@@ -156,11 +156,11 @@
 
     <!-- BOTTOM NAV -->
     <div class="bottom-nav">
-        <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>FEED</span></button>
-        <button class="nav-item" onclick="location.href='../index.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>HOME</span></button>
-        <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>COMMUNITY</span></button>
-        <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg><span>COINS</span></button>
-        <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>MESSAGE</span></button>
+        <button class="nav-item active" onclick="navTo('feed')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>FEED</span></button>
+        <button class="nav-item" onclick="navTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>HOME</span></button>
+        <button class="nav-item" onclick="navTo('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>COMMUNITY</span></button>
+        <button class="nav-item" onclick="navTo('coins')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg><span>COINS</span></button>
+        <button class="nav-item" onclick="navTo('message')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>MESSAGE</span></button>
     </div>
 </div>
 
@@ -261,7 +261,7 @@ function renderFullScroll() {
                     <div class="action-icon">💬</div>
                     <span class="action-label">${s.comments||0}</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" onclick="shareVideo(shortsData[${i}])">
                     <div class="action-icon">↗️</div>
                     <span class="action-label">Share</span>
                 </button>
@@ -497,7 +497,7 @@ function triggerSuperLike(element, x, y, isSplit) {
     // Supabase sync
     if (currentUserId) {
         sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({ data }) => {
-            if (data) sb.from('profiles').update({ emo_coins: (data.emo_coins||0) + 1 }).eq('id', currentUserId);
+            if (data) sb.from('profiles').update({ emo_coins: (data.emo_coins||0) + 1 }).eq('id', currentUserId).then(()=>sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({data:d})=>{if(d){emoCoins=d.emo_coins;coinCountEl.textContent=emoCoins.toLocaleString();}}));
         });
     }
 }
@@ -587,6 +587,21 @@ function setupProgress() {
     }, 100);
 }
 
+function navTo(page){
+    try{if(window.parent&&window.parent.nav){window.parent.nav(page);return;}}catch(e){}
+    const r={feed:'/',home:'/',community:'../community/',coins:'../coins/',message:'../messaging/'};
+    location.href=r[page]||'/';
+}
+function goBack(){
+    try{if(window.parent&&window.parent.goHome){window.parent.goHome();return;}}catch(e){}
+    history.back();
+}
+function shareVideo(s){
+    if(!s)return;
+    const url=location.origin+'/player/shorts.html?id='+s.id;
+    if(navigator.share){navigator.share({title:s.title||'Ddott Short',text:'Watch on Ddott.TV ⚡',url});}
+    else{navigator.clipboard&&navigator.clipboard.writeText(url).then(()=>{const t=document.createElement('div');t.textContent='✅ Link copied!';t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#7c3aed;color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:9999;';document.body.appendChild(t);setTimeout(()=>t.remove(),2000);});}
+}
 init();
 </script>
 </body>
