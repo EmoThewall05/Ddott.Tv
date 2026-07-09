@@ -217,7 +217,7 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
     <div class="form-group">
       <label class="form-label">VIEWS TO PURCHASE</label>
       <div class="range-wrap">
-        <input type="range" class="form-range" id="viewsRange" min="100" max="10000" step="100" value="500" oninput="updateCost()">
+        <input type="range" class="form-range" id="viewsRange" min="500" max="10000" step="100" value="500" oninput="updateCost()">
         <div class="range-val" id="viewsVal">500</div>
       </div>
     </div>
@@ -497,12 +497,20 @@ function selectTier(el) {
   el.classList.add('active');
   const tierName = el.getAttribute('data-tier');
   selectedTier = tierData.find(t => t.tier_name === tierName);
+  if(selectedTier && selectedTier.min_views) {
+    const viewsInput = document.getElementById('viewsRange');
+    viewsInput.min = selectedTier.min_views;
+    if(parseInt(viewsInput.value) < selectedTier.min_views) {
+      viewsInput.value = selectedTier.min_views;
+    }
+  }
   updateCost();
 }
 
 function updateCost() {
   const views = parseInt(document.getElementById('viewsRange').value);
-  document.getElementById('viewsVal').textContent = views;
+  const minV = selectedTier ? selectedTier.min_views : 500;
+  document.getElementById('viewsVal').textContent = views + (views < minV ? ` (min ${minV})` : '');
   document.getElementById('costViews').textContent = views;
 
   if(!selectedTier) {
@@ -552,6 +560,12 @@ async function publishAd() {
   const views = parseInt(document.getElementById('viewsRange').value);
   if(!selectedTier) {
     alert('Please select a pricing tier!');
+    btn.disabled = false;
+    btn.textContent = '🚀 PUBLISH AD CAMPAIGN';
+    return;
+  }
+  if(views < selectedTier.min_views) {
+    alert(`Minimum ${selectedTier.min_views} views required for ${selectedTier.tier_name} tier!`);
     btn.disabled = false;
     btn.textContent = '🚀 PUBLISH AD CAMPAIGN';
     return;
