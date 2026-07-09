@@ -214,7 +214,7 @@ async function init() {
 async function fetchShorts() {
     try {
         const { data, error } = await sb.from('videos')
-            .select('id, title, video_url, thumbnail_url, creator_name, views, likes, comments')
+            .select('id, title, video_url, thumbnail_url, creator_name, views, likes')
             .eq('is_short', true)
             .order('created_at', { ascending: false })
             .limit(20);
