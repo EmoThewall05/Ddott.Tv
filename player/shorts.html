@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Ddott Shorts Player</title>
+    <title>Ddott Shorts</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -11,7 +12,6 @@
             --bg-card: #1a1a2e;
             --accent-purple: #7c3aed;
             --accent-pink: #ec4899;
-            --accent-cyan: #06b6d4;
             --accent-gold: #fbbf24;
             --accent-red: #ef4444;
             --text-primary: #ffffff;
@@ -19,15 +19,41 @@
             --text-muted: #71717a;
             --border: rgba(255,255,255,0.08);
         }
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
-        html,body { width:100%; height:100%; overflow:hidden; background:var(--bg-primary); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:var(--text-primary); }
-        #app { width:100%; height:100%; display:flex; flex-direction:column; position:relative; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-primary); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:var(--text-primary); }
+        #app { width:100%; height:100%; position:relative; }
+
+        /* HEADER */
         .header { position:fixed; top:0; left:0; right:0; height:52px; background:linear-gradient(to bottom,rgba(10,10,15,0.95),transparent); display:flex; align-items:center; justify-content:space-between; padding:0 16px; z-index:1000; backdrop-filter:blur(10px); }
         .logo { font-size:18px; font-weight:800; background:linear-gradient(135deg,#06b6d4,#7c3aed,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:2px; }
+        .header-right { display:flex; align-items:center; gap:10px; }
         .coin-badge { display:flex; align-items:center; gap:4px; background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); padding:4px 10px; border-radius:20px; font-size:13px; font-weight:700; color:var(--accent-gold); }
         .coin-icon { width:16px; height:16px; background:var(--accent-gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; color:#000; font-weight:800; }
-        .main-player { position:fixed; top:52px; left:0; right:0; bottom:220px; background:#000; overflow:hidden; }
-        .main-video { width:100%; height:100%; object-fit:cover; }
+        .view-toggle { width:36px; height:36px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; }
+
+        /* FULL SCROLL MODE */
+        .full-container { position:fixed; top:52px; left:0; right:0; bottom:64px; overflow-y:scroll; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+        .full-container::-webkit-scrollbar { display:none; }
+        .short-item { width:100%; height:100%; scroll-snap-align:start; position:relative; background:#000; flex-shrink:0; }
+        .short-item { height:calc(100vh - 116px); }
+
+        /* SPLIT MODE */
+        .split-container { position:fixed; top:52px; left:0; right:0; bottom:64px; display:none; flex-direction:column; }
+        .split-container.active { display:flex; }
+        .split-player { flex:0 0 62%; position:relative; background:#000; border-bottom:2px solid var(--accent-purple); overflow:hidden; }
+        .strip-section { flex:0 0 38%; background:var(--bg-secondary); display:flex; flex-direction:column; overflow:hidden; }
+        .strip-header { padding:6px 12px 4px; font-size:11px; font-weight:700; color:var(--accent-purple); letter-spacing:1px; flex-shrink:0; }
+        .strip-scroll { flex:1; display:flex; align-items:center; gap:8px; overflow-x:auto; overflow-y:hidden; padding:4px 12px 8px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+        .strip-scroll::-webkit-scrollbar { display:none; }
+        .strip-item { flex-shrink:0; width:68px; height:100px; border-radius:10px; overflow:hidden; position:relative; cursor:pointer; scroll-snap-align:start; border:2px solid transparent; transition:all 0.25s ease; background:var(--bg-card); }
+        .strip-item.active { border-color:var(--accent-purple); box-shadow:0 0 14px rgba(124,58,237,0.5); transform:scale(1.05); }
+        .strip-item img { width:100%; height:100%; object-fit:cover; }
+        .strip-overlay { position:absolute; bottom:0; left:0; right:0; padding:4px; background:linear-gradient(to top,rgba(0,0,0,0.85),transparent); font-size:9px; color:var(--text-secondary); }
+        .strip-like-badge { position:absolute; top:3px; right:3px; font-size:10px; display:none; }
+        .strip-item.liked-s .strip-like-badge,.strip-item.heart-s .strip-like-badge,.strip-item.super-s .strip-like-badge { display:block; }
+
+        /* VIDEO COMMON */
+        .short-video { width:100%; height:100%; object-fit:cover; display:block; }
         .video-overlay { position:absolute; inset:0; pointer-events:none; background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 40%,rgba(0,0,0,0.2) 100%); }
         .video-info { position:absolute; bottom:16px; left:12px; max-width:70%; pointer-events:none; }
         .video-author { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
@@ -35,36 +61,31 @@
         .author-name { font-weight:600; font-size:14px; }
         .video-title { font-size:13px; line-height:1.4; color:var(--text-secondary); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
         .video-stats { font-size:11px; color:var(--text-muted); margin-top:3px; }
+
+        /* SIDE ACTIONS */
         .side-actions { position:absolute; right:10px; bottom:16px; display:flex; flex-direction:column; align-items:center; gap:14px; pointer-events:auto; z-index:10; }
-        .action-btn { display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; color:var(--text-primary); cursor:pointer; }
-        .action-icon { width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid rgba(255,255,255,0.1); transition:all 0.3s ease; }
-        .action-label { font-size:11px; font-weight:600; color:var(--text-secondary); }
+        .action-btn { display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; color:var(--text-primary); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+        .action-icon { width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid rgba(255,255,255,0.1); transition:all 0.3s ease; pointer-events:none; }
+        .action-label { font-size:11px; font-weight:600; color:var(--text-secondary); pointer-events:none; }
         .like-btn.liked .action-icon { background:rgba(124,58,237,0.3); border-color:var(--accent-purple); box-shadow:0 0 20px rgba(124,58,237,0.4); }
         .like-btn.liked .action-label { color:var(--accent-purple); }
         .like-btn.heart .action-icon { background:rgba(239,68,68,0.3); border-color:var(--accent-red); box-shadow:0 0 25px rgba(239,68,68,0.5); }
         .like-btn.heart .action-label { color:var(--accent-red); }
         .like-btn.super .action-icon { background:rgba(251,191,36,0.3); border-color:var(--accent-gold); box-shadow:0 0 30px rgba(251,191,36,0.6); }
         .like-btn.super .action-label { color:var(--accent-gold); }
+
+        /* PROGRESS */
         .progress-bar { position:absolute; bottom:0; left:0; height:3px; background:var(--accent-purple); z-index:50; box-shadow:0 0 8px var(--accent-purple); transition:width 0.1s linear; }
         .play-indicator { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:60px; height:60px; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; opacity:0; transition:opacity 0.3s ease; z-index:20; pointer-events:none; }
         .play-indicator.show { opacity:1; }
-        .strip-section { position:fixed; bottom:64px; left:0; right:0; height:156px; background:var(--bg-secondary); border-top:1px solid rgba(124,58,237,0.4); display:flex; flex-direction:column; }
-        .strip-header { padding:6px 12px 4px; font-size:11px; font-weight:700; color:var(--accent-purple); letter-spacing:1px; display:flex; align-items:center; gap:6px; flex-shrink:0; }
-        .strip-scroll { flex:1; display:flex; align-items:center; gap:8px; overflow-x:auto; overflow-y:hidden; padding:0 12px 8px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-        .strip-scroll::-webkit-scrollbar { display:none; }
-        .strip-item { flex-shrink:0; width:72px; height:110px; border-radius:10px; overflow:hidden; position:relative; cursor:pointer; scroll-snap-align:start; border:2px solid transparent; transition:all 0.25s ease; background:var(--bg-card); }
-        .strip-item.active { border-color:var(--accent-purple); box-shadow:0 0 16px rgba(124,58,237,0.5); transform:scale(1.05); }
-        .strip-item img { width:100%; height:100%; object-fit:cover; }
-        .strip-item-overlay { position:absolute; bottom:0; left:0; right:0; padding:4px; background:linear-gradient(to top,rgba(0,0,0,0.85),transparent); }
-        .strip-item-views { font-size:9px; color:var(--text-secondary); display:flex; align-items:center; gap:2px; }
-        .strip-like-badge { position:absolute; top:4px; right:4px; font-size:9px; background:rgba(0,0,0,0.6); border-radius:6px; padding:2px 4px; display:none; }
-        .strip-item.liked-strip .strip-like-badge { display:block; }
-        .strip-item.heart-strip .strip-like-badge { display:block; }
-        .strip-item.super-strip .strip-like-badge { display:block; }
+
+        /* BOTTOM NAV */
         .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:64px; background:rgba(10,10,15,0.97); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; justify-content:space-around; align-items:center; z-index:1000; padding-bottom:env(safe-area-inset-bottom,0); }
         .nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; background:none; border:none; color:var(--text-muted); font-size:10px; cursor:pointer; padding:8px 12px; transition:color 0.2s; }
         .nav-item.active { color:var(--accent-purple); }
         .nav-item svg { width:22px; height:22px; }
+
+        /* ANIMATIONS */
         .floating-heart { position:absolute; font-size:36px; pointer-events:none; animation:floatUp 1s ease-out forwards; z-index:100; }
         @keyframes floatUp { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-140px) scale(1.4)} }
         .haptic-ring { position:absolute; border-radius:50%; border:3px solid var(--accent-gold); pointer-events:none; z-index:100; animation:hapticExpand 0.8s ease-out forwards; }
@@ -73,77 +94,499 @@
         @keyframes superTextFloat { 0%{opacity:1;transform:translateY(0) scale(0.8)} 30%{transform:translateY(-30px) scale(1.1)} 100%{opacity:0;transform:translateY(-90px) scale(1)} }
         .coin-pop { position:absolute; font-size:13px; font-weight:700; color:var(--accent-gold); pointer-events:none; z-index:101; animation:coinPop 1s ease-out forwards; display:flex; align-items:center; gap:4px; white-space:nowrap; }
         @keyframes coinPop { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-70px)} }
+
+        /* LOADING */
         .loading-screen { position:fixed; inset:0; background:var(--bg-primary); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; z-index:9999; transition:opacity 0.5s ease; }
         .loading-screen.hidden { opacity:0; pointer-events:none; }
         .loader { width:44px; height:44px; border:3px solid rgba(124,58,237,0.2); border-top-color:var(--accent-purple); border-radius:50%; animation:spin 0.8s linear infinite; }
         @keyframes spin { to{transform:rotate(360deg)} }
         .loading-text { font-size:14px; color:var(--text-secondary); letter-spacing:2px; }
+
+        /* EMPTY STATE */
+        .empty-state { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; color:var(--text-muted); display:none; }
+        .empty-state.show { display:flex; }
+        .empty-state .icon { font-size:48px; }
     </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="app">
     <div class="loading-screen" id="loadingScreen"><div class="loader"></div><div class="loading-text">DDOTT.TV</div></div>
-    <div class="header"><div class="logo">DDOTT.TV</div><div class="coin-badge"><div class="coin-icon">E</div><span id="coinCount">1,240</span></div></div>
-    <div class="main-player" id="mainPlayer">
-        <video class="main-video" id="mainVideo" loop playsinline muted preload="auto"></video>
-        <div class="video-overlay"></div>
-        <div class="video-info">
-            <div class="video-author"><div class="author-avatar" id="infoAvatar">M</div><span class="author-name" id="infoAuthor">@meradivin</span></div>
-            <div class="video-title" id="infoTitle">Ddott Shorts</div>
-            <div class="video-stats" id="infoStats">0 views • 0:24</div>
-        </div>
-        <div class="side-actions">
-            <button class="action-btn like-btn" id="likeBtn"><div class="action-icon" id="likeIcon">🤍</div><span class="action-label" id="likeCount">0</span></button>
-            <button class="action-btn"><div class="action-icon">💬</div><span class="action-label" id="commentCount">0</span></button>
-            <button class="action-btn"><div class="action-icon">↗️</div><span class="action-label">Share</span></button>
-        </div>
-        <div class="progress-bar" id="progressBar" style="width:0%"></div>
-        <div class="play-indicator" id="playIndicator">▶️</div>
+
+    <div class="empty-state" id="emptyState">
+        <div class="icon">🎬</div>
+        <div style="font-size:16px;font-weight:600">No shorts yet</div>
+        <div style="font-size:13px">Shorts upload ചെയ്യുക!</div>
     </div>
-    <div class="strip-section">
-        <div class="strip-header">⚡ SHORTS <span id="stripCount" style="color:var(--text-muted);font-weight:400;margin-left:4px"></span></div>
-        <div class="strip-scroll" id="stripScroll"></div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">DDOTT.TV</div>
+        <div class="header-right">
+            <div class="coin-badge"><div class="coin-icon">E</div><span id="coinCount">0</span></div>
+            <div class="view-toggle" id="viewToggle" title="Toggle View">⊞</div>
+        </div>
     </div>
+
+    <!-- FULL SCROLL MODE -->
+    <div class="full-container" id="fullContainer"></div>
+
+    <!-- SPLIT MODE -->
+    <div class="split-container" id="splitContainer">
+        <div class="split-player" id="splitPlayer">
+            <video class="short-video" id="splitVideo" loop playsinline muted preload="auto"></video>
+            <div class="video-overlay"></div>
+            <div class="video-info">
+                <div class="video-author"><div class="author-avatar" id="spAvatar">?</div><span class="author-name" id="spAuthor"></span></div>
+                <div class="video-title" id="spTitle"></div>
+                <div class="video-stats" id="spStats"></div>
+            </div>
+            <div class="side-actions">
+                <button class="action-btn like-btn" id="spLikeBtn"><div class="action-icon" id="spLikeIcon">🤍</div><span class="action-label" id="spLikeCount">0</span></button>
+                <button class="action-btn"><div class="action-icon">💬</div><span class="action-label" id="spComments">0</span></button>
+                <button class="action-btn"><div class="action-icon">↗️</div><span class="action-label">Share</span></button>
+            </div>
+            <div class="progress-bar" id="spProgress" style="width:0%"></div>
+            <div class="play-indicator" id="spPlayIndicator">▶️</div>
+        </div>
+        <div class="strip-section">
+            <div class="strip-header">⚡ SHORTS <span id="stripCount" style="color:var(--text-muted);font-weight:400;margin-left:4px"></span></div>
+            <div class="strip-scroll" id="stripScroll"></div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
         <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>FEED</span></button>
-        <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>HOME</span></button>
+        <button class="nav-item" onclick="location.href='../index.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>HOME</span></button>
         <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>COMMUNITY</span></button>
         <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg><span>COINS</span></button>
         <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>MESSAGE</span></button>
     </div>
 </div>
+
 <script>
-const shortsData=[{id:1,author:"meradivin",avatar:"M",title:"Ddott shorts - AI Butterfly Neural Network",views:"0",duration:"0:24",likes:0,comments:0,thumbnail:"https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=700&fit=crop",videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"},{id:2,author:"neuralart",avatar:"N",title:"7-Brain Claude AI Butterfly in action",views:"1.2K",duration:"0:15",likes:42,comments:8,thumbnail:"https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=700&fit=crop",videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"},{id:3,author:"dwinofficial",avatar:"D",title:"The DWIN Like System - Super Like Demo",views:"5.6K",duration:"0:30",likes:128,comments:24,thumbnail:"https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=700&fit=crop",videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"},{id:4,author:"creatorspot",avatar:"C",title:"Emo Coins earning tutorial",views:"892",duration:"0:45",likes:67,comments:12,thumbnail:"https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=700&fit=crop",videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"},{id:5,author:"aistudio",avatar:"A",title:"Emowall AI 2.0 Family Safety",views:"3.4K",duration:"0:20",likes:95,comments:18,thumbnail:"https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=700&fit=crop",videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"}];
-let currentIndex=0,emoCoins=1240;
-const likeStates=new Map();
-let pressTimer=null,isPressing=false,pressStartX=0,pressStartY=0,pressStartTime=0,lastTapTime=0,tapCount=0;
-const SUPER_HOLD_MS=600;
-const mainVideo=document.getElementById('mainVideo');
-const progressBar=document.getElementById('progressBar');
-const playIndicator=document.getElementById('playIndicator');
-const likeBtn=document.getElementById('likeBtn');
-const likeIcon=document.getElementById('likeIcon');
-const likeCountEl=document.getElementById('likeCount');
-const coinCountEl=document.getElementById('coinCount');
-const stripScroll=document.getElementById('stripScroll');
-const mainPlayer=document.getElementById('mainPlayer');
-function init(){renderStrip();loadVideo(0);attachPlayerGestures();setupProgress();setTimeout(()=>document.getElementById('loadingScreen').classList.add('hidden'),1200);}
-function renderStrip(){document.getElementById('stripCount').textContent=shortsData.length+' shorts';stripScroll.innerHTML=shortsData.map((s,i)=>`<div class="strip-item ${i===0?'active':''}" id="strip-${s.id}" onclick="loadVideo(${i})"><img src="${s.thumbnail}" alt="" loading="lazy"><div class="strip-item-overlay"><div class="strip-item-views">▶ ${s.views}</div></div><div class="strip-like-badge" id="strip-badge-${s.id}"></div></div>`).join('');}
-function loadVideo(index){currentIndex=index;const s=shortsData[index];document.querySelectorAll('.strip-item').forEach((el,i)=>{el.classList.toggle('active',i===index);el.classList.remove('liked-strip','heart-strip','super-strip');});likeStates.forEach((state,id)=>{const el=document.getElementById('strip-'+id);const badge=document.getElementById('strip-badge-'+id);if(!el||!badge)return;if(state.state==='liked'){el.classList.add('liked-strip');badge.textContent='💜';}else if(state.state==='heart'){el.classList.add('heart-strip');badge.textContent='❤️';}else if(state.state==='super'){el.classList.add('super-strip');badge.textContent='💛';}});const activeEl=document.querySelector('.strip-item.active');if(activeEl)activeEl.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});mainVideo.src=s.videoUrl;mainVideo.muted=true;mainVideo.play().then(()=>{mainVideo.muted=false;}).catch(()=>{mainVideo.muted=true;mainVideo.play().catch(()=>{});});document.getElementById('infoAvatar').textContent=s.avatar;document.getElementById('infoAuthor').textContent='@'+s.author;document.getElementById('infoTitle').textContent=s.title;document.getElementById('infoStats').textContent=s.views+' views • '+s.duration;document.getElementById('commentCount').textContent=s.comments;const st=likeStates.get(s.id)||{count:s.likes,state:'none'};updateLikeUI(st);}
-function updateLikeUI(state){likeBtn.classList.remove('liked','heart','super');likeCountEl.textContent=state.count;if(state.state==='liked'){likeBtn.classList.add('liked');likeIcon.textContent='💜';}else if(state.state==='heart'){likeBtn.classList.add('heart');likeIcon.textContent='❤️';}else if(state.state==='super'){likeBtn.classList.add('super');likeIcon.textContent='💛';}else{likeIcon.textContent='🤍';}}
-function updateStripBadge(id,state){const el=document.getElementById('strip-'+id);const badge=document.getElementById('strip-badge-'+id);if(!el||!badge)return;el.classList.remove('liked-strip','heart-strip','super-strip');if(state.state==='liked'){el.classList.add('liked-strip');badge.textContent='💜';}else if(state.state==='heart'){el.classList.add('heart-strip');badge.textContent='❤️';}else if(state.state==='super'){el.classList.add('super-strip');badge.textContent='💛';}else{badge.textContent='';}}
-function attachPlayerGestures(){mainPlayer.addEventListener('touchstart',onTouchStart,{passive:true});mainPlayer.addEventListener('touchend',onTouchEnd,{passive:true});mainPlayer.addEventListener('touchmove',onTouchMove,{passive:true});}
-function onTouchStart(e){if(e.target.closest('.side-actions'))return;const t=e.touches[0];pressStartX=t.clientX;pressStartY=t.clientY;pressStartTime=Date.now();isPressing=true;pressTimer=setTimeout(()=>{if(isPressing){isPressing=false;triggerSuperLike(pressStartX,pressStartY);}},SUPER_HOLD_MS);}
-function onTouchMove(e){if(!isPressing)return;const t=e.touches[0];if(Math.abs(t.clientX-pressStartX)>15||Math.abs(t.clientY-pressStartY)>15){isPressing=false;clearTimeout(pressTimer);}}
-function onTouchEnd(e){if(e.target.closest('.side-actions'))return;clearTimeout(pressTimer);if(!isPressing)return;isPressing=false;const duration=Date.now()-pressStartTime;if(duration>=SUPER_HOLD_MS)return;const t=e.changedTouches[0];if(Math.abs(t.clientX-pressStartX)>15||Math.abs(t.clientY-pressStartY)>15)return;const now=Date.now();if(now-lastTapTime<280){tapCount++;clearTimeout(window._tapTimer);if(tapCount>=2){tapCount=0;triggerHeartBurst(t.clientX,t.clientY);}}else{tapCount=1;window._tapTimer=setTimeout(()=>{if(tapCount===1){triggerSingleLike();togglePlayPause();}tapCount=0;},280);}lastTapTime=now;}
-likeBtn.addEventListener('click',function(e){e.stopPropagation();triggerSingleLike();});
-function triggerSingleLike(){const s=shortsData[currentIndex];let st=likeStates.get(s.id)||{count:s.likes,state:'none'};if(st.state==='super')return;if(st.state==='none'){st={count:st.count+1,state:'liked'};createFloatingHeart('💜',mainPlayer.clientWidth/2,mainPlayer.clientHeight/2);}else if(st.state==='liked'){st={count:st.count-1,state:'none'};}else if(st.state==='heart'){st={count:st.count-1,state:'liked'};}likeStates.set(s.id,st);updateLikeUI(st);updateStripBadge(s.id,st);}
-function triggerHeartBurst(x,y){const s=shortsData[currentIndex];let st=likeStates.get(s.id)||{count:s.likes,state:'none'};if(st.state==='super')return;if(st.state!=='heart'){st={count:st.count+(st.state==='none'?2:1),state:'heart'};}likeStates.set(s.id,st);updateLikeUI(st);updateStripBadge(s.id,st);const rect=mainPlayer.getBoundingClientRect();for(let i=0;i<5;i++){setTimeout(()=>{createFloatingHeart('❤️',x-rect.left+(Math.random()-0.5)*60,y-rect.top+(Math.random()-0.5)*40);},i*70);}}
-function triggerSuperLike(x,y){const s=shortsData[currentIndex];let st=likeStates.get(s.id)||{count:s.likes,state:'none'};if(st.state==='super')return;st={count:st.count+5,state:'super'};likeStates.set(s.id,st);updateLikeUI(st);updateStripBadge(s.id,st);const rect=mainPlayer.getBoundingClientRect();const lx=x-rect.left;const ly=y-rect.top;const ring=document.createElement('div');ring.className='haptic-ring';ring.style.left=lx+'px';ring.style.top=ly+'px';mainPlayer.appendChild(ring);setTimeout(()=>ring.remove(),800);const text=document.createElement('div');text.className='super-like-text';text.textContent='⭐ SUPER LIKE!';text.style.left=Math.max(10,lx-60)+'px';text.style.top=(ly-40)+'px';mainPlayer.appendChild(text);setTimeout(()=>text.remove(),1200);const coin=document.createElement('div');coin.className='coin-pop';coin.innerHTML='🪙 +1 Emo Coin';coin.style.left=Math.max(10,lx-40)+'px';coin.style.top=(ly+10)+'px';mainPlayer.appendChild(coin);setTimeout(()=>coin.remove(),1000);for(let i=0;i<6;i++){setTimeout(()=>{createFloatingHeart('💛',lx+(Math.random()-0.5)*80,ly+(Math.random()-0.5)*60);},i*60);}emoCoins+=1;coinCountEl.textContent=emoCoins.toLocaleString();if(navigator.vibrate)navigator.vibrate([50,30,50,30,100]);}
-function createFloatingHeart(emoji,x,y){const h=document.createElement('div');h.className='floating-heart';h.textContent=emoji;h.style.left=x+'px';h.style.top=y+'px';mainPlayer.appendChild(h);setTimeout(()=>h.remove(),1000);}
-function togglePlayPause(){if(mainVideo.paused){mainVideo.play();playIndicator.classList.remove('show');}else{mainVideo.pause();playIndicator.textContent='⏸️';playIndicator.classList.add('show');setTimeout(()=>playIndicator.classList.remove('show'),800);}}
-function setupProgress(){setInterval(()=>{if(!mainVideo.paused&&mainVideo.duration){progressBar.style.width=((mainVideo.currentTime/mainVideo.duration)*100)+'%';}},100);}
+const SUPA_URL = 'https://havmduragglvstlxrgag.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let shortsData = [];
+let currentIndex = 0;
+let currentMode = 'full';
+let emoCoins = 0;
+let currentUserId = null;
+const likeStates = new Map();
+let pressTimer = null;
+let isPressing = false;
+let pressStartX = 0, pressStartY = 0, pressStartTime = 0;
+let lastTapTime = 0, tapCount = 0;
+const SUPER_HOLD_MS = 600;
+
+// DOM
+const fullContainer = document.getElementById('fullContainer');
+const splitContainer = document.getElementById('splitContainer');
+const splitVideo = document.getElementById('splitVideo');
+const stripScroll = document.getElementById('stripScroll');
+const coinCountEl = document.getElementById('coinCount');
+const viewToggle = document.getElementById('viewToggle');
+
+// ===== INIT =====
+async function init() {
+    // Get user
+    try {
+        const u = localStorage.getItem('ddott_user');
+        if (u) {
+            const parsed = JSON.parse(u);
+            currentUserId = parsed.id;
+            // Load coin balance
+            const { data } = await sb.from('profiles').select('emo_coins').eq('id', currentUserId).single();
+            if (data) { emoCoins = data.emo_coins || 0; coinCountEl.textContent = emoCoins.toLocaleString(); }
+        }
+    } catch(e) {}
+
+    // Fetch shorts
+    await fetchShorts();
+    setupViewToggle();
+    setupProgress();
+    setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 1000);
+}
+
+// ===== FETCH SHORTS =====
+async function fetchShorts() {
+    try {
+        const { data, error } = await sb.from('videos')
+            .select('id, title, video_url, thumbnail_url, creator_name, views, likes, comments')
+            .eq('is_short', true)
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+        if (error || !data || data.length === 0) {
+            document.getElementById('emptyState').classList.add('show');
+            document.getElementById('loadingScreen').classList.add('hidden');
+            return;
+        }
+
+        shortsData = data;
+        renderFullScroll();
+        renderStrip();
+        setupIntersectionObserver();
+
+        // Default full mode
+        fullContainer.style.display = 'block';
+    } catch(e) {
+        document.getElementById('emptyState').classList.add('show');
+        document.getElementById('loadingScreen').classList.add('hidden');
+    }
+}
+
+// ===== RENDER FULL SCROLL =====
+function renderFullScroll() {
+    fullContainer.innerHTML = shortsData.map((s, i) => `
+        <div class="short-item" data-index="${i}" data-id="${s.id}" style="height:calc(100vh - 116px)">
+            <video class="short-video" src="${s.video_url}" loop playsinline muted preload="metadata"></video>
+            <div class="video-overlay"></div>
+            <div class="video-info">
+                <div class="video-author">
+                    <div class="author-avatar">${(s.creator_name||'?')[0].toUpperCase()}</div>
+                    <span class="author-name">@${s.creator_name||'creator'}</span>
+                </div>
+                <div class="video-title">${s.title||''}</div>
+                <div class="video-stats">${s.views||0} views</div>
+            </div>
+            <div class="side-actions">
+                <button class="action-btn like-btn" data-id="${s.id}" onclick="handleLikeBtnClick(event,'${s.id}',${i})">
+                    <div class="action-icon like-icon">🤍</div>
+                    <span class="action-label like-count">${s.likes||0}</span>
+                </button>
+                <button class="action-btn">
+                    <div class="action-icon">💬</div>
+                    <span class="action-label">${s.comments||0}</span>
+                </button>
+                <button class="action-btn">
+                    <div class="action-icon">↗️</div>
+                    <span class="action-label">Share</span>
+                </button>
+            </div>
+            <div class="progress-bar" style="width:0%"></div>
+            <div class="play-indicator">▶️</div>
+        </div>
+    `).join('');
+
+    document.querySelectorAll('.short-item').forEach(el => attachGestures(el));
+}
+
+// ===== RENDER STRIP =====
+function renderStrip() {
+    document.getElementById('stripCount').textContent = shortsData.length + ' shorts';
+    stripScroll.innerHTML = shortsData.map((s, i) => `
+        <div class="strip-item ${i===0?'active':''}" id="strip-${s.id}" onclick="playSplit(${i})">
+            <img src="${s.thumbnail_url||''}" loading="lazy" onerror="this.style.background='#1a1a2e'">
+            <div class="strip-overlay">▶ ${s.views||0}</div>
+            <div class="strip-like-badge" id="sbadge-${s.id}"></div>
+        </div>
+    `).join('');
+}
+
+// ===== INTERSECTION OBSERVER =====
+function setupIntersectionObserver() {
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const video = entry.target.querySelector('video');
+            if (!video) return;
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+                video.muted = true;
+                video.play().then(() => { video.muted = false; }).catch(() => {});
+                currentIndex = parseInt(entry.target.dataset.index);
+            } else {
+                video.pause();
+                video.currentTime = 0;
+            }
+        });
+    }, { threshold: 0.7 });
+    document.querySelectorAll('.short-item').forEach(el => obs.observe(el));
+}
+
+// ===== VIEW TOGGLE =====
+function setupViewToggle() {
+    viewToggle.addEventListener('click', () => {
+        if (currentMode === 'full') {
+            currentMode = 'split';
+            fullContainer.style.display = 'none';
+            splitContainer.classList.add('active');
+            viewToggle.textContent = '▤';
+            document.querySelectorAll('.short-item video').forEach(v => v.pause());
+            playSplit(currentIndex);
+        } else {
+            currentMode = 'full';
+            fullContainer.style.display = 'block';
+            splitContainer.classList.remove('active');
+            viewToggle.textContent = '⊞';
+            splitVideo.pause();
+            const items = document.querySelectorAll('.short-item');
+            if (items[currentIndex]) {
+                const v = items[currentIndex].querySelector('video');
+                v.muted = true;
+                v.play().then(() => { v.muted = false; }).catch(() => {});
+                items[currentIndex].scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
+        }
+    });
+}
+
+// ===== PLAY SPLIT =====
+function playSplit(index) {
+    currentIndex = index;
+    const s = shortsData[index];
+    splitVideo.src = s.video_url;
+    splitVideo.muted = true;
+    splitVideo.play().then(() => { splitVideo.muted = false; }).catch(() => {});
+    document.getElementById('spAvatar').textContent = (s.creator_name||'?')[0].toUpperCase();
+    document.getElementById('spAuthor').textContent = '@' + (s.creator_name||'creator');
+    document.getElementById('spTitle').textContent = s.title||'';
+    document.getElementById('spStats').textContent = (s.views||0) + ' views';
+    document.getElementById('spComments').textContent = s.comments||0;
+    updateSplitLikeUI();
+    document.querySelectorAll('.strip-item').forEach((el,i) => el.classList.toggle('active', i===index));
+    const active = document.querySelector('.strip-item.active');
+    if (active) active.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+    // Attach gestures to split player
+    const sp = document.getElementById('splitPlayer');
+    sp.ontouchstart = null; sp.ontouchend = null; sp.ontouchmove = null;
+    attachGestures(sp, true);
+}
+
+// ===== GESTURES =====
+function attachGestures(element, isSplit = false) {
+    element.addEventListener('touchstart', e => {
+        if (e.target.closest('.action-btn')) return;
+        const t = e.touches[0];
+        pressStartX = t.clientX; pressStartY = t.clientY;
+        pressStartTime = Date.now();
+        isPressing = true;
+        pressTimer = setTimeout(() => {
+            if (isPressing) {
+                isPressing = false;
+                triggerSuperLike(element, pressStartX, pressStartY, isSplit);
+            }
+        }, SUPER_HOLD_MS);
+    }, { passive: true });
+
+    element.addEventListener('touchmove', e => {
+        if (!isPressing) return;
+        const t = e.touches[0];
+        if (Math.abs(t.clientX - pressStartX) > 15 || Math.abs(t.clientY - pressStartY) > 15) {
+            isPressing = false; clearTimeout(pressTimer);
+        }
+    }, { passive: true });
+
+    element.addEventListener('touchend', e => {
+        if (e.target.closest('.action-btn')) return;
+        clearTimeout(pressTimer);
+        if (!isPressing) return;
+        isPressing = false;
+        const duration = Date.now() - pressStartTime;
+        if (duration >= SUPER_HOLD_MS) return;
+        const t = e.changedTouches[0];
+        if (Math.abs(t.clientX - pressStartX) > 15 || Math.abs(t.clientY - pressStartY) > 15) return;
+        const now = Date.now();
+        if (now - lastTapTime < 280) {
+            tapCount++;
+            clearTimeout(window._tapTimer);
+            if (tapCount >= 2) { tapCount = 0; triggerHeartBurst(element, t.clientX, t.clientY, isSplit); }
+        } else {
+            tapCount = 1;
+            window._tapTimer = setTimeout(() => {
+                if (tapCount === 1) {
+                    triggerSingleLike(element, isSplit);
+                    togglePlayPause(element, isSplit);
+                }
+                tapCount = 0;
+            }, 280);
+        }
+        lastTapTime = now;
+    }, { passive: true });
+}
+
+// ===== LIKE BTN CLICK (side button) =====
+function handleLikeBtnClick(e, id, index) {
+    e.stopPropagation();
+    currentIndex = index;
+    const item = document.querySelector(`.short-item[data-id="${id}"]`);
+    triggerSingleLike(item, false);
+}
+
+document.getElementById('spLikeBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    triggerSingleLike(null, true);
+});
+
+// ===== SINGLE LIKE =====
+function triggerSingleLike(element, isSplit) {
+    const s = shortsData[currentIndex];
+    if (!s) return;
+    let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
+    if (st.state === 'super') return;
+    if (st.state === 'none') {
+        st = { count: st.count + 1, state: 'liked' };
+        if (element) createFloatingHeart(element, '💜', element.clientWidth/2, element.clientHeight/2);
+    } else if (st.state === 'liked') {
+        st = { count: st.count - 1, state: 'none' };
+    } else if (st.state === 'heart') {
+        st = { count: st.count - 1, state: 'liked' };
+    }
+    likeStates.set(s.id, st);
+    updateLikeUI(s.id, st, element, isSplit);
+}
+
+// ===== HEART BURST =====
+function triggerHeartBurst(element, x, y, isSplit) {
+    const s = shortsData[currentIndex];
+    if (!s) return;
+    let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
+    if (st.state === 'super') return;
+    if (st.state !== 'heart') st = { count: st.count + (st.state==='none'?2:1), state: 'heart' };
+    likeStates.set(s.id, st);
+    updateLikeUI(s.id, st, element, isSplit);
+    const rect = element.getBoundingClientRect();
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => createFloatingHeart(element, '❤️', x-rect.left+(Math.random()-0.5)*60, y-rect.top+(Math.random()-0.5)*40), i*70);
+    }
+}
+
+// ===== SUPER LIKE =====
+function triggerSuperLike(element, x, y, isSplit) {
+    const s = shortsData[currentIndex];
+    if (!s) return;
+    let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
+    if (st.state === 'super') return;
+    st = { count: st.count + 5, state: 'super' };
+    likeStates.set(s.id, st);
+    updateLikeUI(s.id, st, element, isSplit);
+
+    const rect = element.getBoundingClientRect();
+    const lx = x - rect.left, ly = y - rect.top;
+
+    const ring = document.createElement('div');
+    ring.className = 'haptic-ring';
+    ring.style.cssText = `left:${lx}px;top:${ly}px`;
+    element.appendChild(ring);
+    setTimeout(() => ring.remove(), 800);
+
+    const txt = document.createElement('div');
+    txt.className = 'super-like-text';
+    txt.textContent = '⭐ SUPER LIKE!';
+    txt.style.cssText = `left:${Math.max(10,lx-60)}px;top:${ly-40}px`;
+    element.appendChild(txt);
+    setTimeout(() => txt.remove(), 1200);
+
+    const coin = document.createElement('div');
+    coin.className = 'coin-pop';
+    coin.innerHTML = '🪙 +1 Emo Coin';
+    coin.style.cssText = `left:${Math.max(10,lx-40)}px;top:${ly+10}px`;
+    element.appendChild(coin);
+    setTimeout(() => coin.remove(), 1000);
+
+    for (let i = 0; i < 6; i++) {
+        setTimeout(() => createFloatingHeart(element, '💛', lx+(Math.random()-0.5)*80, ly+(Math.random()-0.5)*60), i*60);
+    }
+
+    // Update coins
+    emoCoins += 1;
+    coinCountEl.textContent = emoCoins.toLocaleString();
+    if (navigator.vibrate) navigator.vibrate([50,30,50,30,100]);
+
+    // Supabase sync
+    if (currentUserId) {
+        sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({ data }) => {
+            if (data) sb.from('profiles').update({ emo_coins: (data.emo_coins||0) + 1 }).eq('id', currentUserId);
+        });
+    }
+}
+
+// ===== UPDATE LIKE UI =====
+function updateLikeUI(id, st, element, isSplit) {
+    // Full scroll item
+    if (element && element.classList.contains('short-item')) {
+        const btn = element.querySelector('.like-btn');
+        const icon = element.querySelector('.like-icon');
+        const count = element.querySelector('.like-count');
+        if (btn && icon && count) {
+            btn.classList.remove('liked','heart','super');
+            count.textContent = st.count;
+            if (st.state==='liked'){btn.classList.add('liked');icon.textContent='💜';}
+            else if(st.state==='heart'){btn.classList.add('heart');icon.textContent='❤️';}
+            else if(st.state==='super'){btn.classList.add('super');icon.textContent='💛';}
+            else{icon.textContent='🤍';}
+        }
+    }
+    // Split UI
+    if (isSplit) updateSplitLikeUI();
+    // Strip badge
+    updateStripBadge(id, st);
+}
+
+function updateSplitLikeUI() {
+    const s = shortsData[currentIndex];
+    if (!s) return;
+    const st = likeStates.get(s.id) || { count: s.likes||0, state:'none' };
+    const btn = document.getElementById('spLikeBtn');
+    const icon = document.getElementById('spLikeIcon');
+    const count = document.getElementById('spLikeCount');
+    btn.classList.remove('liked','heart','super');
+    count.textContent = st.count;
+    if(st.state==='liked'){btn.classList.add('liked');icon.textContent='💜';}
+    else if(st.state==='heart'){btn.classList.add('heart');icon.textContent='❤️';}
+    else if(st.state==='super'){btn.classList.add('super');icon.textContent='💛';}
+    else{icon.textContent='🤍';}
+}
+
+function updateStripBadge(id, st) {
+    const el = document.getElementById('strip-'+id);
+    const badge = document.getElementById('sbadge-'+id);
+    if (!el||!badge) return;
+    el.classList.remove('liked-s','heart-s','super-s');
+    if(st.state==='liked'){el.classList.add('liked-s');badge.textContent='💜';}
+    else if(st.state==='heart'){el.classList.add('heart-s');badge.textContent='❤️';}
+    else if(st.state==='super'){el.classList.add('super-s');badge.textContent='💛';}
+    else{badge.textContent='';}
+}
+
+// ===== FLOATING HEART =====
+function createFloatingHeart(container, emoji, x, y) {
+    const h = document.createElement('div');
+    h.className = 'floating-heart';
+    h.textContent = emoji;
+    h.style.cssText = `left:${x}px;top:${y}px`;
+    container.appendChild(h);
+    setTimeout(() => h.remove(), 1000);
+}
+
+// ===== PLAY/PAUSE =====
+function togglePlayPause(element, isSplit) {
+    const video = isSplit ? splitVideo : element?.querySelector('video');
+    const indicator = isSplit ? document.getElementById('spPlayIndicator') : element?.querySelector('.play-indicator');
+    if (!video||!indicator) return;
+    if (video.paused) {
+        video.play(); indicator.classList.remove('show');
+    } else {
+        video.pause(); indicator.textContent='⏸️'; indicator.classList.add('show');
+        setTimeout(() => indicator.classList.remove('show'), 800);
+    }
+}
+
+// ===== PROGRESS =====
+function setupProgress() {
+    setInterval(() => {
+        if (!splitVideo.paused && splitVideo.duration) {
+            document.getElementById('spProgress').style.width = ((splitVideo.currentTime/splitVideo.duration)*100)+'%';
+        }
+        document.querySelectorAll('.short-item').forEach(item => {
+            const v = item.querySelector('video');
+            const p = item.querySelector('.progress-bar');
+            if (v&&p&&!v.paused&&v.duration) p.style.width = ((v.currentTime/v.duration)*100)+'%';
+        });
+    }, 100);
+}
+
 init();
 </script>
 </body>
