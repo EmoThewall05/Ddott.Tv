@@ -591,7 +591,10 @@
             letter-spacing: 2px;
         }
 
-        /* ===== RESPONSIVE ===== */
+        body.embedded .bottom-nav { display: none !important; }
+body.embedded .header { display: none !important; }
+
+/* ===== RESPONSIVE ===== */
         @media (min-width: 768px) {
             .side-actions { right: 24px; bottom: 120px; }
             .video-overlay { padding: 80px 24px 120px; }
@@ -786,6 +789,7 @@
 
         // ===== INIT =====
         function init() {
+    if (new URLSearchParams(location.search).get('embed') === 'true') document.body.classList.add('embedded');
             renderFullScrollShorts();
             renderSplitGrid();
             setupIntersectionObserver();
@@ -865,6 +869,7 @@
             let hasTriggeredHeart = false;
 
             const startHandler = (e) => {
+    if (e.target.closest('.action-btn')) return;
                 const touch = e.touches ? e.touches[0] : e;
                 pressStartTime = Date.now();
                 pressStartX = touch.clientX;
@@ -1075,7 +1080,7 @@
         function togglePlayPause(video, indicator) {
             if (video.paused) {
                 video.play();
-                video.muted = false;
+                //video.muted = false;
                 indicator.textContent = '▶️';
                 indicator.classList.remove('show');
             } else {
@@ -1094,7 +1099,7 @@
                     const progressBar = entry.target.querySelector('.progress-bar');
                     if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
                         video.play();
-                        video.muted = false;
+                        //video.muted = false;
                         currentIndex = parseInt(entry.target.dataset.index);
                     } else {
                         video.pause();
@@ -1163,7 +1168,7 @@
             if (items[currentIndex]) {
                 const video = items[currentIndex].querySelector('video');
                 video.play();
-                video.muted = false;
+                //video.muted = false;
                 items[currentIndex].scrollIntoView({ behavior: 'instant', block: 'start' });
             }
         }
