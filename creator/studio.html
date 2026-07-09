@@ -520,6 +520,13 @@ async function publishVideo() {
     const cloudData = await cloudRes.json();
     if (!cloudData.secure_url) throw new Error('Cloudinary upload failed');
 
+    // Many phones record in HEVC (H.265), which most mobile browsers can't
+    // decode via <video>. Store the H.264-transcoded URL so playback works
+    // everywhere, instead of the raw upload URL.
+    const h264Url = cloudData.secure_url.includes('/video/upload/')
+      ? cloudData.secure_url.replace('/video/upload/', '/video/upload/f_mp4,vc_h264,q_auto/')
+      : cloudData.secure_url;
+
     statusMsg.textContent = '💾 Saving to database...';
 
     // Step 2: Save to Supabase
@@ -532,7 +539,7 @@ async function publishVideo() {
       description: document.getElementById('videoDesc').value,
       category: document.getElementById('videoCategory').value,
       licence: document.getElementById('videoLicence').value,
-      video_url: cloudData.secure_url,
+      video_url: h264Url,
       thumbnail_url: cloudData.secure_url.replace('/video/upload/', '/video/upload/so_0/'),
       views: 0,
       likes: 0,
