@@ -142,8 +142,8 @@
             </div>
             <div class="side-actions">
                 <button class="action-btn like-btn" id="spLikeBtn"><div class="action-icon" id="spLikeIcon">🤍</div><span class="action-label" id="spLikeCount">0</span></button>
-                <button class="action-btn"><div class="action-icon">💬</div><span class="action-label" id="spComments">0</span></button>
-                <button class="action-btn"><div class="action-icon">↗️</div><span class="action-label">Share</span></button>
+                <button class="action-btn" onclick="navTo('message')"><div class="action-icon">💬</div><span class="action-label" id="spComments">0</span></button>
+                <button class="action-btn" onclick="shareVideo(shortsData[currentSplitIndex])"><div class="action-icon">↗️</div><span class="action-label">Share</span></button>
             </div>
             <div class="progress-bar" id="spProgress" style="width:0%"></div>
             <div class="play-indicator" id="spPlayIndicator">▶️</div>
