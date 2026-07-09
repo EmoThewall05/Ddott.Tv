@@ -488,7 +488,7 @@ async function publishVideo() {
   } catch (modErr) {
     console.error('Moderation check failed', modErr);
     statusMsg.style.color = '#ff4444';
-    statusMsg.textContent = '❌ Safety check failed. Please try again.';
+    statusMsg.textContent = '❌ DEBUG: ' + (modErr && modErr.message ? modErr.message : String(modErr));
     btn.textContent = '🚀 PUBLISH VIDEO';
     btn.disabled = false;
     return;
