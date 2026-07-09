@@ -142,7 +142,7 @@
             </div>
             <div class="side-actions">
                 <button class="action-btn like-btn" id="spLikeBtn"><div class="action-icon" id="spLikeIcon">🤍</div><span class="action-label" id="spLikeCount">0</span></button>
-                <button class="action-btn" onclick="navTo('message')"><div class="action-icon">💬</div><span class="action-label" id="spComments">0</span></button>
+                <button class="action-btn" onclick="openComments(shortsData[currentIndex]?.id)"><div class="action-icon">💬</div><span class="action-label" id="spComments">0</span></button>
                 <button class="action-btn" onclick="shareVideo(shortsData[currentIndex])"><div class="action-icon">↗️</div><span class="action-label">Share</span></button>
             </div>
             <div class="progress-bar" id="spProgress" style="width:0%"></div>
@@ -257,7 +257,7 @@ function renderFullScroll() {
                     <div class="action-icon like-icon">🤍</div>
                     <span class="action-label like-count">${s.likes||0}</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" onclick="openComments('${s.id}')">
                     <div class="action-icon">💬</div>
                     <span class="action-label">${s.comments||0}</span>
                 </button>
@@ -587,6 +587,78 @@ function setupProgress() {
     }, 100);
 }
 
+
+// Comments Drawer
+let currentCommentVideoId = null;
+
+function openComments(videoId) {
+    currentCommentVideoId = videoId;
+    document.getElementById('commentsOverlay').style.display = 'block';
+    const drawer = document.getElementById('commentsDrawer');
+    drawer.style.display = 'flex';
+    setTimeout(() => drawer.style.transform = 'translateY(0)', 10);
+    loadComments(videoId);
+}
+
+function closeComments() {
+    const drawer = document.getElementById('commentsDrawer');
+    drawer.style.transform = 'translateY(100%)';
+    setTimeout(() => {
+        drawer.style.display = 'none';
+        document.getElementById('commentsOverlay').style.display = 'none';
+    }, 300);
+}
+
+async function loadComments(videoId) {
+    const list = document.getElementById('commentsList');
+    list.innerHTML = '<div style="color:rgba(255,255,255,0.4);text-align:center;padding:30px;">Loading...</div>';
+    try {
+        const { data, error } = await sb.from('comments')
+            .select('*')
+            .eq('video_id', videoId)
+            .order('created_at', { ascending: false })
+            .limit(50);
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            list.innerHTML = '<div style="color:rgba(255,255,255,0.4);text-align:center;padding:30px;">No comments yet. Be the first! 💬</div>';
+            return;
+        }
+        list.innerHTML = data.map(cm => `
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="width:34px;height:34px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;">${(cm.username||'U')[0].toUpperCase()}</div>
+                <div style="flex:1;">
+                    <div style="font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:3px;">@${cm.username||'user'}</div>
+                    <div style="font-size:14px;color:#e2e8f0;line-height:1.4;">${cm.content||''}</div>
+                </div>
+            </div>
+        `).join('');
+    } catch(e) {
+        list.innerHTML = '<div style="color:rgba(255,255,255,0.4);text-align:center;padding:30px;">Failed to load comments</div>';
+    }
+}
+
+async function postComment() {
+    if (!currentUserId) { alert('Please login to comment'); return; }
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    try {
+        const { data: profile } = await sb.from('profiles').select('username,display_name').eq('id', currentUserId).single();
+        const uname = profile?.display_name || profile?.username || 'user';
+        await sb.from('comments').insert({
+            video_id: currentCommentVideoId,
+            user_id: currentUserId,
+            username: uname,
+            content: text,
+            likes: 0
+        });
+        loadComments(currentCommentVideoId);
+    } catch(e) {
+        console.error('Comment post error:', e);
+    }
+}
+
 function navTo(page){
     try{if(window.parent&&window.parent.nav){window.parent.nav(page);return;}}catch(e){}
     const r={feed:'/',home:'/',community:'../community/',coins:'../coins/',message:'../messaging/'};
@@ -604,5 +676,19 @@ function shareVideo(s){
 }
 init();
 </script>
+
+<!-- Comments Drawer -->
+<div id="commentsOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;" onclick="closeComments()"></div>
+<div id="commentsDrawer" style="display:none;position:fixed;bottom:0;left:0;right:0;height:70%;background:#0f0f18;border-radius:20px 20px 0 0;z-index:2001;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.3s ease;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.08);">
+    <span style="font-size:15px;font-weight:700;color:#fff;">Comments</span>
+    <button onclick="closeComments()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+  </div>
+  <div id="commentsList" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:14px;"></div>
+  <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:10px;align-items:center;padding-bottom:max(12px,env(safe-area-inset-bottom));">
+    <input id="commentInput" type="text" placeholder="Add a comment..." style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:10px 16px;color:#fff;font-size:14px;outline:none;" maxlength="300"/>
+    <button onclick="postComment()" style="background:#7c3aed;border:none;color:#fff;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">➤</button>
+  </div>
+</div>
 </body>
 </html>
