@@ -1,893 +1,1288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Ddott.TV — Player V3</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #07000f;
-  --bg2: #0f0020;
-  --surface: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.09);
-  --cyan: #00e5ff;
-  --purple: #b44fff;
-  --pink: #ff2d9b;
-  --gold: #ffd700;
-  --text: #f0e8ff;
-  --muted: #7a6a94;
-  --divider: rgba(180,79,255,0.25);
-}
-html, body {
-  height: 100%; background: var(--bg);
-  font-family: 'Space Grotesk', sans-serif;
-  color: var(--text); overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ddott Shorts Player</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --accent-purple: #7c3aed;
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --accent-gold: #fbbf24;
+            --accent-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border: rgba(255,255,255,0.08);
+            --gradient-like: linear-gradient(135deg, #7c3aed, #ec4899);
+            --gradient-super: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
 
-/* ── Shell ── */
-.shell {
-  display: flex; flex-direction: column;
-  height: 100vh; height: 100dvh;
-  position: relative;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
 
-/* ── TOP NAV ── */
-.topnav {
-  height: 48px; flex-shrink: 0;
-  display: flex; align-items: center;
-  padding: 0 16px; gap: 12px;
-  background: rgba(7,0,15,0.97);
-  border-bottom: 1px solid var(--border);
-  z-index: 50;
-}
-.back-btn {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--surface); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; cursor: pointer; color: var(--cyan);
-  flex-shrink: 0;
-}
-.nav-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 15px; font-weight: 800;
-  background: linear-gradient(135deg, #a78bfa, #f472b6);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.coin-pill {
-  display: flex; align-items: center; gap: 4px;
-  background: rgba(255,215,0,0.1);
-  border: 1px solid rgba(255,215,0,0.22);
-  border-radius: 20px; padding: 4px 10px;
-  font-size: 11px; font-weight: 700; color: var(--gold);
-  flex-shrink: 0;
-}
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+        }
 
-/* ── SPLIT CONTAINER ── */
-.split {
-  flex: 1; display: flex; flex-direction: column;
-  overflow: hidden; position: relative;
-}
+        /* ===== APP CONTAINER ===== */
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
 
-/* ── MAIN VIDEO (top 58%) ── */
-.main-player {
-  flex: 0 0 58%;
-  position: relative; background: #000;
-  overflow: hidden;
-}
+        /* ===== HEADER ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: linear-gradient(to bottom, rgba(10,10,15,0.9), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
 
-video.main-vid {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-}
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #06b6d4, #7c3aed, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
 
-.vid-loading {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.7); z-index: 5;
-  transition: opacity 0.3s;
-}
-.vid-loading.hidden { opacity: 0; pointer-events: none; }
-.spinner {
-  width: 44px; height: 44px;
-  border: 2.5px solid rgba(0,229,255,0.2);
-  border-top-color: var(--cyan);
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-  margin-bottom: 10px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-lbl { font-size: 12px; color: var(--cyan); letter-spacing: 1px; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-/* Gradient overlay on video */
-.vid-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(7,0,15,0.85) 0%, transparent 40%);
-  pointer-events: none; z-index: 2;
-}
+        .coin-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
 
-/* Video info overlay (bottom of player) */
-.vid-info {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  z-index: 3; padding: 10px 14px 8px;
-}
-.vid-title-text {
-  font-size: 14px; font-weight: 600; line-height: 1.3;
-  margin-bottom: 6px;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.vid-meta-row {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 11px; color: var(--muted);
-}
-.creator-chip {
-  display: flex; align-items: center; gap: 5px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; padding: 3px 8px 3px 4px;
-}
-.creator-chip-av {
-  width: 18px; height: 18px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--purple), var(--cyan));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; color: #000;
-}
-.creator-chip-name { font-size: 11px; font-weight: 600; color: var(--text); }
+        .coin-icon {
+            width: 16px;
+            height: 16px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #000;
+        }
 
-/* Controls bar */
-.ctrl-bar {
-  position: absolute; bottom: 52px; left: 0; right: 0;
-  z-index: 4; padding: 0 14px;
-  display: flex; align-items: center; gap: 10px;
-  opacity: 0; transition: opacity 0.25s;
-}
-.main-player.show-ctrl .ctrl-bar { opacity: 1; }
-.prog-wrap {
-  flex: 1; height: 3px; background: rgba(255,255,255,0.2);
-  border-radius: 2px; cursor: pointer; position: relative;
-}
-.prog-fill {
-  height: 100%; border-radius: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--purple));
-  width: 0%; transition: width 0.15s linear;
-}
-.ctrl-btn {
-  background: none; border: none; color: #fff;
-  font-size: 16px; cursor: pointer; padding: 2px; opacity: 0.9;
-  line-height: 1;
-}
-.time-lbl {
-  font-size: 10px; color: rgba(255,255,255,0.7);
-  font-variant-numeric: tabular-nums; white-space: nowrap;
-}
+        .view-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-/* Video action pills */
-.vid-actions {
-  position: absolute; right: 12px; top: 50%;
-  transform: translateY(-50%);
-  z-index: 4;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.vact-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-user-select: none; user-select: none;
-}
-.vact-icon {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; backdrop-filter: blur(8px);
-  transition: all 0.2s;
-  position: relative;
-}
-.vact-icon:active { transform: scale(0.9); }
-.vact-lbl { font-size: 9px; color: rgba(255,255,255,0.7); font-weight: 600; }
+        .view-toggle:active { transform: scale(0.95); }
 
-/* Charge ring for main like long-press (super like) */
-.v-charge-ring {
-  position: absolute; inset: -5px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  border-top-color: var(--gold);
-  opacity: 0;
-  animation: spin 0.8s linear infinite;
-}
-.vact-btn.charging .v-charge-ring { opacity: 1; }
+        /* ===== MODE INDICATOR ===== */
+        .mode-indicator {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(124, 58, 237, 0.9);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+            pointer-events: none;
+            white-space: nowrap;
+        }
 
-/* ── DIVIDER ── */
-.divider {
-  flex-shrink: 0; height: 32px;
-  background: linear-gradient(180deg, rgba(7,0,15,0.95), rgba(15,0,32,0.98));
-  border-top: 1px solid var(--divider);
-  border-bottom: 1px solid var(--divider);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 16px; z-index: 10;
-}
-.div-label {
-  display: flex; align-items: center; gap: 6px;
-  font-family: 'Syne', sans-serif;
-  font-size: 11px; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase;
-  color: var(--purple);
-}
-.div-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--pink);
-  animation: pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
-.div-count { font-size: 10px; color: var(--muted); }
+        .mode-indicator.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
 
-/* ── SHORTS FEED (bottom 42%) ── */
-.shorts-feed {
-  flex: 1; position: relative; overflow: hidden;
-  background: var(--bg2);
-}
+        /* ===== FULL SCROLL MODE ===== */
+        .full-scroll-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
 
-/* Horizontal scroll shorts */
-.shorts-scroll {
-  display: flex; gap: 0;
-  height: 100%; overflow-x: auto; overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.shorts-scroll::-webkit-scrollbar { display: none; }
+        .full-scroll-container::-webkit-scrollbar { display: none; }
 
-.short-card {
-  flex-shrink: 0;
-  width: calc(100vw * 0.42);
-  height: 100%;
-  scroll-snap-align: start;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  border-right: 1px solid var(--border);
-  background: var(--bg);
-  transition: transform 0.2s;
-}
-.short-card:active { transform: scale(0.97); }
+        .short-item {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            scroll-snap-align: start;
+            position: relative;
+            flex-shrink: 0;
+            background: #000;
+        }
 
-.short-thumb {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px;
-}
-.short-thumb-bg {
-  position: absolute; inset: 0;
-}
-.short-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(7,0,15,0.92) 0%, transparent 55%);
-  pointer-events: none;
-}
-.short-play {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-  border: 1.5px solid rgba(255,255,255,0.25);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; backdrop-filter: blur(6px);
-  padding-left: 2px;
-}
+        .short-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-/* Short card info */
-.short-info {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 8px 10px; z-index: 5;
-}
-.short-creator {
-  font-size: 10px; font-weight: 700;
-  color: rgba(255,255,255,0.9);
-  margin-bottom: 3px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.short-title-txt {
-  font-size: 10px; color: var(--muted); line-height: 1.3;
-  display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
+        /* ===== SPLIT SCREEN MODE ===== */
+        .split-container {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+        }
 
-/* Short side actions */
-.short-actions {
-  position: absolute; right: 6px; bottom: 60px;
-  z-index: 6;
-  display: flex; flex-direction: column; gap: 10px;
-  align-items: center;
-}
-.sa-btn {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 2px; cursor: pointer;
-  touch-action: manipulation;
-  -webkit-user-select: none; user-select: none;
-}
-.sa-icon {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(0,0,0,0.5);
-  border: 1px solid rgba(255,255,255,0.12);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; backdrop-filter: blur(8px);
-  transition: all 0.2s;
-  position: relative;
-}
-.sa-icon:active { transform: scale(0.88); }
-.sa-count { font-size: 8px; color: rgba(255,255,255,0.65); font-weight: 600; }
+        .split-container.active { display: flex; }
 
-/* Like states */
-.sa-btn.liked .sa-icon { border-color: rgba(219,39,119,0.5); box-shadow: 0 0 12px rgba(219,39,119,0.25); }
-.sa-btn.super-liked .sa-icon {
-  background: linear-gradient(135deg, #db2777, #f59e0b);
-  border-color: transparent;
-  box-shadow: 0 0 16px rgba(219,39,119,0.4);
-}
+        .split-player {
+            height: 50%;
+            position: relative;
+            background: #000;
+            border-bottom: 2px solid var(--accent-purple);
+        }
 
-/* Charge ring on short like */
-.s-charge-ring {
-  position: absolute; inset: -5px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  border-top-color: var(--gold);
-  opacity: 0;
-  animation: spin 0.8s linear infinite;
-}
-.sa-btn.charging .s-charge-ring { opacity: 1; }
+        .split-player .short-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
 
-/* Now playing indicator */
-.now-playing {
-  position: absolute; top: 8px; left: 8px; z-index: 7;
-  display: flex; align-items: center; gap: 4px;
-  background: rgba(180,79,255,0.2);
-  border: 1px solid rgba(180,79,255,0.4);
-  border-radius: 20px; padding: 2px 8px;
-  font-size: 8px; font-weight: 700;
-  color: #c084fc; letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.np-dot {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: #c084fc;
-  animation: pulse 1s ease-in-out infinite;
-}
+        .split-grid {
+            height: 50%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: var(--bg-secondary);
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            scroll-behavior: smooth;
+        }
 
-/* Empty shorts */
-.shorts-empty {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 8px; text-align: center; padding: 20px;
-}
-.shorts-empty-icon { font-size: 32px; opacity: 0.5; }
-.shorts-empty-txt { font-size: 12px; color: var(--muted); }
+        .grid-item {
+            aspect-ratio: 9/16;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
 
-/* ── BOTTOM NAV ── */
-.bottom-nav {
-  flex-shrink: 0;
-  height: calc(52px + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
-  background: rgba(7,0,15,0.97);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center;
-  justify-content: space-around; z-index: 50;
-}
-.bnav-item {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 2px;
-  cursor: pointer; padding: 6px 12px;
-  text-decoration: none; color: var(--muted);
-  transition: color 0.2s;
-}
-.bnav-item.active { color: var(--cyan); }
-.bnav-icon { font-size: 18px; }
-.bnav-lbl { font-size: 9px; font-weight: 600; letter-spacing: 0.5px; }
+        .grid-item.active {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
 
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 70px; left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  background: rgba(124,58,237,0.95);
-  backdrop-filter: blur(12px);
-  color: white; padding: 8px 18px;
-  border-radius: 20px; font-size: 12px; font-weight: 600;
-  z-index: 999; white-space: nowrap;
-  border: 1px solid rgba(167,139,250,0.4);
-  opacity: 0; transition: all 0.25s;
-  pointer-events: none;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .grid-item img, .grid-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-/* ── COIN BURST ── */
-.coin-burst {
-  position: fixed; font-size: 20px;
-  pointer-events: none; z-index: 9999;
-  animation: burstUp 0.7s ease-out forwards;
-}
-@keyframes burstUp {
-  0% { opacity: 1; transform: translateY(0) scale(0.6); }
-  50% { opacity: 1; transform: translateY(-60px) scale(1.1); }
-  100% { opacity: 0; transform: translateY(-110px) scale(0.8); }
-}
+        .grid-item .grid-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            font-size: 11px;
+            font-weight: 600;
+        }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-}
-</style>
+        .grid-item .grid-views {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            color: var(--text-secondary);
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        /* Swipe hint for split mode */
+        .swipe-hint {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(124, 58, 237, 0.8);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: swipePulse 2s infinite;
+            z-index: 10;
+        }
+
+        @keyframes swipePulse {
+            0%, 100% { opacity: 0.6; transform: translateY(-50%) translateX(0); }
+            50% { opacity: 1; transform: translateY(-50%) translateX(-5px); }
+        }
+
+        /* ===== OVERLAY UI ===== */
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 80px 16px 100px;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 40%, rgba(0,0,0,0.3) 100%);
+        }
+
+        .video-info {
+            max-width: 75%;
+        }
+
+        .video-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .video-title {
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-stats {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== SIDE ACTIONS ===== */
+        .side-actions {
+            position: absolute;
+            right: 12px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            pointer-events: auto;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .action-btn:active .action-icon { transform: scale(0.9); }
+
+        .action-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Like states */
+        .like-btn .action-icon { transition: all 0.3s ease; }
+        .like-btn.liked .action-icon {
+            background: rgba(124, 58, 237, 0.3);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+        .like-btn.liked .action-label { color: var(--accent-purple); }
+
+        .like-btn.heart-burst .action-icon {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: var(--accent-red);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+            animation: heartBurst 0.5s ease;
+        }
+        .like-btn.heart-burst .action-label { color: var(--accent-red); }
+
+        .like-btn.super-liked .action-icon {
+            background: rgba(251, 191, 36, 0.3);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+            animation: superLikePulse 0.6s ease;
+        }
+        .like-btn.super-liked .action-label { color: var(--accent-gold); }
+
+        @keyframes heartBurst {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.4); }
+            60% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes superLikePulse {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.5); }
+            50% { transform: scale(0.8); }
+            75% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .floating-heart {
+            position: absolute;
+            font-size: 40px;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
+            filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.6));
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-150px) scale(1.5); }
+        }
+
+        .haptic-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid var(--accent-gold);
+            pointer-events: none;
+            z-index: 100;
+            animation: hapticExpand 0.8s ease-out forwards;
+        }
+
+        @keyframes hapticExpand {
+            0% { width: 40px; height: 40px; opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            100% { width: 200px; height: 200px; opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .super-like-text {
+            position: absolute;
+            font-size: 18px;
+            font-weight: 800;
+            background: var(--gradient-super);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            pointer-events: none;
+            z-index: 101;
+            animation: superTextFloat 1.2s ease-out forwards;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+        }
+
+        @keyframes superTextFloat {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            30% { transform: translateY(-30px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        }
+
+        .coin-pop {
+            position: absolute;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            pointer-events: none;
+            z-index: 101;
+            animation: coinPop 1s ease-out forwards;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @keyframes coinPop {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-80px); }
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-purple);
+            transition: width 0.1s linear;
+            z-index: 50;
+            box-shadow: 0 0 10px var(--accent-purple);
+        }
+
+        /* Play/Pause indicator */
+        .play-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 64px;
+            height: 64px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .play-indicator.show { opacity: 1; }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 8px 12px;
+        }
+
+        .nav-item.active { color: var(--accent-purple); }
+        .nav-item svg { width: 24px; height: 24px; }
+
+        /* ===== LOADING / EMPTY STATES ===== */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(124, 58, 237, 0.2);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 768px) {
+            .side-actions { right: 24px; bottom: 120px; }
+            .video-overlay { padding: 80px 24px 120px; }
+        }
+    </style>
+<base target="_blank">
 </head>
 <body>
-
-<div class="shell">
-
-  <!-- TOP NAV -->
-  <div class="topnav">
-    <div class="back-btn" onclick="history.back()">←</div>
-    <div class="nav-title" id="navTitle">Loading...</div>
-    <div class="coin-pill">🪙 <span id="coinDisplay">0</span></div>
-  </div>
-
-  <!-- SPLIT -->
-  <div class="split">
-
-    <!-- MAIN VIDEO PLAYER -->
-    <div class="main-player" id="mainPlayer" onclick="toggleCtrl()">
-
-      <video class="main-vid" id="mainVid" playsinline webkit-playsinline preload="metadata"></video>
-
-      <!-- Loading -->
-      <div class="vid-loading" id="vidLoading">
-        <div class="spinner"></div>
-        <div class="loading-lbl">Loading...</div>
-      </div>
-
-      <!-- Overlay -->
-      <div class="vid-overlay"></div>
-
-      <!-- Controls -->
-      <div class="ctrl-bar" id="ctrlBar">
-        <button class="ctrl-btn" id="playBtn" onclick="event.stopPropagation(); togglePlay()">▶</button>
-        <div class="prog-wrap" id="progWrap">
-          <div class="prog-fill" id="progFill"></div>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loader"></div>
+            <div class="loading-text">DDOTT.TV</div>
         </div>
-        <span class="time-lbl" id="timeLbl">0:00</span>
-        <button class="ctrl-btn" onclick="event.stopPropagation(); toggleMute()">🔊</button>
-      </div>
 
-      <!-- Video Info -->
-      <div class="vid-info">
-        <div class="vid-title-text" id="vidTitle">Loading video...</div>
-        <div class="vid-meta-row">
-          <div class="creator-chip">
-            <div class="creator-chip-av" id="creatorAv">D</div>
-            <span class="creator-chip-name" id="creatorChipName">Creator</span>
-          </div>
-          <span id="viewsTxt">0 views</span>
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">DDOTT.TV</div>
+            <div class="header-right">
+                <div class="coin-badge">
+                    <div class="coin-icon">E</div>
+                    <span id="coinCount">1,240</span>
+                </div>
+                <div class="view-toggle" id="viewToggle" title="Toggle View Mode">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <!-- Side Actions -->
-      <!-- Simple like button — no coin system for shorts-player main video -->
-      <div class="vid-actions">
-        <div class="vact-btn" onclick="event.stopPropagation(); mainLike()">
-          <div class="vact-icon" id="mainLikeIcon">
-            <span id="mainLikeEmoji">🤍</span>
-          </div>
-          <span class="vact-lbl" id="mainLikeCount">0</span>
-        </div>
-        <div class="vact-btn" onclick="event.stopPropagation(); mainComment()">
-          <div class="vact-icon">💬</div>
-          <span class="vact-lbl">Chat</span>
-        </div>
-        <div class="vact-btn" onclick="event.stopPropagation(); mainShare()">
-          <div class="vact-icon">↗</div>
-          <span class="vact-lbl">Share</span>
-        </div>
-      </div>
+        <!-- Mode Indicator -->
+        <div class="mode-indicator" id="modeIndicator">Full Scroll Mode</div>
 
+        <!-- FULL SCROLL MODE -->
+        <div class="full-scroll-container" id="fullScrollContainer">
+            <!-- Shorts will be injected here -->
+        </div>
+
+        <!-- SPLIT SCREEN MODE -->
+        <div class="split-container" id="splitContainer">
+            <div class="split-player" id="splitPlayer">
+                <video class="short-video" id="splitVideo" loop playsinline muted></video>
+                <div class="video-overlay" style="padding-bottom: 20px;">
+                    <div class="video-info">
+                        <div class="video-author">
+                            <div class="author-avatar" id="splitAvatar">M</div>
+                            <span class="author-name" id="splitAuthor">@meradivin</span>
+                        </div>
+                        <div class="video-title" id="splitTitle">Ddott shorts</div>
+                        <div class="video-stats">
+                            <span id="splitViews">0 views</span>
+                            <span>•</span>
+                            <span id="splitDuration">0:24</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="side-actions" style="bottom: 20px;">
+                    <button class="action-btn like-btn" id="splitLikeBtn">
+                        <div class="action-icon">🤍</div>
+                        <span class="action-label" id="splitLikeCount">0</span>
+                    </button>
+                    <button class="action-btn">
+                        <div class="action-icon">💬</div>
+                        <span class="action-label">0</span>
+                    </button>
+                    <button class="action-btn">
+                        <div class="action-icon">↗️</div>
+                        <span class="action-label">Share</span>
+                    </button>
+                </div>
+                <div class="progress-bar" id="splitProgress" style="width: 0%"></div>
+                <div class="play-indicator" id="splitPlayIndicator">▶️</div>
+                <div class="swipe-hint">←</div>
+            </div>
+            <div class="split-grid" id="splitGrid"></div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+            <button class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <span>FEED</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>HOME</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span>COMMUNITY</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                <span>COINS</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                <span>MESSAGE</span>
+            </button>
+        </div>
     </div>
 
-    <!-- DIVIDER -->
-    <div class="divider">
-      <div class="div-label">
-        <div class="div-dot"></div>
-        ⚡ Shorts
-      </div>
-      <div class="div-count" id="shortsCount">0 shorts</div>
-    </div>
+    <script>
+        // ===== DATA =====
+        const shortsData = [
+            {
+                id: 1,
+                author: "meradivin",
+                avatar: "M",
+                title: "Ddott shorts - AI Butterfly Neural Network",
+                views: "0",
+                duration: "0:24",
+                likes: 0,
+                comments: 0,
+                thumbnail: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=700&fit=crop",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+            },
+            {
+                id: 2,
+                author: "neuralart",
+                avatar: "N",
+                title: "7-Brain Claude AI Butterfly in action",
+                views: "1.2K",
+                duration: "0:15",
+                likes: 42,
+                comments: 8,
+                thumbnail: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=700&fit=crop",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+            },
+            {
+                id: 3,
+                author: "dwinofficial",
+                avatar: "D",
+                title: "The DWIN Like System - Super Like Demo",
+                views: "5.6K",
+                duration: "0:30",
+                likes: 128,
+                comments: 24,
+                thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=700&fit=crop",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+            },
+            {
+                id: 4,
+                author: "creatorspot",
+                avatar: "C",
+                title: "Emo Coins earning tutorial",
+                views: "892",
+                duration: "0:45",
+                likes: 67,
+                comments: 12,
+                thumbnail: "https://images.unsplash.com/photo-1634017839464-5c339ez0c7a6?w=400&h=700&fit=crop",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+            },
+            {
+                id: 5,
+                author: "aistudio",
+                avatar: "A",
+                title: "Emowall AI 2.0 Family Safety",
+                views: "3.4K",
+                duration: "0:20",
+                likes: 95,
+                comments: 18,
+                thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=700&fit=crop",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+            }
+        ];
 
-    <!-- SHORTS FEED -->
-    <div class="shorts-feed">
-      <div class="shorts-scroll" id="shortsScroll">
-        <!-- Injected by JS -->
-      </div>
-      <div class="shorts-empty" id="shortsEmpty" style="display:none">
-        <div class="shorts-empty-icon">⚡</div>
-        <div class="shorts-empty-txt">No shorts yet</div>
-      </div>
-    </div>
+        // ===== STATE =====
+        let currentMode = 'full'; // 'full' or 'split'
+        let currentIndex = 0;
+        let emoCoins = 1240;
+        const likeStates = new Map(); // id -> { count, state: 'none'|'liked'|'heart'|'super' }
+        let pressTimer = null;
+        let isPressing = false;
+        let lastTapTime = 0;
+        let tapCount = 0;
+        const SUPER_LIKE_HOLD_MS = 600;
 
-  </div>
+        // ===== DOM REFS =====
+        const fullContainer = document.getElementById('fullScrollContainer');
+        const splitContainer = document.getElementById('splitContainer');
+        const splitVideo = document.getElementById('splitVideo');
+        const splitGrid = document.getElementById('splitGrid');
+        const viewToggle = document.getElementById('viewToggle');
+        const modeIndicator = document.getElementById('modeIndicator');
+        const coinCount = document.getElementById('coinCount');
+        const loadingScreen = document.getElementById('loadingScreen');
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <a href="/" class="bnav-item">
-      <span class="bnav-icon">🏠</span>
-      <span class="bnav-lbl">HOME</span>
-    </a>
-    <a href="/player/shorts.html" class="bnav-item">
-      <span class="bnav-icon">⚡</span>
-      <span class="bnav-lbl">SHORTS</span>
-    </a>
-    <a href="/community/" class="bnav-item">
-      <span class="bnav-icon">🌐</span>
-      <span class="bnav-lbl">COMMUNITY</span>
-    </a>
-    <a href="/coins/" class="bnav-item">
-      <span class="bnav-icon">🪙</span>
-      <span class="bnav-lbl">COINS</span>
-    </a>
-    <a href="/messaging/" class="bnav-item">
-      <span class="bnav-icon">💬</span>
-      <span class="bnav-lbl">MESSAGE</span>
-    </a>
-  </nav>
+        // ===== INIT =====
+        function init() {
+            renderFullScrollShorts();
+            renderSplitGrid();
+            setupIntersectionObserver();
+            setupViewToggle();
 
-</div>
+            // Hide loading after 1.5s
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+            }, 1500);
+        }
 
-<!-- Toast -->
-<div class="toast" id="toastEl"></div>
+        // ===== RENDER FULL SCROLL =====
+        function renderFullScrollShorts() {
+            fullContainer.innerHTML = shortsData.map((short, idx) => `
+                <div class="short-item" data-index="${idx}" data-id="${short.id}">
+                    <video class="short-video" src="${short.videoUrl}" loop playsinline muted preload="metadata"></video>
+                    <div class="video-overlay">
+                        <div class="video-info">
+                            <div class="video-author">
+                                <div class="author-avatar">${short.avatar}</div>
+                                <span class="author-name">@${short.author}</span>
+                            </div>
+                            <div class="video-title">${short.title}</div>
+                            <div class="video-stats">
+                                <span>${short.views} views</span>
+                                <span>•</span>
+                                <span>${short.duration}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side-actions">
+                        <button class="action-btn like-btn" data-id="${short.id}">
+                            <div class="action-icon">🤍</div>
+                            <span class="action-label like-count">${short.likes}</span>
+                        </button>
+                        <button class="action-btn">
+                            <div class="action-icon">💬</div>
+                            <span class="action-label">${short.comments}</span>
+                        </button>
+                        <button class="action-btn">
+                            <div class="action-icon">↗️</div>
+                            <span class="action-label">Share</span>
+                        </button>
+                    </div>
+                    <div class="progress-bar" style="width: 0%"></div>
+                    <div class="play-indicator">▶️</div>
+                </div>
+            `).join('');
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../supabase-config.js"></script>
-<script>
-/* ══════════════════════════════════
-   DDOTT TV — PLAYER V3
-   Split Screen: Video + Shorts Feed
-   ══════════════════════════════════ */
+            // Attach gesture handlers to each short
+            document.querySelectorAll('.short-item').forEach(item => {
+                attachGestureHandlers(item);
+            });
+        }
 
-const FALLBACK = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+        // ===== RENDER SPLIT GRID =====
+        function renderSplitGrid() {
+            splitGrid.innerHTML = shortsData.map((short, idx) => `
+                <div class="grid-item ${idx === 0 ? 'active' : ''}" data-index="${idx}" onclick="playSplitShort(${idx})">
+                    <img src="${short.thumbnail}" alt="${short.title}" loading="lazy">
+                    <div class="grid-overlay">
+                        <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${short.title}</div>
+                        <div class="grid-views">
+                            <span>▶</span> ${short.views}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-// ── State ──
-let coins = 0;
-let mainLiked = false;
-let mainLikeCountVal = 0;
-let currentVideoId = null;
-let shorts = [];
-let shortStates = new Map(); // id -> { liked, superLiked }
-let toastTimer = null;
+        // ===== GESTURE HANDLERS (DWIN LIKE SYSTEM) =====
+        function attachGestureHandlers(element) {
+            let pressStartTime = 0;
+            let pressStartX = 0;
+            let pressStartY = 0;
+            let hasTriggeredSuper = false;
+            let hasTriggeredHeart = false;
 
-// ── DOM ──
-const mainVid = document.getElementById('mainVid');
-const vidLoading = document.getElementById('vidLoading');
-const progFill = document.getElementById('progFill');
-const timeLbl = document.getElementById('timeLbl');
-const playBtn = document.getElementById('playBtn');
-const mainPlayer = document.getElementById('mainPlayer');
-const toastEl = document.getElementById('toastEl');
-const shortsScroll = document.getElementById('shortsScroll');
-const coinDisplay = document.getElementById('coinDisplay');
+            const startHandler = (e) => {
+                const touch = e.touches ? e.touches[0] : e;
+                pressStartTime = Date.now();
+                pressStartX = touch.clientX;
+                pressStartY = touch.clientY;
+                isPressing = true;
+                hasTriggeredSuper = false;
+                hasTriggeredHeart = false;
 
-// ── INIT ──
-async function init() {
-  loadFromParams();
-  loadCoins();
-  await loadShorts();
-  bindProgress();
-  bindCtrlAutoHide();
-}
+                pressTimer = setTimeout(() => {
+                    if (isPressing && !hasTriggeredHeart) {
+                        hasTriggeredSuper = true;
+                        triggerSuperLike(element, pressStartX, pressStartY);
+                    }
+                }, SUPER_LIKE_HOLD_MS);
+            };
 
-// ── URL PARAMS ──
-function loadFromParams() {
-  const p = new URLSearchParams(window.location.search);
+            const endHandler = (e) => {
+                const pressDuration = Date.now() - pressStartTime;
+                isPressing = false;
+                clearTimeout(pressTimer);
 
-  const url = p.get('url');
-  const title = p.get('title') ? decodeURIComponent(p.get('title')) : 'Ddott TV';
-  const creator = p.get('creator') ? decodeURIComponent(p.get('creator')) : 'Creator';
-  const views = p.get('views') || '0';
-  const likes = parseInt(p.get('likes') || '0');
-  const id = p.get('id') || '';
+                if (hasTriggeredSuper) return; // Super like already handled
 
-  currentVideoId = id;
-  mainLikeCountVal = likes;
+                const touch = e.changedTouches ? e.changedTouches[0] : e;
+                const dx = Math.abs((touch.clientX || touch.pageX) - pressStartX);
+                const dy = Math.abs((touch.clientY || touch.pageY) - pressStartY);
 
-  document.getElementById('navTitle').textContent = title;
-  document.getElementById('vidTitle').textContent = title;
-  document.getElementById('creatorChipName').textContent = creator;
-  document.getElementById('creatorAv').textContent = (creator[0] || 'D').toUpperCase();
-  document.getElementById('viewsTxt').textContent = fmtNum(parseInt(views)) + ' views';
-  document.getElementById('mainLikeCount').textContent = fmtNum(likes);
+                // Ignore if dragged too much
+                if (dx > 10 || dy > 10) return;
 
-  // Load video
-  if (url && url !== 'undefined') {
-    let videoUrl = decodeURIComponent(url);
-    // Cloudinary fix
-    if (videoUrl.includes('cloudinary.com') && videoUrl.includes('/upload/') && !videoUrl.includes('f_mp4')) {
-      videoUrl = videoUrl.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
-    }
-    mainVid.src = videoUrl;
-  } else if (id) {
-    loadVideoById(id);
-  } else {
-    mainVid.src = FALLBACK;
-  }
+                if (pressDuration < SUPER_LIKE_HOLD_MS) {
+                    handleTap(element, touch.clientX || touch.pageX, touch.clientY || touch.pageY);
+                }
+            };
 
-  mainVid.load();
-  mainVid.play().catch(() => {});
-}
+            const moveHandler = (e) => {
+                if (!isPressing) return;
+                const touch = e.touches ? e.touches[0] : e;
+                const dx = Math.abs(touch.clientX - pressStartX);
+                const dy = Math.abs(touch.clientY - pressStartY);
+                if (dx > 20 || dy > 20) {
+                    isPressing = false;
+                    clearTimeout(pressTimer);
+                }
+            };
 
-async function loadVideoById(id) {
-  if (typeof db === 'undefined') { mainVid.src = FALLBACK; return; }
-  try {
-    const { data } = await db.from('videos').select('video_url, title, views, likes').eq('id', id).single();
-    if (data?.video_url) {
-      let url = data.video_url;
-      if (url.includes('cloudinary.com') && !url.includes('f_mp4')) {
-        url = url.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
-      }
-      mainVid.src = url;
-      mainVid.load();
-      mainVid.play().catch(() => {});
-    }
-  } catch(e) { mainVid.src = FALLBACK; }
-}
+            element.addEventListener('touchstart', startHandler, { passive: true });
+            element.addEventListener('touchend', endHandler, { passive: true });
+            element.addEventListener('touchmove', moveHandler, { passive: true });
+            element.addEventListener('mousedown', startHandler);
+            element.addEventListener('mouseup', endHandler);
+            element.addEventListener('mousemove', moveHandler);
+        }
 
-// ── VIDEO EVENTS ──
-mainVid.addEventListener('loadeddata', () => {
-  vidLoading.classList.add('hidden');
-  playBtn.textContent = '⏸';
-});
-mainVid.addEventListener('waiting', () => vidLoading.classList.remove('hidden'));
-mainVid.addEventListener('playing', () => {
-  vidLoading.classList.add('hidden');
-  playBtn.textContent = '⏸';
-});
-mainVid.addEventListener('pause', () => playBtn.textContent = '▶');
-mainVid.addEventListener('error', () => {
-  vidLoading.classList.add('hidden');
-  if (mainVid.src !== FALLBACK) { mainVid.src = FALLBACK; mainVid.load(); }
-});
-mainVid.addEventListener('timeupdate', () => {
-  if (mainVid.duration) {
-    progFill.style.width = (mainVid.currentTime / mainVid.duration * 100) + '%';
-    timeLbl.textContent = fmtTime(mainVid.currentTime) + ' / ' + fmtTime(mainVid.duration);
-  }
-});
+        // ===== TAP LOGIC (Single vs Double) =====
+        function handleTap(element, x, y) {
+            const now = Date.now();
+            const id = parseInt(element.dataset.id);
+            const video = element.querySelector('video');
 
-// ── CONTROLS ──
-function togglePlay() {
-  mainVid.paused ? mainVid.play() : mainVid.pause();
-}
+            if (now - lastTapTime < 300) {
+                // Double tap detected
+                tapCount++;
+                if (tapCount === 2) {
+                    triggerHeartBurst(element, id, x, y);
+                    tapCount = 0;
+                }
+            } else {
+                tapCount = 1;
+                setTimeout(() => {
+                    if (tapCount === 1) {
+                        // Single tap - toggle like + play/pause
+                        triggerSingleLike(element, id);
+                        togglePlayPause(video, element.querySelector('.play-indicator'));
+                    }
+                    tapCount = 0;
+                }, 300);
+            }
+            lastTapTime = now;
+        }
 
-function toggleMute() {
-  mainVid.muted = !mainVid.muted;
-}
+        // ===== SINGLE LIKE (1 Coin) =====
+        function triggerSingleLike(element, id) {
+            const btn = element.querySelector('.like-btn');
+            const countEl = btn.querySelector('.like-count');
+            let state = likeStates.get(id) || { count: shortsData.find(s => s.id === id)?.likes || 0, state: 'none' };
 
-let ctrlTimeout;
-function toggleCtrl() {
-  mainPlayer.classList.toggle('show-ctrl');
-  clearTimeout(ctrlTimeout);
-  if (mainPlayer.classList.contains('show-ctrl')) {
-    ctrlTimeout = setTimeout(() => mainPlayer.classList.remove('show-ctrl'), 3000);
-  }
-}
+            if (state.state === 'none') {
+                state.count++;
+                state.state = 'liked';
+                btn.classList.add('liked');
+                btn.querySelector('.action-icon').textContent = '💜';
+                createFloatingHeart(element, '💜');
+            } else if (state.state === 'liked') {
+                state.count--;
+                state.state = 'none';
+                btn.classList.remove('liked');
+                btn.querySelector('.action-icon').textContent = '🤍';
+            } else {
+                // Already heart/super - downgrade to liked
+                state.state = 'liked';
+                btn.classList.remove('heart-burst', 'super-liked');
+                btn.classList.add('liked');
+                btn.querySelector('.action-icon').textContent = '💜';
+            }
 
-function bindCtrlAutoHide() {
-  mainPlayer.addEventListener('touchstart', () => {
-    mainPlayer.classList.add('show-ctrl');
-    clearTimeout(ctrlTimeout);
-    ctrlTimeout = setTimeout(() => mainPlayer.classList.remove('show-ctrl'), 3000);
-  }, { passive: true });
-}
+            countEl.textContent = state.count;
+            likeStates.set(id, state);
+        }
 
-function bindProgress() {
-  document.getElementById('progWrap').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    mainVid.currentTime = ((e.clientX - rect.left) / rect.width) * mainVid.duration;
-  });
-}
+        // ===== HEART BURST (2 Likes) =====
+        function triggerHeartBurst(element, id, x, y) {
+            const btn = element.querySelector('.like-btn');
+            const countEl = btn.querySelector('.like-count');
+            let state = likeStates.get(id) || { count: shortsData.find(s => s.id === id)?.likes || 0, state: 'none' };
 
-function mainLike() {
-  mainLiked = !mainLiked;
-  mainLikeCountVal += mainLiked ? 1 : -1;
-  document.getElementById('mainLikeEmoji').textContent = mainLiked ? ' 💜' : '🤍';
-  document.getElementById('mainLikeCount').textContent = fmtNum(mainLikeCountVal);
-  if (currentVideoId && typeof db !== 'undefined') {
-    db.from('videos').update({ likes: mainLikeCountVal }).eq('id', currentVideoId).catch(() => {});
-  }
-}
+            if (state.state !== 'heart') {
+                state.count += 2;
+                state.state = 'heart';
+            }
 
-function mainComment() { showToast('Comments coming soon 💬'); }
-function mainShare() {
-  if (navigator.share) {
-    navigator.share({ title: document.getElementById('vidTitle').textContent, url: window.location.href }).catch(() => {});
-  } else {
-    navigator.clipboard?.writeText(window.location.href);
-    showToast('Link copied! 🔗');
-  }
-}
+            btn.classList.remove('liked', 'super-liked');
+            btn.classList.add('heart-burst');
+            btn.querySelector('.action-icon').textContent = '❤️';
+            countEl.textContent = state.count;
+            likeStates.set(id, state);
 
-// ── LOAD SHORTS ──
-async function loadShorts() {
-  const scroll = shortsScroll;
-  const empty = document.getElementById('shortsEmpty');
+            // Multiple floating hearts
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFloatingHeart(element, '❤️', x + (Math.random() - 0.5) * 60, y + (Math.random() - 0.5) * 60);
+                }, i * 80);
+            }
 
-  if (typeof db === 'undefined') {
-    empty.style.display = 'flex';
-    return;
-  }
+            // Remove animation class after
+            setTimeout(() => btn.classList.remove('heart-burst'), 500);
+        }
 
-  try {
-    const { data, error } = await db.from('videos')
-      .select('*, profiles(display_name, username)')
-      .eq('is_short', true)
-      .order('created_at', { ascending: false })
-      .limit(15);
+        // ===== SUPER LIKE (1 Emo Coin + Haptic Ring) =====
+        function triggerSuperLike(element, x, y) {
+            const id = parseInt(element.dataset.id);
+            const btn = element.querySelector('.like-btn');
+            const countEl = btn.querySelector('.like-count');
+            let state = likeStates.get(id) || { count: shortsData.find(s => s.id === id)?.likes || 0, state: 'none' };
 
-    if (error || !data || !data.length) {
-      empty.style.display = 'flex';
-      return;
-    }
+            if (state.state !== 'super') {
+                state.count += 5;
+                state.state = 'super';
+            }
 
-    shorts = data;
-    document.getElementById('shortsCount').textContent = data.length + ' shorts';
-    scroll.innerHTML = '';
+            btn.classList.remove('liked', 'heart-burst');
+            btn.classList.add('super-liked');
+            btn.querySelector('.action-icon').textContent = '💛';
+            countEl.textContent = state.count;
+            likeStates.set(id, state);
 
-    data.forEach((s, i) => {
-      const card = buildShortCard(s, i);
-      scroll.appendChild(card);
-    });
+            // Haptic charge ring
+            const ring = document.createElement('div');
+            ring.className = 'haptic-ring';
+            ring.style.left = x + 'px';
+            ring.style.top = y + 'px';
+            element.appendChild(ring);
+            setTimeout(() => ring.remove(), 800);
 
-  } catch(e) {
-    empty.style.display = 'flex';
-  }
-}
+            // Super like text
+            const text = document.createElement('div');
+            text.className = 'super-like-text';
+            text.textContent = 'SUPER LIKE!';
+            text.style.left = (x - 50) + 'px';
+            text.style.top = (y - 50) + 'px';
+            element.appendChild(text);
+            setTimeout(() => text.remove(), 1200);
 
-function buildShortCard(s, i) {
-  const el = document.createElement('div');
-  el.className = 'short-card';
-  el.dataset.id = s.id || i;
+            // Coin pop
+            const coin = document.createElement('div');
+            coin.className = 'coin-pop';
+            coin.innerHTML = '<span style="font-size:16px">🪙</span> +1 Emo Coin';
+            coin.style.left = (x + 20) + 'px';
+            coin.style.top = (y - 30) + 'px';
+            element.appendChild(coin);
+            setTimeout(() => coin.remove(), 1000);
 
-  const creator = s.profiles?.display_name || s.profiles?.username || 'Creator';
-  const initial = creator[0].toUpperCase();
-  const likes = s.likes || 0;
+            // Update coin balance
+            emoCoins += 1;
+            updateCoinDisplay();
 
-  // Gradient based on index
-  const gradients = [
-    'linear-gradient(160deg,#0a001a,#1a0035,#000d20)',
-    'linear-gradient(160deg,#001020,#00082a,#0a0015)',
-    'linear-gradient(160deg,#100010,#200025,#0a000a)',
-    'linear-gradient(160deg,#0a0800,#1a1000,#050500)',
-    'linear-gradient(160deg,#000a15,#00151a,#000508)',
-  ];
-  const grad = gradients[i % gradients.length];
+            // Vibrate if supported
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
 
-  el.innerHTML = `
-    <div class="short-thumb">
-      <div class="short-thumb-bg" style="background:${grad}"></div>
-      ${s.thumbnail_url ? `<img src="${s.thumbnail_url}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1;">` : ''}
-    </div>
-    <div class="short-overlay"></div>
-    <div class="short-play">▶</div>
-    ${i === 0 ? '<div class="now-playing"><div class="np-dot"></div>NEW</div>' : ''}
-    <div class="short-actions" onclick="event.stopPropagation()">
-      <div class="sa-btn" id="slike-${s.id || i}" data-id="${s.id || i}" data-likes="${likes}">
-        <div class="sa-icon" style="position:relative">
-          <div class="s-charge-ring"></div>
-          <span class="s-like-icon">🤍</span>
-        </div>
-        <span class="sa-count s-like-count">${fmtNum(likes)}</span>
-      </div>
-      <div class="sa-btn" onclick="showToast('Coming soon 💬')">
-        <div class="sa-icon">💬</div>
-        <span class="sa-count">${fmtNum(s.comments_count || 0)}</span>
-      </div>
-    </div>
-    <div class="short-info">
-      <div class="short-creator">@${creator}</div>
-      <div class="short-title-txt">${s.title || ''}</div>
-    </div>
-  `;
+            setTimeout(() => btn.classList.remove('super-liked'), 600);
+        }
 
-  // Click to play in main player
-  el.addEventListener('click', () => playShortInMain(s));
+        // ===== FLOATING HEART =====
+        function createFloatingHeart(container, emoji, x, y) {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = emoji;
+            const rect = container.getBoundingClientRect();
+            const posX = x ? (x - rect.left) : (rect.width / 2 + (Math.random() - 0.5) * 100);
+            const posY = y ? (y - rect.top) : (rect.height / 2 + (Math.random() - 0.5) * 50);
+            heart.style.left = posX + 'px';
+            heart.style.top = posY + 'px';
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
 
-  // Like system for shorts
-  bindShortLike(el.querySelector(`#slike-${s.id || i}`), s.id || i, likes);
+        // ===== PLAY / PAUSE =====
+        function togglePlayPause(video, indicator) {
+            if (video.paused) {
+                video.play();
+                video.muted = false;
+                indicator.textContent = '▶️';
+                indicator.classList.remove('show');
+            } else {
+                video.pause();
+                indicator.textContent = '⏸️';
+                indicator.classList.add('show');
+                setTimeout(() => indicator.classList.remove('show'), 800);
+            }
+        }
 
-  return el;
-}
+        // ===== INTERSECTION OBSERVER (Auto-play) =====
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('video');
+                    const progressBar = entry.target.querySelector('.progress-bar');
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+                        video.play();
+                        video.muted = false;
+                        currentIndex = parseInt(entry.target.dataset.index);
+                    } else {
+                        video.pause();
+                        video.currentTime = 0;
+                    }
+                });
+            }, { threshold: [0.7] });
 
-// ── SHORT LIKE (hard press) ──
-function bindShortLike(btn,id,initialLikes){if(!btn)return;let isPressed=false,pressStart=0,raf=null,likeCount=initialLikes;const start=()=>{const s0=shortStates.get(id)||{};if(s0.superLiked)return;isPressed=true;pressStart=Date.now();btn.classList.add('pressing');const tick=()=>{if(!isPressed)return;const e=Date.now()-pressStart;if(e>600&&!btn.classList.contains('charging')){btn.classList.add('charging');if(navigator.vibrate)navigator.vibrate(30);}raf=requestAnimationFrame(tick);};raf=requestAnimationFrame(tick);};const end=()=>{if(!isPressed)return;isPressed=false;cancelAnimationFrame(raf);btn.classList.remove('pressing');const elapsed=Date.now()-pressStart,wasCharging=btn.classList.contains('charging');btn.classList.remove('charging');const state=shortStates.get(id)||{};if(state.superLiked){shortStates.set(id,state);return;}if(wasCharging&&elapsed>=600){state.superLiked=true;state.liked=true;likeCount+=5;btn.classList.add('super-liked','locked');btn.querySelector('.s-like-icon').textContent='💛';btn.querySelector('.sa-count').textContent=fmtNum(likeCount);showToast('Super Liked! 💛');if(navigator.vibrate)navigator.vibrate([40,20,40]);}else if(!state.liked){state.liked=true;likeCount++;btn.classList.add('liked');btn.querySelector('.s-like-icon').textContent='💜';btn.querySelector('.sa-count').textContent=fmtNum(likeCount);}shortStates.set(id,state);};const cancel=()=>{isPressed=false;cancelAnimationFrame(raf);btn.classList.remove('pressing','charging');};btn.addEventListener('touchstart',start,{passive:true});btn.addEventListener('touchend',end);btn.addEventListener('touchcancel',cancel);btn.addEventListener('mousedown',start);btn.addEventListener('mouseup',end);btn.addEventListener('mouseleave',cancel);}
+            document.querySelectorAll('.short-item').forEach(item => observer.observe(item));
 
-// ── PLAY SHORT IN MAIN PLAYER ──
-function playShortInMain(short) {
-  let url = short.video_url || FALLBACK;
-  if (url.includes('cloudinary.com') && !url.includes('f_mp4')) {
-    url = url.replace('/upload/', '/upload/f_mp4,vc_h264,q_auto/');
-  }
+            // Progress bar update
+            setInterval(() => {
+                document.querySelectorAll('.short-item').forEach(item => {
+                    const video = item.querySelector('video');
+                    const progress = item.querySelector('.progress-bar');
+                    if (video && progress && !video.paused) {
+                        const pct = (video.currentTime / video.duration) * 100;
+                        progress.style.width = pct + '%';
+                    }
+                });
+                // Split mode progress
+                if (splitVideo && !splitVideo.paused) {
+                    const pct = (splitVideo.currentTime / splitVideo.duration) * 100;
+                    document.getElementById('splitProgress').style.width = pct + '%';
+                }
+            }, 100);
+        }
 
-  // Update main player
-  mainVid.src = url;
-  mainVid.load();
-  mainVid.play().catch(() => {});
+        // ===== VIEW TOGGLE =====
+        function setupViewToggle() {
+            viewToggle.addEventListener('click', () => {
+                if (currentMode === 'full') {
+                    switchToSplitMode();
+                } else {
+                    switchToFullMode();
+                }
+            });
+        }
 
-  // Update info
-  const creator = short.profiles?.display_name || short.profiles?.username || 'Creator';
-  document.getElementById('navTitle').textContent = short.title || 'Short';
-  document.getElementById('vidTitle').textContent = short.title || '';
-  document.getElementById('creatorChipName').textContent = creator;
-  document.getElementById('creatorAv').textContent = creator[0].toUpperCase();
-  document.getElementById('viewsTxt').textContent = fmtNum(short.views || 0) + ' views';
-  mainLikeCountVal = short.likes || 0;
-  mainLiked = false;
-  document.getElementById('mainLikeEmoji').textContent = '🤍';
-  document.getElementById('mainLikeCount').textContent = fmtNum(mainLikeCountVal);
-  currentVideoId = short.id;
+        function switchToSplitMode() {
+            currentMode = 'split';
+            fullContainer.style.display = 'none';
+            splitContainer.classList.add('active');
+            modeIndicator.textContent = 'Split Screen Mode';
+            showModeIndicator();
 
-  showToast('▶ Playing short');
-}
+            // Pause all full-scroll videos
+            document.querySelectorAll('.short-item video').forEach(v => v.pause());
 
-// ── COINS ──
-async function loadCoins() {
-  if (typeof db === 'undefined') return;
-  try {
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) return;
-    const { data } = await db.from('profiles').select('emo_coins').eq('id', user.id).single();
-    if (data) { coins = data.emo_coins || 0; updateCoins(); }
-  } catch(e) {}
-}
+            // Play current in split
+            playSplitShort(currentIndex);
+        }
 
-function updateCoins() {
-  coinDisplay.textContent = fmtNum(coins);
-  // Save to Supabase
-  if (typeof db !== 'undefined') {
-    db.auth.getUser().then(({ data: { user } }) => {
-      if (user) db.from('profiles').update({ emo_coins: coins }).eq('id', user.id).catch(() => {});
-    });
-  }
-}
+        function switchToFullMode() {
+            currentMode = 'full';
+            fullContainer.style.display = 'block';
+            splitContainer.classList.remove('active');
+            modeIndicator.textContent = 'Full Scroll Mode';
+            showModeIndicator();
 
-// ── UTILS ──
-function fmtNum(n) {
-  if (!n) return '0';
-  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
-  if (n >= 1e3) return (n/1e3).toFixed(1)+'K';
-  return n.toString();
-}
+            // Pause split video
+            splitVideo.pause();
 
-function fmtTime(s) {
-  if (!s || isNaN(s)) return '0:00';
-  const m = Math.floor(s/60), sec = Math.floor(s%60);
-  return m + ':' + sec.toString().padStart(2,'0');
-}
+            // Resume current full-scroll video
+            const items = document.querySelectorAll('.short-item');
+            if (items[currentIndex]) {
+                const video = items[currentIndex].querySelector('video');
+                video.play();
+                video.muted = false;
+                items[currentIndex].scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
+        }
 
-function showToast(msg) {
-  toastEl.textContent = msg;
-  toastEl.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2000);
-}
+        function showModeIndicator() {
+            modeIndicator.classList.add('show');
+            setTimeout(() => modeIndicator.classList.remove('show'), 2000);
+        }
 
-function showCoinBurst(el) {
-  const rect = el.getBoundingClientRect();
-  const burst = document.createElement('div');
-  burst.className = 'coin-burst';
-  burst.textContent = '🪙';
-  burst.style.left = (rect.left + rect.width/2) + 'px';
-  burst.style.top = rect.top + 'px';
-  document.body.appendChild(burst);
-  setTimeout(() => burst.remove(), 700);
-}
+        // ===== SPLIT MODE PLAY =====
+        function playSplitShort(index) {
+            currentIndex = index;
+            const short = shortsData[index];
 
-// ── BOOT ──
-init();
-</script>
+            splitVideo.src = short.videoUrl;
+            splitVideo.play();
+            splitVideo.muted = false;
+
+            document.getElementById('splitAuthor').textContent = '@' + short.author;
+            document.getElementById('splitAvatar').textContent = short.avatar;
+            document.getElementById('splitTitle').textContent = short.title;
+            document.getElementById('splitViews').textContent = short.views + ' views';
+            document.getElementById('splitDuration').textContent = short.duration;
+
+            // Update like button state
+            const state = likeStates.get(short.id) || { count: short.likes, state: 'none' };
+            const btn = document.getElementById('splitLikeBtn');
+            const countEl = document.getElementById('splitLikeCount');
+            countEl.textContent = state.count;
+            btn.classList.remove('liked', 'heart-burst', 'super-liked');
+
+            if (state.state === 'liked') {
+                btn.classList.add('liked');
+                btn.querySelector('.action-icon').textContent = '💜';
+            } else if (state.state === 'heart') {
+                btn.classList.add('heart-burst');
+                btn.querySelector('.action-icon').textContent = '❤️';
+            } else if (state.state === 'super') {
+                btn.classList.add('super-liked');
+                btn.querySelector('.action-icon').textContent = '💛';
+            } else {
+                btn.querySelector('.action-icon').textContent = '🤍';
+            }
+
+            // Highlight grid item
+            document.querySelectorAll('.grid-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+
+            // Attach gesture to split player
+            attachGestureHandlers(document.getElementById('splitPlayer'));
+        }
+
+        // Split like button handler
+        document.getElementById('splitLikeBtn').addEventListener('click', function() {
+            const short = shortsData[currentIndex];
+            const id = short.id;
+            let state = likeStates.get(id) || { count: short.likes, state: 'none' };
+
+            if (state.state === 'none') {
+                state.count++;
+                state.state = 'liked';
+                this.classList.add('liked');
+                this.querySelector('.action-icon').textContent = '💜';
+            } else {
+                state.count--;
+                state.state = 'none';
+                this.classList.remove('liked');
+                this.querySelector('.action-icon').textContent = '🤍';
+            }
+
+            document.getElementById('splitLikeCount').textContent = state.count;
+            likeStates.set(id, state);
+        });
+
+        // ===== COIN DISPLAY =====
+        function updateCoinDisplay() {
+            coinCount.textContent = emoCoins.toLocaleString();
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                if (currentMode === 'full' && currentIndex < shortsData.length - 1) {
+                    currentIndex++;
+                    document.querySelectorAll('.short-item')[currentIndex]?.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'ArrowUp') {
+                if (currentMode === 'full' && currentIndex > 0) {
+                    currentIndex--;
+                    document.querySelectorAll('.short-item')[currentIndex]?.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'v' || e.key === 'V') {
+                viewToggle.click();
+            }
+        });
+
+        // ===== SWIPE LEFT ON GRID (Load more simulation) =====
+        let gridTouchStartX = 0;
+        splitGrid.addEventListener('touchstart', (e) => {
+            gridTouchStartX = e.touches[0].clientX;
+        }, { passive: true });
+
+        splitGrid.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].clientX - gridTouchStartX;
+            if (dx < -50) {
+                // Swipe left - simulate loading more
+                const hint = document.querySelector('.swipe-hint');
+                hint.textContent = '↻';
+                hint.style.animation = 'none';
+                setTimeout(() => {
+                    hint.textContent = '←';
+                    hint.style.animation = '';
+                }, 1000);
+            }
+        }, { passive: true });
+
+        // ===== START =====
+        init();
+    </script>
 </body>
 </html>
