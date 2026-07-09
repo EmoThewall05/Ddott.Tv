@@ -240,7 +240,7 @@
       <div class="loader-text">LOADING...</div>
       <div class="loader-bar"><div class="loader-fill"></div></div>
     </div>
-    <iframe id="pageFrame" src="" onload="onFrameLoad()"></iframe>
+    <iframe id="pageFrame" src="" allow="autoplay; fullscreen" onload="onFrameLoad()"></iframe>
   </div>
 
 </div>
@@ -264,7 +264,7 @@
 
   // Inject into iframe to hide its own nav & tab bar
   const HIDE_CSS = `<style id="__sf__">
-    nav, .top-nav, .tab-bar, .studio-tabs + * > nav { display:none!important; } html, body { overflow-y:auto!important; height:auto!important; min-height:100%!important; }
+    nav, .top-nav, .tab-bar, .bottom-nav, .studio-tabs + * > nav { display:none!important; } html, body { overflow-y:auto!important; height:auto!important; min-height:100%!important; }
     body { padding-top:0!important; margin-top:0!important; }
     .studio-tabs { top:0!important; position:sticky; }
     .butterfly-fab { bottom:12px!important; }
