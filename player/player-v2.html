@@ -866,8 +866,16 @@
     video.addEventListener('error', (e) => {
         loadingOverlay.classList.add('hidden');
         const errorMsg = video.error ?
-            `Error ${video.error.code}: ${video.error.message || 'Unknown'}` :
+            `Error ${video.error.code}: ${video.error.message || 'Unknown'} | src: ${video.currentSrc || video.src}` :
             'Video failed to load';
+        console.error('VIDEO ERROR DEBUG:', {
+            code: video.error?.code,
+            message: video.error?.message,
+            src: video.src,
+            currentSrc: video.currentSrc,
+            networkState: video.networkState,
+            readyState: video.readyState
+        });
         errorText.textContent = errorMsg;
         errorState.classList.add('visible');
 
