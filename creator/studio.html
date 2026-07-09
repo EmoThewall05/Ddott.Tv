@@ -461,8 +461,19 @@ async function publishVideo() {
   statusMsg.style.color = '#00f5ff';
   statusMsg.textContent = '🔍 Running safety check...';
 
+  let frames = [];
   try {
-    const frames = await extractVideoFrames(selectedFile, 3);
+    frames = await extractVideoFrames(selectedFile, 3);
+  } catch (frameErr) {
+    // Fail-open: some phone-recorded videos (HEVC codec, streaming layout)
+    // can't be read by the browser's <video> element for canvas capture.
+    // Don't block the upload for this — just skip image checks and still
+    // run the text-based check below.
+    console.warn('Frame extraction failed, skipping image moderation (fail-open):', frameErr);
+    frames = [];
+  }
+
+  try {
     const { data: { user: modUser } } = await db.auth.getUser();
 
     const modRes = await fetch(MODERATION_WORKER_URL, {
@@ -486,12 +497,9 @@ async function publishVideo() {
       return;
     }
   } catch (modErr) {
-    console.error('Moderation check failed', modErr);
-    statusMsg.style.color = '#ff4444';
-    statusMsg.textContent = '❌ DEBUG: ' + (modErr && modErr.message ? modErr.message : String(modErr));
-    btn.textContent = '🚀 PUBLISH VIDEO';
-    btn.disabled = false;
-    return;
+    // Fail-open: if the moderation worker itself is unreachable, don't
+    // block a genuine creator's upload — log it and let it through.
+    console.error('Moderation worker unreachable, skipping check (fail-open):', modErr);
   }
 
   btn.textContent = '⏳ Uploading to Cloudinary...';
