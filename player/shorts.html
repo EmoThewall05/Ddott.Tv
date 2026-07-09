@@ -18,8 +18,6 @@
             --text-secondary: #a1a1aa;
             --text-muted: #71717a;
             --border: rgba(255,255,255,0.08);
-            --gradient-like: linear-gradient(135deg, #7c3aed, #ec4899);
-            --gradient-super: linear-gradient(135deg, #fbbf24, #f59e0b);
         }
 
         * {
@@ -39,12 +37,12 @@
             color: var(--text-primary);
         }
 
-        /* ===== APP CONTAINER ===== */
         #app {
             width: 100%;
             height: 100%;
+            display: flex;
+            flex-direction: column;
             position: relative;
-            overflow: hidden;
         }
 
         /* ===== HEADER ===== */
@@ -53,8 +51,8 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 56px;
-            background: linear-gradient(to bottom, rgba(10,10,15,0.9), transparent);
+            height: 52px;
+            background: linear-gradient(to bottom, rgba(10,10,15,0.95), transparent);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -64,7 +62,7 @@
         }
 
         .logo {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             background: linear-gradient(135deg, #06b6d4, #7c3aed, #ec4899);
             -webkit-background-clip: text;
@@ -73,18 +71,12 @@
             letter-spacing: 2px;
         }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         .coin-badge {
             display: flex;
             align-items: center;
             gap: 4px;
-            background: rgba(251, 191, 36, 0.15);
-            border: 1px solid rgba(251, 191, 36, 0.3);
+            background: rgba(251,191,36,0.15);
+            border: 1px solid rgba(251,191,36,0.3);
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 13px;
@@ -102,223 +94,73 @@
             justify-content: center;
             font-size: 10px;
             color: #000;
+            font-weight: 800;
         }
 
-        .view-toggle {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .view-toggle:active { transform: scale(0.95); }
-
-        /* ===== MODE INDICATOR ===== */
-        .mode-indicator {
+        /* ===== MAIN PLAYER (65%) ===== */
+        .main-player {
             position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: rgba(124, 58, 237, 0.9);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 999;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        .mode-indicator.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* ===== FULL SCROLL MODE ===== */
-        .full-scroll-container {
-            width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .full-scroll-container::-webkit-scrollbar { display: none; }
-
-        .short-item {
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            scroll-snap-align: start;
-            position: relative;
-            flex-shrink: 0;
-            background: #000;
-        }
-
-        .short-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* ===== SPLIT SCREEN MODE ===== */
-        .split-container {
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-        }
-
-        .split-container.active { display: flex; }
-
-        .split-player {
-            height: 50%;
-            position: relative;
-            background: #000;
-            border-bottom: 2px solid var(--accent-purple);
-        }
-
-        .split-player .short-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .split-grid {
-            height: 50%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            background: var(--bg-secondary);
-            padding: 8px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            scroll-behavior: smooth;
-        }
-
-        .grid-item {
-            aspect-ratio: 9/16;
-            background: var(--bg-card);
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .grid-item.active {
-            border-color: var(--accent-purple);
-            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
-        }
-
-        .grid-item img, .grid-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .grid-item .grid-overlay {
-            position: absolute;
-            bottom: 0;
+            top: 52px;
             left: 0;
             right: 0;
-            padding: 8px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            font-size: 11px;
-            font-weight: 600;
+            bottom: 220px;
+            background: #000;
+            overflow: hidden;
         }
 
-        .grid-item .grid-views {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            color: var(--text-secondary);
-            font-size: 10px;
-            margin-top: 2px;
+        .main-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        /* Swipe hint for split mode */
-        .swipe-hint {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(124, 58, 237, 0.8);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: swipePulse 2s infinite;
-            z-index: 10;
-        }
-
-        @keyframes swipePulse {
-            0%, 100% { opacity: 0.6; transform: translateY(-50%) translateX(0); }
-            50% { opacity: 1; transform: translateY(-50%) translateX(-5px); }
-        }
-
-        /* ===== OVERLAY UI ===== */
+        /* Video overlay gradient */
         .video-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 80px 16px 100px;
-            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 40%, rgba(0,0,0,0.3) 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%, rgba(0,0,0,0.2) 100%);
         }
 
+        /* Video info bottom left */
         .video-info {
-            max-width: 75%;
+            position: absolute;
+            bottom: 16px;
+            left: 12px;
+            max-width: 70%;
+            pointer-events: none;
         }
 
         .video-author {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .author-avatar {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
         }
 
         .author-name {
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .video-title {
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.4;
             color: var(--text-secondary);
-            margin-bottom: 4px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -326,52 +168,48 @@
         }
 
         .video-stats {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-top: 3px;
         }
 
-        /* ===== SIDE ACTIONS ===== */
+        /* Side action buttons */
         .side-actions {
             position: absolute;
-            right: 12px;
-            bottom: 100px;
+            right: 10px;
+            bottom: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             pointer-events: auto;
+            z-index: 10;
         }
 
         .action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             background: none;
             border: none;
             color: var(--text-primary);
             cursor: pointer;
-            position: relative;
         }
 
         .action-icon {
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.12);
             backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            transition: all 0.3s ease;
+            font-size: 22px;
             border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
         }
-
-        .action-btn:active .action-icon { transform: scale(0.9); }
 
         .action-label {
             font-size: 11px;
@@ -380,111 +218,26 @@
         }
 
         /* Like states */
-        .like-btn .action-icon { transition: all 0.3s ease; }
         .like-btn.liked .action-icon {
-            background: rgba(124, 58, 237, 0.3);
+            background: rgba(124,58,237,0.3);
             border-color: var(--accent-purple);
-            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+            box-shadow: 0 0 20px rgba(124,58,237,0.4);
         }
         .like-btn.liked .action-label { color: var(--accent-purple); }
 
-        .like-btn.heart-burst .action-icon {
-            background: rgba(239, 68, 68, 0.3);
+        .like-btn.heart .action-icon {
+            background: rgba(239,68,68,0.3);
             border-color: var(--accent-red);
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
-            animation: heartBurst 0.5s ease;
+            box-shadow: 0 0 25px rgba(239,68,68,0.5);
         }
-        .like-btn.heart-burst .action-label { color: var(--accent-red); }
+        .like-btn.heart .action-label { color: var(--accent-red); }
 
-        .like-btn.super-liked .action-icon {
-            background: rgba(251, 191, 36, 0.3);
+        .like-btn.super .action-icon {
+            background: rgba(251,191,36,0.3);
             border-color: var(--accent-gold);
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
-            animation: superLikePulse 0.6s ease;
+            box-shadow: 0 0 30px rgba(251,191,36,0.6);
         }
-        .like-btn.super-liked .action-label { color: var(--accent-gold); }
-
-        @keyframes heartBurst {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.4); }
-            60% { transform: scale(0.9); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes superLikePulse {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.5); }
-            50% { transform: scale(0.8); }
-            75% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        /* ===== ANIMATIONS ===== */
-        .floating-heart {
-            position: absolute;
-            font-size: 40px;
-            pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
-            z-index: 100;
-            filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.6));
-        }
-
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-150px) scale(1.5); }
-        }
-
-        .haptic-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 3px solid var(--accent-gold);
-            pointer-events: none;
-            z-index: 100;
-            animation: hapticExpand 0.8s ease-out forwards;
-        }
-
-        @keyframes hapticExpand {
-            0% { width: 40px; height: 40px; opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-            100% { width: 200px; height: 200px; opacity: 0; transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .super-like-text {
-            position: absolute;
-            font-size: 18px;
-            font-weight: 800;
-            background: var(--gradient-super);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            pointer-events: none;
-            z-index: 101;
-            animation: superTextFloat 1.2s ease-out forwards;
-            text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
-        }
-
-        @keyframes superTextFloat {
-            0% { opacity: 1; transform: translateY(0) scale(0.8); }
-            30% { transform: translateY(-30px) scale(1.1); }
-            100% { opacity: 0; transform: translateY(-100px) scale(1); }
-        }
-
-        .coin-pop {
-            position: absolute;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent-gold);
-            pointer-events: none;
-            z-index: 101;
-            animation: coinPop 1s ease-out forwards;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        @keyframes coinPop {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-80px); }
-        }
+        .like-btn.super .action-label { color: var(--accent-gold); }
 
         /* Progress bar */
         .progress-bar {
@@ -493,33 +246,130 @@
             left: 0;
             height: 3px;
             background: var(--accent-purple);
-            transition: width 0.1s linear;
             z-index: 50;
-            box-shadow: 0 0 10px var(--accent-purple);
+            box-shadow: 0 0 8px var(--accent-purple);
+            transition: width 0.1s linear;
         }
 
-        /* Play/Pause indicator */
+        /* Play indicator */
         .play-indicator {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(10px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 26px;
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 20;
             pointer-events: none;
         }
-
         .play-indicator.show { opacity: 1; }
+
+        /* ===== HORIZONTAL STRIP (35%) ===== */
+        .strip-section {
+            position: fixed;
+            bottom: 64px;
+            left: 0;
+            right: 0;
+            height: 156px;
+            background: var(--bg-secondary);
+            border-top: 1px solid rgba(124,58,237,0.4);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .strip-header {
+            padding: 6px 12px 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-purple);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .strip-scroll {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0 12px 8px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .strip-scroll::-webkit-scrollbar { display: none; }
+
+        .strip-item {
+            flex-shrink: 0;
+            width: 72px;
+            height: 110px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            scroll-snap-align: start;
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            background: var(--bg-card);
+        }
+
+        .strip-item.active {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 16px rgba(124,58,237,0.5);
+            transform: scale(1.05);
+        }
+
+        .strip-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .strip-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 4px;
+            background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+        }
+
+        .strip-item-views {
+            font-size: 9px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .strip-like-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 9px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 6px;
+            padding: 2px 4px;
+            display: none;
+        }
+
+        .strip-item.liked-strip .strip-like-badge { display: block; color: var(--accent-purple); }
+        .strip-item.heart-strip .strip-like-badge { display: block; color: var(--accent-red); }
+        .strip-item.super-strip .strip-like-badge { display: block; color: var(--accent-gold); }
 
         /* ===== BOTTOM NAV ===== */
         .bottom-nav {
@@ -528,7 +378,7 @@
             left: 0;
             right: 0;
             height: 64px;
-            background: rgba(10, 10, 15, 0.95);
+            background: rgba(10,10,15,0.97);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
             display: flex;
@@ -548,14 +398,80 @@
             color: var(--text-muted);
             font-size: 10px;
             cursor: pointer;
-            transition: all 0.2s ease;
             padding: 8px 12px;
+            transition: color 0.2s;
+        }
+        .nav-item.active { color: var(--accent-purple); }
+        .nav-item svg { width: 22px; height: 22px; }
+
+        /* ===== ANIMATIONS ===== */
+        .floating-heart {
+            position: absolute;
+            font-size: 36px;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
         }
 
-        .nav-item.active { color: var(--accent-purple); }
-        .nav-item svg { width: 24px; height: 24px; }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-140px) scale(1.4); }
+        }
 
-        /* ===== LOADING / EMPTY STATES ===== */
+        .haptic-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid var(--accent-gold);
+            pointer-events: none;
+            z-index: 100;
+            animation: hapticExpand 0.8s ease-out forwards;
+        }
+
+        @keyframes hapticExpand {
+            0% { width: 40px; height: 40px; opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            100% { width: 180px; height: 180px; opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .super-like-text {
+            position: absolute;
+            font-size: 16px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            pointer-events: none;
+            z-index: 101;
+            animation: superTextFloat 1.2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes superTextFloat {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            30% { transform: translateY(-30px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-90px) scale(1); }
+        }
+
+        .coin-pop {
+            position: absolute;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            pointer-events: none;
+            z-index: 101;
+            animation: coinPop 1s ease-out forwards;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        @keyframes coinPop {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-70px); }
+        }
+
+        /* ===== LOADING ===== */
         .loading-screen {
             position: fixed;
             inset: 0;
@@ -568,21 +484,16 @@
             z-index: 9999;
             transition: opacity 0.5s ease;
         }
-
-        .loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        .loading-screen.hidden { opacity: 0; pointer-events: none; }
 
         .loader {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(124, 58, 237, 0.2);
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(124,58,237,0.2);
             border-top-color: var(--accent-purple);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .loading-text {
@@ -590,704 +501,474 @@
             color: var(--text-secondary);
             letter-spacing: 2px;
         }
-
-        body.embedded .bottom-nav { display: none !important; }
-body.embedded .header { display: none !important; }
-
-/* ===== RESPONSIVE ===== */
-        @media (min-width: 768px) {
-            .side-actions { right: 24px; bottom: 120px; }
-            .video-overlay { padding: 80px 24px 120px; }
-        }
     </style>
-<base target="_blank">
 </head>
 <body>
-    <div id="app">
-        <!-- Loading Screen -->
-        <div class="loading-screen" id="loadingScreen">
-            <div class="loader"></div>
-            <div class="loading-text">DDOTT.TV</div>
-        </div>
+<div id="app">
 
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">DDOTT.TV</div>
-            <div class="header-right">
-                <div class="coin-badge">
-                    <div class="coin-icon">E</div>
-                    <span id="coinCount">1,240</span>
-                </div>
-                <div class="view-toggle" id="viewToggle" title="Toggle View Mode">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
-                </div>
-            </div>
-        </div>
+    <!-- Loading -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">DDOTT.TV</div>
+    </div>
 
-        <!-- Mode Indicator -->
-        <div class="mode-indicator" id="modeIndicator">Full Scroll Mode</div>
-
-        <!-- FULL SCROLL MODE -->
-        <div class="full-scroll-container" id="fullScrollContainer">
-            <!-- Shorts will be injected here -->
-        </div>
-
-        <!-- SPLIT SCREEN MODE -->
-        <div class="split-container" id="splitContainer">
-            <div class="split-player" id="splitPlayer">
-                <video class="short-video" id="splitVideo" loop playsinline muted></video>
-                <div class="video-overlay" style="padding-bottom: 20px;">
-                    <div class="video-info">
-                        <div class="video-author">
-                            <div class="author-avatar" id="splitAvatar">M</div>
-                            <span class="author-name" id="splitAuthor">@meradivin</span>
-                        </div>
-                        <div class="video-title" id="splitTitle">Ddott shorts</div>
-                        <div class="video-stats">
-                            <span id="splitViews">0 views</span>
-                            <span>•</span>
-                            <span id="splitDuration">0:24</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="side-actions" style="bottom: 20px;">
-                    <button class="action-btn like-btn" id="splitLikeBtn">
-                        <div class="action-icon">🤍</div>
-                        <span class="action-label" id="splitLikeCount">0</span>
-                    </button>
-                    <button class="action-btn">
-                        <div class="action-icon">💬</div>
-                        <span class="action-label">0</span>
-                    </button>
-                    <button class="action-btn">
-                        <div class="action-icon">↗️</div>
-                        <span class="action-label">Share</span>
-                    </button>
-                </div>
-                <div class="progress-bar" id="splitProgress" style="width: 0%"></div>
-                <div class="play-indicator" id="splitPlayIndicator">▶️</div>
-                <div class="swipe-hint">←</div>
-            </div>
-            <div class="split-grid" id="splitGrid"></div>
-        </div>
-
-        <!-- Bottom Nav -->
-        <div class="bottom-nav">
-            <button class="nav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                <span>FEED</span>
-            </button>
-            <button class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                <span>HOME</span>
-            </button>
-            <button class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                <span>COMMUNITY</span>
-            </button>
-            <button class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
-                <span>COINS</span>
-            </button>
-            <button class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                <span>MESSAGE</span>
-            </button>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">DDOTT.TV</div>
+        <div class="coin-badge">
+            <div class="coin-icon">E</div>
+            <span id="coinCount">1,240</span>
         </div>
     </div>
 
-    <script>
-        // ===== DATA =====
-        const shortsData = [
-            {
-                id: 1,
-                author: "meradivin",
-                avatar: "M",
-                title: "Ddott shorts - AI Butterfly Neural Network",
-                views: "0",
-                duration: "0:24",
-                likes: 0,
-                comments: 0,
-                thumbnail: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=700&fit=crop",
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-            },
-            {
-                id: 2,
-                author: "neuralart",
-                avatar: "N",
-                title: "7-Brain Claude AI Butterfly in action",
-                views: "1.2K",
-                duration: "0:15",
-                likes: 42,
-                comments: 8,
-                thumbnail: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=700&fit=crop",
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
-            },
-            {
-                id: 3,
-                author: "dwinofficial",
-                avatar: "D",
-                title: "The DWIN Like System - Super Like Demo",
-                views: "5.6K",
-                duration: "0:30",
-                likes: 128,
-                comments: 24,
-                thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=700&fit=crop",
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
-            },
-            {
-                id: 4,
-                author: "creatorspot",
-                avatar: "C",
-                title: "Emo Coins earning tutorial",
-                views: "892",
-                duration: "0:45",
-                likes: 67,
-                comments: 12,
-                thumbnail: "https://images.unsplash.com/photo-1634017839464-5c339ez0c7a6?w=400&h=700&fit=crop",
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
-            },
-            {
-                id: 5,
-                author: "aistudio",
-                avatar: "A",
-                title: "Emowall AI 2.0 Family Safety",
-                views: "3.4K",
-                duration: "0:20",
-                likes: 95,
-                comments: 18,
-                thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=700&fit=crop",
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+    <!-- Main Player -->
+    <div class="main-player" id="mainPlayer">
+        <video class="main-video" id="mainVideo" loop playsinline muted preload="auto"></video>
+        <div class="video-overlay"></div>
+        <div class="video-info">
+            <div class="video-author">
+                <div class="author-avatar" id="infoAvatar">M</div>
+                <span class="author-name" id="infoAuthor">@meradivin</span>
+            </div>
+            <div class="video-title" id="infoTitle">Ddott Shorts</div>
+            <div class="video-stats" id="infoStats">0 views • 0:24</div>
+        </div>
+        <div class="side-actions">
+            <button class="action-btn like-btn" id="likeBtn">
+                <div class="action-icon" id="likeIcon">🤍</div>
+                <span class="action-label" id="likeCount">0</span>
+            </button>
+            <button class="action-btn">
+                <div class="action-icon">💬</div>
+                <span class="action-label" id="commentCount">0</span>
+            </button>
+            <button class="action-btn" id="shareBtn">
+                <div class="action-icon">↗️</div>
+                <span class="action-label">Share</span>
+            </button>
+        </div>
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        <div class="play-indicator" id="playIndicator">▶️</div>
+    </div>
+
+    <!-- Horizontal Strip -->
+    <div class="strip-section">
+        <div class="strip-header">
+            ⚡ SHORTS
+            <span id="stripCount" style="color:var(--text-muted);font-weight:400"></span>
+        </div>
+        <div class="strip-scroll" id="stripScroll"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="location.href='../index.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>FEED</span>
+        </button>
+        <button class="nav-item" onclick="location.href='../index.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>HOME</span>
+        </button>
+        <button class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>COMMUNITY</span>
+        </button>
+        <button class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            <span>COINS</span>
+        </button>
+        <button class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>MESSAGE</span>
+        </button>
+    </div>
+
+</div>
+
+<script>
+// ===== DATA =====
+const shortsData = [
+    {
+        id: 1, author: "meradivin", avatar: "M",
+        title: "Ddott shorts - AI Butterfly Neural Network",
+        views: "0", duration: "0:24", likes: 0, comments: 0,
+        thumbnail: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=700&fit=crop",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+    },
+    {
+        id: 2, author: "neuralart", avatar: "N",
+        title: "7-Brain Claude AI Butterfly in action",
+        views: "1.2K", duration: "0:15", likes: 42, comments: 8,
+        thumbnail: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=700&fit=crop",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+    },
+    {
+        id: 3, author: "dwinofficial", avatar: "D",
+        title: "The DWIN Like System - Super Like Demo",
+        views: "5.6K", duration: "0:30", likes: 128, comments: 24,
+        thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=700&fit=crop",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+    },
+    {
+        id: 4, author: "creatorspot", avatar: "C",
+        title: "Emo Coins earning tutorial",
+        views: "892", duration: "0:45", likes: 67, comments: 12,
+        thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=700&fit=crop",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+    },
+    {
+        id: 5, author: "aistudio", avatar: "A",
+        title: "Emowall AI 2.0 Family Safety",
+        views: "3.4K", duration: "0:20", likes: 95, comments: 18,
+        thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=700&fit=crop",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+    }
+];
+
+// ===== STATE =====
+let currentIndex = 0;
+let emoCoins = 1240;
+const likeStates = new Map(); // id -> { count, state: 'none'|'liked'|'heart'|'super' }
+let pressTimer = null;
+let isPressing = false;
+let pressStartX = 0, pressStartY = 0, pressStartTime = 0;
+let lastTapTime = 0, tapCount = 0;
+const SUPER_HOLD_MS = 600;
+
+// ===== DOM =====
+const mainVideo = document.getElementById('mainVideo');
+const progressBar = document.getElementById('progressBar');
+const playIndicator = document.getElementById('playIndicator');
+const likeBtn = document.getElementById('likeBtn');
+const likeIcon = document.getElementById('likeIcon');
+const likeCountEl = document.getElementById('likeCount');
+const coinCountEl = document.getElementById('coinCount');
+const stripScroll = document.getElementById('stripScroll');
+const mainPlayer = document.getElementById('mainPlayer');
+
+// ===== INIT =====
+function init() {
+    renderStrip();
+    loadVideo(0);
+    attachPlayerGestures();
+    setupProgress();
+    setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 1200);
+}
+
+// ===== RENDER STRIP =====
+function renderStrip() {
+    document.getElementById('stripCount').textContent = shortsData.length + ' shorts';
+    stripScroll.innerHTML = shortsData.map((s, i) => `
+        <div class="strip-item ${i === 0 ? 'active' : ''}" id="strip-${s.id}" onclick="loadVideo(${i})">
+            <img src="${s.thumbnail}" alt="${s.title}" loading="lazy">
+            <div class="strip-item-overlay">
+                <div class="strip-item-views">▶ ${s.views}</div>
+            </div>
+            <div class="strip-like-badge" id="strip-badge-${s.id}"></div>
+        </div>
+    `).join('');
+}
+
+// ===== LOAD VIDEO =====
+function loadVideo(index) {
+    currentIndex = index;
+    const s = shortsData[index];
+
+    // Update strip active state
+    document.querySelectorAll('.strip-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+        el.classList.remove('liked-strip', 'heart-strip', 'super-strip');
+    });
+
+    // Restore strip like badges
+    likeStates.forEach((state, id) => {
+        const stripEl = document.getElementById('strip-' + id);
+        if (!stripEl) return;
+        if (state.state === 'liked') stripEl.classList.add('liked-strip');
+        else if (state.state === 'heart') stripEl.classList.add('heart-strip');
+        else if (state.state === 'super') stripEl.classList.add('super-strip');
+        const badge = document.getElementById('strip-badge-' + id);
+        if (badge) {
+            if (state.state === 'liked') badge.textContent = '💜';
+            else if (state.state === 'heart') badge.textContent = '❤️';
+            else if (state.state === 'super') badge.textContent = '💛';
+        }
+    });
+
+    // Scroll strip to active
+    const activeStrip = document.querySelector('.strip-item.active');
+    if (activeStrip) activeStrip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+    // Update video
+    mainVideo.src = s.videoUrl;
+    mainVideo.muted = true;
+    mainVideo.play().then(() => {
+        mainVideo.muted = false;
+    }).catch(() => {
+        mainVideo.muted = true;
+        mainVideo.play().catch(() => {});
+    });
+
+    // Update info
+    document.getElementById('infoAvatar').textContent = s.avatar;
+    document.getElementById('infoAuthor').textContent = '@' + s.author;
+    document.getElementById('infoTitle').textContent = s.title;
+    document.getElementById('infoStats').textContent = s.views + ' views • ' + s.duration;
+    document.getElementById('commentCount').textContent = s.comments;
+
+    // Restore like state for this video
+    const st = likeStates.get(s.id) || { count: s.likes, state: 'none' };
+    updateLikeUI(st);
+}
+
+// ===== UPDATE LIKE UI =====
+function updateLikeUI(state) {
+    likeBtn.classList.remove('liked', 'heart', 'super');
+    likeCountEl.textContent = state.count;
+    if (state.state === 'liked') {
+        likeBtn.classList.add('liked');
+        likeIcon.textContent = '💜';
+    } else if (state.state === 'heart') {
+        likeBtn.classList.add('heart');
+        likeIcon.textContent = '❤️';
+    } else if (state.state === 'super') {
+        likeBtn.classList.add('super');
+        likeIcon.textContent = '💛';
+    } else {
+        likeIcon.textContent = '🤍';
+    }
+}
+
+// ===== UPDATE STRIP BADGE =====
+function updateStripBadge(id, state) {
+    const stripEl = document.getElementById('strip-' + id);
+    const badge = document.getElementById('strip-badge-' + id);
+    if (!stripEl || !badge) return;
+    stripEl.classList.remove('liked-strip', 'heart-strip', 'super-strip');
+    if (state.state === 'liked') { stripEl.classList.add('liked-strip'); badge.textContent = '💜'; }
+    else if (state.state === 'heart') { stripEl.classList.add('heart-strip'); badge.textContent = '❤️'; }
+    else if (state.state === 'super') { stripEl.classList.add('super-strip'); badge.textContent = '💛'; }
+    else { badge.textContent = ''; }
+}
+
+// ===== PLAYER GESTURES =====
+function attachPlayerGestures() {
+    mainPlayer.addEventListener('touchstart', onTouchStart, { passive: true });
+    mainPlayer.addEventListener('touchend', onTouchEnd, { passive: true });
+    mainPlayer.addEventListener('touchmove', onTouchMove, { passive: true });
+}
+
+function onTouchStart(e) {
+    if (e.target.closest('.side-actions')) return;
+    const t = e.touches[0];
+    pressStartX = t.clientX;
+    pressStartY = t.clientY;
+    pressStartTime = Date.now();
+    isPressing = true;
+
+    pressTimer = setTimeout(() => {
+        if (isPressing) {
+            isPressing = false;
+            triggerSuperLike(pressStartX, pressStartY);
+        }
+    }, SUPER_HOLD_MS);
+}
+
+function onTouchMove(e) {
+    if (!isPressing) return;
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - pressStartX);
+    const dy = Math.abs(t.clientY - pressStartY);
+    if (dx > 15 || dy > 15) {
+        isPressing = false;
+        clearTimeout(pressTimer);
+    }
+}
+
+function onTouchEnd(e) {
+    if (e.target.closest('.side-actions')) return;
+    clearTimeout(pressTimer);
+    if (!isPressing) return;
+    isPressing = false;
+
+    const duration = Date.now() - pressStartTime;
+    if (duration >= SUPER_HOLD_MS) return;
+
+    const t = e.changedTouches[0];
+    const dx = Math.abs(t.clientX - pressStartX);
+    const dy = Math.abs(t.clientY - pressStartY);
+    if (dx > 15 || dy > 15) return;
+
+    const now = Date.now();
+    if (now - lastTapTime < 280) {
+        tapCount++;
+        clearTimeout(window._tapTimer);
+        if (tapCount >= 2) {
+            tapCount = 0;
+            triggerHeartBurst(t.clientX, t.clientY);
+        }
+    } else {
+        tapCount = 1;
+        window._tapTimer = setTimeout(() => {
+            if (tapCount === 1) {
+                triggerSingleLike();
+                togglePlayPause();
             }
-        ];
+            tapCount = 0;
+        }, 280);
+    }
+    lastTapTime = now;
+}
 
-        // ===== STATE =====
-        let currentMode = 'full'; // 'full' or 'split'
-        let currentIndex = 0;
-        let emoCoins = 1240;
-        const likeStates = new Map(); // id -> { count, state: 'none'|'liked'|'heart'|'super' }
-        let pressTimer = null;
-        let isPressing = false;
-        let lastTapTime = 0;
-        let tapCount = 0;
-        const SUPER_LIKE_HOLD_MS = 600;
+// ===== LIKE BUTTON (side button) =====
+likeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    triggerSingleLike();
+});
 
-        // ===== DOM REFS =====
-        const fullContainer = document.getElementById('fullScrollContainer');
-        const splitContainer = document.getElementById('splitContainer');
-        const splitVideo = document.getElementById('splitVideo');
-        const splitGrid = document.getElementById('splitGrid');
-        const viewToggle = document.getElementById('viewToggle');
-        const modeIndicator = document.getElementById('modeIndicator');
-        const coinCount = document.getElementById('coinCount');
-        const loadingScreen = document.getElementById('loadingScreen');
+// ===== SINGLE LIKE =====
+function triggerSingleLike() {
+    const s = shortsData[currentIndex];
+    let st = likeStates.get(s.id) || { count: s.likes, state: 'none' };
+    if (st.state === 'super') return; // super like locked
 
-        // ===== INIT =====
-        function init() {
-    if (new URLSearchParams(location.search).get('embed') === 'true') document.body.classList.add('embedded');
-            renderFullScrollShorts();
-            renderSplitGrid();
-            setupIntersectionObserver();
-            setupViewToggle();
+    if (st.state === 'none') {
+        st = { count: st.count + 1, state: 'liked' };
+        createFloatingHeart('💜', mainPlayer.clientWidth / 2, mainPlayer.clientHeight / 2);
+    } else if (st.state === 'liked') {
+        st = { count: st.count - 1, state: 'none' };
+    } else if (st.state === 'heart') {
+        st = { count: st.count - 1, state: 'liked' };
+    }
 
-            // Hide loading after 1.5s
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-            }, 1500);
+    likeStates.set(s.id, st);
+    updateLikeUI(st);
+    updateStripBadge(s.id, st);
+}
+
+// ===== HEART BURST (double tap) =====
+function triggerHeartBurst(x, y) {
+    const s = shortsData[currentIndex];
+    let st = likeStates.get(s.id) || { count: s.likes, state: 'none' };
+    if (st.state === 'super') return; // super locked
+
+    const wasHeart = st.state === 'heart';
+    if (!wasHeart) {
+        st = { count: st.count + (st.state === 'none' ? 2 : 1), state: 'heart' };
+    }
+
+    likeStates.set(s.id, st);
+    updateLikeUI(st);
+    updateStripBadge(s.id, st);
+
+    // Burst hearts
+    const rect = mainPlayer.getBoundingClientRect();
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            createFloatingHeart('❤️',
+                x - rect.left + (Math.random() - 0.5) * 60,
+                y - rect.top + (Math.random() - 0.5) * 40
+            );
+        }, i * 70);
+    }
+}
+
+// ===== SUPER LIKE (hold, permanent) =====
+function triggerSuperLike(x, y) {
+    const s = shortsData[currentIndex];
+    let st = likeStates.get(s.id) || { count: s.likes, state: 'none' };
+    if (st.state === 'super') return; // already super
+
+    const addCoins = 5;
+    st = { count: st.count + addCoins, state: 'super' };
+    likeStates.set(s.id, st);
+    updateLikeUI(st);
+    updateStripBadge(s.id, st);
+
+    const rect = mainPlayer.getBoundingClientRect();
+    const lx = x - rect.left;
+    const ly = y - rect.top;
+
+    // Haptic ring
+    const ring = document.createElement('div');
+    ring.className = 'haptic-ring';
+    ring.style.left = lx + 'px';
+    ring.style.top = ly + 'px';
+    mainPlayer.appendChild(ring);
+    setTimeout(() => ring.remove(), 800);
+
+    // Super like text
+    const text = document.createElement('div');
+    text.className = 'super-like-text';
+    text.textContent = '⭐ SUPER LIKE!';
+    text.style.left = Math.max(10, lx - 60) + 'px';
+    text.style.top = (ly - 40) + 'px';
+    mainPlayer.appendChild(text);
+    setTimeout(() => text.remove(), 1200);
+
+    // Coin pop
+    const coin = document.createElement('div');
+    coin.className = 'coin-pop';
+    coin.innerHTML = '🪙 +1 Emo Coin';
+    coin.style.left = Math.max(10, lx - 40) + 'px';
+    coin.style.top = (ly + 10) + 'px';
+    mainPlayer.appendChild(coin);
+    setTimeout(() => coin.remove(), 1000);
+
+    // Floating hearts burst
+    for (let i = 0; i < 6; i++) {
+        setTimeout(() => {
+            createFloatingHeart('💛',
+                lx + (Math.random() - 0.5) * 80,
+                ly + (Math.random() - 0.5) * 60
+            );
+        }, i * 60);
+    }
+
+    // Update coin
+    emoCoins += 1;
+    coinCountEl.textContent = emoCoins.toLocaleString();
+
+    // Vibrate
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
+}
+
+// ===== FLOATING HEART =====
+function createFloatingHeart(emoji, x, y) {
+    const h = document.createElement('div');
+    h.className = 'floating-heart';
+    h.textContent = emoji;
+    h.style.left = x + 'px';
+    h.style.top = y + 'px';
+    mainPlayer.appendChild(h);
+    setTimeout(() => h.remove(), 1000);
+}
+
+// ===== PLAY / PAUSE =====
+function togglePlayPause() {
+    if (mainVideo.paused) {
+        mainVideo.play();
+        playIndicator.classList.remove('show');
+    } else {
+        mainVideo.pause();
+        playIndicator.textContent = '⏸️';
+        playIndicator.classList.add('show');
+        setTimeout(() => playIndicator.classList.remove('show'), 800);
+    }
+}
+
+// ===== PROGRESS =====
+function setupProgress() {
+    setInterval(() => {
+        if (!mainVideo.paused && mainVideo.duration) {
+            progressBar.style.width = ((mainVideo.currentTime / mainVideo.duration) * 100) + '%';
         }
+    }, 100);
+}
 
-        // ===== RENDER FULL SCROLL =====
-        function renderFullScrollShorts() {
-            fullContainer.innerHTML = shortsData.map((short, idx) => `
-                <div class="short-item" data-index="${idx}" data-id="${short.id}">
-                    <video class="short-video" src="${short.videoUrl}" loop playsinline muted preload="metadata"></video>
-                    <div class="video-overlay">
-                        <div class="video-info">
-                            <div class="video-author">
-                                <div class="author-avatar">${short.avatar}</div>
-                                <span class="author-name">@${short.author}</span>
-                            </div>
-                            <div class="video-title">${short.title}</div>
-                            <div class="video-stats">
-                                <span>${short.views} views</span>
-                                <span>•</span>
-                                <span>${short.duration}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="side-actions">
-                        <button class="action-btn like-btn" data-id="${short.id}">
-                            <div class="action-icon">🤍</div>
-                            <span class="action-label like-count">${short.likes}</span>
-                        </button>
-                        <button class="action-btn">
-                            <div class="action-icon">💬</div>
-                            <span class="action-label">${short.comments}</span>
-                        </button>
-                        <button class="action-btn">
-                            <div class="action-icon">↗️</div>
-                            <span class="action-label">Share</span>
-                        </button>
-                    </div>
-                    <div class="progress-bar" style="width: 0%"></div>
-                    <div class="play-indicator">▶️</div>
-                </div>
-            `).join('');
-
-            // Attach gesture handlers to each short
-            document.querySelectorAll('.short-item').forEach(item => {
-                attachGestureHandlers(item);
-            });
-        }
-
-        // ===== RENDER SPLIT GRID =====
-        function renderSplitGrid() {
-            splitGrid.innerHTML = shortsData.map((short, idx) => `
-                <div class="grid-item ${idx === 0 ? 'active' : ''}" data-index="${idx}" onclick="playSplitShort(${idx})">
-                    <img src="${short.thumbnail}" alt="${short.title}" loading="lazy">
-                    <div class="grid-overlay">
-                        <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${short.title}</div>
-                        <div class="grid-views">
-                            <span>▶</span> ${short.views}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // ===== GESTURE HANDLERS (DWIN LIKE SYSTEM) =====
-        function attachGestureHandlers(element) {
-            let pressStartTime = 0;
-            let pressStartX = 0;
-            let pressStartY = 0;
-            let hasTriggeredSuper = false;
-            let hasTriggeredHeart = false;
-
-            const startHandler = (e) => {
-    if (e.target.closest('.action-btn')) return;
-                const touch = e.touches ? e.touches[0] : e;
-                pressStartTime = Date.now();
-                pressStartX = touch.clientX;
-                pressStartY = touch.clientY;
-                isPressing = true;
-                hasTriggeredSuper = false;
-                hasTriggeredHeart = false;
-
-                pressTimer = setTimeout(() => {
-                    if (isPressing && !hasTriggeredHeart) {
-                        hasTriggeredSuper = true;
-                        triggerSuperLike(element, pressStartX, pressStartY);
-                    }
-                }, SUPER_LIKE_HOLD_MS);
-            };
-
-            const endHandler = (e) => {
-                const pressDuration = Date.now() - pressStartTime;
-                isPressing = false;
-                clearTimeout(pressTimer);
-
-                if (hasTriggeredSuper) return; // Super like already handled
-
-                const touch = e.changedTouches ? e.changedTouches[0] : e;
-                const dx = Math.abs((touch.clientX || touch.pageX) - pressStartX);
-                const dy = Math.abs((touch.clientY || touch.pageY) - pressStartY);
-
-                // Ignore if dragged too much
-                if (dx > 10 || dy > 10) return;
-
-                if (pressDuration < SUPER_LIKE_HOLD_MS) {
-                    handleTap(element, touch.clientX || touch.pageX, touch.clientY || touch.pageY);
-                }
-            };
-
-            const moveHandler = (e) => {
-                if (!isPressing) return;
-                const touch = e.touches ? e.touches[0] : e;
-                const dx = Math.abs(touch.clientX - pressStartX);
-                const dy = Math.abs(touch.clientY - pressStartY);
-                if (dx > 20 || dy > 20) {
-                    isPressing = false;
-                    clearTimeout(pressTimer);
-                }
-            };
-
-            element.addEventListener('touchstart', startHandler, { passive: true });
-            element.addEventListener('touchend', endHandler, { passive: true });
-            element.addEventListener('touchmove', moveHandler, { passive: true });
-            element.addEventListener('mousedown', startHandler);
-            element.addEventListener('mouseup', endHandler);
-            element.addEventListener('mousemove', moveHandler);
-        }
-
-        // ===== TAP LOGIC (Single vs Double) =====
-        function handleTap(element, x, y) {
-            const now = Date.now();
-            const id = parseInt(element.dataset.id);
-            const video = element.querySelector('video');
-
-            if (now - lastTapTime < 300) {
-                // Double tap detected
-                tapCount++;
-                if (tapCount === 2) {
-                    triggerHeartBurst(element, id, x, y);
-                    tapCount = 0;
-                }
-            } else {
-                tapCount = 1;
-                setTimeout(() => {
-                    if (tapCount === 1) {
-                        // Single tap - toggle like + play/pause
-                        triggerSingleLike(element, id);
-                        togglePlayPause(video, element.querySelector('.play-indicator'));
-                    }
-                    tapCount = 0;
-                }, 300);
-            }
-            lastTapTime = now;
-        }
-
-        // ===== SINGLE LIKE (1 Coin) =====
-        function triggerSingleLike(element, id) {
-            const btn = element.querySelector('.like-btn');
-            const countEl = btn.querySelector('.like-count');
-            let state = likeStates.get(id) || { count: shortsData.find(s => s.id === id)?.likes || 0, state: 'none' };
-
-            if (state.state === 'none') {
-                state.count++;
-                state.state = 'liked';
-                btn.classList.add('liked');
-                btn.querySelector('.action-icon').textContent = '💜';
-                createFloatingHeart(element, '💜');
-            } else if (state.state === 'liked') {
-                state.count--;
-                state.state = 'none';
-                btn.classList.remove('liked');
-                btn.querySelector('.action-icon').textContent = '🤍';
-            } else {
-                // Already heart/super - downgrade to liked
-                state.state = 'liked';
-                btn.classList.remove('heart-burst', 'super-liked');
-                btn.classList.add('liked');
-                btn.querySelector('.action-icon').textContent = '💜';
-            }
-
-            countEl.textContent = state.count;
-            likeStates.set(id, state);
-        }
-
-        // ===== HEART BURST (2 Likes) =====
-        function triggerHeartBurst(element, id, x, y) {
-            const btn = element.querySelector('.like-btn');
-            const countEl = btn.querySelector('.like-count');
-            let state = likeStates.get(id) || { count: shortsData.find(s => s.id === id)?.likes || 0, state: 'none' };
-
-            if (state.state !== 'heart') {
-                state.count += 2;
-                state.state = 'heart';
-            }
-
-            btn.classList.remove('liked', 'super-liked');
-            btn.classList.add('heart-burst');
-            btn.querySelector('.action-icon').textContent = '❤️';
-            countEl.textContent = state.count;
-            likeStates.set(id, state);
-
-            // Multiple floating hearts
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    createFloatingHeart(element, '❤️', x + (Math.random() - 0.5) * 60, y + (Math.random() - 0.5) * 60);
-                }, i * 80);
-            }
-
-            // Remove animation class after
-            setTimeout(() => btn.classList.remove('heart-burst'), 500);
-        }
-
-        // ===== SUPER LIKE (1 Emo Coin + Haptic Ring) =====
-        function triggerSuperLike(element, x, y) {
-            const id = parseInt(element.dataset.id);
-            const btn = element.querySelector('.like-btn');
-            const countEl = btn.querySelector('.like-count');
-            let state = likeStates.get(id) || { count: shortsData.find(s => s.id === id)?.likes || 0, state: 'none' };
-
-            if (state.state !== 'super') {
-                state.count += 5;
-                state.state = 'super';
-            }
-
-            btn.classList.remove('liked', 'heart-burst');
-            btn.classList.add('super-liked');
-            btn.querySelector('.action-icon').textContent = '💛';
-            countEl.textContent = state.count;
-            likeStates.set(id, state);
-
-            // Haptic charge ring
-            const ring = document.createElement('div');
-            ring.className = 'haptic-ring';
-            ring.style.left = x + 'px';
-            ring.style.top = y + 'px';
-            element.appendChild(ring);
-            setTimeout(() => ring.remove(), 800);
-
-            // Super like text
-            const text = document.createElement('div');
-            text.className = 'super-like-text';
-            text.textContent = 'SUPER LIKE!';
-            text.style.left = (x - 50) + 'px';
-            text.style.top = (y - 50) + 'px';
-            element.appendChild(text);
-            setTimeout(() => text.remove(), 1200);
-
-            // Coin pop
-            const coin = document.createElement('div');
-            coin.className = 'coin-pop';
-            coin.innerHTML = '<span style="font-size:16px">🪙</span> +1 Emo Coin';
-            coin.style.left = (x + 20) + 'px';
-            coin.style.top = (y - 30) + 'px';
-            element.appendChild(coin);
-            setTimeout(() => coin.remove(), 1000);
-
-            // Update coin balance
-            emoCoins += 1;
-            updateCoinDisplay();
-
-            // Vibrate if supported
-            if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
-
-            setTimeout(() => btn.classList.remove('super-liked'), 600);
-        }
-
-        // ===== FLOATING HEART =====
-        function createFloatingHeart(container, emoji, x, y) {
-            const heart = document.createElement('div');
-            heart.className = 'floating-heart';
-            heart.textContent = emoji;
-            const rect = container.getBoundingClientRect();
-            const posX = x ? (x - rect.left) : (rect.width / 2 + (Math.random() - 0.5) * 100);
-            const posY = y ? (y - rect.top) : (rect.height / 2 + (Math.random() - 0.5) * 50);
-            heart.style.left = posX + 'px';
-            heart.style.top = posY + 'px';
-            container.appendChild(heart);
-            setTimeout(() => heart.remove(), 1000);
-        }
-
-        // ===== PLAY / PAUSE =====
-        function togglePlayPause(video, indicator) {
-            if (video.paused) {
-                video.play();
-                //video.muted = false;
-                indicator.textContent = '▶️';
-                indicator.classList.remove('show');
-            } else {
-                video.pause();
-                indicator.textContent = '⏸️';
-                indicator.classList.add('show');
-                setTimeout(() => indicator.classList.remove('show'), 800);
-            }
-        }
-
-        // ===== INTERSECTION OBSERVER (Auto-play) =====
-        function setupIntersectionObserver() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
-                    const progressBar = entry.target.querySelector('.progress-bar');
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
-                        video.play();
-                        //video.muted = false;
-                        currentIndex = parseInt(entry.target.dataset.index);
-                    } else {
-                        video.pause();
-                        video.currentTime = 0;
-                    }
-                });
-            }, { threshold: [0.7] });
-
-            document.querySelectorAll('.short-item').forEach(item => observer.observe(item));
-
-            // Progress bar update
-            setInterval(() => {
-                document.querySelectorAll('.short-item').forEach(item => {
-                    const video = item.querySelector('video');
-                    const progress = item.querySelector('.progress-bar');
-                    if (video && progress && !video.paused) {
-                        const pct = (video.currentTime / video.duration) * 100;
-                        progress.style.width = pct + '%';
-                    }
-                });
-                // Split mode progress
-                if (splitVideo && !splitVideo.paused) {
-                    const pct = (splitVideo.currentTime / splitVideo.duration) * 100;
-                    document.getElementById('splitProgress').style.width = pct + '%';
-                }
-            }, 100);
-        }
-
-        // ===== VIEW TOGGLE =====
-        function setupViewToggle() {
-            viewToggle.addEventListener('click', () => {
-                if (currentMode === 'full') {
-                    switchToSplitMode();
-                } else {
-                    switchToFullMode();
-                }
-            });
-        }
-
-        function switchToSplitMode() {
-            currentMode = 'split';
-            fullContainer.style.display = 'none';
-            splitContainer.classList.add('active');
-            modeIndicator.textContent = 'Split Screen Mode';
-            showModeIndicator();
-
-            // Pause all full-scroll videos
-            document.querySelectorAll('.short-item video').forEach(v => v.pause());
-
-            // Play current in split
-            playSplitShort(currentIndex);
-        }
-
-        function switchToFullMode() {
-            currentMode = 'full';
-            fullContainer.style.display = 'block';
-            splitContainer.classList.remove('active');
-            modeIndicator.textContent = 'Full Scroll Mode';
-            showModeIndicator();
-
-            // Pause split video
-            splitVideo.pause();
-
-            // Resume current full-scroll video
-            const items = document.querySelectorAll('.short-item');
-            if (items[currentIndex]) {
-                const video = items[currentIndex].querySelector('video');
-                video.play();
-                //video.muted = false;
-                items[currentIndex].scrollIntoView({ behavior: 'instant', block: 'start' });
-            }
-        }
-
-        function showModeIndicator() {
-            modeIndicator.classList.add('show');
-            setTimeout(() => modeIndicator.classList.remove('show'), 2000);
-        }
-
-        // ===== SPLIT MODE PLAY =====
-        function playSplitShort(index) {
-            currentIndex = index;
-            const short = shortsData[index];
-
-            splitVideo.src = short.videoUrl;
-            splitVideo.play();
-            splitVideo.muted = false;
-
-            document.getElementById('splitAuthor').textContent = '@' + short.author;
-            document.getElementById('splitAvatar').textContent = short.avatar;
-            document.getElementById('splitTitle').textContent = short.title;
-            document.getElementById('splitViews').textContent = short.views + ' views';
-            document.getElementById('splitDuration').textContent = short.duration;
-
-            // Update like button state
-            const state = likeStates.get(short.id) || { count: short.likes, state: 'none' };
-            const btn = document.getElementById('splitLikeBtn');
-            const countEl = document.getElementById('splitLikeCount');
-            countEl.textContent = state.count;
-            btn.classList.remove('liked', 'heart-burst', 'super-liked');
-
-            if (state.state === 'liked') {
-                btn.classList.add('liked');
-                btn.querySelector('.action-icon').textContent = '💜';
-            } else if (state.state === 'heart') {
-                btn.classList.add('heart-burst');
-                btn.querySelector('.action-icon').textContent = '❤️';
-            } else if (state.state === 'super') {
-                btn.classList.add('super-liked');
-                btn.querySelector('.action-icon').textContent = '💛';
-            } else {
-                btn.querySelector('.action-icon').textContent = '🤍';
-            }
-
-            // Highlight grid item
-            document.querySelectorAll('.grid-item').forEach((item, i) => {
-                item.classList.toggle('active', i === index);
-            });
-
-            // Attach gesture to split player
-            attachGestureHandlers(document.getElementById('splitPlayer'));
-        }
-
-        // Split like button handler
-        document.getElementById('splitLikeBtn').addEventListener('click', function() {
-            const short = shortsData[currentIndex];
-            const id = short.id;
-            let state = likeStates.get(id) || { count: short.likes, state: 'none' };
-
-            if (state.state === 'none') {
-                state.count++;
-                state.state = 'liked';
-                this.classList.add('liked');
-                this.querySelector('.action-icon').textContent = '💜';
-            } else {
-                state.count--;
-                state.state = 'none';
-                this.classList.remove('liked');
-                this.querySelector('.action-icon').textContent = '🤍';
-            }
-
-            document.getElementById('splitLikeCount').textContent = state.count;
-            likeStates.set(id, state);
-        });
-
-        // ===== COIN DISPLAY =====
-        function updateCoinDisplay() {
-            coinCount.textContent = emoCoins.toLocaleString();
-        }
-
-        // ===== KEYBOARD SHORTCUTS =====
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowDown') {
-                if (currentMode === 'full' && currentIndex < shortsData.length - 1) {
-                    currentIndex++;
-                    document.querySelectorAll('.short-item')[currentIndex]?.scrollIntoView({ behavior: 'smooth' });
-                }
-            } else if (e.key === 'ArrowUp') {
-                if (currentMode === 'full' && currentIndex > 0) {
-                    currentIndex--;
-                    document.querySelectorAll('.short-item')[currentIndex]?.scrollIntoView({ behavior: 'smooth' });
-                }
-            } else if (e.key === 'v' || e.key === 'V') {
-                viewToggle.click();
-            }
-        });
-
-        // ===== SWIPE LEFT ON GRID (Load more simulation) =====
-        let gridTouchStartX = 0;
-        splitGrid.addEventListener('touchstart', (e) => {
-            gridTouchStartX = e.touches[0].clientX;
-        }, { passive: true });
-
-        splitGrid.addEventListener('touchend', (e) => {
-            const dx = e.changedTouches[0].clientX - gridTouchStartX;
-            if (dx < -50) {
-                // Swipe left - simulate loading more
-                const hint = document.querySelector('.swipe-hint');
-                hint.textContent = '↻';
-                hint.style.animation = 'none';
-                setTimeout(() => {
-                    hint.textContent = '←';
-                    hint.style.animation = '';
-                }, 1000);
-            }
-        }, { passive: true });
-
-        // ===== START =====
-        init();
-    </script>
+// ===== START =====
+init();
+</script>
 </body>
 </html>
