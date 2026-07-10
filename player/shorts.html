@@ -653,6 +653,19 @@ async function postComment() {
             content: text,
             likes: 0
         });
+        // Increment comment count in videos table
+        const { data: vid } = await sb.from('videos').select('comments').eq('id', currentCommentVideoId).single();
+        if (vid) {
+            await sb.from('videos').update({ comments: (vid.comments||0) + 1 }).eq('id', currentCommentVideoId);
+            // Update UI count
+            const newCount = (vid.comments||0) + 1;
+            // Update split view count
+            const spEl = document.getElementById('spComments');
+            if (spEl) spEl.textContent = newCount;
+            // Update shortsData cache
+            const idx = shortsData.findIndex(s => s.id === currentCommentVideoId);
+            if (idx !== -1) shortsData[idx].comments = newCount;
+        }
         loadComments(currentCommentVideoId);
     } catch(e) {
         console.error('Comment post error:', e);
