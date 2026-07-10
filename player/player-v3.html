@@ -111,7 +111,7 @@ video.main-vid{width:100%;height:100%;object-fit:cover;display:block;}
 .shorts-feed{flex:1;position:relative;overflow:hidden;background:var(--bg2);}
 .shorts-scroll{display:flex;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .shorts-scroll::-webkit-scrollbar{display:none;}
-.short-card{flex-shrink:0;width:calc(100vw * 0.42);height:100%;scroll-snap-align:start;position:relative;overflow:hidden;cursor:pointer;border-right:1px solid var(--border);background:var(--bg);transition:transform 0.2s;}
+.short-card{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;flex-shrink:0;width:calc(100vw * 0.42);height:100%;scroll-snap-align:start;position:relative;overflow:hidden;cursor:pointer;border-right:1px solid var(--border);background:var(--bg);transition:transform 0.2s;}
 .short-card:active{transform:scale(0.97);}
 .short-thumb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 .short-thumb-bg{position:absolute;inset:0;}
