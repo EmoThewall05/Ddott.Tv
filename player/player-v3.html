@@ -11,15 +11,14 @@ let activeShortEl = null;
 
 function switchSoundToShort(el, s) {
     const mainVidEl = document.getElementById('mainVid');
-    const id = s.id || el.dataset.id;
-    const svEl = document.getElementById('sv-' + id);
-    const muteEl = document.getElementById('smute-' + id);
+    const id = s.id;
+    const svEl = el.querySelector('video');
+    const muteEl = el.querySelector('[id^="smute-"]');
 
     if (!svEl) return;
 
     // If already active short - toggle back to main
     if (activeShortEl === el) {
-        // Mute short, unmute main
         svEl.muted = true;
         svEl.pause();
         svEl.style.display = 'none';
@@ -31,9 +30,8 @@ function switchSoundToShort(el, s) {
 
     // Mute any previous active short
     if (activeShortEl) {
-        const prevId = activeShortEl.dataset.id;
-        const prevSv = document.getElementById('sv-' + prevId);
-        const prevMute = document.getElementById('smute-' + prevId);
+        const prevSv = activeShortEl.querySelector('video');
+        const prevMute = activeShortEl.querySelector('[id^="smute-"]');
         if (prevSv) { prevSv.muted = true; prevSv.pause(); prevSv.style.display = 'none'; }
         if (prevMute) prevMute.textContent = '🔇';
     }
@@ -45,7 +43,6 @@ function switchSoundToShort(el, s) {
     svEl.play().catch(() => { svEl.muted = true; svEl.play(); });
     if (muteEl) muteEl.textContent = '🔊';
     activeShortEl = el;
-    el.dataset.id = id;
 }
 
 function shareShort(id, title) {
