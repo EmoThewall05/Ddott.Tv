@@ -46,7 +46,7 @@
         /* ===== MAIN PLAYER (60%) ===== */
         .main-player {
             flex: 6;
-            min-height: 300px;
+            min-height: 0;
             position: relative;
             background: #000;
             flex-shrink: 0;
@@ -310,7 +310,7 @@
         /* ===== SHORTS SECTION (40%) ===== */
         .shorts-section {
             flex: 4;
-            min-height: 220px;
+            min-height: 0;
             background: var(--bg);
             display: flex;
             flex-direction: column;
@@ -372,7 +372,7 @@
         .shorts-grid::-webkit-scrollbar { display: none; }
 
         .short-card {
-            flex: 0 0 200px;
+            flex: 0 0 160px;
             height: 100%;
             position: relative;
             scroll-snap-align: start;
@@ -741,7 +741,7 @@
                     views: formatViews(v.views || 0),
                     likes: v.likes || 0,
                     url: v.video_url,
-                    thumb: v.thumbnail_url
+                    thumb: v.thumbnail_url ? v.thumbnail_url.replace(/\.mp4$/, '.jpg') : ''
                 }));
 
                 // Fetch drotts/shorts (is_short = true)
@@ -766,7 +766,7 @@
                         likes: s.likes || 0,
                         comments: 0,
                         isNew: diffHrs < 48,
-                        thumb: s.thumbnail_url,
+                        thumb: s.thumbnail_url ? s.thumbnail_url.replace(/\.mp4$/, '.jpg') : '',
                         url: s.video_url
                     };
                 });
