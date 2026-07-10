@@ -5,7 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Ddott.TV — Player V3</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+function shareShort(id, title) {
+    const url = location.origin + '/player/shorts.html?id=' + id;
+    if (navigator.share) {
+        navigator.share({ title: title || 'Ddott Short', text: 'Watch on Ddott.TV ⚡', url });
+    } else {
+        navigator.clipboard && navigator.clipboard.writeText(url).then(() => {
+            showToast('✅ Link copied!');
+        });
+    }
+}
+
+function openShortComments(id) {
+    location.href = '/player/shorts.html?id=' + id;
+}
+</script>
 <script src="../supabase-config.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -181,7 +196,7 @@ function mainLike(){
 function mainComment(){showToast('Comments coming soon 💬');}
 function mainShare(){if(navigator.share){navigator.share({title:document.getElementById('vidTitle').textContent,url:window.location.href}).catch(()=>{});}else{navigator.clipboard?.writeText(window.location.href);showToast('Link copied! 🔗');}}
 async function loadShorts(){const empty=document.getElementById('shortsEmpty');if(typeof db==='undefined'){empty.style.display='flex';return;}try{const{data,error}=await db.from('videos').select('*, profiles(display_name, username)').eq('is_short',true).order('created_at',{ascending:false}).limit(15);if(error||!data||!data.length){empty.style.display='flex';return;}shorts=data;document.getElementById('shortsCount').textContent=data.length+' shorts';shortsScroll.innerHTML='';data.forEach((s,i)=>{shortsScroll.appendChild(buildShortCard(s,i));});}catch(e){empty.style.display='flex';}}
-function buildShortCard(s,i){const el=document.createElement('div');el.className='short-card';el.dataset.id=s.id||i;const creator=s.profiles?.display_name||s.profiles?.username||'Creator';const likes=s.likes||0;const grads=['linear-gradient(160deg,#0a001a,#1a0035,#000d20)','linear-gradient(160deg,#001020,#00082a,#0a0015)','linear-gradient(160deg,#100010,#200025,#0a000a)','linear-gradient(160deg,#0a0800,#1a1000,#050500)','linear-gradient(160deg,#000a15,#00151a,#000508)'];el.innerHTML=`<div class="short-thumb"><div class="short-thumb-bg" style="background:${grads[i%grads.length]}"></div>${s.thumbnail_url ? `<img src="${s.thumbnail_url}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1;">` : ''}</div><div class="short-overlay"></div><div class="short-play">▶</div>${i===0?'<div class="now-playing"><div class="np-dot"></div>NEW</div>':''}<div class="short-actions" onclick="event.stopPropagation()"><div class="sa-btn" id="slike-${s.id||i}" data-id="${s.id||i}"><div class="sa-icon" style="position:relative"><div class="s-charge-ring"></div><span class="s-like-icon">🤍</span></div><span class="sa-count s-like-count">${fmtNum(likes)}</span></div><div class="sa-btn" onclick="showToast('Coming soon 💬')"><div class="sa-icon">💬</div><span class="sa-count">${fmtNum(s.comments_count||0)}</span></div></div><div class="short-info"><div class="short-creator">@${creator}</div><div class="short-title-txt">${s.title||''}</div></div>`;el.addEventListener('click',()=>playShortInMain(s));bindShortLike(el.querySelector(`#slike-${s.id||i}`),s.id||i,likes);return el;}
+function buildShortCard(s,i){const el=document.createElement('div');el.className='short-card';el.dataset.id=s.id||i;const creator=s.profiles?.display_name||s.profiles?.username||'Creator';const likes=s.likes||0;const grads=['linear-gradient(160deg,#0a001a,#1a0035,#000d20)','linear-gradient(160deg,#001020,#00082a,#0a0015)','linear-gradient(160deg,#100010,#200025,#0a000a)','linear-gradient(160deg,#0a0800,#1a1000,#050500)','linear-gradient(160deg,#000a15,#00151a,#000508)'];el.innerHTML=`<div class="short-thumb"><div class="short-thumb-bg" style="background:${grads[i%grads.length]}"></div>${s.thumbnail_url ? `<img src="${s.thumbnail_url}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1;">` : ''}</div><div class="short-overlay"></div><div class="short-play">▶</div>${i===0?'<div class="now-playing"><div class="np-dot"></div>NEW</div>':''}<div class="short-actions" onclick="event.stopPropagation()"><div class="sa-btn" id="slike-${s.id||i}" data-id="${s.id||i}"><div class="sa-icon" style="position:relative"><div class="s-charge-ring"></div><span class="s-like-icon">🤍</span></div><span class="sa-count s-like-count">${fmtNum(likes)}</span></div><div class="sa-btn" onclick="event.stopPropagation();openShortComments('${s.id||i}')"><div class="sa-icon">💬</div><span class="sa-count">${fmtNum(s.comments_count||0)}</span></div><div class="sa-btn" onclick="event.stopPropagation();shareShort('${s.id||i}','${(s.title||'').replace(/'/g,'')}')"><div class="sa-icon">↗️</div></div></div><div class="short-info"><div class="short-creator">@${creator}</div><div class="short-title-txt">${s.title||''}</div></div>`;el.addEventListener('click',()=>{ location.href='/player/shorts.html?id='+(s.id||i); });bindShortLike(el.querySelector(`#slike-${s.id||i}`),s.id||i,likes);return el;}
 
 /* Shorts like — visual toggle + super-like animation kept, NO coin earning anywhere */
 function bindShortLike(btn,id,initialLikes){
