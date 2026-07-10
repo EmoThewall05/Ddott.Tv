@@ -15,6 +15,9 @@ function switchSoundToShort(el, s) {
     const svEl = el.querySelector('video');
     const muteEl = el.querySelector('[id^="smute-"]');
 
+    // Debug toast
+    showToast('tap ok | vid:' + (svEl ? svEl.src.slice(-20) : 'NULL'));
+
     if (!svEl) return;
 
     // If already active short - toggle back to main
