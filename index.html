@@ -168,7 +168,7 @@
       <div class="stat-pill"><div class="sp-val" style="color:var(--cyan)" id="statViews">...</div><div class="sp-lbl">Views</div></div>
       <div class="stat-pill"><div class="sp-val" style="color:var(--gold)" id="statCoins">...</div><div class="sp-lbl">Coins</div></div>
       <div class="stat-pill"><div class="sp-val" style="color:var(--green)" id="statToday">...</div><div class="sp-lbl">Today</div></div>
-      <div class="stat-pill"><div class="sp-val" style="color:var(--pink)">96%</div><div class="sp-lbl">Likes</div></div>
+      <div class="stat-pill"><div class="sp-val" style="color:var(--pink)" id="statLikeRate">...%</div><div class="sp-lbl">Likes</div></div>
       <div class="stat-pill"><div class="sp-val" style="color:var(--purple)" id="statVideos">...</div><div class="sp-lbl">Videos</div></div>
     </div>
 
@@ -376,6 +376,18 @@ async function loadRealStats() {
   document.getElementById('navCoins').textContent = balance.toLocaleString();
   document.getElementById('statCoins').textContent = balance + '🪙';
   document.getElementById('statToday').textContent = '+' + todayEarned;
+  // Calculate real like rate from videos table
+  try {
+    const { data: vids } = await sb.from('videos').select('likes,views').eq('user_id', user.id);
+    if (vids && vids.length > 0) {
+      const totalLikes = vids.reduce((a, v) => a + (v.likes || 0), 0);
+      const totalViews = vids.reduce((a, v) => a + (v.views || 0), 0);
+      const rate = totalViews > 0 ? Math.round((totalLikes / totalViews) * 100) : 0;
+      document.getElementById('statLikeRate').textContent = rate + '%';
+    } else {
+      document.getElementById('statLikeRate').textContent = '0%';
+    }
+  } catch(e) { document.getElementById('statLikeRate').textContent = '0%'; }
   document.getElementById('statVideos').textContent = videoCount || 0;
   document.getElementById('statViews').textContent = '0';
 }

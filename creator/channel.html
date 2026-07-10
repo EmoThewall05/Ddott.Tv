@@ -753,6 +753,7 @@ function toggleSub() {
           ${v.duration ? `<div class="vc-dur">${fmtDuration(v.duration)}</div>` : ''}
           ${v.is_live ? `<div class="vc-live-badge"><div class="live-dot"></div>LIVE</div>` : ''}
           ${v.is_new ? `<div class="vc-new-badge">NEW</div>` : ''}
+          ${v.is_short ? `<div style="position:absolute;top:6px;left:8px;background:rgba(0,200,100,0.9);padding:2px 7px;border-radius:4px;font-size:9px;font-family:monospace;color:#fff;">⚡ SHORT</div>` : ''}
         </div>
         <div class="vc-info">
           <div class="vc-title">${escapeHtml(v.title || 'Untitled')}</div>
