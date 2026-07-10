@@ -316,6 +316,7 @@
             flex-direction: column;
             flex-shrink: 0;
             overflow: hidden;
+            height: 0;
         }
 
         .shorts-header {
@@ -367,13 +368,16 @@
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            min-height: 0;
+            align-items: stretch;
         }
 
         .shorts-grid::-webkit-scrollbar { display: none; }
 
         .short-card {
             flex: 0 0 160px;
-            height: 100%;
+            height: auto;
+            min-height: 0;
             position: relative;
             scroll-snap-align: start;
             display: flex;
@@ -388,7 +392,7 @@
             background: var(--bg-card);
             border: 2px solid transparent;
             transition: border-color 0.3s;
-            min-height: 140px;
+            min-height: 0;
         }
 
         .card-visual.active {
