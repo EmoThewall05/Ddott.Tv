@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Ddott TV - Split Player</title>
+    <title>Ddott TV</title>
     <style>
         :root {
-            --bg-primary: #0a0a12;
-            --bg-secondary: #0f0f1a;
-            --bg-card: #16162a;
-            --accent-purple: #8b5cf6;
-            --accent-cyan: #06b6d4;
-            --accent-pink: #ec4899;
-            --accent-gold: #fbbf24;
-            --text-primary: #ffffff;
+            --bg: #0a0a14;
+            --bg-elevated: #12121e;
+            --bg-card: #1a1a2e;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --gold: #fbbf24;
+            --text: #ffffff;
             --text-secondary: #a1a1aa;
             --text-muted: #71717a;
             --border: rgba(255,255,255,0.06);
-            --gradient-bar: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899);
         }
 
         * {
@@ -32,9 +31,9 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: var(--bg-primary);
+            background: var(--bg);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text-primary);
+            color: var(--text);
         }
 
         #app {
@@ -42,13 +41,12 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
-        /* ===== TOP BAR (Browser style) ===== */
+        /* ===== TOP BAR ===== */
         .top-bar {
-            height: 48px;
-            background: var(--bg-secondary);
+            height: 44px;
+            background: var(--bg-elevated);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -60,53 +58,50 @@
         .top-bar-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .home-icon {
-            width: 28px;
-            height: 28px;
-            color: var(--text-primary);
+        .top-home-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--text);
         }
 
-        .url-bar {
+        .url-pill {
             display: flex;
             align-items: center;
             gap: 6px;
             background: rgba(255,255,255,0.05);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 13px;
             color: var(--text-secondary);
         }
 
-        .url-bar .secure-icon {
-            font-size: 12px;
-        }
+        .url-pill .lock { font-size: 11px; }
 
         .top-bar-right {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
 
-        .top-bar-btn {
+        .top-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 20px;
             width: 32px;
             height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 20px;
             cursor: pointer;
         }
 
         /* ===== HEADER ===== */
         .header {
-            height: 56px;
-            background: var(--bg-primary);
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -115,35 +110,34 @@
         }
 
         .logo {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 900;
             letter-spacing: 3px;
-            background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+            background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .header-center {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             flex: 1;
+            display: flex;
             justify-content: center;
-            max-width: 300px;
+            max-width: 220px;
+            margin: 0 10px;
         }
 
-        .search-box {
+        .search-pill {
+            width: 100%;
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
-            padding: 8px 16px;
-            border-radius: 24px;
+            padding: 8px 14px;
+            border-radius: 20px;
             color: var(--text-muted);
             font-size: 14px;
-            width: 100%;
         }
 
         .header-right {
@@ -152,54 +146,54 @@
             gap: 10px;
         }
 
-        .header-icon-btn {
-            width: 40px;
-            height: 40px;
+        .h-icon {
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: rgba(255,255,255,0.05);
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-primary);
             cursor: pointer;
             position: relative;
+            font-size: 18px;
         }
 
-        .header-icon-btn.gold {
-            background: rgba(251, 191, 36, 0.1);
-            border-color: rgba(251, 191, 36, 0.3);
+        .h-icon.gold {
+            background: rgba(251, 191, 36, 0.08);
+            border-color: rgba(251, 191, 36, 0.2);
         }
 
-        .header-icon-btn.notif::after {
+        .h-icon.notif::after {
             content: '';
             position: absolute;
             top: 8px;
             right: 8px;
             width: 8px;
             height: 8px;
-            background: var(--accent-pink);
+            background: var(--pink);
             border-radius: 50%;
-            border: 2px solid var(--bg-primary);
+            border: 2px solid var(--bg);
         }
 
-        .avatar-btn {
-            width: 40px;
-            height: 40px;
+        .h-avatar {
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 16px;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.15);
             cursor: pointer;
         }
 
         /* ===== SUB HEADER ===== */
         .sub-header {
-            height: 48px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -207,60 +201,60 @@
             flex-shrink: 0;
         }
 
-        .back-btn {
-            width: 36px;
-            height: 36px;
+        .back-circle {
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: rgba(255,255,255,0.05);
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-primary);
+            color: var(--text);
+            font-size: 16px;
             cursor: pointer;
-            font-size: 18px;
         }
 
-        .section-title {
-            font-size: 22px;
+        .page-title {
+            font-size: 20px;
             font-weight: 700;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            background: linear-gradient(90deg, var(--purple), var(--pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: 1px;
         }
 
-        .coin-display {
+        .coin-pill {
             display: flex;
             align-items: center;
             gap: 6px;
-            background: rgba(251, 191, 36, 0.1);
+            background: rgba(251, 191, 36, 0.08);
             border: 1px solid rgba(251, 191, 36, 0.25);
-            padding: 6px 14px;
+            padding: 5px 14px;
             border-radius: 20px;
             font-size: 15px;
             font-weight: 700;
-            color: var(--accent-gold);
+            color: var(--gold);
         }
 
-        .coin-display .coin-icon {
-            width: 20px;
-            height: 20px;
-            background: var(--accent-gold);
+        .coin-pill .c-icon {
+            width: 22px;
+            height: 22px;
+            background: var(--gold);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
             color: #000;
+            font-weight: 800;
         }
 
-        /* ===== MAIN VIDEO PLAYER (TOP) ===== */
+        /* ===== MAIN PLAYER (60%) ===== */
         .main-player {
+            height: 60%;
+            min-height: 300px;
             position: relative;
-            height: 55%;
-            min-height: 320px;
             background: #000;
             flex-shrink: 0;
             overflow: hidden;
@@ -272,272 +266,54 @@
             object-fit: cover;
         }
 
-        .main-overlay {
+        /* Select Video Dropdown */
+        .video-select {
             position: absolute;
-            inset: 0;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 16px;
-            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 30%, rgba(0,0,0,0.2) 100%);
+            top: 12px;
+            left: 14px;
+            z-index: 20;
         }
 
-        /* Progress bar */
-        .progress-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            cursor: pointer;
-            pointer-events: auto;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--gradient-bar);
-            width: 0%;
-            transition: width 0.1s linear;
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
-        }
-
-        .time-display {
-            position: absolute;
-            bottom: 10px;
-            right: 50px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-        }
-
-        .mute-btn {
-            position: absolute;
-            bottom: 8px;
-            right: 12px;
-            width: 32px;
-            height: 32px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-            pointer-events: auto;
-        }
-
-        /* Video info overlay */
-        .video-meta {
-            margin-bottom: 8px;
-        }
-
-        .video-title-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .play-mini {
-            width: 28px;
-            height: 28px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        .video-title-main {
-            font-size: 18px;
-            font-weight: 700;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-        }
-
-        .creator-row {
+        .select-trigger {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .creator-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 13px;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .creator-badge {
-            background: rgba(255,255,255,0.1);
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .view-count {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* Side actions */
-        .side-actions {
-            position: absolute;
-            right: 10px;
-            bottom: 50px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            pointer-events: auto;
-        }
-
-        .action-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            cursor: pointer;
-        }
-
-        .action-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(20, 20, 35, 0.7);
+            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(12px);
+            padding: 7px 16px;
+            border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:active .action-circle { transform: scale(0.92); }
-
-        .action-label {
-            font-size: 11px;
+            color: var(--text);
+            font-size: 14px;
             font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        /* Like states */
-        .like-btn.liked .action-circle {
-            background: rgba(139, 92, 246, 0.25);
-            border-color: var(--accent-purple);
-        }
-        .like-btn.liked .action-label { color: var(--accent-purple); }
-
-        .like-btn.heart-burst .action-circle {
-            background: rgba(239, 68, 68, 0.25);
-            border-color: #ef4444;
-            animation: heartBurst 0.5s ease;
-        }
-
-        .like-btn.super-liked .action-circle {
-            background: rgba(251, 191, 36, 0.25);
-            border-color: var(--accent-gold);
-            animation: superPulse 0.6s ease;
-        }
-        .like-btn.super-liked .action-label { color: var(--accent-gold); }
-
-        @keyframes heartBurst {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.35); }
-            60% { transform: scale(0.9); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes superPulse {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.45); }
-            50% { transform: scale(0.85); }
-            75% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-
-        /* ===== VIDEO SELECTOR (Route) ===== */
-        .video-selector {
-            position: absolute;
-            top: 56px;
-            left: 14px;
-            z-index: 100;
-            pointer-events: auto;
-        }
-
-        .selector-trigger {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-primary);
             cursor: pointer;
         }
 
-        .selector-dropdown {
+        .select-dropdown {
             position: absolute;
-            top: 40px;
+            top: 44px;
             left: 0;
-            width: 220px;
+            width: 240px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 8px;
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             pointer-events: none;
-            transition: all 0.3s ease;
-            z-index: 101;
-            max-height: 300px;
+            transition: all 0.25s ease;
+            z-index: 30;
+            max-height: 280px;
             overflow-y: auto;
         }
 
-        .selector-dropdown.open {
+        .select-dropdown.open {
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
         }
 
-        .selector-item {
+        .select-item {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -547,43 +323,207 @@
             transition: background 0.2s;
         }
 
-        .selector-item:hover { background: rgba(255,255,255,0.05); }
-        .selector-item.active { background: rgba(139, 92, 246, 0.15); }
+        .select-item:hover, .select-item.active { background: rgba(139, 92, 246, 0.12); }
 
-        .selector-thumb {
-            width: 48px;
-            height: 36px;
+        .select-thumb {
+            width: 52px;
+            height: 38px;
             border-radius: 8px;
             object-fit: cover;
             background: #333;
         }
 
-        .selector-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .select-title { font-size: 13px; font-weight: 600; }
+        .select-author { font-size: 11px; color: var(--text-muted); }
 
-        .selector-title {
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .selector-author {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* ===== SHORTS SECTION (BOTTOM) ===== */
-        .shorts-section {
-            flex: 1;
-            background: var(--bg-primary);
+        /* Side Actions */
+        .side-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 60px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            z-index: 10;
+        }
+
+        .s-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .s-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(20, 20, 35, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: all 0.3s ease;
+        }
+
+        .s-btn:active .s-circle { transform: scale(0.92); }
+        .s-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+
+        /* Simple like state */
+        .s-btn.liked .s-circle {
+            background: rgba(139, 92, 246, 0.25);
+            border-color: var(--purple);
+            box-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
+        }
+        .s-btn.liked .s-label { color: var(--purple); }
+
+        /* Bottom Info Overlay */
+        .main-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 14px 36px;
+            background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .play-dot {
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .creator-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .c-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+
+        .c-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .c-views {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Progress */
+        .progress-wrap {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 50px;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+            width: 0%;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+        }
+
+        .time-display {
+            position: absolute;
+            bottom: 10px;
+            right: 46px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        .mute-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* ===== SHORTS SECTION (40%) ===== */
+        .shorts-section {
+            height: 40%;
+            min-height: 220px;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
             overflow: hidden;
-            min-height: 0;
         }
 
         .shorts-header {
@@ -594,44 +534,43 @@
             flex-shrink: 0;
         }
 
-        .shorts-title {
+        .sh-title {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: var(--accent-purple);
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: var(--purple);
         }
 
-        .shorts-title .dot {
+        .sh-dot {
             width: 8px;
             height: 8px;
-            background: var(--accent-pink);
+            background: var(--pink);
             border-radius: 50%;
-            animation: pulse 2s infinite;
+            animation: blink 2s infinite;
         }
 
-        .shorts-title .bolt {
-            font-size: 16px;
-        }
+        .sh-bolt { font-size: 16px; }
 
-        @keyframes pulse {
+        @keyframes blink {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+            50% { opacity: 0.3; }
         }
 
-        .shorts-count {
+        .sh-count {
             font-size: 13px;
             color: var(--text-muted);
         }
 
+        /* Shorts Grid - BIGGER CARDS */
         .shorts-grid {
             flex: 1;
             overflow-x: auto;
             overflow-y: hidden;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             padding: 0 14px 10px;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
@@ -641,46 +580,47 @@
         .shorts-grid::-webkit-scrollbar { display: none; }
 
         .short-card {
-            flex: 0 0 160px;
+            flex: 0 0 200px;
             height: 100%;
-            max-height: 280px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            overflow: hidden;
             position: relative;
             scroll-snap-align: start;
-            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-visual {
+            flex: 1;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-card);
             border: 2px solid transparent;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s;
+            min-height: 0;
         }
 
-        .short-card:hover { border-color: rgba(139, 92, 246, 0.3); }
-        .short-card.active {
-            border-color: var(--accent-purple);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        .card-visual.active {
+            border-color: var(--purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
         }
 
-        .short-card .thumb {
+        .card-visual img, .card-visual video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .short-card .short-video-inline {
+        .card-visual video {
             position: absolute;
             inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
             display: none;
-            z-index: 2;
         }
 
-        .short-card.playing .short-video-inline { display: block; }
-        .short-card.playing .thumb { opacity: 0; }
+        .card-visual.playing video { display: block; }
+        .card-visual.playing img { opacity: 0; }
 
         /* Card overlays */
-        .card-badge-new {
+        .badge-new {
             position: absolute;
             top: 8px;
             left: 8px;
@@ -691,6 +631,17 @@
             font-weight: 700;
             letter-spacing: 1px;
             z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge-new::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: #fff;
+            border-radius: 50%;
         }
 
         .card-mute {
@@ -699,16 +650,16 @@
             right: 8px;
             width: 26px;
             height: 26px;
-            background: rgba(239, 68, 68, 0.8);
+            background: rgba(239, 68, 68, 0.85);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            z-index: 3;
+            font-size: 11px;
             border: none;
             color: #fff;
             cursor: pointer;
+            z-index: 3;
         }
 
         .card-play {
@@ -718,26 +669,24 @@
             transform: translate(-50%, -50%);
             width: 44px;
             height: 44px;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.12);
             backdrop-filter: blur(10px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            z-index: 3;
-            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 16px;
+            border: 1px solid rgba(255,255,255,0.15);
             color: #fff;
             cursor: pointer;
+            z-index: 3;
         }
 
         .card-actions {
             position: absolute;
-            bottom: 0;
+            bottom: 8px;
             left: 0;
             right: 0;
-            padding: 10px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -745,7 +694,7 @@
             z-index: 3;
         }
 
-        .card-action-row {
+        .ca-row {
             display: flex;
             align-items: center;
             gap: 4px;
@@ -753,20 +702,27 @@
             color: var(--text-secondary);
         }
 
-        .card-action-row .icon { font-size: 14px; }
-
-        .card-info {
-            position: absolute;
-            bottom: -40px;
-            left: 0;
-            right: 0;
-            padding: 6px 0;
+        .ca-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
         }
 
-        .card-username {
+        .card-info {
+            padding: 6px 2px 2px;
+        }
+
+        .card-user {
             font-size: 13px;
             font-weight: 700;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .card-desc {
@@ -777,44 +733,10 @@
             text-overflow: ellipsis;
         }
 
-        /* Inline player overlay when short is playing */
-        .inline-player-controls {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            right: 8px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            z-index: 4;
-        }
-
-        .short-card.playing .inline-player-controls { display: flex; }
-
-        .inline-progress {
-            flex: 1;
-            height: 3px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .inline-progress-fill {
-            height: 100%;
-            background: var(--gradient-bar);
-            width: 0%;
-        }
-
-        .inline-time {
-            font-size: 10px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-        }
-
         /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             height: 64px;
-            background: rgba(10, 10, 18, 0.98);
+            background: rgba(10, 10, 20, 0.98);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
             display: flex;
@@ -828,89 +750,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 3px;
             background: none;
             border: none;
             color: var(--text-muted);
             font-size: 10px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            padding: 6px 10px;
+            transition: color 0.2s;
+            padding: 4px 8px;
         }
 
-        .nav-item.active { color: var(--accent-purple); }
-        .nav-item svg { width: 24px; height: 24px; }
+        .nav-item.active { color: var(--purple); }
+        .nav-item svg { width: 26px; height: 26px; }
 
         /* ===== ANIMATIONS ===== */
-        .floating-heart {
+        .float-heart {
             position: absolute;
-            font-size: 36px;
+            font-size: 32px;
             pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
+            animation: fu 0.9s ease-out forwards;
             z-index: 100;
-            filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));
+            filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.5));
         }
 
-        @keyframes floatUp {
+        @keyframes fu {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-120px) scale(1.3); }
-        }
-
-        .haptic-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 3px solid var(--accent-gold);
-            pointer-events: none;
-            z-index: 100;
-            animation: ringExpand 0.8s ease-out forwards;
-        }
-
-        @keyframes ringExpand {
-            0% { width: 30px; height: 30px; opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-            100% { width: 180px; height: 180px; opacity: 0; transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .super-text {
-            position: absolute;
-            font-size: 16px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            pointer-events: none;
-            z-index: 101;
-            animation: superFloat 1.2s ease-out forwards;
-        }
-
-        @keyframes superFloat {
-            0% { opacity: 1; transform: translateY(0) scale(0.8); }
-            30% { transform: translateY(-25px) scale(1.1); }
-            100% { opacity: 0; transform: translateY(-90px) scale(1); }
-        }
-
-        .coin-pop {
-            position: absolute;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--accent-gold);
-            pointer-events: none;
-            z-index: 101;
-            animation: coinUp 1s ease-out forwards;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        @keyframes coinUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-70px); }
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (min-width: 768px) {
-            .short-card { flex: 0 0 200px; }
-            .side-actions { right: 20px; }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.3); }
         }
     </style>
 <base target="_blank">
@@ -920,19 +785,19 @@
         <!-- TOP BAR -->
         <div class="top-bar">
             <div class="top-bar-left">
-                <svg class="home-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="top-home-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                <div class="url-bar">
-                    <span class="secure-icon">🔒</span>
+                <div class="url-pill">
+                    <span class="lock">🔒</span>
                     <span>ddott.live</span>
                 </div>
             </div>
             <div class="top-bar-right">
-                <button class="top-bar-btn">+</button>
-                <button class="top-bar-btn">1</button>
-                <button class="top-bar-btn">⋮</button>
+                <button class="top-btn">+</button>
+                <button class="top-btn">1</button>
+                <button class="top-btn">⋮</button>
             </div>
         </div>
 
@@ -940,114 +805,117 @@
         <div class="header">
             <div class="logo">DDOTT.TV</div>
             <div class="header-center">
-                <div class="search-box">
+                <div class="search-pill">
                     <span>🔍</span>
                     <span>Search...</span>
                 </div>
             </div>
             <div class="header-right">
-                <button class="header-icon-btn gold" title="Coins">🏛️</button>
-                <button class="header-icon-btn notif" title="Notifications">🔔</button>
-                <div class="avatar-btn">D</div>
+                <div class="h-icon gold" title="Coins">🏛️</div>
+                <div class="h-icon notif" title="Notifications">🔔</div>
+                <div class="h-avatar">D</div>
             </div>
         </div>
 
         <!-- SUB HEADER -->
         <div class="sub-header">
-            <button class="back-btn">←</button>
-            <div class="section-title">Ddott TV</div>
-            <div class="coin-display">
-                <div class="coin-icon">E</div>
+            <button class="back-circle">←</button>
+            <div class="page-title">Ddott TV</div>
+            <div class="coin-pill">
+                <div class="c-icon">E</div>
                 <span id="coinCount">527</span>
             </div>
         </div>
 
-        <!-- MAIN VIDEO PLAYER -->
+        <!-- MAIN PLAYER (60%) -->
         <div class="main-player" id="mainPlayer">
             <video id="mainVideo" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" loop playsinline></video>
 
-            <!-- Video Selector Route -->
-            <div class="video-selector">
-                <button class="selector-trigger" id="selectorTrigger" onclick="toggleSelector()">
+            <!-- Video Selector -->
+            <div class="video-select">
+                <button class="select-trigger" id="selectTrigger" onclick="toggleSelect()">
                     <span>📺</span>
                     <span>Select Video</span>
                     <span>▼</span>
                 </button>
-                <div class="selector-dropdown" id="selectorDropdown"></div>
+                <div class="select-dropdown" id="selectDropdown"></div>
             </div>
-
-            <div class="main-overlay">
-                <div class="video-meta">
-                    <div class="video-title-row">
-                        <div class="play-mini">▶</div>
-                        <div class="video-title-main" id="mainTitle">Ddott TV</div>
-                    </div>
-                    <div class="creator-row">
-                        <div class="creator-avatar" id="mainAvatar">C</div>
-                        <div class="creator-badge">
-                            <span id="mainCreator">Creator</span>
-                        </div>
-                        <span class="view-count" id="mainViews">0 views</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Progress -->
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-fill" id="mainProgress"></div>
-            </div>
-            <div class="time-display" id="mainTime">0:00 / 0:00</div>
-            <button class="mute-btn" id="mainMute" onclick="toggleMainMute()">🔊</button>
 
             <!-- Side Actions -->
             <div class="side-actions">
-                <button class="action-btn like-btn" id="mainLikeBtn" onclick="handleMainLike()">
-                    <div class="action-circle" id="mainLikeIcon">🤍</div>
-                    <span class="action-label" id="mainLikeCount">0</span>
+                <button class="s-btn" id="mainLikeBtn" onclick="likeMain()">
+                    <div class="s-circle" id="mainLikeIcon">🤍</div>
+                    <span class="s-label" id="mainLikeCount">0</span>
                 </button>
-                <button class="action-btn" onclick="openChat()">
-                    <div class="action-circle">💬</div>
-                    <span class="action-label">Chat</span>
+                <button class="s-btn" onclick="alert('💬 Chat')">
+                    <div class="s-circle">💬</div>
+                    <span class="s-label">Chat</span>
                 </button>
-                <button class="action-btn" onclick="shareVideo()">
-                    <div class="action-circle">↗️</div>
-                    <span class="action-label">Share</span>
+                <button class="s-btn" onclick="shareMain()">
+                    <div class="s-circle">↗️</div>
+                    <span class="s-label">Share</span>
                 </button>
             </div>
+
+            <!-- Bottom Info -->
+            <div class="main-overlay">
+                <div class="info-row">
+                    <div class="play-dot">▶</div>
+                    <div class="info-title" id="mainTitle">Ddott TV</div>
+                </div>
+                <div class="creator-line">
+                    <div class="c-avatar" id="mainAvatar">C</div>
+                    <div class="c-badge" id="mainCreator">Creator</div>
+                    <span class="c-views" id="mainViews">0 views</span>
+                </div>
+            </div>
+
+            <!-- Progress + Time + Mute -->
+            <div class="progress-wrap" id="progressWrap">
+                <div class="progress-fill" id="mainProgress"></div>
+            </div>
+            <div class="time-display" id="mainTime">0:00 / 0:00</div>
+            <button class="mute-btn" id="mainMute" onclick="toggleMute()">🔊</button>
         </div>
 
-        <!-- SHORTS SECTION -->
+        <!-- SHORTS SECTION (40%) -->
         <div class="shorts-section">
             <div class="shorts-header">
-                <div class="shorts-title">
-                    <span class="dot"></span>
-                    <span class="bolt">⚡</span>
+                <div class="sh-title">
+                    <span class="sh-dot"></span>
+                    <span class="sh-bolt">⚡</span>
                     <span>SHORTS</span>
                 </div>
-                <span class="shorts-count" id="shortsCount">5 shorts</span>
+                <span class="sh-count" id="shortsCount">5 shorts</span>
             </div>
             <div class="shorts-grid" id="shortsGrid"></div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="bottom-nav">
+            <!-- FEED: Retro TV -->
             <button class="nav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="4" width="20" height="12" rx="2"></rect>
-                    <path d="M8 20h8"></path>
-                    <path d="M12 16v4"></path>
-                    <path d="M6 8h.01"></path>
-                    <path d="M10 8h.01"></path>
+                    <rect x="3" y="7" width="18" height="12" rx="2"></rect>
+                    <path d="M8 3 L12 7 M16 3 L12 7"></path>
+                    <line x1="6" y1="11" x2="6" y2="11"></line>
+                    <line x1="10" y1="11" x2="10" y2="11"></line>
+                    <path d="M3 11h18" opacity="0.3"></path>
                 </svg>
                 <span>FEED</span>
             </button>
+
+            <!-- HOME: House with red roof -->
             <button class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none"></path>
+                    <polyline points="9 22 9 12 15 12 15 22" fill="none"></polyline>
+                    <path d="M3 9l9-7 9 7" stroke="#ef4444" stroke-width="2.5" fill="none"></path>
                 </svg>
                 <span>HOME</span>
             </button>
+
+            <!-- COMMUNITY: Globe -->
             <button class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -1056,17 +924,25 @@
                 </svg>
                 <span>COMMUNITY</span>
             </button>
+
+            <!-- COINS: Gold coin with building -->
             <button class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                    <path d="M2 17l10 5 10-5"></path>
-                    <path d="M2 12l10 5 10-5"></path>
+                    <circle cx="12" cy="12" r="10" stroke="#fbbf24" stroke-width="1.5"></circle>
+                    <path d="M8 16V10l4-2 4 2v6" stroke="#fbbf24"></path>
+                    <path d="M8 10h8" stroke="#fbbf24"></path>
+                    <path d="M10 16v-4h4v4" stroke="#fbbf24"></path>
                 </svg>
                 <span>COINS</span>
             </button>
+
+            <!-- MESSAGE: Speech bubble with 3 dots -->
             <button class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    <circle cx="9" cy="12" r="0.8" fill="currentColor" stroke="none"></circle>
+                    <circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"></circle>
+                    <circle cx="15" cy="12" r="0.8" fill="currentColor" stroke="none"></circle>
                 </svg>
                 <span>MESSAGE</span>
             </button>
@@ -1076,542 +952,222 @@
     <script>
         // ===== DATA =====
         const mainVideos = [
-            {
-                id: 'mv1',
-                title: 'Ddott TV',
-                creator: 'Creator',
-                avatar: 'C',
-                views: '0',
-                likes: 0,
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                thumb: 'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=400&h=300&fit=crop'
-            },
-            {
-                id: 'mv2',
-                title: 'Emowall AI 2.0 Demo',
-                creator: 'meradivin',
-                avatar: 'M',
-                views: '1.2K',
-                likes: 42,
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-                thumb: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop'
-            },
-            {
-                id: 'mv3',
-                title: 'The DWIN Universe',
-                creator: 'dwinofficial',
-                avatar: 'D',
-                views: '5.6K',
-                likes: 128,
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-                thumb: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop'
-            },
-            {
-                id: 'mv4',
-                title: 'Neural Butterfly Network',
-                creator: 'neuralart',
-                avatar: 'N',
-                views: '892',
-                likes: 67,
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-                thumb: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=300&fit=crop'
-            }
+            { id:'m1', title:'Ddott TV', creator:'Creator', avatar:'C', views:'0', likes:0, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', thumb:'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=400&h=300&fit=crop' },
+            { id:'m2', title:'Emowall AI 2.0', creator:'meradivin', avatar:'M', views:'1.2K', likes:42, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', thumb:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop' },
+            { id:'m3', title:'DWIN Universe', creator:'dwinofficial', avatar:'D', views:'5.6K', likes:128, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', thumb:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop' },
+            { id:'m4', title:'Neural Butterfly', creator:'neuralart', avatar:'N', views:'892', likes:67, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', thumb:'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=300&fit=crop' }
         ];
 
         const shortsData = [
-            {
-                id: 1,
-                author: 'meradivin',
-                avatar: 'M',
-                title: 'Emowall Ai 2.0',
-                views: '0',
-                likes: 0,
-                comments: 0,
-                isNew: true,
-                thumb: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=300&h=500&fit=crop',
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'
-            },
-            {
-                id: 2,
-                author: 'meradivin',
-                avatar: 'M',
-                title: 'Ddott shorts',
-                views: '0',
-                likes: 0,
-                comments: 0,
-                isNew: true,
-                thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=500&fit=crop',
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
-            },
-            {
-                id: 3,
-                author: 'creatorspot',
-                avatar: 'C',
-                title: 'Emo Coins Guide',
-                views: '234',
-                likes: 12,
-                comments: 3,
-                isNew: false,
-                thumb: 'https://images.unsplash.com/photo-1634017839464-5c339ez0c7a6?w=300&h=500&fit=crop',
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
-            },
-            {
-                id: 4,
-                author: 'aistudio',
-                avatar: 'A',
-                title: '7-Brain AI',
-                views: '1.1K',
-                likes: 89,
-                comments: 15,
-                isNew: false,
-                thumb: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=500&fit=crop',
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'
-            },
-            {
-                id: 5,
-                author: 'dwinofficial',
-                avatar: 'D',
-                title: 'DWIN Like System',
-                views: '3.4K',
-                likes: 156,
-                comments: 28,
-                isNew: false,
-                thumb: 'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=300&h=500&fit=crop',
-                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
-            }
+            { id:1, author:'meradivin', title:'Emowall Ai 2.0', views:'0', likes:0, comments:0, isNew:true, thumb:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4' },
+            { id:2, author:'meradivin', title:'Ddott shorts', views:'0', likes:0, comments:0, isNew:true, thumb:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
+            { id:3, author:'creatorspot', title:'Emo Coins Guide', views:'234', likes:12, comments:3, isNew:false, thumb:'https://images.unsplash.com/photo-1634017839464-5c339ez0c7a6?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
+            { id:4, author:'aistudio', title:'7-Brain AI', views:'1.1K', likes:89, comments:15, isNew:false, thumb:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' },
+            { id:5, author:'dwinofficial', title:'DWIN Like System', views:'3.4K', likes:156, comments:28, isNew:false, thumb:'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4' }
         ];
 
         // ===== STATE =====
-        let currentMainIndex = 0;
-        let currentShortId = null;
-        let emoCoins = 527;
-        const mainLikeStates = new Map();
-        const shortLikeStates = new Map();
-        let pressTimer = null;
-        let isPressing = false;
-        let lastTapTime = 0;
-        let tapCount = 0;
-        const SUPER_LIKE_HOLD_MS = 600;
+        let mainIndex = 0;
+        let activeShortId = null;
+        const mainLikes = new Map();
+        const shortLikes = new Map();
 
-        // ===== DOM REFS =====
+        // ===== DOM =====
         const mainVideo = document.getElementById('mainVideo');
-        const mainProgress = document.getElementById('mainProgress');
-        const mainTime = document.getElementById('mainTime');
+        const selectDropdown = document.getElementById('selectDropdown');
         const shortsGrid = document.getElementById('shortsGrid');
-        const selectorDropdown = document.getElementById('selectorDropdown');
 
         // ===== INIT =====
         function init() {
             renderSelector();
             renderShorts();
             setupMainVideo();
-            updateMainVideoUI();
+            updateMainUI();
             mainVideo.play();
+            mainVideo.muted = false;
         }
 
-        // ===== MAIN VIDEO SETUP =====
+        // ===== MAIN VIDEO =====
         function setupMainVideo() {
-            mainVideo.addEventListener('timeupdate', () => {
+            mainVideo.ontimeupdate = () => {
                 const pct = (mainVideo.currentTime / mainVideo.duration) * 100;
-                mainProgress.style.width = pct + '%';
-                mainTime.textContent = formatTime(mainVideo.currentTime) + ' / ' + formatTime(mainVideo.duration || 0);
-            });
-
-            // Click to play/pause
-            mainVideo.addEventListener('click', () => {
-                if (mainVideo.paused) mainVideo.play();
-                else mainVideo.pause();
-            });
-
-            // Progress bar seek
-            document.getElementById('progressContainer').addEventListener('click', (e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const pct = (e.clientX - rect.left) / rect.width;
-                mainVideo.currentTime = pct * mainVideo.duration;
-            });
+                document.getElementById('mainProgress').style.width = pct + '%';
+                document.getElementById('mainTime').textContent = fmt(mainVideo.currentTime) + ' / ' + fmt(mainVideo.duration || 0);
+            };
+            mainVideo.onclick = () => { mainVideo.paused ? mainVideo.play() : mainVideo.pause(); };
+            document.getElementById('progressWrap').onclick = (e) => {
+                const r = e.currentTarget.getBoundingClientRect();
+                mainVideo.currentTime = ((e.clientX - r.left) / r.width) * mainVideo.duration;
+            };
         }
 
-        function formatTime(s) {
+        function fmt(s) {
             if (!s || isNaN(s)) return '0:00';
-            const m = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
+            const m = Math.floor(s / 60), sec = Math.floor(s % 60);
             return m + ':' + (sec < 10 ? '0' : '') + sec;
         }
 
-        function toggleMainMute() {
+        function toggleMute() {
             mainVideo.muted = !mainVideo.muted;
             document.getElementById('mainMute').textContent = mainVideo.muted ? '🔇' : '🔊';
         }
 
-        // ===== VIDEO SELECTOR (ROUTE) =====
-        function renderSelector() {
-            selectorDropdown.innerHTML = mainVideos.map((v, i) => `
-                <div class="selector-item ${i === currentMainIndex ? 'active' : ''}" onclick="selectMainVideo(${i})">
-                    <img class="selector-thumb" src="${v.thumb}" alt="">
-                    <div class="selector-info">
-                        <div class="selector-title">${v.title}</div>
-                        <div class="selector-author">@${v.creator}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function toggleSelector() {
-            selectorDropdown.classList.toggle('open');
-        }
-
-        function selectMainVideo(index) {
-            currentMainIndex = index;
-            const v = mainVideos[index];
-            mainVideo.src = v.url;
-            mainVideo.play();
-            updateMainVideoUI();
-            renderSelector();
-            toggleSelector();
-        }
-
-        function updateMainVideoUI() {
-            const v = mainVideos[currentMainIndex];
+        function updateMainUI() {
+            const v = mainVideos[mainIndex];
             document.getElementById('mainTitle').textContent = v.title;
             document.getElementById('mainCreator').textContent = v.creator;
             document.getElementById('mainAvatar').textContent = v.avatar;
             document.getElementById('mainViews').textContent = v.views + ' views';
 
-            const state = mainLikeStates.get(v.id) || { count: v.likes, state: 'none' };
-            document.getElementById('mainLikeCount').textContent = state.count;
+            const st = mainLikes.get(v.id) || { count: v.likes, liked: false };
+            document.getElementById('mainLikeCount').textContent = st.count;
             const btn = document.getElementById('mainLikeBtn');
             const icon = document.getElementById('mainLikeIcon');
-            btn.classList.remove('liked', 'heart-burst', 'super-liked');
-
-            if (state.state === 'liked') { btn.classList.add('liked'); icon.textContent = '💜'; }
-            else if (state.state === 'heart') { btn.classList.add('heart-burst'); icon.textContent = '❤️'; }
-            else if (state.state === 'super') { btn.classList.add('super-liked'); icon.textContent = '💛'; }
-            else { icon.textContent = '🤍'; }
+            btn.classList.toggle('liked', st.liked);
+            icon.textContent = st.liked ? '💜' : '🤍';
         }
 
-        // ===== MAIN LIKE (DWIN SYSTEM) =====
-        function handleMainLike() {
-            const id = mainVideos[currentMainIndex].id;
-            let state = mainLikeStates.get(id) || { count: mainVideos[currentMainIndex].likes, state: 'none' };
-
-            if (state.state === 'none') {
-                state.count++;
-                state.state = 'liked';
-            } else {
-                state.count--;
-                state.state = 'none';
-            }
-            mainLikeStates.set(id, state);
-            updateMainVideoUI();
-            createFloatingHeart(document.getElementById('mainPlayer'), state.state === 'liked' ? '💜' : '🤍');
+        // Simple like main video
+        function likeMain() {
+            const id = mainVideos[mainIndex].id;
+            let st = mainLikes.get(id) || { count: mainVideos[mainIndex].likes, liked: false };
+            st.liked = !st.liked;
+            st.count += st.liked ? 1 : -1;
+            mainLikes.set(id, st);
+            updateMainUI();
         }
 
-        // ===== SHORTS RENDER =====
-        function renderShorts() {
-            document.getElementById('shortsCount').textContent = shortsData.length + ' shorts';
-            shortsGrid.innerHTML = shortsData.map(short => `
-                <div class="short-card" data-id="${short.id}" id="short-${short.id}">
-                    <img class="thumb" src="${short.thumb}" alt="${short.title}">
-                    <video class="short-video-inline" loop playsinline muted preload="metadata"></video>
-
-                    ${short.isNew ? '<div class="card-badge-new">NEW</div>' : ''}
-                    <button class="card-mute" onclick="toggleShortMute(event, ${short.id})">🔇</button>
-                    <button class="card-play" onclick="playShort(event, ${short.id})">▶</button>
-
-                    <div class="card-actions">
-                        <div class="card-action-row">
-                            <span class="icon">🤍</span>
-                            <span class="short-like-count-${short.id}">${short.likes}</span>
-                        </div>
-                        <div class="card-action-row">
-                            <span class="icon">💬</span>
-                            <span>${short.comments}</span>
-                        </div>
-                        <div class="card-action-row">
-                            <span class="icon">↗️</span>
-                            <span>Share</span>
-                        </div>
-                    </div>
-
-                    <div class="inline-player-controls">
-                        <div class="inline-progress">
-                            <div class="inline-progress-fill" id="short-progress-${short.id}"></div>
-                        </div>
-                        <span class="inline-time" id="short-time-${short.id}">0:00</span>
-                    </div>
-
-                    <div class="card-info">
-                        <div class="card-username">@${short.author}</div>
-                        <div class="card-desc">${short.title}</div>
+        // ===== VIDEO SELECTOR =====
+        function renderSelector() {
+            selectDropdown.innerHTML = mainVideos.map((v, i) => `
+                <div class="select-item ${i===mainIndex?'active':''}" onclick="selectMain(${i})">
+                    <img class="select-thumb" src="${v.thumb}">
+                    <div>
+                        <div class="select-title">${v.title}</div>
+                        <div class="select-author">@${v.creator}</div>
                     </div>
                 </div>
             `).join('');
-
-            // Attach gesture handlers to each short card
-            shortsData.forEach(short => {
-                const card = document.getElementById(`short-${short.id}`);
-                attachShortGestures(card, short.id);
-            });
         }
 
-        // ===== SHORT INLINE PLAY =====
-        function playShort(e, id) {
-            e.stopPropagation();
-            const short = shortsData.find(s => s.id === id);
-            const card = document.getElementById(`short-${id}`);
-            const video = card.querySelector('.short-video-inline');
+        function toggleSelect() {
+            selectDropdown.classList.toggle('open');
+        }
 
-            // Stop any other playing short
-            if (currentShortId && currentShortId !== id) {
-                const prevCard = document.getElementById(`short-${currentShortId}`);
-                if (prevCard) {
-                    prevCard.classList.remove('active', 'playing');
-                    const prevVideo = prevCard.querySelector('.short-video-inline');
-                    prevVideo.pause();
-                    prevVideo.currentTime = 0;
-                    prevVideo.src = '';
+        function selectMain(i) {
+            mainIndex = i;
+            const v = mainVideos[i];
+            mainVideo.src = v.url;
+            mainVideo.play();
+            mainVideo.muted = false;
+            updateMainUI();
+            renderSelector();
+            toggleSelect();
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.video-select')) selectDropdown.classList.remove('open');
+        });
+
+        function shareMain() {
+            const v = mainVideos[mainIndex];
+            if (navigator.share) navigator.share({ title: v.title, text: 'Check out ' + v.title + ' on Ddott TV!' });
+            else alert('🔗 Link copied: ddott.live/video/' + v.id);
+        }
+
+        // ===== SHORTS =====
+        function renderShorts() {
+            document.getElementById('shortsCount').textContent = shortsData.length + ' shorts';
+            shortsGrid.innerHTML = shortsData.map(s => `
+                <div class="short-card" id="sc-${s.id}">
+                    <div class="card-visual" id="cv-${s.id}">
+                        <img src="${s.thumb}" alt="${s.title}">
+                        <video loop playsinline muted preload="metadata"></video>
+
+                        ${s.isNew ? '<div class="badge-new">NEW</div>' : ''}
+                        <button class="card-mute" onclick="event.stopPropagation();toggleShortMute(${s.id})">🔇</button>
+                        <button class="card-play" onclick="event.stopPropagation();playShort(${s.id})">▶</button>
+
+                        <div class="card-actions">
+                            <div class="ca-row">
+                                <button class="ca-btn" onclick="event.stopPropagation();likeShort(${s.id})">🤍</button>
+                                <span id="sl-${s.id}">${s.likes}</span>
+                            </div>
+                            <div class="ca-row">
+                                <button class="ca-btn" onclick="event.stopPropagation();alert('💬 Comment')">💬</button>
+                                <span>${s.comments}</span>
+                            </div>
+                            <div class="ca-row">
+                                <button class="ca-btn" onclick="event.stopPropagation();alert('↗️ Share')">↗️</button>
+                                <span>Share</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-user">@${s.author}</div>
+                        <div class="card-desc">${s.title}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playShort(id) {
+            const s = shortsData.find(x => x.id === id);
+            const cv = document.getElementById(`cv-${id}`);
+            const vid = cv.querySelector('video');
+
+            // Stop previous
+            if (activeShortId && activeShortId !== id) {
+                const prev = document.getElementById(`cv-${activeShortId}`);
+                if (prev) {
+                    prev.classList.remove('playing', 'active');
+                    const pv = prev.querySelector('video');
+                    pv.pause(); pv.currentTime = 0; pv.src = '';
                 }
             }
 
-            currentShortId = id;
-            card.classList.add('active', 'playing');
-            video.src = short.url;
-            video.muted = false;
-            video.play();
+            activeShortId = id;
+            cv.classList.add('playing', 'active');
+            vid.src = s.url;
+            vid.muted = false;
+            vid.play();
 
-            // Update progress
-            video.ontimeupdate = () => {
-                const pct = (video.currentTime / video.duration) * 100;
-                document.getElementById(`short-progress-${id}`).style.width = pct + '%';
-                document.getElementById(`short-time-${id}`).textContent = formatTime(video.currentTime);
-            };
-
-            video.onended = () => {
-                card.classList.remove('playing', 'active');
-                video.src = '';
-                currentShortId = null;
+            vid.onended = () => {
+                cv.classList.remove('playing', 'active');
+                vid.src = '';
+                activeShortId = null;
             };
         }
 
-        function toggleShortMute(e, id) {
-            e.stopPropagation();
-            const card = document.getElementById(`short-${id}`);
-            const video = card.querySelector('.short-video-inline');
-            const btn = card.querySelector('.card-mute');
-            if (video) {
-                video.muted = !video.muted;
-                btn.textContent = video.muted ? '🔇' : '🔊';
+        function toggleShortMute(id) {
+            const cv = document.getElementById(`cv-${id}`);
+            const vid = cv.querySelector('video');
+            const btn = cv.querySelector('.card-mute');
+            if (vid.src) {
+                vid.muted = !vid.muted;
+                btn.textContent = vid.muted ? '🔇' : '🔊';
             }
         }
 
-        // ===== SHORT GESTURES (DWIN LIKE SYSTEM) =====
-        function attachShortGestures(card, id) {
-            let pressStartTime = 0;
-            let pressX = 0;
-            let pressY = 0;
-            let hasSuper = false;
+        // Simple like short
+        function likeShort(id) {
+            const s = shortsData.find(x => x.id === id);
+            let st = shortLikes.get(id) || { count: s.likes, liked: false };
+            st.liked = !st.liked;
+            st.count += st.liked ? 1 : -1;
+            shortLikes.set(id, st);
+            document.getElementById(`sl-${id}`).textContent = st.count;
 
-            const start = (e) => {
-                const t = e.touches ? e.touches[0] : e;
-                pressStartTime = Date.now();
-                pressX = t.clientX;
-                pressY = t.clientY;
-                isPressing = true;
-                hasSuper = false;
-
-                pressTimer = setTimeout(() => {
-                    if (isPressing) {
-                        hasSuper = true;
-                        triggerShortSuperLike(card, id, pressX, pressY);
-                    }
-                }, SUPER_LIKE_HOLD_MS);
-            };
-
-            const end = (e) => {
-                const duration = Date.now() - pressStartTime;
-                isPressing = false;
-                clearTimeout(pressTimer);
-                if (hasSuper) return;
-
-                const t = e.changedTouches ? e.changedTouches[0] : e;
-                const dx = Math.abs((t.clientX || t.pageX) - pressX);
-                const dy = Math.abs((t.clientY || t.pageY) - pressY);
-                if (dx > 10 || dy > 10) return;
-
-                if (duration < SUPER_LIKE_HOLD_MS) {
-                    handleShortTap(card, id, t.clientX || t.pageX, t.clientY || t.pageY);
-                }
-            };
-
-            const move = (e) => {
-                if (!isPressing) return;
-                const t = e.touches ? e.touches[0] : e;
-                if (Math.abs(t.clientX - pressX) > 20 || Math.abs(t.clientY - pressY) > 20) {
-                    isPressing = false;
-                    clearTimeout(pressTimer);
-                }
-            };
-
-            card.addEventListener('touchstart', start, { passive: true });
-            card.addEventListener('touchend', end, { passive: true });
-            card.addEventListener('touchmove', move, { passive: true });
-            card.addEventListener('mousedown', start);
-            card.addEventListener('mouseup', end);
+            const btn = document.querySelector(`#sc-${id} .ca-btn`);
+            if (btn) btn.textContent = st.liked ? '💜' : '🤍';
         }
 
-        function handleShortTap(card, id, x, y) {
-            const now = Date.now();
-            if (now - lastTapTime < 300) {
-                tapCount++;
-                if (tapCount === 2) {
-                    triggerShortHeartBurst(card, id);
-                    tapCount = 0;
-                }
-            } else {
-                tapCount = 1;
-                setTimeout(() => {
-                    if (tapCount === 1) {
-                        triggerShortSingleLike(card, id);
-                        // Also play the short if not playing
-                        if (currentShortId !== id) {
-                            const playBtn = card.querySelector('.card-play');
-                            if (playBtn) playBtn.click();
-                        }
-                    }
-                    tapCount = 0;
-                }, 300);
-            }
-            lastTapTime = now;
-        }
-
-        function triggerShortSingleLike(card, id) {
-            const short = shortsData.find(s => s.id === id);
-            let state = shortLikeStates.get(id) || { count: short.likes, state: 'none' };
-            const countEl = card.querySelector(`.short-like-count-${id}`);
-            const iconRow = card.querySelector('.card-action-row .icon');
-
-            if (state.state === 'none') {
-                state.count++;
-                state.state = 'liked';
-                if (iconRow) iconRow.textContent = '💜';
-            } else {
-                state.count = Math.max(0, state.count - 1);
-                state.state = 'none';
-                if (iconRow) iconRow.textContent = '🤍';
-            }
-
-            if (countEl) countEl.textContent = state.count;
-            shortLikeStates.set(id, state);
-            createFloatingHeart(card, state.state === 'liked' ? '💜' : '🤍');
-        }
-
-        function triggerShortHeartBurst(card, id) {
-            const short = shortsData.find(s => s.id === id);
-            let state = shortLikeStates.get(id) || { count: short.likes, state: 'none' };
-            if (state.state !== 'heart') {
-                state.count += 2;
-                state.state = 'heart';
-            }
-            const countEl = card.querySelector(`.short-like-count-${id}`);
-            if (countEl) countEl.textContent = state.count;
-            shortLikeStates.set(id, state);
-
-            const iconRow = card.querySelector('.card-action-row .icon');
-            if (iconRow) iconRow.textContent = '❤️';
-
-            for (let i = 0; i < 4; i++) {
-                setTimeout(() => createFloatingHeart(card, '❤️'), i * 80);
-            }
-            setTimeout(() => { if (iconRow) iconRow.textContent = '💜'; }, 500);
-        }
-
-        function triggerShortSuperLike(card, id, x, y) {
-            const short = shortsData.find(s => s.id === id);
-            let state = shortLikeStates.get(id) || { count: short.likes, state: 'none' };
-            if (state.state !== 'super') {
-                state.count += 5;
-                state.state = 'super';
-            }
-            const countEl = card.querySelector(`.short-like-count-${id}`);
-            if (countEl) countEl.textContent = state.count;
-            shortLikeStates.set(id, state);
-
-            const iconRow = card.querySelector('.card-action-row .icon');
-            if (iconRow) iconRow.textContent = '💛';
-
-            // Haptic ring
-            const ring = document.createElement('div');
-            ring.className = 'haptic-ring';
-            const rect = card.getBoundingClientRect();
-            ring.style.left = (x - rect.left) + 'px';
-            ring.style.top = (y - rect.top) + 'px';
-            card.appendChild(ring);
-            setTimeout(() => ring.remove(), 800);
-
-            // Super text
-            const text = document.createElement('div');
-            text.className = 'super-text';
-            text.textContent = 'SUPER LIKE!';
-            text.style.left = '20px';
-            text.style.top = '40px';
-            card.appendChild(text);
-            setTimeout(() => text.remove(), 1200);
-
-            // Coin pop
-            const coin = document.createElement('div');
-            coin.className = 'coin-pop';
-            coin.innerHTML = '🪙 +1';
-            coin.style.left = '20px';
-            coin.style.top = '60px';
-            card.appendChild(coin);
-            setTimeout(() => coin.remove(), 1000);
-
-            emoCoins += 1;
-            document.getElementById('coinCount').textContent = emoCoins;
-            if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
-
-            setTimeout(() => { if (iconRow) iconRow.textContent = '💛'; }, 600);
-        }
-
-        // ===== FLOATING HEART =====
-        function createFloatingHeart(container, emoji) {
-            const heart = document.createElement('div');
-            heart.className = 'floating-heart';
-            heart.textContent = emoji;
-            const rect = container.getBoundingClientRect();
-            heart.style.left = (rect.width / 2 + (Math.random() - 0.5) * 60) + 'px';
-            heart.style.top = (rect.height / 2 + (Math.random() - 0.5) * 40) + 'px';
-            container.appendChild(heart);
-            setTimeout(() => heart.remove(), 1000);
-        }
-
-        // ===== CHAT & SHARE =====
-        function openChat() {
-            alert('💬 Chat opened for: ' + mainVideos[currentMainIndex].title);
-        }
-
-        function shareVideo() {
-            const v = mainVideos[currentMainIndex];
-            if (navigator.share) {
-                navigator.share({ title: v.title, text: 'Check out ' + v.title + ' on Ddott TV!' });
-            } else {
-                alert('🔗 Link copied: ddott.live/video/' + v.id);
-            }
-        }
-
-        // ===== NAV ACTIVE STATE =====
+        // ===== NAV =====
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             });
-        });
-
-        // Close selector on outside click
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.video-selector')) {
-                selectorDropdown.classList.remove('open');
-            }
         });
 
         // ===== START =====
