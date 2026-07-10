@@ -43,98 +43,6 @@
             flex-direction: column;
         }
 
-        /* ===== HEADER ===== */
-        .header {
-            height: 52px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 14px;
-            flex-shrink: 0;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-center {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            max-width: 220px;
-            margin: 0 10px;
-        }
-
-        .search-pill {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 8px 14px;
-            border-radius: 20px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .h-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            font-size: 18px;
-        }
-
-        .h-icon.gold {
-            background: rgba(251, 191, 36, 0.08);
-            border-color: rgba(251, 191, 36, 0.2);
-        }
-
-        .h-icon.notif::after {
-            content: '';
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: var(--pink);
-            border-radius: 50%;
-            border: 2px solid var(--bg);
-        }
-
-        .h-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 16px;
-            border: 2px solid rgba(255,255,255,0.15);
-            cursor: pointer;
-        }
-
         /* ===== SUB HEADER ===== */
         .sub-header {
             height: 44px;
@@ -726,22 +634,6 @@
 </head>
 <body>
     <div id="app">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="logo">DDOTT.TV</div>
-            <div class="header-center">
-                <div class="search-pill">
-                    <span>🔍</span>
-                    <span>Search...</span>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="h-icon gold" title="Coins">🏛️</div>
-                <div class="h-icon notif" title="Notifications">🔔</div>
-                <div class="h-avatar">D</div>
-            </div>
-        </div>
-
         <!-- SUB HEADER -->
         <div class="sub-header">
             <button class="back-circle">←</button>
@@ -909,7 +801,7 @@
             setupMainVideo();
             updateMainUI();
             mainVideo.play();
-            mainVideo.muted = false;
+            mainVideo.muted = true;
         }
 
         // ===== MAIN VIDEO =====
