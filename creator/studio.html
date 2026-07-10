@@ -170,7 +170,7 @@ select option { background: #0d0d0d; }
         <input type="radio" name="videoType" value="short" onchange="setVideoType(this.value)" style="display:none;">
         <span style="font-size:1.5rem;">⚡</span>
         <div>
-          <div style="font-weight:bold;">Short</div>
+          <div style="font-weight:bold;">Drott</div>
           <div style="color:#b300ff; font-size:0.75rem;">3x Emo Coins 🔥</div>
         </div>
       </label>
@@ -319,7 +319,7 @@ function renderVideos(videos) {
 
   list.innerHTML = videos.map(v => `
     <div class="video-card" onclick="playVideo('${v.id}', '${encodeURIComponent(v.video_url || '')}', '${encodeURIComponent(v.title || 'Untitled')}')">
-      <div class="video-thumb" style="position:relative;">${v.thumbnail || '🎬'}${v.is_short ? '<div style="position:absolute;top:4px;left:4px;background:rgba(0,210,255,0.9);padding:2px 6px;border-radius:4px;font-size:9px;font-family:monospace;color:#fff;">⚡ SHORT</div>' : ''}</div>
+      <div class="video-thumb" style="position:relative;">${v.thumbnail || '🎬'}${v.is_short ? '<div style="position:absolute;top:4px;left:4px;background:rgba(0,210,255,0.9);padding:2px 6px;border-radius:4px;font-size:9px;font-family:monospace;color:#fff;">⚡ DROTT</div>' : ''}</div>
       <div class="video-info">
         <div class="video-title">${v.title || 'Untitled'}</div>
         <div class="video-meta">${v.category || 'General'} · ${formatDate(v.created_at)}</div>

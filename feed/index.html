@@ -67,7 +67,7 @@ function renderFeed() {
     return '<div class="video-card" onclick="openVideo(this)" data-id="'+v.id+'" data-url="'+encodeURIComponent(v.video_url||'')+'" data-title="'+encodeURIComponent(v.title||'')+'" data-short="'+(v.is_short?'1':'0')+'">'
       +'<div class="thumb">'
       +(v.thumbnail_url ? '<img src="'+v.thumbnail_url+'" onerror="this.style.display=\'none\'">' : '🎬')
-      +(v.is_short ? '<div class="short-badge">⚡ SHORT</div>' : '')
+      +(v.is_short ? '<div class="short-badge">⚡ DROTT</div>' : '')
       +'</div>'
       +'<div class="card-info">'
       +'<div class="creator-row"><div class="creator-avatar">'+initial+'</div><span class="creator-name">'+creator+'</span></div>'

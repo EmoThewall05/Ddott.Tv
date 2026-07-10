@@ -33,7 +33,7 @@ async function loadVideos() {
           ${v.thumbnail_url ? `<img src="${v.thumbnail_url}" style="width:100%;height:100%;object-fit:cover;">` : '🎬'}
         </div>
         <div class="vc-earn">+5🪙</div>
-        ${v.is_short ? `<div style="position:absolute;top:6px;left:6px;background:#7c3aed;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px;">⚡ SHORT</div>` : `<div style="position:absolute;top:6px;left:6px;background:#0e7490;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px;">🎬 VIDEO</div>`}
+        ${v.is_short ? `<div style="position:absolute;top:6px;left:6px;background:#7c3aed;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px;">⚡ DROTT</div>` : `<div style="position:absolute;top:6px;left:6px;background:#0e7490;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px;">🎬 VIDEO</div>`}
       </div>
       <div class="vc-info">
         <div class="vc-top">

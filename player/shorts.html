@@ -114,7 +114,7 @@
 
     <div class="empty-state" id="emptyState">
         <div class="icon">🎬</div>
-        <div style="font-size:16px;font-weight:600">No shorts yet</div>
+        <div style="font-size:16px;font-weight:600">No drotts yet</div>
         <div style="font-size:13px">Shorts upload ചെയ്യുക!</div>
     </div>
 
@@ -149,7 +149,7 @@
             <div class="play-indicator" id="spPlayIndicator">▶️</div>
         </div>
         <div class="strip-section">
-            <div class="strip-header">⚡ SHORTS <span id="stripCount" style="color:var(--text-muted);font-weight:400;margin-left:4px"></span></div>
+            <div class="strip-header">⚡ DROTTS <span id="stripCount" style="color:var(--text-muted);font-weight:400;margin-left:4px"></span></div>
             <div class="strip-scroll" id="stripScroll"></div>
         </div>
     </div>
@@ -169,7 +169,7 @@ const SUPA_URL = 'https://havmduragglvstlxrgag.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-let shortsData = [];
+let drottsData = [];
 let currentIndex = 0;
 let currentMode = 'full';
 let emoCoins = 0;
@@ -203,7 +203,7 @@ async function init() {
         }
     } catch(e) {}
 
-    // Fetch shorts
+    // Fetch drotts
     await fetchShorts();
     setupViewToggle();
     setupProgress();
@@ -225,7 +225,7 @@ async function fetchShorts() {
             return;
         }
 
-        shortsData = data;
+        drottsData = data;
         renderFullScroll();
         renderStrip();
         setupIntersectionObserver();
@@ -240,7 +240,7 @@ async function fetchShorts() {
 
 // ===== RENDER FULL SCROLL =====
 function renderFullScroll() {
-    fullContainer.innerHTML = shortsData.map((s, i) => `
+    fullContainer.innerHTML = drottsData.map((s, i) => `
         <div class="short-item" data-index="${i}" data-id="${s.id}" style="height:calc(100vh - 116px)">
             <video class="short-video" src="${s.video_url}" loop playsinline muted preload="metadata"></video>
             <div class="video-overlay"></div>
@@ -276,8 +276,8 @@ function renderFullScroll() {
 
 // ===== RENDER STRIP =====
 function renderStrip() {
-    document.getElementById('stripCount').textContent = shortsData.length + ' shorts';
-    stripScroll.innerHTML = shortsData.map((s, i) => `
+    document.getElementById('stripCount').textContent = drottsData.length + ' drotts';
+    stripScroll.innerHTML = drottsData.map((s, i) => `
         <div class="strip-item ${i===0?'active':''}" id="strip-${s.id}" onclick="playSplit(${i})">
             <img src="${s.thumbnail_url||''}" loading="lazy" onerror="this.style.background='#1a1a2e'">
             <div class="strip-overlay">▶ ${s.views||0}</div>
@@ -335,7 +335,7 @@ function setupViewToggle() {
 // ===== PLAY SPLIT =====
 function playSplit(index) {
     currentIndex = index;
-    const s = shortsData[index];
+    const s = drottsData[index];
     splitVideo.src = s.video_url;
     splitVideo.muted = true;
     splitVideo.play().then(() => { splitVideo.muted = false; }).catch(() => {});
@@ -421,7 +421,7 @@ document.getElementById('spLikeBtn').addEventListener('click', e => {
 
 // ===== SINGLE LIKE =====
 function triggerSingleLike(element, isSplit) {
-    const s = shortsData[currentIndex];
+    const s = drottsData[currentIndex];
     if (!s) return;
     let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
     if (st.state === 'super') return;
@@ -439,7 +439,7 @@ function triggerSingleLike(element, isSplit) {
 
 // ===== HEART BURST =====
 function triggerHeartBurst(element, x, y, isSplit) {
-    const s = shortsData[currentIndex];
+    const s = drottsData[currentIndex];
     if (!s) return;
     let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
     if (st.state === 'super') return;
@@ -454,7 +454,7 @@ function triggerHeartBurst(element, x, y, isSplit) {
 
 // ===== SUPER LIKE =====
 function triggerSuperLike(element, x, y, isSplit) {
-    const s = shortsData[currentIndex];
+    const s = drottsData[currentIndex];
     if (!s) return;
     let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
     if (st.state === 'super') return;
@@ -525,7 +525,7 @@ function updateLikeUI(id, st, element, isSplit) {
 }
 
 function updateSplitLikeUI() {
-    const s = shortsData[currentIndex];
+    const s = drottsData[currentIndex];
     if (!s) return;
     const st = likeStates.get(s.id) || { count: s.likes||0, state:'none' };
     const btn = document.getElementById('spLikeBtn');
@@ -662,9 +662,9 @@ async function postComment() {
             // Update split view count
             const spEl = document.getElementById('spComments');
             if (spEl) spEl.textContent = newCount;
-            // Update shortsData cache
-            const idx = shortsData.findIndex(s => s.id === currentCommentVideoId);
-            if (idx !== -1) shortsData[idx].comments = newCount;
+            // Update drottsData cache
+            const idx = drottsData.findIndex(s => s.id === currentCommentVideoId);
+            if (idx !== -1) drottsData[idx].comments = newCount;
         }
         loadComments(currentCommentVideoId);
     } catch(e) {
