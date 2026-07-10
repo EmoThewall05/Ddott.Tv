@@ -46,7 +46,7 @@
 
         /* ===== MAIN PLAYER (60%) ===== */
         .main-player {
-            height: 53dvh;
+            height: 60dvh;
             flex-shrink: 0;
             min-height: 0;
             position: relative;
@@ -800,9 +800,12 @@
             renderSelector();
             renderShorts();
             setupMainVideo();
+            if (mainVideos.length > 0) {
+                mainVideo.src = mainVideos[0].url;
+                mainVideo.muted = true;
+                mainVideo.play().catch(() => {});
+            }
             updateMainUI();
-            mainVideo.play();
-            mainVideo.muted = true;
         }
 
         // ===== MAIN VIDEO =====
