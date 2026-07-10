@@ -1,308 +1,1621 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Ddott.TV — Player V3</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ddott TV - Split Player</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a12;
+            --bg-secondary: #0f0f1a;
+            --bg-card: #16162a;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+            --accent-gold: #fbbf24;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border: rgba(255,255,255,0.06);
+            --gradient-bar: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899);
+        }
 
-let activeShortEl = null;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
 
-function switchSoundToShort(el, s) {
-    const mainVidEl = document.getElementById('mainVid');
-    const id = s.id;
-    const svEl = el.querySelector('video');
-    const muteEl = el.querySelector('[id^="smute-"]');
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+        }
 
-    // Debug toast
-    showToast('tap ok | vid:' + (svEl ? svEl.src.slice(-20) : 'NULL'));
+        #app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
 
-    if (!svEl) return;
+        /* ===== TOP BAR (Browser style) ===== */
+        .top-bar {
+            height: 48px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
 
-    // If already active short - toggle back to main
-    if (activeShortEl === el) {
-        svEl.muted = true;
-        svEl.pause();
-        svEl.style.display = 'none';
-        if (muteEl) muteEl.textContent = '🔇';
-        if (mainVidEl) mainVidEl.muted = false;
-        activeShortEl = null;
-        return;
-    }
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    // Mute any previous active short
-    if (activeShortEl) {
-        const prevSv = activeShortEl.querySelector('video');
-        const prevMute = activeShortEl.querySelector('[id^="smute-"]');
-        if (prevSv) { prevSv.muted = true; prevSv.pause(); prevSv.style.display = 'none'; }
-        if (prevMute) prevMute.textContent = '🔇';
-    }
+        .home-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--text-primary);
+        }
 
-    // Play this short with sound, mute main
-    if (mainVidEl) mainVidEl.muted = true;
-    svEl.style.display = 'block';
-    svEl.muted = false;
-    svEl.play().catch(() => { svEl.muted = true; svEl.play(); });
-    if (muteEl) muteEl.textContent = '🔊';
-    activeShortEl = el;
-}
+        .url-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
 
-function shareShort(id, title) {
-    const url = location.origin + '/player/shorts.html?id=' + id;
-    if (navigator.share) {
-        navigator.share({ title: title || 'Ddott Short', text: 'Watch on Ddott.TV ⚡', url });
-    } else {
-        navigator.clipboard && navigator.clipboard.writeText(url).then(() => {
-            showToast('✅ Link copied!');
-        });
-    }
-}
+        .url-bar .secure-icon {
+            font-size: 12px;
+        }
 
-function openShortComments(id) {
-    location.href = '/player/shorts.html?id=' + id;
-}
-</script>
-<script src="../supabase-config.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#07000f;--bg2:#0f0020;--surface:rgba(255,255,255,0.06);
-  --border:rgba(255,255,255,0.09);--cyan:#00e5ff;--purple:#b44fff;
-  --pink:#ff2d9b;--gold:#ffd700;--text:#f0e8ff;--muted:#7a6a94;
-  --divider:rgba(180,79,255,0.25);
-}
-html,body{height:100%;background:var(--bg);font-family:'Space Grotesk',sans-serif;color:var(--text);overflow:hidden;-webkit-tap-highlight-color:transparent;}
-.shell{display:flex;flex-direction:column;height:100vh;height:100dvh;}
-.topnav{height:48px;flex-shrink:0;display:flex;align-items:center;padding:0 16px;gap:12px;background:rgba(7,0,15,0.97);border-bottom:1px solid var(--border);z-index:50;}
-.back-btn{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--cyan);flex-shrink:0;}
-.nav-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.coin-pill{display:flex;align-items:center;gap:4px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.22);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;}
-.split{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.main-player{flex:0 0 58%;position:relative;background:#000;overflow:hidden;}
-video.main-vid{width:100%;height:100%;object-fit:cover;display:block;}
-.vid-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:5;transition:opacity 0.3s;}
-.vid-loading.hidden{opacity:0;pointer-events:none;}
-.spinner{width:44px;height:44px;border:2.5px solid rgba(0,229,255,0.2);border-top-color:var(--cyan);border-radius:50%;animation:spin 0.9s linear infinite;margin-bottom:10px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-lbl{font-size:12px;color:var(--cyan);letter-spacing:1px;}
-.vid-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,0,15,0.85) 0%,transparent 40%);pointer-events:none;z-index:2;}
-.vid-info{position:absolute;bottom:0;left:0;right:0;z-index:3;padding:10px 14px 8px;}
-.vid-title-text{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.vid-meta-row{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);}
-.creator-chip{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 8px 3px 4px;}
-.creator-chip-av{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#000;}
-.creator-chip-name{font-size:11px;font-weight:600;color:var(--text);}
-.ctrl-bar{position:absolute;bottom:52px;left:0;right:0;z-index:4;padding:0 14px;display:flex;align-items:center;gap:10px;opacity:0;transition:opacity 0.25s;}
-.main-player.show-ctrl .ctrl-bar{opacity:1;}
-.prog-wrap{flex:1;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;cursor:pointer;}
-.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));width:0%;transition:width 0.15s linear;}
-.ctrl-btn{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;padding:2px;opacity:0.9;line-height:1;}
-.time-lbl{font-size:10px;color:rgba(255,255,255,0.7);font-variant-numeric:tabular-nums;white-space:nowrap;}
-.vid-actions{position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;gap:10px;}
-.vact-btn{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
-.vact-icon{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:16px;backdrop-filter:blur(8px);transition:all 0.2s;}
-.vact-lbl{font-size:9px;color:rgba(255,255,255,0.7);font-weight:600;}
-.divider{flex-shrink:0;height:32px;background:linear-gradient(180deg,rgba(7,0,15,0.95),rgba(15,0,32,0.98));border-top:1px solid var(--divider);border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:10;}
-.div-label{display:flex;align-items:center;gap:6px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purple);}
-.div-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);animation:pulse 1.5s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
-.div-count{font-size:10px;color:var(--muted);}
-.shorts-feed{flex:1;position:relative;overflow:hidden;background:var(--bg2);}
-.shorts-scroll{display:flex;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-.shorts-scroll::-webkit-scrollbar{display:none;}
-.short-card{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;flex-shrink:0;width:calc(100vw * 0.42);height:100%;scroll-snap-align:start;position:relative;overflow:hidden;cursor:pointer;border-right:1px solid var(--border);background:var(--bg);transition:transform 0.2s;}
-.short-card:active{transform:scale(0.97);}
-.short-thumb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-.short-thumb-bg{position:absolute;inset:0;}
-.short-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,0,15,0.92) 0%,transparent 55%);pointer-events:none;}
-.short-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:14px;backdrop-filter:blur(6px);padding-left:2px;}
-.short-info{position:absolute;bottom:0;left:0;right:0;padding:8px 10px;z-index:5;}
-.short-creator{font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.short-title-txt{font-size:10px;color:var(--muted);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.short-actions{position:absolute;right:6px;bottom:60px;z-index:6;display:flex;flex-direction:column;gap:10px;align-items:center;}
-.sa-btn{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
-.sa-icon{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:13px;backdrop-filter:blur(8px);transition:all 0.2s;position:relative;}
-.sa-count{font-size:8px;color:rgba(255,255,255,0.65);font-weight:600;}
-.sa-btn.liked .sa-icon{border-color:rgba(219,39,119,0.5);box-shadow:0 0 12px rgba(219,39,119,0.25);}
-.sa-btn.super-liked .sa-icon{background:linear-gradient(135deg,#db2777,#f59e0b);border-color:transparent;box-shadow:0 0 16px rgba(219,39,119,0.4);}
-.s-charge-ring{position:absolute;inset:-5px;border-radius:50%;border:2px solid transparent;border-top-color:var(--gold);opacity:0;animation:spin 0.8s linear infinite;}
-.sa-btn.charging .s-charge-ring{opacity:1;}
-.now-playing{position:absolute;top:8px;left:8px;z-index:7;display:flex;align-items:center;gap:4px;background:rgba(180,79,255,0.2);border:1px solid rgba(180,79,255,0.4);border-radius:20px;padding:2px 8px;font-size:8px;font-weight:700;color:#c084fc;letter-spacing:1px;text-transform:uppercase;}
-.np-dot{width:4px;height:4px;border-radius:50%;background:#c084fc;animation:pulse 1s ease-in-out infinite;}
-.shorts-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px;}
-.shorts-empty-icon{font-size:32px;opacity:0.5;}
-.shorts-empty-txt{font-size:12px;color:var(--muted);}
-.bottom-nav{flex-shrink:0;height:calc(52px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(7,0,15,0.97);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:50;}
-.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 12px;text-decoration:none;color:var(--muted);transition:color 0.2s;}
-.bnav-item.active{color:var(--cyan);}
-.bnav-icon{font-size:18px;}
-.bnav-lbl{font-size:9px;font-weight:600;letter-spacing:0.5px;}
-.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(124,58,237,0.95);backdrop-filter:blur(12px);color:white;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:999;white-space:nowrap;border:1px solid rgba(167,139,250,0.4);opacity:0;transition:all 0.25s;pointer-events:none;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-@media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms !important;transition-duration:0.01ms !important}}
-</style>
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .top-bar-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            height: 56px;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            justify-content: center;
+            max-width: 300px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px 16px;
+            border-radius: 24px;
+            color: var(--text-muted);
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .header-icon-btn.gold {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .header-icon-btn.notif::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-pink);
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+        }
+
+        .avatar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+        }
+
+        /* ===== SUB HEADER ===== */
+        .sub-header {
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .coin-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .coin-display .coin-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #000;
+        }
+
+        /* ===== MAIN VIDEO PLAYER (TOP) ===== */
+        .main-player {
+            position: relative;
+            height: 55%;
+            min-height: 320px;
+            background: #000;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .main-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .main-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 16px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 30%, rgba(0,0,0,0.2) 100%);
+        }
+
+        /* Progress bar */
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-bar);
+            width: 0%;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+        }
+
+        .time-display {
+            position: absolute;
+            bottom: 10px;
+            right: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+
+        .mute-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        /* Video info overlay */
+        .video-meta {
+            margin-bottom: 8px;
+        }
+
+        .video-title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .play-mini {
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .video-title-main {
+            font-size: 18px;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .creator-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .creator-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .creator-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Side actions */
+        .side-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            pointer-events: auto;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .action-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(20, 20, 35, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:active .action-circle { transform: scale(0.92); }
+
+        .action-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Like states */
+        .like-btn.liked .action-circle {
+            background: rgba(139, 92, 246, 0.25);
+            border-color: var(--accent-purple);
+        }
+        .like-btn.liked .action-label { color: var(--accent-purple); }
+
+        .like-btn.heart-burst .action-circle {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+            animation: heartBurst 0.5s ease;
+        }
+
+        .like-btn.super-liked .action-circle {
+            background: rgba(251, 191, 36, 0.25);
+            border-color: var(--accent-gold);
+            animation: superPulse 0.6s ease;
+        }
+        .like-btn.super-liked .action-label { color: var(--accent-gold); }
+
+        @keyframes heartBurst {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.35); }
+            60% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes superPulse {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.45); }
+            50% { transform: scale(0.85); }
+            75% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* ===== VIDEO SELECTOR (Route) ===== */
+        .video-selector {
+            position: absolute;
+            top: 56px;
+            left: 14px;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .selector-trigger {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .selector-dropdown {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 101;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .selector-dropdown.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .selector-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .selector-item:hover { background: rgba(255,255,255,0.05); }
+        .selector-item.active { background: rgba(139, 92, 246, 0.15); }
+
+        .selector-thumb {
+            width: 48px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #333;
+        }
+
+        .selector-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .selector-title {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .selector-author {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ===== SHORTS SECTION (BOTTOM) ===== */
+        .shorts-section {
+            flex: 1;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .shorts-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            flex-shrink: 0;
+        }
+
+        .shorts-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent-purple);
+        }
+
+        .shorts-title .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-pink);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .shorts-title .bolt {
+            font-size: 16px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .shorts-count {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .shorts-grid {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: flex;
+            gap: 10px;
+            padding: 0 14px 10px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .shorts-grid::-webkit-scrollbar { display: none; }
+
+        .short-card {
+            flex: 0 0 160px;
+            height: 100%;
+            max-height: 280px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            scroll-snap-align: start;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .short-card:hover { border-color: rgba(139, 92, 246, 0.3); }
+        .short-card.active {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .short-card .thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .short-card .short-video-inline {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+            z-index: 2;
+        }
+
+        .short-card.playing .short-video-inline { display: block; }
+        .short-card.playing .thumb { opacity: 0; }
+
+        /* Card overlays */
+        .card-badge-new {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(139, 92, 246, 0.9);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            z-index: 3;
+        }
+
+        .card-mute {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 26px;
+            height: 26px;
+            background: rgba(239, 68, 68, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            z-index: 3;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .card-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            z-index: 3;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .card-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            z-index: 3;
+        }
+
+        .card-action-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .card-action-row .icon { font-size: 14px; }
+
+        .card-info {
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            padding: 6px 0;
+        }
+
+        .card-username {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .card-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Inline player overlay when short is playing */
+        .inline-player-controls {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 4;
+        }
+
+        .short-card.playing .inline-player-controls { display: flex; }
+
+        .inline-progress {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .inline-progress-fill {
+            height: 100%;
+            background: var(--gradient-bar);
+            width: 0%;
+        }
+
+        .inline-time {
+            font-size: 10px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            height: 64px;
+            background: rgba(10, 10, 18, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 6px 10px;
+        }
+
+        .nav-item.active { color: var(--accent-purple); }
+        .nav-item svg { width: 24px; height: 24px; }
+
+        /* ===== ANIMATIONS ===== */
+        .floating-heart {
+            position: absolute;
+            font-size: 36px;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
+            filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.3); }
+        }
+
+        .haptic-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid var(--accent-gold);
+            pointer-events: none;
+            z-index: 100;
+            animation: ringExpand 0.8s ease-out forwards;
+        }
+
+        @keyframes ringExpand {
+            0% { width: 30px; height: 30px; opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            100% { width: 180px; height: 180px; opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .super-text {
+            position: absolute;
+            font-size: 16px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            pointer-events: none;
+            z-index: 101;
+            animation: superFloat 1.2s ease-out forwards;
+        }
+
+        @keyframes superFloat {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            30% { transform: translateY(-25px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-90px) scale(1); }
+        }
+
+        .coin-pop {
+            position: absolute;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            pointer-events: none;
+            z-index: 101;
+            animation: coinUp 1s ease-out forwards;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @keyframes coinUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-70px); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 768px) {
+            .short-card { flex: 0 0 200px; }
+            .side-actions { right: 20px; }
+        }
+    </style>
+<base target="_blank">
 </head>
 <body>
-<div class="shell">
-  <div class="topnav">
-    <div class="back-btn" onclick="history.back()">←</div>
-    <div class="nav-title" id="navTitle">Loading...</div>
-    <div class="coin-pill">🪙 <span id="coinDisplay">0</span></div>
-  </div>
-  <div class="split">
-    <div class="main-player" id="mainPlayer" onclick="toggleCtrl()">
-      <video class="main-vid" id="mainVid" playsinline webkit-playsinline preload="metadata"></video>
-      <div class="vid-loading" id="vidLoading"><div class="spinner"></div><div class="loading-lbl">Loading...</div></div>
-      <div class="vid-overlay"></div>
-      <div class="ctrl-bar" id="ctrlBar">
-        <button class="ctrl-btn" id="playBtn" onclick="event.stopPropagation();togglePlay()">▶</button>
-        <div class="prog-wrap" id="progWrap"><div class="prog-fill" id="progFill"></div></div>
-        <span class="time-lbl" id="timeLbl">0:00</span>
-        <button class="ctrl-btn" onclick="event.stopPropagation();toggleMute()">🔊</button>
-      </div>
-      <div class="vid-info">
-        <div class="vid-title-text" id="vidTitle">Loading...</div>
-        <div class="vid-meta-row">
-          <div class="creator-chip"><div class="creator-chip-av" id="creatorAv">D</div><span class="creator-chip-name" id="creatorChipName">Creator</span></div>
-          <span id="viewsTxt">0 views</span>
+    <div id="app">
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <svg class="home-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <div class="url-bar">
+                    <span class="secure-icon">🔒</span>
+                    <span>ddott.live</span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <button class="top-bar-btn">+</button>
+                <button class="top-bar-btn">1</button>
+                <button class="top-bar-btn">⋮</button>
+            </div>
         </div>
-      </div>
-      <div class="vid-actions">
-        <div class="vact-btn" onclick="event.stopPropagation();mainLike()"><div class="vact-icon" id="mainLikeIcon">🤍</div><span class="vact-lbl" id="mainLikeCount">0</span></div>
-        <div class="vact-btn" onclick="event.stopPropagation();mainComment()"><div class="vact-icon">💬</div><span class="vact-lbl">Chat</span></div>
-        <div class="vact-btn" onclick="event.stopPropagation();mainShare()"><div class="vact-icon">↗</div><span class="vact-lbl">Share</span></div>
-      </div>
-    </div>
-    <div class="divider">
-      <div class="div-label"><div class="div-dot"></div>⚡ Shorts</div>
-      <div class="div-count" id="shortsCount">0 shorts</div>
-    </div>
-    <div class="shorts-feed">
-      <div class="shorts-scroll" id="shortsScroll"></div>
-      <div class="shorts-empty" id="shortsEmpty" style="display:none"><div class="shorts-empty-icon">⚡</div><div class="shorts-empty-txt">No shorts yet</div></div>
-    </div>
-  </div>
-  <nav class="bottom-nav">
-    <a href="/" class="bnav-item"><span class="bnav-icon">🏠</span><span class="bnav-lbl">HOME</span></a>
-    <a href="/player/shorts.html" class="bnav-item"><span class="bnav-icon">⚡</span><span class="bnav-lbl">SHORTS</span></a>
-    <a href="/community/" class="bnav-item"><span class="bnav-icon">🌐</span><span class="bnav-lbl">COMMUNITY</span></a>
-    <a href="/coins/" class="bnav-item"><span class="bnav-icon">🪙</span><span class="bnav-lbl">COINS</span></a>
-    <a href="/messaging/" class="bnav-item"><span class="bnav-icon">💬</span><span class="bnav-lbl">MESSAGE</span></a>
-  </nav>
-</div>
-<div class="toast" id="toastEl"></div>
-<script>
-function safeDecodeUrl(raw){let val=raw;for(let i=0;i<3;i++){if(!/%[0-9A-Fa-f]{2}/.test(val))break;try{const d=decodeURIComponent(val);if(d===val)break;val=d;}catch(e){break;}}return val;}
-const FALLBACK='https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-let coins=0,mainLiked=false,mainLikeCountVal=0,currentVideoId=null,shorts=[],shortStates=new Map(),toastTimer=null;
-const mainVid=document.getElementById('mainVid'),vidLoading=document.getElementById('vidLoading'),progFill=document.getElementById('progFill'),timeLbl=document.getElementById('timeLbl'),playBtn=document.getElementById('playBtn'),mainPlayer=document.getElementById('mainPlayer'),toastEl=document.getElementById('toastEl'),shortsScroll=document.getElementById('shortsScroll'),coinDisplay=document.getElementById('coinDisplay');
-async function init(){loadFromParams();loadCoins();await loadShorts();bindProgress();bindCtrlAutoHide();}
-function loadFromParams(){
-  const p=new URLSearchParams(window.location.search);
-  const url=p.get('url'),title=p.get('title')?decodeURIComponent(p.get('title')):'Ddott TV',creator=p.get('creator')?decodeURIComponent(p.get('creator')):'Creator',views=p.get('views')||'0',likes=parseInt(p.get('likes')||'0'),id=p.get('id')||'';
-  currentVideoId=id;mainLikeCountVal=likes;
-  document.getElementById('navTitle').textContent=title;
-  document.getElementById('vidTitle').textContent=title;
-  document.getElementById('creatorChipName').textContent=creator;
-  document.getElementById('creatorAv').textContent=(creator[0]||'D').toUpperCase();
-  document.getElementById('viewsTxt').textContent=fmtNum(parseInt(views))+' views';
-  document.getElementById('mainLikeCount').textContent=fmtNum(likes);
-  if(url&&url!=='undefined'){let v=safeDecodeUrl(url);if(v.includes('cloudinary.com')&&!v.includes('f_mp4'))v=v.replace('/upload/','/upload/f_mp4,vc_h264,q_auto/');mainVid.src=v;}
-  else if(id){loadVideoById(id);}else{mainVid.src=FALLBACK;}
-  mainVid.load();mainVid.play().catch(()=>{});
-}
-async function loadVideoById(id){if(typeof db==='undefined'){mainVid.src=FALLBACK;return;}try{const{data}=await db.from('videos').select('video_url').eq('id',id).single();if(data?.video_url){let u=data.video_url;if(u.includes('cloudinary.com')&&!u.includes('f_mp4'))u=u.replace('/upload/','/upload/f_mp4,vc_h264,q_auto/');mainVid.src=u;mainVid.load();mainVid.play().catch(()=>{});}}catch(e){mainVid.src=FALLBACK;}}
-mainVid.addEventListener('loadeddata',()=>{vidLoading.classList.add('hidden');playBtn.textContent='⏸';});
-mainVid.addEventListener('waiting',()=>vidLoading.classList.remove('hidden'));
-mainVid.addEventListener('playing',()=>{vidLoading.classList.add('hidden');playBtn.textContent='⏸';});
-mainVid.addEventListener('pause',()=>playBtn.textContent='▶');
-mainVid.addEventListener('error',()=>{vidLoading.classList.add('hidden');if(mainVid.src!==FALLBACK){mainVid.src=FALLBACK;mainVid.load();}});
-mainVid.addEventListener('timeupdate',()=>{if(mainVid.duration){progFill.style.width=(mainVid.currentTime/mainVid.duration*100)+'%';timeLbl.textContent=fmtTime(mainVid.currentTime)+' / '+fmtTime(mainVid.duration);}});
-function togglePlay(){mainVid.paused?mainVid.play():mainVid.pause();}
-function toggleMute(){mainVid.muted=!mainVid.muted;}
-let ctrlTimeout;
-function toggleCtrl(){mainPlayer.classList.toggle('show-ctrl');clearTimeout(ctrlTimeout);if(mainPlayer.classList.contains('show-ctrl')){ctrlTimeout=setTimeout(()=>mainPlayer.classList.remove('show-ctrl'),3000);}}
-function bindCtrlAutoHide(){mainPlayer.addEventListener('touchstart',()=>{mainPlayer.classList.add('show-ctrl');clearTimeout(ctrlTimeout);ctrlTimeout=setTimeout(()=>mainPlayer.classList.remove('show-ctrl'),3000);},{passive:true});}
-function bindProgress(){document.getElementById('progWrap').addEventListener('click',(e)=>{e.stopPropagation();const r=e.currentTarget.getBoundingClientRect();mainVid.currentTime=((e.clientX-r.left)/r.width)*mainVid.duration;});}
 
-/* Like button kept — visual toggle only, NO coin earning */
-function mainLike(){
-  mainLiked=!mainLiked;
-  mainLikeCountVal+=mainLiked?1:-1;
-  document.getElementById('mainLikeIcon').textContent=mainLiked?'💜':'🤍';
-  document.getElementById('mainLikeCount').textContent=fmtNum(mainLikeCountVal);
-  if(mainLiked){showToast('Liked!');}
-  if(currentVideoId&&typeof db!=='undefined')db.from('videos').update({likes:mainLikeCountVal}).eq('id',currentVideoId).catch(()=>{});
-}
-function mainComment(){showToast('Comments coming soon 💬');}
-function mainShare(){if(navigator.share){navigator.share({title:document.getElementById('vidTitle').textContent,url:window.location.href}).catch(()=>{});}else{navigator.clipboard?.writeText(window.location.href);showToast('Link copied! 🔗');}}
-async function loadShorts(){const empty=document.getElementById('shortsEmpty');if(typeof db==='undefined'){empty.style.display='flex';return;}try{const{data,error}=await db.from('videos').select('*, profiles(display_name, username)').eq('is_short',true).order('created_at',{ascending:false}).limit(15);if(error||!data||!data.length){empty.style.display='flex';return;}shorts=data;document.getElementById('shortsCount').textContent=data.length+' shorts';shortsScroll.innerHTML='';data.forEach((s,i)=>{shortsScroll.appendChild(buildShortCard(s,i));});}catch(e){empty.style.display='flex';}}
-function buildShortCard(s,i){const el=document.createElement('div');el.className='short-card';el.dataset.id=s.id||i;const creator=s.profiles?.display_name||s.profiles?.username||'Creator';const likes=s.likes||0;const grads=['linear-gradient(160deg,#0a001a,#1a0035,#000d20)','linear-gradient(160deg,#001020,#00082a,#0a0015)','linear-gradient(160deg,#100010,#200025,#0a000a)','linear-gradient(160deg,#0a0800,#1a1000,#050500)','linear-gradient(160deg,#000a15,#00151a,#000508)'];el.innerHTML=`<div class="short-thumb" style="position:relative;"><div class="short-thumb-bg" style="background:${grads[i%grads.length]}"></div>${s.thumbnail_url ? `<img src="${s.thumbnail_url}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1;">` : ''}<video id="sv-${s.id||i}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:2;display:none;" loop muted playsinline></video><div id="smute-${s.id||i}" style="position:absolute;top:6px;right:6px;z-index:10;background:rgba(0,0,0,0.6);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;">🔇</div></div><div class="short-overlay"></div><div class="short-play">▶</div>${i===0?'<div class="now-playing"><div class="np-dot"></div>NEW</div>':''}<div class="short-actions" onclick="event.stopPropagation()"><div class="sa-btn" id="slike-${s.id||i}" data-id="${s.id||i}"><div class="sa-icon" style="position:relative"><div class="s-charge-ring"></div><span class="s-like-icon">🤍</span></div><span class="sa-count s-like-count">${fmtNum(likes)}</span></div><div class="sa-btn" onclick="event.stopPropagation();openShortComments('${s.id||i}')"><div class="sa-icon">💬</div><span class="sa-count">${fmtNum(s.comments_count||0)}</span></div><div class="sa-btn" onclick="event.stopPropagation();shareShort('${s.id||i}','${(s.title||'').replace(/'/g,'')}')"><div class="sa-icon">↗️</div></div></div><div class="short-info"><div class="short-creator">@${creator}</div><div class="short-title-txt">${s.title||''}</div></div>`;// Set video src via DOM after innerHTML
-const svid = el.querySelector('video');
-if (svid && s.video_url) { svid.src = s.video_url; }
-let _touchMoved = false;
-el.addEventListener('touchstart', () => { _touchMoved = false; }, { passive: true });
-el.addEventListener('touchmove', () => { _touchMoved = true; }, { passive: true });
-el.addEventListener('touchend', (e) => { if (!_touchMoved) { e.preventDefault(); switchSoundToShort(el, s); } });
-el.addEventListener('click', () => { switchSoundToShort(el, s); });bindShortLike(el.querySelector(`#slike-${s.id||i}`),s.id||i,likes);return el;}
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">DDOTT.TV</div>
+            <div class="header-center">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <span>Search...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-icon-btn gold" title="Coins">🏛️</button>
+                <button class="header-icon-btn notif" title="Notifications">🔔</button>
+                <div class="avatar-btn">D</div>
+            </div>
+        </div>
 
-/* Shorts like — visual toggle + super-like animation kept, NO coin earning anywhere */
-function bindShortLike(btn,id,initialLikes){
-  if(!btn)return;
-  let isPressed=false,pressStart=0,raf=null,likeCount=initialLikes;
-  const start=()=>{
-    const s0=shortStates.get(id)||{};
-    if(s0.superLiked)return; // locked after super-like — no more interaction
-    isPressed=true;pressStart=Date.now();btn.classList.add('pressing');
-    const tick=()=>{
-      if(!isPressed)return;
-      const e=Date.now()-pressStart;
-      if(e>600&&!btn.classList.contains('charging')){btn.classList.add('charging');if(navigator.vibrate)navigator.vibrate(30);}
-      raf=requestAnimationFrame(tick);
-    };
-    raf=requestAnimationFrame(tick);
-  };
-  const end=()=>{
-    if(!isPressed)return;
-    isPressed=false;cancelAnimationFrame(raf);btn.classList.remove('pressing');
-    const elapsed=Date.now()-pressStart,wasCharging=btn.classList.contains('charging');
-    btn.classList.remove('charging');
-    const state=shortStates.get(id)||{};
-    if(state.superLiked){shortStates.set(id,state);return;} // fully locked
-    if(wasCharging&&elapsed>=600){
-      // Super like — visual only, no coins
-      state.superLiked=true;state.liked=true;likeCount+=5;
-      btn.classList.add('super-liked','locked');
-      btn.querySelector('.s-like-icon').textContent='💛';
-      btn.querySelector('.sa-count').textContent=fmtNum(likeCount);
-      showToast('Super Liked! 💛');
-      if(navigator.vibrate)navigator.vibrate([40,20,40]);
-    } else if(!state.liked){
-      // First-time like — visual only, no coins, one-way (no unlike/re-farm)
-      state.liked=true;likeCount++;
-      btn.classList.add('liked');
-      btn.querySelector('.s-like-icon').textContent='💜';
-      btn.querySelector('.sa-count').textContent=fmtNum(likeCount);
-    }
-    shortStates.set(id,state);
-  };
-  const cancel=()=>{isPressed=false;cancelAnimationFrame(raf);btn.classList.remove('pressing','charging');};
-  btn.addEventListener('touchstart',start,{passive:true});
-  btn.addEventListener('touchend',end);
-  btn.addEventListener('touchcancel',cancel);
-  btn.addEventListener('mousedown',start);
-  btn.addEventListener('mouseup',end);
-  btn.addEventListener('mouseleave',cancel);
-}
+        <!-- SUB HEADER -->
+        <div class="sub-header">
+            <button class="back-btn">←</button>
+            <div class="section-title">Ddott TV</div>
+            <div class="coin-display">
+                <div class="coin-icon">E</div>
+                <span id="coinCount">527</span>
+            </div>
+        </div>
 
-function playShortInMain(s){let url=s.video_url||FALLBACK;if(url.includes('cloudinary.com')&&!url.includes('f_mp4'))url=url.replace('/upload/','/upload/f_mp4,vc_h264,q_auto/');mainVid.src=url;mainVid.load();mainVid.play().catch(()=>{});const creator=s.profiles?.display_name||s.profiles?.username||'Creator';document.getElementById('navTitle').textContent=s.title||'Short';document.getElementById('vidTitle').textContent=s.title||'';document.getElementById('creatorChipName').textContent=creator;document.getElementById('creatorAv').textContent=creator[0].toUpperCase();document.getElementById('viewsTxt').textContent=fmtNum(s.views||0)+' views';mainLikeCountVal=s.likes||0;mainLiked=false;document.getElementById('mainLikeIcon').textContent='🤍';document.getElementById('mainLikeCount').textContent=fmtNum(mainLikeCountVal);currentVideoId=s.id;showToast('▶ Playing short');}
-async function loadCoins(){if(typeof db==='undefined')return;try{const{data:{user}}=await db.auth.getUser();if(!user)return;const{data}=await db.from('profiles').select('emo_coins').eq('id',user.id).single();if(data){coins=data.emo_coins||0;updateCoins();}}catch(e){}}
-function updateCoins(){coinDisplay.textContent=fmtNum(coins);}
-function fmtNum(n){if(!n)return'0';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toString();}
-function fmtTime(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+sec.toString().padStart(2,'0');}
-function showToast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2000);}
-init();
-</script>
+        <!-- MAIN VIDEO PLAYER -->
+        <div class="main-player" id="mainPlayer">
+            <video id="mainVideo" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" loop playsinline></video>
+
+            <!-- Video Selector Route -->
+            <div class="video-selector">
+                <button class="selector-trigger" id="selectorTrigger" onclick="toggleSelector()">
+                    <span>📺</span>
+                    <span>Select Video</span>
+                    <span>▼</span>
+                </button>
+                <div class="selector-dropdown" id="selectorDropdown"></div>
+            </div>
+
+            <div class="main-overlay">
+                <div class="video-meta">
+                    <div class="video-title-row">
+                        <div class="play-mini">▶</div>
+                        <div class="video-title-main" id="mainTitle">Ddott TV</div>
+                    </div>
+                    <div class="creator-row">
+                        <div class="creator-avatar" id="mainAvatar">C</div>
+                        <div class="creator-badge">
+                            <span id="mainCreator">Creator</span>
+                        </div>
+                        <span class="view-count" id="mainViews">0 views</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-fill" id="mainProgress"></div>
+            </div>
+            <div class="time-display" id="mainTime">0:00 / 0:00</div>
+            <button class="mute-btn" id="mainMute" onclick="toggleMainMute()">🔊</button>
+
+            <!-- Side Actions -->
+            <div class="side-actions">
+                <button class="action-btn like-btn" id="mainLikeBtn" onclick="handleMainLike()">
+                    <div class="action-circle" id="mainLikeIcon">🤍</div>
+                    <span class="action-label" id="mainLikeCount">0</span>
+                </button>
+                <button class="action-btn" onclick="openChat()">
+                    <div class="action-circle">💬</div>
+                    <span class="action-label">Chat</span>
+                </button>
+                <button class="action-btn" onclick="shareVideo()">
+                    <div class="action-circle">↗️</div>
+                    <span class="action-label">Share</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SHORTS SECTION -->
+        <div class="shorts-section">
+            <div class="shorts-header">
+                <div class="shorts-title">
+                    <span class="dot"></span>
+                    <span class="bolt">⚡</span>
+                    <span>SHORTS</span>
+                </div>
+                <span class="shorts-count" id="shortsCount">5 shorts</span>
+            </div>
+            <div class="shorts-grid" id="shortsGrid"></div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="bottom-nav">
+            <button class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="12" rx="2"></rect>
+                    <path d="M8 20h8"></path>
+                    <path d="M12 16v4"></path>
+                    <path d="M6 8h.01"></path>
+                    <path d="M10 8h.01"></path>
+                </svg>
+                <span>FEED</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>HOME</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span>COMMUNITY</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                <span>COINS</span>
+            </button>
+            <button class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span>MESSAGE</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ===== DATA =====
+        const mainVideos = [
+            {
+                id: 'mv1',
+                title: 'Ddott TV',
+                creator: 'Creator',
+                avatar: 'C',
+                views: '0',
+                likes: 0,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+                thumb: 'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=400&h=300&fit=crop'
+            },
+            {
+                id: 'mv2',
+                title: 'Emowall AI 2.0 Demo',
+                creator: 'meradivin',
+                avatar: 'M',
+                views: '1.2K',
+                likes: 42,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+                thumb: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop'
+            },
+            {
+                id: 'mv3',
+                title: 'The DWIN Universe',
+                creator: 'dwinofficial',
+                avatar: 'D',
+                views: '5.6K',
+                likes: 128,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+                thumb: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop'
+            },
+            {
+                id: 'mv4',
+                title: 'Neural Butterfly Network',
+                creator: 'neuralart',
+                avatar: 'N',
+                views: '892',
+                likes: 67,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+                thumb: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=300&fit=crop'
+            }
+        ];
+
+        const shortsData = [
+            {
+                id: 1,
+                author: 'meradivin',
+                avatar: 'M',
+                title: 'Emowall Ai 2.0',
+                views: '0',
+                likes: 0,
+                comments: 0,
+                isNew: true,
+                thumb: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=300&h=500&fit=crop',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'
+            },
+            {
+                id: 2,
+                author: 'meradivin',
+                avatar: 'M',
+                title: 'Ddott shorts',
+                views: '0',
+                likes: 0,
+                comments: 0,
+                isNew: true,
+                thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=500&fit=crop',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+            },
+            {
+                id: 3,
+                author: 'creatorspot',
+                avatar: 'C',
+                title: 'Emo Coins Guide',
+                views: '234',
+                likes: 12,
+                comments: 3,
+                isNew: false,
+                thumb: 'https://images.unsplash.com/photo-1634017839464-5c339ez0c7a6?w=300&h=500&fit=crop',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
+            },
+            {
+                id: 4,
+                author: 'aistudio',
+                avatar: 'A',
+                title: '7-Brain AI',
+                views: '1.1K',
+                likes: 89,
+                comments: 15,
+                isNew: false,
+                thumb: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=500&fit=crop',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'
+            },
+            {
+                id: 5,
+                author: 'dwinofficial',
+                avatar: 'D',
+                title: 'DWIN Like System',
+                views: '3.4K',
+                likes: 156,
+                comments: 28,
+                isNew: false,
+                thumb: 'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=300&h=500&fit=crop',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
+            }
+        ];
+
+        // ===== STATE =====
+        let currentMainIndex = 0;
+        let currentShortId = null;
+        let emoCoins = 527;
+        const mainLikeStates = new Map();
+        const shortLikeStates = new Map();
+        let pressTimer = null;
+        let isPressing = false;
+        let lastTapTime = 0;
+        let tapCount = 0;
+        const SUPER_LIKE_HOLD_MS = 600;
+
+        // ===== DOM REFS =====
+        const mainVideo = document.getElementById('mainVideo');
+        const mainProgress = document.getElementById('mainProgress');
+        const mainTime = document.getElementById('mainTime');
+        const shortsGrid = document.getElementById('shortsGrid');
+        const selectorDropdown = document.getElementById('selectorDropdown');
+
+        // ===== INIT =====
+        function init() {
+            renderSelector();
+            renderShorts();
+            setupMainVideo();
+            updateMainVideoUI();
+            mainVideo.play();
+        }
+
+        // ===== MAIN VIDEO SETUP =====
+        function setupMainVideo() {
+            mainVideo.addEventListener('timeupdate', () => {
+                const pct = (mainVideo.currentTime / mainVideo.duration) * 100;
+                mainProgress.style.width = pct + '%';
+                mainTime.textContent = formatTime(mainVideo.currentTime) + ' / ' + formatTime(mainVideo.duration || 0);
+            });
+
+            // Click to play/pause
+            mainVideo.addEventListener('click', () => {
+                if (mainVideo.paused) mainVideo.play();
+                else mainVideo.pause();
+            });
+
+            // Progress bar seek
+            document.getElementById('progressContainer').addEventListener('click', (e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const pct = (e.clientX - rect.left) / rect.width;
+                mainVideo.currentTime = pct * mainVideo.duration;
+            });
+        }
+
+        function formatTime(s) {
+            if (!s || isNaN(s)) return '0:00';
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        function toggleMainMute() {
+            mainVideo.muted = !mainVideo.muted;
+            document.getElementById('mainMute').textContent = mainVideo.muted ? '🔇' : '🔊';
+        }
+
+        // ===== VIDEO SELECTOR (ROUTE) =====
+        function renderSelector() {
+            selectorDropdown.innerHTML = mainVideos.map((v, i) => `
+                <div class="selector-item ${i === currentMainIndex ? 'active' : ''}" onclick="selectMainVideo(${i})">
+                    <img class="selector-thumb" src="${v.thumb}" alt="">
+                    <div class="selector-info">
+                        <div class="selector-title">${v.title}</div>
+                        <div class="selector-author">@${v.creator}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleSelector() {
+            selectorDropdown.classList.toggle('open');
+        }
+
+        function selectMainVideo(index) {
+            currentMainIndex = index;
+            const v = mainVideos[index];
+            mainVideo.src = v.url;
+            mainVideo.play();
+            updateMainVideoUI();
+            renderSelector();
+            toggleSelector();
+        }
+
+        function updateMainVideoUI() {
+            const v = mainVideos[currentMainIndex];
+            document.getElementById('mainTitle').textContent = v.title;
+            document.getElementById('mainCreator').textContent = v.creator;
+            document.getElementById('mainAvatar').textContent = v.avatar;
+            document.getElementById('mainViews').textContent = v.views + ' views';
+
+            const state = mainLikeStates.get(v.id) || { count: v.likes, state: 'none' };
+            document.getElementById('mainLikeCount').textContent = state.count;
+            const btn = document.getElementById('mainLikeBtn');
+            const icon = document.getElementById('mainLikeIcon');
+            btn.classList.remove('liked', 'heart-burst', 'super-liked');
+
+            if (state.state === 'liked') { btn.classList.add('liked'); icon.textContent = '💜'; }
+            else if (state.state === 'heart') { btn.classList.add('heart-burst'); icon.textContent = '❤️'; }
+            else if (state.state === 'super') { btn.classList.add('super-liked'); icon.textContent = '💛'; }
+            else { icon.textContent = '🤍'; }
+        }
+
+        // ===== MAIN LIKE (DWIN SYSTEM) =====
+        function handleMainLike() {
+            const id = mainVideos[currentMainIndex].id;
+            let state = mainLikeStates.get(id) || { count: mainVideos[currentMainIndex].likes, state: 'none' };
+
+            if (state.state === 'none') {
+                state.count++;
+                state.state = 'liked';
+            } else {
+                state.count--;
+                state.state = 'none';
+            }
+            mainLikeStates.set(id, state);
+            updateMainVideoUI();
+            createFloatingHeart(document.getElementById('mainPlayer'), state.state === 'liked' ? '💜' : '🤍');
+        }
+
+        // ===== SHORTS RENDER =====
+        function renderShorts() {
+            document.getElementById('shortsCount').textContent = shortsData.length + ' shorts';
+            shortsGrid.innerHTML = shortsData.map(short => `
+                <div class="short-card" data-id="${short.id}" id="short-${short.id}">
+                    <img class="thumb" src="${short.thumb}" alt="${short.title}">
+                    <video class="short-video-inline" loop playsinline muted preload="metadata"></video>
+
+                    ${short.isNew ? '<div class="card-badge-new">NEW</div>' : ''}
+                    <button class="card-mute" onclick="toggleShortMute(event, ${short.id})">🔇</button>
+                    <button class="card-play" onclick="playShort(event, ${short.id})">▶</button>
+
+                    <div class="card-actions">
+                        <div class="card-action-row">
+                            <span class="icon">🤍</span>
+                            <span class="short-like-count-${short.id}">${short.likes}</span>
+                        </div>
+                        <div class="card-action-row">
+                            <span class="icon">💬</span>
+                            <span>${short.comments}</span>
+                        </div>
+                        <div class="card-action-row">
+                            <span class="icon">↗️</span>
+                            <span>Share</span>
+                        </div>
+                    </div>
+
+                    <div class="inline-player-controls">
+                        <div class="inline-progress">
+                            <div class="inline-progress-fill" id="short-progress-${short.id}"></div>
+                        </div>
+                        <span class="inline-time" id="short-time-${short.id}">0:00</span>
+                    </div>
+
+                    <div class="card-info">
+                        <div class="card-username">@${short.author}</div>
+                        <div class="card-desc">${short.title}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Attach gesture handlers to each short card
+            shortsData.forEach(short => {
+                const card = document.getElementById(`short-${short.id}`);
+                attachShortGestures(card, short.id);
+            });
+        }
+
+        // ===== SHORT INLINE PLAY =====
+        function playShort(e, id) {
+            e.stopPropagation();
+            const short = shortsData.find(s => s.id === id);
+            const card = document.getElementById(`short-${id}`);
+            const video = card.querySelector('.short-video-inline');
+
+            // Stop any other playing short
+            if (currentShortId && currentShortId !== id) {
+                const prevCard = document.getElementById(`short-${currentShortId}`);
+                if (prevCard) {
+                    prevCard.classList.remove('active', 'playing');
+                    const prevVideo = prevCard.querySelector('.short-video-inline');
+                    prevVideo.pause();
+                    prevVideo.currentTime = 0;
+                    prevVideo.src = '';
+                }
+            }
+
+            currentShortId = id;
+            card.classList.add('active', 'playing');
+            video.src = short.url;
+            video.muted = false;
+            video.play();
+
+            // Update progress
+            video.ontimeupdate = () => {
+                const pct = (video.currentTime / video.duration) * 100;
+                document.getElementById(`short-progress-${id}`).style.width = pct + '%';
+                document.getElementById(`short-time-${id}`).textContent = formatTime(video.currentTime);
+            };
+
+            video.onended = () => {
+                card.classList.remove('playing', 'active');
+                video.src = '';
+                currentShortId = null;
+            };
+        }
+
+        function toggleShortMute(e, id) {
+            e.stopPropagation();
+            const card = document.getElementById(`short-${id}`);
+            const video = card.querySelector('.short-video-inline');
+            const btn = card.querySelector('.card-mute');
+            if (video) {
+                video.muted = !video.muted;
+                btn.textContent = video.muted ? '🔇' : '🔊';
+            }
+        }
+
+        // ===== SHORT GESTURES (DWIN LIKE SYSTEM) =====
+        function attachShortGestures(card, id) {
+            let pressStartTime = 0;
+            let pressX = 0;
+            let pressY = 0;
+            let hasSuper = false;
+
+            const start = (e) => {
+                const t = e.touches ? e.touches[0] : e;
+                pressStartTime = Date.now();
+                pressX = t.clientX;
+                pressY = t.clientY;
+                isPressing = true;
+                hasSuper = false;
+
+                pressTimer = setTimeout(() => {
+                    if (isPressing) {
+                        hasSuper = true;
+                        triggerShortSuperLike(card, id, pressX, pressY);
+                    }
+                }, SUPER_LIKE_HOLD_MS);
+            };
+
+            const end = (e) => {
+                const duration = Date.now() - pressStartTime;
+                isPressing = false;
+                clearTimeout(pressTimer);
+                if (hasSuper) return;
+
+                const t = e.changedTouches ? e.changedTouches[0] : e;
+                const dx = Math.abs((t.clientX || t.pageX) - pressX);
+                const dy = Math.abs((t.clientY || t.pageY) - pressY);
+                if (dx > 10 || dy > 10) return;
+
+                if (duration < SUPER_LIKE_HOLD_MS) {
+                    handleShortTap(card, id, t.clientX || t.pageX, t.clientY || t.pageY);
+                }
+            };
+
+            const move = (e) => {
+                if (!isPressing) return;
+                const t = e.touches ? e.touches[0] : e;
+                if (Math.abs(t.clientX - pressX) > 20 || Math.abs(t.clientY - pressY) > 20) {
+                    isPressing = false;
+                    clearTimeout(pressTimer);
+                }
+            };
+
+            card.addEventListener('touchstart', start, { passive: true });
+            card.addEventListener('touchend', end, { passive: true });
+            card.addEventListener('touchmove', move, { passive: true });
+            card.addEventListener('mousedown', start);
+            card.addEventListener('mouseup', end);
+        }
+
+        function handleShortTap(card, id, x, y) {
+            const now = Date.now();
+            if (now - lastTapTime < 300) {
+                tapCount++;
+                if (tapCount === 2) {
+                    triggerShortHeartBurst(card, id);
+                    tapCount = 0;
+                }
+            } else {
+                tapCount = 1;
+                setTimeout(() => {
+                    if (tapCount === 1) {
+                        triggerShortSingleLike(card, id);
+                        // Also play the short if not playing
+                        if (currentShortId !== id) {
+                            const playBtn = card.querySelector('.card-play');
+                            if (playBtn) playBtn.click();
+                        }
+                    }
+                    tapCount = 0;
+                }, 300);
+            }
+            lastTapTime = now;
+        }
+
+        function triggerShortSingleLike(card, id) {
+            const short = shortsData.find(s => s.id === id);
+            let state = shortLikeStates.get(id) || { count: short.likes, state: 'none' };
+            const countEl = card.querySelector(`.short-like-count-${id}`);
+            const iconRow = card.querySelector('.card-action-row .icon');
+
+            if (state.state === 'none') {
+                state.count++;
+                state.state = 'liked';
+                if (iconRow) iconRow.textContent = '💜';
+            } else {
+                state.count = Math.max(0, state.count - 1);
+                state.state = 'none';
+                if (iconRow) iconRow.textContent = '🤍';
+            }
+
+            if (countEl) countEl.textContent = state.count;
+            shortLikeStates.set(id, state);
+            createFloatingHeart(card, state.state === 'liked' ? '💜' : '🤍');
+        }
+
+        function triggerShortHeartBurst(card, id) {
+            const short = shortsData.find(s => s.id === id);
+            let state = shortLikeStates.get(id) || { count: short.likes, state: 'none' };
+            if (state.state !== 'heart') {
+                state.count += 2;
+                state.state = 'heart';
+            }
+            const countEl = card.querySelector(`.short-like-count-${id}`);
+            if (countEl) countEl.textContent = state.count;
+            shortLikeStates.set(id, state);
+
+            const iconRow = card.querySelector('.card-action-row .icon');
+            if (iconRow) iconRow.textContent = '❤️';
+
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => createFloatingHeart(card, '❤️'), i * 80);
+            }
+            setTimeout(() => { if (iconRow) iconRow.textContent = '💜'; }, 500);
+        }
+
+        function triggerShortSuperLike(card, id, x, y) {
+            const short = shortsData.find(s => s.id === id);
+            let state = shortLikeStates.get(id) || { count: short.likes, state: 'none' };
+            if (state.state !== 'super') {
+                state.count += 5;
+                state.state = 'super';
+            }
+            const countEl = card.querySelector(`.short-like-count-${id}`);
+            if (countEl) countEl.textContent = state.count;
+            shortLikeStates.set(id, state);
+
+            const iconRow = card.querySelector('.card-action-row .icon');
+            if (iconRow) iconRow.textContent = '💛';
+
+            // Haptic ring
+            const ring = document.createElement('div');
+            ring.className = 'haptic-ring';
+            const rect = card.getBoundingClientRect();
+            ring.style.left = (x - rect.left) + 'px';
+            ring.style.top = (y - rect.top) + 'px';
+            card.appendChild(ring);
+            setTimeout(() => ring.remove(), 800);
+
+            // Super text
+            const text = document.createElement('div');
+            text.className = 'super-text';
+            text.textContent = 'SUPER LIKE!';
+            text.style.left = '20px';
+            text.style.top = '40px';
+            card.appendChild(text);
+            setTimeout(() => text.remove(), 1200);
+
+            // Coin pop
+            const coin = document.createElement('div');
+            coin.className = 'coin-pop';
+            coin.innerHTML = '🪙 +1';
+            coin.style.left = '20px';
+            coin.style.top = '60px';
+            card.appendChild(coin);
+            setTimeout(() => coin.remove(), 1000);
+
+            emoCoins += 1;
+            document.getElementById('coinCount').textContent = emoCoins;
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
+
+            setTimeout(() => { if (iconRow) iconRow.textContent = '💛'; }, 600);
+        }
+
+        // ===== FLOATING HEART =====
+        function createFloatingHeart(container, emoji) {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = emoji;
+            const rect = container.getBoundingClientRect();
+            heart.style.left = (rect.width / 2 + (Math.random() - 0.5) * 60) + 'px';
+            heart.style.top = (rect.height / 2 + (Math.random() - 0.5) * 40) + 'px';
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        // ===== CHAT & SHARE =====
+        function openChat() {
+            alert('💬 Chat opened for: ' + mainVideos[currentMainIndex].title);
+        }
+
+        function shareVideo() {
+            const v = mainVideos[currentMainIndex];
+            if (navigator.share) {
+                navigator.share({ title: v.title, text: 'Check out ' + v.title + ' on Ddott TV!' });
+            } else {
+                alert('🔗 Link copied: ddott.live/video/' + v.id);
+            }
+        }
+
+        // ===== NAV ACTIVE STATE =====
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Close selector on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.video-selector')) {
+                selectorDropdown.classList.remove('open');
+            }
+        });
+
+        // ===== START =====
+        init();
+    </script>
 </body>
 </html>
