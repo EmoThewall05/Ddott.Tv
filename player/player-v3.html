@@ -587,7 +587,7 @@
     <div id="app">
         <!-- MAIN PLAYER (60%) -->
         <div class="main-player" id="mainPlayer">
-            <video id="mainVideo" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" loop playsinline></video>
+            <video id="mainVideo" src="" loop playsinline></video>
 
             <!-- Video Selector -->
             <div class="video-select">
@@ -709,20 +709,8 @@
 
     <script>
         // ===== DATA =====
-        const mainVideos = [
-            { id:'m1', title:'Ddott TV', creator:'Creator', avatar:'C', views:'0', likes:0, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', thumb:'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=400&h=300&fit=crop' },
-            { id:'m2', title:'Emowall AI 2.0', creator:'meradivin', avatar:'M', views:'1.2K', likes:42, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', thumb:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop' },
-            { id:'m3', title:'DWIN Universe', creator:'dwinofficial', avatar:'D', views:'5.6K', likes:128, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', thumb:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop' },
-            { id:'m4', title:'Neural Butterfly', creator:'neuralart', avatar:'N', views:'892', likes:67, url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', thumb:'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=300&fit=crop' }
-        ];
-
-        const drottsData = [
-            { id:1, author:'meradivin', title:'Emowall Ai 2.0', views:'0', likes:0, comments:0, isNew:true, thumb:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4' },
-            { id:2, author:'meradivin', title:'Ddott drotts', views:'0', likes:0, comments:0, isNew:true, thumb:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
-            { id:3, author:'creatorspot', title:'Emo Coins Guide', views:'234', likes:12, comments:3, isNew:false, thumb:'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
-            { id:4, author:'aistudio', title:'7-Brain AI', views:'1.1K', likes:89, comments:15, isNew:false, thumb:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' },
-            { id:5, author:'dwinofficial', title:'DWIN Like System', views:'3.4K', likes:156, comments:28, isNew:false, thumb:'https://images.unsplash.com/photo-1490750967868-88aa9f00c4f8?w=300&h=500&fit=crop', url:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4' }
-        ];
+        let mainVideos = [];
+        let drottsData = [];
 
         // ===== STATE =====
         let mainIndex = 0;
@@ -730,13 +718,78 @@
         const mainLikes = new Map();
         const shortLikes = new Map();
 
+        // ===== SUPABASE FETCH =====
+        async function loadAllData() {
+            try {
+                // Fetch main videos (is_short = false)
+                const { data: videos, error: vErr } = await window.db
+                    .from('videos')
+                    .select('id, title, creator_name, views, likes, video_url, thumbnail_url, created_at')
+                    .eq('is_short', false)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+
+                if (vErr) throw vErr;
+
+                mainVideos = (videos || []).map(v => ({
+                    id: v.id,
+                    title: v.title || 'Untitled',
+                    creator: v.creator_name || 'Creator',
+                    avatar: (v.creator_name || 'C')[0].toUpperCase(),
+                    views: formatViews(v.views || 0),
+                    likes: v.likes || 0,
+                    url: v.video_url,
+                    thumb: v.thumbnail_url
+                }));
+
+                // Fetch drotts/shorts (is_short = true)
+                const { data: shorts, error: sErr } = await window.db
+                    .from('videos')
+                    .select('id, title, creator_name, views, likes, video_url, thumbnail_url, created_at')
+                    .eq('is_short', true)
+                    .order('created_at', { ascending: false })
+                    .limit(30);
+
+                if (sErr) throw sErr;
+
+                const now = new Date();
+                drottsData = (shorts || []).map(s => {
+                    const created = new Date(s.created_at);
+                    const diffHrs = (now - created) / 36e5;
+                    return {
+                        id: s.id,
+                        author: s.creator_name || 'creator',
+                        title: s.title || 'Untitled',
+                        views: formatViews(s.views || 0),
+                        likes: s.likes || 0,
+                        comments: 0,
+                        isNew: diffHrs < 48,
+                        thumb: s.thumbnail_url,
+                        url: s.video_url
+                    };
+                });
+
+            } catch (err) {
+                console.error('Supabase fetch error:', err);
+                mainVideos = [];
+                drottsData = [];
+            }
+        }
+
+        function formatViews(n) {
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return String(n);
+        }
+
         // ===== DOM =====
         const mainVideo = document.getElementById('mainVideo');
         const selectDropdown = document.getElementById('selectDropdown');
         const drottsGrid = document.getElementById('shortsGrid');
 
         // ===== INIT =====
-        function init() {
+        async function init() {
+            await loadAllData();
             renderSelector();
             renderShorts();
             setupMainVideo();
