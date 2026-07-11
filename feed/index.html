@@ -83,8 +83,7 @@ function openVideo(el) {
   var isShort = el.dataset.short === '1';
   var base = isShort ? '/player/shorts.html' : '/player/player-v2.html';
   var href = base + '?id='+id;
-  if (url) href += '&url='+url;
-  if (title) href += '&title='+title;
+  if (title) href += '&title='+encodeURIComponent(title);
   window.top.location.href = href;
 }
 async function loadFeed() {
