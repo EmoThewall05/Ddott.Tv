@@ -1006,25 +1006,34 @@
         let currentCommentVideoId = null;
 
         function openComments(videoId) {
-            // Hide right drott card
-            const cards = document.querySelectorAll('.short-card');
-            if(cards[1]) cards[1].style.visibility = 'hidden';
             currentCommentVideoId = videoId;
+            // Find which card was tapped and its position
+            const card = document.getElementById('sc-' + videoId);
             const drawer = document.getElementById('commentsDrawer');
+            if (card) {
+                const rect = card.getBoundingClientRect();
+                const screenW = window.innerWidth;
+                if (rect.left < screenW / 2) {
+                    // Left card — show comments on LEFT
+                    drawer.style.left = '0';
+                    drawer.style.right = 'auto';
+                } else {
+                    // Right card — show comments on RIGHT
+                    drawer.style.left = 'auto';
+                    drawer.style.right = '0';
+                }
+            }
             drawer.style.display = 'flex';
             setTimeout(() => drawer.style.transform = 'translateY(0)', 10);
             loadComments(videoId);
         }
 
         function closeComments() {
-            // Show all drott cards
-            document.querySelectorAll('.short-card').forEach(c => c.style.visibility = 'visible');
             const drawer = document.getElementById('commentsDrawer');
             drawer.style.transform = 'translateY(100%)';
             setTimeout(() => {
                 drawer.style.display = 'none';
             }, 300);
-            toggleMainWidth(false);
         }
 
         function toggleMainWidth(shrink) {
@@ -1097,7 +1106,7 @@
         }
     </script>
 <!-- Comments Side Panel -->
-<div id="commentsDrawer" style="display:none;position:fixed;bottom:64px;left:0;right:0;width:100%;height:35dvh;background:#0f0f18;border-left:1px solid rgba(255,255,255,0.08);z-index:1000;flex-direction:column;transform:translateY(100%);transition:transform 0.3s ease;">
+<div id="commentsDrawer" style="display:none;position:fixed;bottom:64px;left:0;width:50%;height:42dvh;background:#0f0f18;border:1px solid rgba(255,255,255,0.1);border-radius:12px 12px 0 0;z-index:1000;flex-direction:column;transform:translateY(100%);transition:transform 0.3s ease;">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
     <span style="font-size:13px;font-weight:700;color:#fff;">💬 Comments</span>
     <button onclick="closeComments()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:18px;cursor:pointer;line-height:1;">✕</button>
