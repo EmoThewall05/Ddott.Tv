@@ -535,6 +535,7 @@ async function publishVideo() {
 
     const { error } = await db.from('videos').insert({
       user_id: user.id,
+      creator_id: user.id,
       title: title,
       description: document.getElementById('videoDesc').value,
       category: document.getElementById('videoCategory').value,

@@ -989,8 +989,8 @@
             if (resolved) return resolved;
         }
 
-        console.log('⚠️ No video param found or DB lookup failed, using fallback');
-        return FALLBACK_VIDEO;
+        console.log('⚠️ No video param found or DB lookup failed');
+        return null;
     }
 
     async function loadVideo() {
@@ -1004,7 +1004,9 @@
         console.log('🎬 Loading video URL:', currentVideoUrl);
 
         if (!currentVideoUrl || currentVideoUrl === 'undefined') {
-            currentVideoUrl = FALLBACK_VIDEO;
+            loadingOverlay.classList.add('hidden');
+            showToast('⚠️ Video not found — go back and try another');
+            return;
         }
 
         video.pause();
@@ -1714,13 +1716,10 @@
     }
 
     function goBack() {
-        const ref = document.referrer;
-        if (ref && ref.includes('channel')) {
-            window.location.href = '/creator/channel.html';
-        } else if (ref && ref.includes('ddott.live')) {
-            history.back();
+        if (window.parent !== window) {
+            window.parent.history.back();
         } else {
-            window.location.href = '/';
+            history.back();
         }
     }
 

@@ -695,7 +695,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       filtered = filtered.filter(v => v.category === 'web3');
     } else if (filterType === 'ai') {
       filtered = filtered.filter(v => v.tags?.some(t => t.toLowerCase() === 'ai'));
-    } else if (filterType === 'shorts') {
+    } else if (filterType === 'drotts') {
       filtered = filtered.filter(v => v.is_short === true);
     }
 
