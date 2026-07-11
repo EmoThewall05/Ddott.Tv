@@ -455,21 +455,10 @@ function addAIMsg(txt,type){
   msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
 }
 </script>
-<script src="home-script.js"></script>
+<script src="../home-script.js"></script>
 <script>
-function openPlayer(url, title, creator, category, id) {
-  const params = {
-    url: url || 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', id: id || '',
-    title: title || 'Ddott TV',
-    creator: creator || 'Unknown',
-    category: category || 'General'
-  };
-  const qs = new URLSearchParams(params).toString();
-  if (window.parent && window.parent.nav) {
-    window.parent.nav('player', params);
-  } else {
-    window.location.href = '/player/player-v2.html?' + qs;
-  }
+function openPlayer(id) {
+  window.location.href = '/player/player-v2.html?id=' + id;
 }
 </script>
 </body>
