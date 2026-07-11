@@ -901,7 +901,7 @@
             document.getElementById('shortsCount').textContent = drottsData.length + ' drotts';
             drottsGrid.innerHTML = drottsData.map(s => `
                 <div class="short-card" id="sc-${s.id}">
-                    <div class="card-visual" id="cv-${s.id}">
+                    <div class="card-visual" id="cv-${s.id}" onclick="playShort(${s.id})">
                         <img src="${s.thumb}" alt="${s.title}">
                         <video loop playsinline muted preload="metadata"></video>
 
