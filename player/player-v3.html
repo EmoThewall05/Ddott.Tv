@@ -613,7 +613,7 @@
                     <div class="s-circle" id="mainLikeIcon">🤍</div>
                     <span class="s-label" id="mainLikeCount">0</span>
                 </button>
-                <button class="s-btn" onclick="alert('💬 Chat')">
+                <button class="s-btn" onclick="window.parent.location.href='/messaging/'">
                     <div class="s-circle">💬</div>
                     <span class="s-label">Chat</span>
                 </button>
@@ -893,8 +893,15 @@
 
         function shareMain() {
             const v = mainVideos[mainIndex];
-            if (navigator.share) navigator.share({ title: v.title, text: 'Check out ' + v.title + ' on Ddott TV!' });
-            else alert('🔗 Link copied: ddott.live/video/' + v.id);
+            if (navigator.share) navigator.share({ title: v.title, text: 'Check out ' + v.title + ' on Ddott TV!', url: 'https://ddott.live/player/player-v3.html?v=' + v.id });
+            else alert('🔗 Link: ddott.live/video/' + v.id);
+        }
+
+        function shareShort(id) {
+            const s = drottsData.find(x => x.id === id);
+            if (!s) return;
+            if (navigator.share) navigator.share({ title: s.title, text: 'Check out ' + s.title + ' on Ddott TV!', url: 'https://ddott.live/player/shorts.html?v=' + id });
+            else alert('🔗 Link: ddott.live/shorts/' + id);
         }
 
         // ===== SHORTS =====
@@ -916,11 +923,11 @@
                                 <span id="sl-${s.id}">${s.likes}</span>
                             </div>
                             <div class="ca-row">
-                                <button class="ca-btn" onclick="event.stopPropagation();alert('💬 Comment')">💬</button>
+                                <button class="ca-btn" onclick="event.stopPropagation();window.parent.location.href='/messaging/'">💬</button>
                                 <span>${s.comments}</span>
                             </div>
                             <div class="ca-row">
-                                <button class="ca-btn" onclick="event.stopPropagation();alert('↗️ Share')">↗️</button>
+                                <button class="ca-btn" onclick="event.stopPropagation();shareShort('${s.id}')">↗️</button>
                                 <span>Share</span>
                             </div>
                         </div>
