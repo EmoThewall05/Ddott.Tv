@@ -753,7 +753,7 @@
                 // Fetch drotts/shorts (is_short = true)
                 const { data: shorts, error: sErr } = await window.db
                     .from('videos')
-                    .select('id, title, creator_name, views, likes, video_url, thumbnail_url, created_at')
+                    .select('id, title, creator_name, views, likes, video_url, thumbnail_url, created_at, comments')
                     .eq('is_short', true)
                     .order('created_at', { ascending: false })
                     .limit(30);
