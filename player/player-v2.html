@@ -23,12 +23,28 @@
             min-height: 100vh;
         }
 
+        /* ===== PLAYER (taller in normal/portrait view, per Divin's request) ===== */
         .player-container {
             position: relative;
             width: 100%;
-            aspect-ratio: 16/9;
+            aspect-ratio: 4/5;
             background: #000;
             overflow: hidden;
+        }
+
+        @media (orientation: landscape) {
+            .player-container:not(.fullscreen-mode) {
+                aspect-ratio: 16/9;
+            }
+        }
+
+        .player-container.fullscreen-mode {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            aspect-ratio: unset;
+            z-index: 2000;
         }
 
         video {
@@ -37,6 +53,22 @@
             object-fit: cover;
             display: block;
         }
+
+        .ad-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 85, 0, 0.9);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            z-index: 8;
+            display: none;
+            letter-spacing: 1px;
+        }
+        .ad-badge.visible { display: block; }
 
         .loading-overlay {
             position: absolute;
@@ -100,6 +132,23 @@
             border: 2px solid rgba(255,255,255,0.3);
         }
 
+        .toast {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 85, 0, 0.95);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 8px;
+            z-index: 12;
+            display: none;
+            white-space: nowrap;
+        }
+        .toast.visible { display: block; }
+
         .controls-bar {
             position: absolute;
             bottom: 0;
@@ -109,7 +158,7 @@
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             z-index: 5;
             opacity: 0;
             transition: opacity 0.3s;
@@ -217,44 +266,6 @@
             font-weight: 600;
         }
 
-        .coins-bar {
-            background: linear-gradient(135deg, rgba(179, 0, 255, 0.2), rgba(255, 0, 255, 0.2));
-            border: 1px solid rgba(179, 0, 255, 0.3);
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .coins-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--neon-pink);
-            font-weight: 700;
-        }
-
-        .coins-value {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .tip-btn {
-            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-            border: none;
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
         .creator-card {
             display: flex;
             align-items: center;
@@ -293,6 +304,13 @@
             color: rgba(255,255,255,0.5);
         }
 
+        .creator-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: stretch;
+        }
+
         .follow-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -302,6 +320,17 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+        }
+
+        .tip-btn {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
         }
 
         .description {
@@ -343,13 +372,16 @@
         .comment-box {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px 12px;
             margin-bottom: 16px;
             border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .comment-input {
-            width: 100%;
+            flex: 1;
             background: transparent;
             border: none;
             color: #fff;
@@ -358,6 +390,63 @@
         }
 
         .comment-input::placeholder { color: rgba(255,255,255,0.4); }
+
+        .comment-send-btn {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            border: none;
+            color: #000;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 8px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .comment-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .comment-list { margin-bottom: 16px; }
+
+        .comment-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .comment-user {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-bottom: 3px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .comment-action-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .comment-action-btn.liked { color: var(--neon-pink); }
+
+        .empty-comments {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            padding: 8px 0 16px;
+        }
 
         .tabs-row {
             display: flex;
@@ -429,6 +518,8 @@
             color: #ff4444;
             margin-bottom: 12px;
             font-size: 14px;
+            text-align: center;
+            padding: 0 20px;
         }
 
         .retry-btn {
@@ -441,6 +532,7 @@
             cursor: pointer;
         }
 
+        /* ===== QUIZ (video + ad share the same visual style) ===== */
         .quiz-overlay {
             display: none;
             position: fixed;
@@ -494,6 +586,53 @@
             margin-bottom: 12px;
         }
         .quiz-timer.warning { color: #ff5500; }
+
+        .share-ad-btn {
+            display: none; width: 100%;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            color: #fff; font-weight: 800; font-size: 14px;
+            padding: 13px; border-radius: 12px;
+            border: none; cursor: pointer; margin-top: 10px;
+        }
+        .share-ad-btn.visible { display: block; }
+
+        /* ===== AD PRE-ROLL PROMPT ===== */
+        .ad-prompt-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 998;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .ad-prompt-overlay.active { display: flex; }
+        .ad-prompt-box {
+            background: #0d1117;
+            border: 1px solid rgba(179,0,255,0.5);
+            border-radius: 20px;
+            padding: 28px 20px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+        .ad-prompt-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .ad-prompt-sub { font-size: 13px; color: #8892a4; margin-bottom: 22px; }
+        .ad-prompt-earn-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00e676, #00b0ff);
+            color: #000; font-weight: 800; font-size: 15px;
+            padding: 14px; border-radius: 12px;
+            border: none; cursor: pointer; margin-bottom: 10px;
+        }
+        .ad-prompt-skip-btn {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            color: #fff; font-weight: 600; font-size: 14px;
+            padding: 12px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -509,6 +648,9 @@
         <video id="mainVideo" playsinline webkit-playsinline preload="metadata">
             Your browser does not support the video tag.
         </video>
+
+        <div class="ad-badge" id="adBadge">AD</div>
+        <div class="toast" id="toastMsg"></div>
 
         <div class="loading-overlay" id="loadingOverlay">
             <div class="spinner"></div>
@@ -533,6 +675,8 @@
             </div>
             <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
             <button class="ctrl-btn">🔊</button>
+            <button class="ctrl-btn" id="fullscreenPortraitBtn" title="Fullscreen">⛶</button>
+            <button class="ctrl-btn" id="fullscreenLandscapeBtn" title="Landscape Fullscreen">🔄</button>
             <span class="quality-badge">4K</span>
         </div>
     </div>
@@ -554,17 +698,9 @@
         <div class="actions-row">
             <button class="action-btn primary" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span></button>
             <button class="action-btn" id="dislikeBtn" onclick="toggleDislike()">👎 <span id="dislikeCount">0</span></button>
-            <button class="action-btn">↗ Share</button>
+            <button class="action-btn" onclick="shareVideo()">↗ Share</button>
             <button class="action-btn">+ Save</button>
             <button class="action-btn">✂ Clip</button>
-        </div>
-
-        <div class="coins-bar">
-            <div>
-                <div class="coins-label">EMO COINS</div>
-                <div class="coins-value">🪙 <span id="userCoins">0</span></div>
-            </div>
-            <button class="tip-btn">TIP CREATOR</button>
         </div>
 
         <div class="creator-card">
@@ -573,7 +709,10 @@
                 <div class="creator-name" id="creatorName">Ddott Creator</div>
                 <div class="creator-handle" id="creatorHandle">Loading...</div>
             </div>
-            <button class="follow-btn">FOLLOW</button>
+            <div class="creator-actions">
+                <button class="follow-btn">FOLLOW</button>
+                <button class="tip-btn">TIP CREATOR</button>
+            </div>
         </div>
 
         <div class="description" id="videoDescription">
@@ -588,7 +727,11 @@
 
         <div class="section-header">💬 Comments (<span id="commentCount">0</span>)</div>
         <div class="comment-box">
-            <input type="text" class="comment-input" placeholder="Add a comment...">
+            <input type="text" class="comment-input" id="commentInput" placeholder="Add a comment...">
+            <button class="comment-send-btn" id="commentSendBtn" onclick="submitComment()">Send</button>
+        </div>
+        <div class="comment-list" id="commentList">
+            <div class="empty-comments" id="emptyComments">No comments yet. Be the first!</div>
         </div>
 
         <div class="tabs-row">
@@ -622,29 +765,51 @@
         </a>
     </nav>
 
+    <!-- Pre-roll ad prompt: Skip vs Watch & Earn -->
+    <div class="ad-prompt-overlay" id="adPromptOverlay">
+        <div class="ad-prompt-box">
+            <div class="ad-prompt-title">📢 Sponsored Ad</div>
+            <div class="ad-prompt-sub" id="adPromptSub">Watch this short ad and earn Emo Coins, or skip straight to the video.</div>
+            <button class="ad-prompt-earn-btn" id="adWatchBtn" onclick="startAdPlayback()">▶ Watch &amp; Earn <span id="adRewardLabel">1.5</span> 🪙</button>
+            <button class="ad-prompt-skip-btn" onclick="skipAd()">Skip Ad</button>
+        </div>
+    </div>
+
+    <!-- Shared quiz overlay (used for both video quiz and ad quiz) -->
     <div class="quiz-overlay" id="quizOverlay">
         <div class="quiz-box">
-            <div class="quiz-title">🎬 Proof of Watch</div>
-            <div class="quiz-subtitle">Answer to earn your Emo Coins! 🪙</div>
+            <div class="quiz-title" id="quizTitle">🎬 Proof of Watch</div>
+            <div class="quiz-subtitle" id="quizSubtitle">Answer to earn your Emo Coins! 🪙</div>
             <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
             <div class="quiz-question" id="quizQuestion"></div>
             <div id="quizOptions"></div>
             <div class="quiz-result" id="quizResult"></div>
             <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
+            <button class="share-ad-btn" id="shareAdBtn" onclick="shareAd()">↗ Share This Ad &amp; Earn More</button>
             <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
         </div>
     </div>
 
     <script>
     // ============================================
-    // DDOTT TV PLAYER V2 — FIXED VERSION 2
-    // Fixes added this pass: removed <base target="_blank"> (nav no longer opens
-    // new tabs), real view count increment, per-video/per-user duplicate-claim
-    // guard for quiz coins, and like/dislike state restored on reload via
-    // localStorage so refresh doesn't double count.
+    // DDOTT TV PLAYER V2 — FIXED VERSION 3
+    // New this pass: real comments (send/like/share), landscape + portrait
+    // fullscreen, taller normal-view player, EMO COINS box removed (TIP
+    // CREATOR kept near FOLLOW), no-repeat randomized video quiz pool,
+    // pre-roll ad flow (Skip / Watch & Earn) with its own quiz + tier-based
+    // fixed coin rewards, Share-tier-only "share this ad" bonus, and basic
+    // anti-cheat: tab/notification hide auto-pauses, forward-seeking is
+    // blocked and flags the quiz as failed.
+    //
+    // ⚠️ ASSUMED TABLE SCHEMAS — please verify/adjust column names:
+    //   comments: id, video_id, user_id, username, text, likes, created_at
+    //   ads: id, title, brand_name, video_url, tier ('normal'|'mid'|'viral'|'share'), status
+    // If your real column names differ, tell me and I'll patch just those bits.
     // ============================================
 
     const FALLBACK_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    const AD_TIER_REWARDS = { normal: 1.5, mid: 2.0, viral: 2.5, share: 1.5 };
+    const AD_SHARE_BONUS = 0.5; // only for 'share' tier ads, on top of AD_TIER_REWARDS.share
 
     const video = document.getElementById('mainVideo');
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -657,6 +822,8 @@
     const progressContainer = document.getElementById('progressContainer');
     const timeDisplay = document.getElementById('timeDisplay');
     const playerContainer = document.getElementById('playerContainer');
+    const adBadge = document.getElementById('adBadge');
+    const toastMsg = document.getElementById('toastMsg');
 
     let isPlaying = false;
     let currentVideoUrl = '';
@@ -664,6 +831,18 @@
     let currentUser = null;
     let quizCoinsClaimed = false;
     let viewCounted = false;
+
+    // playerMode: 'content' (main video) or 'ad' (pre-roll ad)
+    let playerMode = 'content';
+    let activeAd = null;
+    let cheatDetected = false;
+    let lastSafeTime = 0;
+
+    function showToast(msg) {
+        toastMsg.textContent = msg;
+        toastMsg.classList.add('visible');
+        setTimeout(() => toastMsg.classList.remove('visible'), 2200);
+    }
 
     function safeDecodeUrl(raw) {
         let val = raw;
@@ -691,7 +870,7 @@
 
     async function loadUserCoins() {
         if (!currentUser) {
-            document.getElementById('userCoins').textContent = '0';
+            document.getElementById('creatorHandle');
             return;
         }
         try {
@@ -701,7 +880,7 @@
                 .eq('id', currentUser.id)
                 .single();
             if (!error && data) {
-                document.getElementById('userCoins').textContent = data.emo_coins ?? 0;
+                window.__userCoins = data.emo_coins ?? 0;
             }
         } catch (e) {
             console.error('Could not load coins:', e);
@@ -734,7 +913,6 @@
             likeCountVal = data.likes || 0;
             dislikeCountVal = data.dislikes || 0;
 
-            // Restore this user's like/dislike state so refresh doesn't double-count
             liked = localStorage.getItem('liked_' + id) === '1';
             disliked = localStorage.getItem('disliked_' + id) === '1';
             if (liked) document.getElementById('likeBtn').style.background = 'linear-gradient(135deg, #00f3ff, #bf00ff)';
@@ -744,6 +922,7 @@
             document.getElementById('dislikeCount').textContent = dislikeCountVal;
 
             if (data.creator_id) loadCreatorInfo(data.creator_id);
+            loadComments(id);
 
             return data.video_url;
         } catch (e) {
@@ -801,6 +980,7 @@
             const resolved = await fetchVideoFromDB(videoId);
             if (resolved) return resolved;
             console.warn('⚠️ Could not resolve video for id:', videoId);
+            showToast('⚠️ Video not found in database — check the link');
         }
 
         const v = params.get('v');
@@ -814,6 +994,8 @@
     }
 
     async function loadVideo() {
+        playerMode = 'content';
+        adBadge.classList.remove('visible');
         errorState.classList.remove('visible');
         loadingOverlay.classList.remove('hidden');
         loadingText.textContent = 'Loading video...';
@@ -854,9 +1036,13 @@
     video.addEventListener('loadeddata', () => {
         loadingOverlay.classList.add('hidden');
         errorState.classList.remove('visible');
-        document.getElementById('videoDuration').textContent = formatTime(video.duration || 0);
+        if (playerMode === 'content') {
+            document.getElementById('videoDuration').textContent = formatTime(video.duration || 0);
+            incrementViewCount();
+        }
         updateTimeDisplay();
-        incrementViewCount();
+        cheatDetected = false;
+        lastSafeTime = 0;
     });
 
     video.addEventListener('canplaythrough', () => {
@@ -872,10 +1058,16 @@
             code: video.error?.code,
             message: video.error?.message,
             src: video.src,
-            currentSrc: video.currentSrc,
-            networkState: video.networkState,
-            readyState: video.readyState
+            currentSrc: video.currentSrc
         });
+
+        if (playerMode === 'ad') {
+            // If an ad fails to load, just fall through to the main video instead of blocking the user.
+            console.warn('Ad failed to load, skipping straight to content.');
+            loadVideo();
+            return;
+        }
+
         errorText.textContent = errorMsg;
         errorState.classList.add('visible');
 
@@ -894,32 +1086,124 @@
     video.addEventListener('timeupdate', () => {
         updateTimeDisplay();
         updateProgress();
+        if (!video.seeking) lastSafeTime = video.currentTime;
+    });
+
+    // ===== ANTI-CHEAT: block forward-skipping past what's genuinely been watched =====
+    video.addEventListener('seeking', () => {
+        const jump = video.currentTime - lastSafeTime;
+        if (jump > 2) {
+            cheatDetected = true;
+            video.currentTime = lastSafeTime;
+            showToast('⚠️ Skipping ahead is not allowed — Proof of Watch will fail');
+        }
     });
 
     video.addEventListener('ended', () => {
         isPlaying = false;
         playBtn.textContent = '▶';
-        showVideoQuiz();
+        if (playerMode === 'ad') {
+            showAdQuiz();
+        } else {
+            showVideoQuiz();
+        }
     });
 
-    function showVideoQuiz() {
-        quizCoinsClaimed = false;
+    // ===== ANTI-CHEAT: notification bar / app switch / lock screen pauses video =====
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && !video.paused) {
+            video.pause();
+            isPlaying = false;
+            playBtn.textContent = '▶';
+            cheatDetected = true;
+        }
+    });
+
+    // ===== VIDEO QUIZ: random pool, never repeats a question for this video =====
+    function buildVideoQuestionPool() {
         const title = document.getElementById('videoTitle').textContent || 'this video';
-        const dur = video.duration;
+        const dur = video.duration || 0;
         const mins = Math.floor(dur / 60);
         const secs = Math.floor(dur % 60);
         const durStr = mins > 0 ? `${mins} min ${secs} sec` : `${secs} sec`;
-
         const wrong1 = mins > 0 ? `${mins - 1} min ${secs} sec` : `${secs + 15} sec`;
         const wrong2 = mins > 0 ? `${mins + 1} min ${secs} sec` : `${Math.max(secs - 10, 5)} sec`;
+        const views = document.getElementById('viewCount').textContent;
+        const creatorName = document.getElementById('creatorName').textContent || 'the creator';
 
-        const questions = [
-            { q: `Q1. How long was this video?`, options: shuffle([durStr, wrong1, wrong2]), answer: durStr },
-            { q: `Q2. What is the title of this video?`, options: shuffle([title, 'Ddott TV Short', 'Creator Studio Guide']), answer: title }
+        return [
+            { key: 'q_duration', q: 'How long was this video?', options: shuffle([durStr, wrong1, wrong2]), answer: durStr },
+            { key: 'q_title', q: 'What is the title of this video?', options: shuffle([title, 'Ddott TV Short', 'Creator Studio Guide']), answer: title },
+            { key: 'q_creator', q: 'Who is the creator of this video?', options: shuffle([creatorName, 'Random Creator', 'Guest Uploader']), answer: creatorName },
+            { key: 'q_views', q: 'Roughly how many views does this video have right now?', options: shuffle([views, '999,999 views', '1 views']), answer: views }
         ];
+    }
 
-        const idx = Math.floor(Math.random() * questions.length);
-        const quiz = questions[idx];
+    function pickUnaskedQuestion(pool, videoId) {
+        const askedKey = 'quiz_asked_' + videoId;
+        let asked = [];
+        try { asked = JSON.parse(localStorage.getItem(askedKey) || '[]'); } catch (e) { asked = []; }
+
+        let available = pool.filter(q => !asked.includes(q.key));
+        if (available.length === 0) {
+            // exhausted the pool — reset so the feature keeps working
+            asked = [];
+            available = pool;
+        }
+        const chosen = available[Math.floor(Math.random() * available.length)];
+        asked.push(chosen.key);
+        localStorage.setItem(askedKey, JSON.stringify(asked));
+        return chosen;
+    }
+
+    function showVideoQuiz() {
+        quizCoinsClaimed = false;
+        document.getElementById('quizTitle').textContent = '🎬 Proof of Watch';
+        document.getElementById('quizSubtitle').textContent = 'Answer to earn your Emo Coins! 🪙';
+        document.getElementById('shareAdBtn').classList.remove('visible');
+
+        const pool = buildVideoQuestionPool();
+        const quiz = pickUnaskedQuestion(pool, currentVideoId || 'unknown');
+        renderQuiz(quiz, async () => {
+            await creditCoins(10, 'video watch');
+        });
+    }
+
+    // ===== AD QUIZ: brand/title based, harder to guess blindly =====
+    function buildAdQuestionPool(ad) {
+        return [
+            { key: 'ad_brand', q: 'Which brand was this ad for?', options: shuffle([ad.brand_name || ad.title, 'Random Co.', 'Sample Traders']), answer: ad.brand_name || ad.title },
+            { key: 'ad_title', q: 'What was this ad about?', options: shuffle([ad.title, 'Unrelated Product Launch', 'Different Service']), answer: ad.title }
+        ];
+    }
+
+    function showAdQuiz() {
+        adBadge.classList.remove('visible');
+        quizCoinsClaimed = false;
+        document.getElementById('quizTitle').textContent = '📢 Ad Proof of Watch';
+        document.getElementById('quizSubtitle').textContent = 'Answer correctly to earn your ad reward 🪙';
+
+        const pool = buildAdQuestionPool(activeAd);
+        const quiz = pool[Math.floor(Math.random() * pool.length)];
+        renderQuiz(quiz, async () => {
+            const tier = (activeAd.tier || 'normal').toLowerCase();
+            const reward = AD_TIER_REWARDS[tier] ?? AD_TIER_REWARDS.normal;
+            await creditCoins(reward, 'ad watch (' + tier + ')');
+            if (tier === 'share') {
+                document.getElementById('shareAdBtn').classList.add('visible');
+            }
+        }, () => {
+            // after quiz closes (pass or fail), go on to the main content video
+            loadVideo();
+        });
+    }
+
+    let quizOnClaim = null;
+    let quizOnClose = null;
+
+    function renderQuiz(quiz, onClaim, onClose) {
+        quizOnClaim = onClaim;
+        quizOnClose = onClose || null;
 
         document.getElementById('quizQuestion').textContent = quiz.q;
         document.getElementById('quizResult').textContent = '';
@@ -944,6 +1228,7 @@
     function startQuizTimer() {
         let timeLeft = 90;
         const timerEl = document.getElementById('quizTimer');
+        timerEl.classList.remove('warning');
         clearInterval(quizTimerInterval);
         quizTimerInterval = setInterval(() => {
             timeLeft--;
@@ -963,12 +1248,19 @@
     }
 
     function shuffle(arr) {
-        return arr.sort(() => Math.random() - 0.5);
+        return [...arr].sort(() => Math.random() - 0.5);
     }
 
     function checkQuizAnswer(btn, selected, answer, optDiv) {
         const btns = optDiv.querySelectorAll('.quiz-option');
         btns.forEach(b => b.disabled = true);
+
+        if (cheatDetected) {
+            btn.classList.add('wrong');
+            document.getElementById('quizResult').textContent = '❌ Skipping/leaving the screen was detected — no coins this time.';
+            return;
+        }
+
         if (selected === answer) {
             btn.classList.add('correct');
             document.getElementById('quizResult').textContent = '✅ Correct! Claim your Emo Coins below.';
@@ -980,7 +1272,32 @@
         }
     }
 
-    // ===== REAL COIN CLAIM (writes to Supabase, one claim per user per video) =====
+    async function creditCoins(amount, reason) {
+        if (!currentUser) return false;
+        try {
+            const { data: profile, error: fetchErr } = await db
+                .from('profiles')
+                .select('emo_coins')
+                .eq('id', currentUser.id)
+                .single();
+            if (fetchErr) throw fetchErr;
+
+            const newBalance = (profile?.emo_coins || 0) + amount;
+            const { error: updateErr } = await db
+                .from('profiles')
+                .update({ emo_coins: newBalance })
+                .eq('id', currentUser.id);
+            if (updateErr) throw updateErr;
+
+            window.__userCoins = newBalance;
+            console.log('🪙 +' + amount + ' coins credited for: ' + reason);
+            return true;
+        } catch (e) {
+            console.error('Coin credit failed (' + reason + '):', e);
+            return false;
+        }
+    }
+
     async function claimQuizCoins() {
         if (quizCoinsClaimed) return;
         const earnBtn = document.getElementById('quizEarnBtn');
@@ -993,38 +1310,24 @@
             return;
         }
 
-        const claimKey = 'quiz_claimed_' + currentVideoId + '_' + currentUser.id;
+        const scope = playerMode === 'ad' ? ('ad_' + (activeAd?.id || 'x')) : ('video_' + currentVideoId);
+        const claimKey = 'quiz_claimed_' + scope + '_' + currentUser.id;
         if (localStorage.getItem(claimKey)) {
-            document.getElementById('quizResult').textContent = '⚠️ Already claimed for this video.';
+            document.getElementById('quizResult').textContent = '⚠️ Already claimed for this item.';
             earnBtn.classList.remove('visible');
             setTimeout(closeQuiz, 1500);
             return;
         }
 
         try {
-            const { data: profile, error: fetchErr } = await db
-                .from('profiles')
-                .select('emo_coins')
-                .eq('id', currentUser.id)
-                .single();
-
-            if (fetchErr) throw fetchErr;
-
-            const newBalance = (profile?.emo_coins || 0) + 10;
-
-            const { error: updateErr } = await db
-                .from('profiles')
-                .update({ emo_coins: newBalance })
-                .eq('id', currentUser.id);
-
-            if (updateErr) throw updateErr;
-
+            if (quizOnClaim) await quizOnClaim();
             localStorage.setItem(claimKey, '1');
             quizCoinsClaimed = true;
-            document.getElementById('quizResult').textContent = '🎉 +10 Emo Coins added to your wallet!';
-            document.getElementById('userCoins').textContent = newBalance;
+            document.getElementById('quizResult').textContent = '🎉 Emo Coins added to your wallet!';
             earnBtn.classList.remove('visible');
-            setTimeout(closeQuiz, 1500);
+            if (!(playerMode === 'ad' && (activeAd?.tier || '').toLowerCase() === 'share')) {
+                setTimeout(closeQuiz, 1500);
+            }
         } catch (e) {
             console.error('Coin claim failed:', e);
             document.getElementById('quizResult').textContent = '⚠️ Failed to add coins. Try again.';
@@ -1032,13 +1335,249 @@
         }
     }
 
+    async function shareAd() {
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: activeAd.title || 'Sponsored Ad on Ddott TV',
+                    text: 'Check out this ad on Ddott TV!',
+                    url: window.location.href
+                });
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                showToast('Link copied — share it anywhere!');
+            }
+            await creditCoins(AD_SHARE_BONUS, 'ad share bonus');
+            document.getElementById('quizResult').textContent = '🎉 Ad shared! Bonus coins added.';
+            document.getElementById('shareAdBtn').classList.remove('visible');
+            setTimeout(closeQuiz, 1200);
+        } catch (e) {
+            console.warn('Share cancelled or failed:', e);
+        }
+    }
+
     function closeQuiz() {
         clearInterval(quizTimerInterval);
         document.getElementById('quizOverlay').classList.remove('active');
         document.getElementById('quizResult').style.color = '#00e676';
+        document.getElementById('shareAdBtn').classList.remove('visible');
         const timerEl = document.getElementById('quizTimer');
         if (timerEl) timerEl.classList.remove('warning');
+        cheatDetected = false;
+        if (quizOnClose) { const fn = quizOnClose; quizOnClose = null; fn(); }
     }
+
+    // ===== PRE-ROLL AD FLOW =====
+    async function maybeShowAdPrompt() {
+        try {
+            const { data, error } = await db
+                .from('ads')
+                .select('id,title,brand_name,video_url,tier')
+                .eq('status', 'active')
+                .limit(10);
+
+            if (error || !data || data.length === 0) {
+                loadVideo();
+                return;
+            }
+
+            activeAd = data[Math.floor(Math.random() * data.length)];
+            const tier = (activeAd.tier || 'normal').toLowerCase();
+            const reward = AD_TIER_REWARDS[tier] ?? AD_TIER_REWARDS.normal;
+            document.getElementById('adRewardLabel').textContent = reward;
+            document.getElementById('adPromptSub').textContent =
+                (activeAd.brand_name || activeAd.title || 'A sponsor') + ' wants to show you a quick ad.';
+            document.getElementById('adPromptOverlay').classList.add('active');
+        } catch (e) {
+            console.warn('No ads available, skipping straight to content:', e);
+            loadVideo();
+        }
+    }
+
+    function skipAd() {
+        document.getElementById('adPromptOverlay').classList.remove('active');
+        activeAd = null;
+        loadVideo();
+    }
+
+    function startAdPlayback() {
+        document.getElementById('adPromptOverlay').classList.remove('active');
+        if (!activeAd || !activeAd.video_url) { loadVideo(); return; }
+
+        playerMode = 'ad';
+        adBadge.classList.add('visible');
+        loadingOverlay.classList.remove('hidden');
+        loadingText.textContent = 'Loading ad...';
+        errorState.classList.remove('visible');
+
+        video.pause();
+        video.src = activeAd.video_url;
+        video.load();
+        attemptPlay();
+    }
+
+    // ===== COMMENTS =====
+    async function loadComments(videoId) {
+        const listEl = document.getElementById('commentList');
+        const emptyEl = document.getElementById('emptyComments');
+        try {
+            const { data, error } = await db
+                .from('comments')
+                .select('id,user_id,username,text,likes,created_at')
+                .eq('video_id', videoId)
+                .order('created_at', { ascending: false });
+
+            if (error || !data) throw error || new Error('no data');
+
+            document.getElementById('commentCount').textContent = data.length;
+            listEl.innerHTML = '';
+            if (data.length === 0) {
+                listEl.appendChild(emptyEl);
+                return;
+            }
+            data.forEach(c => listEl.appendChild(renderCommentItem(c)));
+        } catch (e) {
+            console.error('Load comments failed (check "comments" table schema):', e);
+        }
+    }
+
+    function renderCommentItem(c) {
+        const wrap = document.createElement('div');
+        wrap.className = 'comment-item';
+
+        const liked = localStorage.getItem('comment_liked_' + c.id) === '1';
+
+        wrap.innerHTML = `
+            <div class="comment-user">${escapeHtml(c.username || 'Ddott User')}</div>
+            <div class="comment-text">${escapeHtml(c.text)}</div>
+            <div class="comment-actions">
+                <button class="comment-action-btn ${liked ? 'liked' : ''}" data-id="${c.id}" data-action="like">👍 <span>${c.likes || 0}</span></button>
+                <button class="comment-action-btn" data-id="${c.id}" data-action="share">↗ Share</button>
+            </div>
+        `;
+
+        wrap.querySelector('[data-action="like"]').addEventListener('click', (e) => likeComment(c.id, e.currentTarget));
+        wrap.querySelector('[data-action="share"]').addEventListener('click', () => shareComment(c));
+
+        return wrap;
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+    }
+
+    async function submitComment() {
+        const input = document.getElementById('commentInput');
+        const text = input.value.trim();
+        if (!text || !currentVideoId) return;
+
+        if (!currentUser) {
+            showToast('⚠️ Please log in to comment');
+            return;
+        }
+
+        const btn = document.getElementById('commentSendBtn');
+        btn.disabled = true;
+        try {
+            const { error } = await db.from('comments').insert({
+                video_id: currentVideoId,
+                user_id: currentUser.id,
+                username: currentUser.email || 'Ddott User',
+                text,
+                likes: 0
+            });
+            if (error) throw error;
+            input.value = '';
+            await loadComments(currentVideoId);
+        } catch (e) {
+            console.error('Comment insert failed (check "comments" table schema):', e);
+            showToast('⚠️ Could not post comment');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    document.getElementById('commentInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitComment();
+    });
+
+    async function likeComment(commentId, btnEl) {
+        const key = 'comment_liked_' + commentId;
+        const already = localStorage.getItem(key) === '1';
+        const countSpan = btnEl.querySelector('span');
+        let count = parseInt(countSpan.textContent || '0', 10);
+
+        count = already ? Math.max(0, count - 1) : count + 1;
+        localStorage.setItem(key, already ? '0' : '1');
+        btnEl.classList.toggle('liked', !already);
+        countSpan.textContent = count;
+
+        try {
+            await db.from('comments').update({ likes: count }).eq('id', commentId);
+        } catch (e) {
+            console.error('Comment like update failed:', e);
+        }
+    }
+
+    async function shareComment(c) {
+        try {
+            if (navigator.share) {
+                await navigator.share({ text: c.text, url: window.location.href });
+            } else {
+                await navigator.clipboard.writeText(c.text + ' — ' + window.location.href);
+                showToast('Comment link copied!');
+            }
+        } catch (e) {
+            console.warn('Comment share cancelled:', e);
+        }
+    }
+
+    async function shareVideo() {
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: document.getElementById('videoTitle').textContent,
+                    url: window.location.href
+                });
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                showToast('Link copied!');
+            }
+        } catch (e) {
+            console.warn('Share cancelled:', e);
+        }
+    }
+
+    // ===== FULLSCREEN (landscape + portrait) =====
+    async function enterFullscreen(orientation) {
+        try {
+            if (playerContainer.requestFullscreen) {
+                await playerContainer.requestFullscreen();
+            } else if (playerContainer.webkitRequestFullscreen) {
+                playerContainer.webkitRequestFullscreen();
+            }
+            playerContainer.classList.add('fullscreen-mode');
+            if (screen.orientation && screen.orientation.lock) {
+                try { await screen.orientation.lock(orientation); } catch (e) { console.warn('Orientation lock not supported:', e); }
+            }
+        } catch (e) {
+            console.warn('Fullscreen request failed:', e);
+        }
+    }
+
+    document.getElementById('fullscreenLandscapeBtn').addEventListener('click', () => enterFullscreen('landscape'));
+    document.getElementById('fullscreenPortraitBtn').addEventListener('click', () => enterFullscreen('portrait'));
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            playerContainer.classList.remove('fullscreen-mode');
+            if (screen.orientation && screen.orientation.unlock) {
+                try { screen.orientation.unlock(); } catch (e) {}
+            }
+        }
+    });
 
     playBtn.addEventListener('click', () => {
         if (video.paused) {
@@ -1067,9 +1606,16 @@
     });
 
     progressContainer.addEventListener('click', (e) => {
+        // Manual scrubbing via the progress bar counts as seeking too — same anti-cheat rule applies.
         const rect = progressContainer.getBoundingClientRect();
         const pos = (e.clientX - rect.left) / rect.width;
-        video.currentTime = pos * video.duration;
+        const target = pos * video.duration;
+        if (target - lastSafeTime > 2) {
+            cheatDetected = true;
+            showToast('⚠️ Skipping ahead is not allowed — Proof of Watch will fail');
+            return;
+        }
+        video.currentTime = target;
     });
 
     function formatTime(seconds) {
@@ -1182,7 +1728,7 @@
         populateFromUrl();
         currentUser = await getCurrentUser();
         await loadUserCoins();
-        loadVideo();
+        maybeShowAdPrompt();
     });
 
     window.ddottPlayer = { loadVideo, getVideoUrl, video, refreshUserCoins };
