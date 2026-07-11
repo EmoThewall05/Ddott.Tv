@@ -1006,6 +1006,9 @@
         let currentCommentVideoId = null;
 
         function openComments(videoId) {
+            // Hide right drott card
+            const cards = document.querySelectorAll('.short-card');
+            if(cards[1]) cards[1].style.visibility = 'hidden';
             currentCommentVideoId = videoId;
             const drawer = document.getElementById('commentsDrawer');
             drawer.style.display = 'flex';
@@ -1014,6 +1017,8 @@
         }
 
         function closeComments() {
+            // Show all drott cards
+            document.querySelectorAll('.short-card').forEach(c => c.style.visibility = 'visible');
             const drawer = document.getElementById('commentsDrawer');
             drawer.style.transform = 'translateX(100%)';
             setTimeout(() => {
