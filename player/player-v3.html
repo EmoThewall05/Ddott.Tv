@@ -901,17 +901,17 @@
             document.getElementById('shortsCount').textContent = drottsData.length + ' drotts';
             drottsGrid.innerHTML = drottsData.map(s => `
                 <div class="short-card" id="sc-${s.id}">
-                    <div class="card-visual" id="cv-${s.id}" onclick="playShort(${s.id})">
+                    <div class="card-visual" id="cv-${s.id}" onclick="playShort('${s.id}')">
                         <img src="${s.thumb}" alt="${s.title}">
                         <video loop playsinline muted preload="metadata"></video>
 
                         ${s.isNew ? '<div class="badge-new">NEW</div>' : ''}
-                        <button class="card-mute" onclick="event.stopPropagation();toggleShortMute(${s.id})">🔇</button>
-                        <button class="card-play" onclick="event.stopPropagation();playShort(${s.id})">▶</button>
+                        <button class="card-mute" onclick="event.stopPropagation();toggleShortMute('${s.id}')">🔇</button>
+                        <button class="card-play" onclick="event.stopPropagation();playShort('${s.id}')">▶</button>
 
                         <div class="card-actions">
                             <div class="ca-row">
-                                <button class="ca-btn" onclick="event.stopPropagation();likeShort(${s.id})">🤍</button>
+                                <button class="ca-btn" onclick="event.stopPropagation();likeShort('${s.id}')">🤍</button>
                                 <span id="sl-${s.id}">${s.likes}</span>
                             </div>
                             <div class="ca-row">
