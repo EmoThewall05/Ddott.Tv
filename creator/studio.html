@@ -541,7 +541,7 @@ async function publishVideo() {
       category: document.getElementById('videoCategory').value,
       licence: document.getElementById('videoLicence').value,
       video_url: h264Url,
-      thumbnail_url: cloudData.secure_url.replace('/video/upload/', '/video/upload/so_0/'),
+      thumbnail_url: cloudData.secure_url.replace('/video/upload/', '/video/upload/so_0/').replace(/\.[^/.]+$/, '.jpg'),
       views: 0,
       likes: 0,
       is_short: isShort,
