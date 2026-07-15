@@ -47,7 +47,7 @@ select option { background: #0d0d0d; }
 .success-card { background: #00ff8811; border: 1px solid #00ff8833; border-radius: 12px; padding: 20px; text-align: center; display: none; }
 .success-card.show { display: block; }
 .my-videos { display: flex; flex-direction: column; gap: 12px; }
-.video-card { background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 14px; overflow: hidden; display: flex; gap: 12px; padding: 12px; cursor: pointer; transition: all 0.2s; }
+.video-card { position: relative; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 14px; overflow: hidden; display: flex; gap: 12px; padding: 12px; cursor: pointer; transition: all 0.2s; }
 .video-card:hover { border-color: #00f5ff33; background: #0d0d0d; }
 .video-card:active { transform: scale(0.98); }
 .video-thumb { width: 80px; height: 60px; background: #1a1a2e; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
@@ -319,6 +319,7 @@ function renderVideos(videos) {
 
   list.innerHTML = videos.map(v => `
     <div class="video-card" onclick="playVideo('${v.id}', '${encodeURIComponent(v.video_url || '')}', '${encodeURIComponent(v.title || 'Untitled')}')">
+      <button onclick="event.stopPropagation(); deleteVideo('${v.id}')" style="position:absolute;top:6px;right:6px;z-index:5;background:rgba(255,50,50,0.9);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">🗑</button>
       <div class="video-thumb" style="position:relative;">${v.thumbnail || '🎬'}${v.is_short ? '<div style="position:absolute;top:4px;left:4px;background:rgba(0,210,255,0.9);padding:2px 6px;border-radius:4px;font-size:9px;font-family:monospace;color:#fff;">⚡ DROTT</div>' : ''}</div>
       <div class="video-info">
         <div class="video-title">${v.title || 'Untitled'}</div>
@@ -331,6 +332,22 @@ function renderVideos(videos) {
       </div>
     </div>
   `).join('');
+}
+
+async function deleteVideo(id) {
+  if (!confirm('Delete this video? This cannot be undone.')) return;
+  try {
+    if (typeof db !== 'undefined' && db.from) {
+      const { error } = await db.from('videos').delete().eq('id', id);
+      if (error) {
+        alert('Delete failed: ' + error.message);
+        return;
+      }
+    }
+    loadMyVideos();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
 }
 
 function playVideo(id, url, title) {
