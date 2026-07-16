@@ -663,6 +663,11 @@
             <div class="tap-icon">▶</div>
         </div>
 
+        <div class="error-state" id="noVideoState">
+            <div class="error-text">📺 No video selected</div>
+            <button class="retry-btn" onclick="window.top.location.href='/'">Go to Feed</button>
+        </div>
+
         <div class="error-state" id="errorState">
             <div class="error-text" id="errorText">Video failed to load</div>
             <button class="retry-btn" onclick="loadVideo()">Retry</button>
@@ -1007,7 +1012,13 @@
 
         if (!currentVideoUrl || currentVideoUrl === 'undefined') {
             loadingOverlay.classList.add('hidden');
-            showToast('⚠️ Video not found — go back and try another');
+            const params = new URLSearchParams(window.location.search);
+            const hasAnyParam = params.get('id') || params.get('url') || params.get('v');
+            if (!hasAnyParam) {
+                document.getElementById('noVideoState').classList.add('visible');
+            } else {
+                showToast('⚠️ Video not found — go back and try another');
+            }
             return;
         }
 
