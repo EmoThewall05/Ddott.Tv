@@ -311,6 +311,12 @@
             align-items: stretch;
         }
 
+        .follow-btn.following {
+            background: rgba(0,243,255,0.15);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+        }
+
         .follow-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -717,7 +723,7 @@
                 <div class="creator-handle" id="creatorHandle">Loading...</div>
             </div>
             <div class="creator-actions">
-                <button class="follow-btn">FOLLOW</button>
+                <button class="follow-btn" id="followBtn" onclick="toggleFollow()">FOLLOW</button>
                 <button class="tip-btn">TIP CREATOR</button>
             </div>
         </div>
@@ -835,6 +841,7 @@
     let isPlaying = false;
     let currentVideoUrl = '';
     let currentVideoId = null;
+    let currentCreatorId = null;
     let currentUser = null;
     let quizCoinsClaimed = false;
     let viewCounted = false;
@@ -928,7 +935,7 @@
             document.getElementById('likeCount').textContent = likeCountVal;
             document.getElementById('dislikeCount').textContent = dislikeCountVal;
 
-            if (data.creator_id) loadCreatorInfo(data.creator_id);
+            if (data.creator_id) { currentCreatorId = data.creator_id; loadCreatorInfo(data.creator_id); }
             loadComments(id);
 
             return data.video_url;
@@ -955,8 +962,66 @@
                 document.getElementById('creatorAvatar').innerHTML =
                     '<img src="' + data.avatar_url + '" alt="avatar">';
             }
+
+            if (currentUser) {
+                const { data: followData } = await db
+                    .from('follows')
+                    .select('id')
+                    .eq('follower_id', currentUser.id)
+                    .eq('creator_id', creatorId)
+                    .maybeSingle();
+                const followBtn = document.getElementById('followBtn');
+                if (followData) {
+                    followBtn.textContent = 'FOLLOWING';
+                    followBtn.classList.add('following');
+                } else {
+                    followBtn.textContent = 'FOLLOW';
+                    followBtn.classList.remove('following');
+                }
+            }
         } catch (e) {
             console.error('Creator info fetch error:', e);
+        }
+    }
+
+    async function toggleFollow() {
+        if (!currentUser) {
+            showToast('⚠️ Please log in to follow');
+            return;
+        }
+        if (!currentCreatorId) return;
+
+        const followBtn = document.getElementById('followBtn');
+        followBtn.disabled = true;
+        try {
+            const { data: existing } = await db
+                .from('follows')
+                .select('id')
+                .eq('follower_id', currentUser.id)
+                .eq('creator_id', currentCreatorId)
+                .maybeSingle();
+
+            if (existing) {
+                await db.from('follows').delete().eq('id', existing.id);
+                followBtn.textContent = 'FOLLOW';
+                followBtn.classList.remove('following');
+                showToast('Unfollowed');
+            } else {
+                await db.from('follows').insert({
+                    follower_id: currentUser.id,
+                    creator_id: currentCreatorId
+                });
+                followBtn.textContent = 'FOLLOWING';
+                followBtn.classList.add('following');
+                showToast('✅ Followed!');
+            }
+
+            loadCreatorInfo(currentCreatorId);
+        } catch (e) {
+            console.error('Toggle follow failed:', e);
+            showToast('⚠️ Follow action failed');
+        } finally {
+            followBtn.disabled = false;
         }
     }
 
@@ -1438,7 +1503,7 @@
         try {
             const { data, error } = await db
                 .from('comments')
-                .select('id,user_id,username,text,likes,created_at')
+                .select('id,user_id,username,content,likes,created_at')
                 .eq('video_id', videoId)
                 .order('created_at', { ascending: false });
 
@@ -1500,7 +1565,7 @@
                 video_id: currentVideoId,
                 user_id: currentUser.id,
                 username: currentUser.email || 'Ddott User',
-                text,
+                content: text,
                 likes: 0
             });
             if (error) throw error;
@@ -1539,9 +1604,9 @@
     async function shareComment(c) {
         try {
             if (navigator.share) {
-                await navigator.share({ text: c.text, url: window.location.href });
+                await navigator.share({ text: c.content, url: window.location.href });
             } else {
-                await navigator.clipboard.writeText(c.text + ' — ' + window.location.href);
+                await navigator.clipboard.writeText(c.content + ' — ' + window.location.href);
                 showToast('Comment link copied!');
             }
         } catch (e) {
