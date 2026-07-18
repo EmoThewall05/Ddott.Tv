@@ -1464,7 +1464,7 @@
 
         wrap.innerHTML = `
             <div class="comment-user">${escapeHtml(c.username || 'Ddott User')}</div>
-            <div class="comment-text">${escapeHtml(c.text)}</div>
+            <div class="comment-text">${escapeHtml(c.content)}</div>
             <div class="comment-actions">
                 <button class="comment-action-btn ${liked ? 'liked' : ''}" data-id="${c.id}" data-action="like">👍 <span>${c.likes || 0}</span></button>
                 <button class="comment-action-btn" data-id="${c.id}" data-action="share">↗ Share</button>
