@@ -423,16 +423,20 @@ document.getElementById('spLikeBtn').addEventListener('click', e => {
 function triggerSingleLike(element, isSplit) {
     const s = drottsData[currentIndex];
     if (!s) return;
-    let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
+    const base = s.likes || 0;
+    let st = likeStates.get(s.id) || { count: base, state: 'none' };
     if (st.state === 'super') return;
+    let newState;
     if (st.state === 'none') {
-        st = { count: st.count + 1, state: 'liked' };
+        newState = 'liked';
         if (element) createFloatingHeart(element, '💜', element.clientWidth/2, element.clientHeight/2);
     } else if (st.state === 'liked') {
-        st = { count: st.count - 1, state: 'none' };
+        newState = 'none';
     } else if (st.state === 'heart') {
-        st = { count: st.count - 1, state: 'liked' };
+        newState = 'liked';
     }
+    const inc = newState === 'liked' ? 1 : newState === 'heart' ? 2 : newState === 'super' ? 3 : 0;
+    st = { count: base + inc, state: newState };
     likeStates.set(s.id, st);
     updateLikeUI(s.id, st, element, isSplit);
 }
@@ -441,9 +445,10 @@ function triggerSingleLike(element, isSplit) {
 function triggerHeartBurst(element, x, y, isSplit) {
     const s = drottsData[currentIndex];
     if (!s) return;
-    let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
+    const base = s.likes || 0;
+    let st = likeStates.get(s.id) || { count: base, state: 'none' };
     if (st.state === 'super') return;
-    if (st.state !== 'heart') st = { count: st.count + (st.state==='none'?2:1), state: 'heart' };
+    if (st.state !== 'heart') st = { count: base + 2, state: 'heart' };
     likeStates.set(s.id, st);
     updateLikeUI(s.id, st, element, isSplit);
     const rect = element.getBoundingClientRect();
@@ -456,9 +461,10 @@ function triggerHeartBurst(element, x, y, isSplit) {
 function triggerSuperLike(element, x, y, isSplit) {
     const s = drottsData[currentIndex];
     if (!s) return;
-    let st = likeStates.get(s.id) || { count: s.likes||0, state: 'none' };
+    const base = s.likes || 0;
+    let st = likeStates.get(s.id) || { count: base, state: 'none' };
     if (st.state === 'super') return;
-    st = { count: st.count + 5, state: 'super' };
+    st = { count: base + 3, state: 'super' };
     likeStates.set(s.id, st);
     updateLikeUI(s.id, st, element, isSplit);
 

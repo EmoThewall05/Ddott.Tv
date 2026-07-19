@@ -1756,7 +1756,7 @@
         if (currentVideoId) {
             localStorage.setItem('liked_' + currentVideoId, liked ? '1' : '0');
             localStorage.setItem('disliked_' + currentVideoId, disliked ? '1' : '0');
-            db.from('videos').update({ likes: likeCountVal, dislikes: dislikeCountVal }).eq('id', currentVideoId)
+            db.rpc('update_video_reaction', { p_video_id: currentVideoId, p_likes: likeCountVal, p_dislikes: dislikeCountVal })
                 .then(({ error }) => { if (error) console.error('Like update failed:', error); });
         }
     }
@@ -1786,7 +1786,7 @@
         if (currentVideoId) {
             localStorage.setItem('liked_' + currentVideoId, liked ? '1' : '0');
             localStorage.setItem('disliked_' + currentVideoId, disliked ? '1' : '0');
-            db.from('videos').update({ likes: likeCountVal, dislikes: dislikeCountVal }).eq('id', currentVideoId)
+            db.rpc('update_video_reaction', { p_video_id: currentVideoId, p_likes: likeCountVal, p_dislikes: dislikeCountVal })
                 .then(({ error }) => { if (error) console.error('Dislike update failed:', error); });
         }
     }
