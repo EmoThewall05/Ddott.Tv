@@ -715,9 +715,9 @@
         </div>
 
         <div class="creator-card">
-            <div class="creator-avatar" id="creatorAvatar">🦋</div>
+            <div class="creator-avatar" id="creatorAvatar" onclick="goToChannel()" style="cursor:pointer;">🦋</div>
             <div class="creator-info">
-                <div class="creator-name" id="creatorName">Ddott Creator</div>
+                <div class="creator-name" id="creatorName" onclick="goToChannel()" style="cursor:pointer;">Ddott Creator</div>
                 <div class="creator-handle" id="creatorHandle">Loading...</div>
             </div>
             <div class="creator-actions">
@@ -943,8 +943,16 @@
         }
     }
 
+    let _currentCreatorId = null;
+    function goToChannel() {
+        if (_currentCreatorId) {
+            window.location.href = '/creator/channel.html?id=' + _currentCreatorId;
+        }
+    }
+
     async function loadCreatorInfo(creatorId) {
         try {
+            _currentCreatorId = creatorId;
             const { data, error } = await db
                 .from('profiles')
                 .select('display_name,avatar_url,subscribers')
