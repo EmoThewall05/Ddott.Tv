@@ -952,17 +952,26 @@ async function toggleSub() {
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Initialize with creator ID from URL or context
-    const params = new URLSearchParams(window.location.search);
-    const creatorId = params.get('id');
-    if (creatorId) {
-      loadChannel(creatorId);
-    } else {
-      // Load own channel
-      db.auth.getUser().then(({ data: { user } }) => {
-        if (user) loadChannel(user.id);
-        else window.location.href = '/auth/login.html';
-      });
+  // Initialize with creator ID from URL or context
+  const params = new URLSearchParams(window.location.search);
+  const creatorId = params.get('id');
+
+  db.auth.getUser().then(async ({ data: { user } }) => {
+    currentUser = user;
+    const targetId = creatorId || (user ? user.id : null);
+    if (!targetId) { window.location.href = '/auth/login.html'; return; }
+    loadChannel(targetId);
+
+    const subBtn = document.getElementById('subBtn');
+    if (user && targetId === user.id) {
+      if (subBtn) subBtn.style.display = 'none';
+    } else if (user) {
+      const { data: existingSub } = await db.from('subscriptions')
+        .select('id').eq('subscriber_id', user.id).eq('creator_id', targetId).maybeSingle();
+      if (existingSub) {
+        subscribed = true;
+        if (subBtn) { subBtn.textContent = '✓ SUBSCRIBED'; subBtn.classList.add('subscribed'); }
+      }
     }
   });
 </script>
