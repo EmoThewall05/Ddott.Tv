@@ -705,6 +705,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     renderVideos(filtered);
   }
 
+  let currentUser = null;
   let subscribed = false;
   let allVideos = [];
   async function doLogout(){
@@ -718,11 +719,34 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 }
 
-function toggleSub() {
-    subscribed = !subscribed;
+async function toggleSub() {
+    if (!currentUser) { window.location.href = '/auth/login.html'; return; }
+    const targetCreatorId = new URLSearchParams(window.location.search).get('id');
+    if (!targetCreatorId || targetCreatorId === currentUser.id) return;
     const btn = document.getElementById('subBtn');
-    btn.textContent = subscribed ? '✓ SUBSCRIBED' : 'SUBSCRIBE';
-    btn.classList.toggle('subscribed', subscribed);
+    btn.disabled = true;
+    if (subscribed) {
+      const { error } = await db.from('subscriptions').delete()
+        .eq('subscriber_id', currentUser.id).eq('creator_id', targetCreatorId);
+      if (!error) {
+        subscribed = false;
+        btn.textContent = 'SUBSCRIBE';
+        btn.classList.remove('subscribed');
+        const s = document.getElementById('statSubs');
+        s.textContent = fmtNum(Math.max(parseInt(s.dataset.raw||'0')-1,0));
+      }
+    } else {
+      const { error } = await db.from('subscriptions').insert({
+        subscriber_id: currentUser.id, creator_id: targetCreatorId });
+      if (!error) {
+        subscribed = true;
+        btn.textContent = '✓ SUBSCRIBED';
+        btn.classList.add('subscribed');
+        const s = document.getElementById('statSubs');
+        s.textContent = fmtNum(parseInt(s.dataset.raw||'0')+1);
+      }
+    }
+    btn.disabled = false;
   }
 
   /* ─── Data Formatters ─── */
@@ -878,6 +902,7 @@ function toggleSub() {
       document.getElementById('creatorHandle').innerHTML = `@<span>${profile.username || ''}</span>`;
       document.getElementById('creatorBio').textContent = profile.bio || '';
       document.getElementById('statSubs').textContent = fmtNum(profile.subscribers || 0);
+      document.getElementById('statSubs').dataset.raw = profile.subscribers || 0;
       document.getElementById('statViews').textContent = fmtNum(profile.total_views || 0);
       document.getElementById('emoCoins').textContent = fmtNum(profile.emo_coins || 0);
       if (profile.is_verified) document.getElementById('verifiedBadge').style.display = 'flex';
