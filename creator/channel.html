@@ -901,8 +901,12 @@ async function toggleSub() {
       document.getElementById('creatorName').textContent = profile.username || profile.full_name || 'Creator';
       document.getElementById('creatorHandle').innerHTML = `@<span>${profile.username || ''}</span>`;
       document.getElementById('creatorBio').textContent = profile.bio || '';
-      document.getElementById('statSubs').textContent = fmtNum(profile.subscribers || 0);
-      document.getElementById('statSubs').dataset.raw = profile.subscribers || 0;
+      const { count: followsCount } = await db.from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('creator_id', creatorId);
+      const subCount = followsCount || 0;
+      document.getElementById('statSubs').textContent = fmtNum(subCount);
+      document.getElementById('statSubs').dataset.raw = subCount;
       document.getElementById('statViews').textContent = fmtNum(profile.total_views || 0);
       document.getElementById('emoCoins').textContent = fmtNum(profile.emo_coins || 0);
       if (profile.is_verified) document.getElementById('verifiedBadge').style.display = 'flex';
@@ -916,7 +920,7 @@ async function toggleSub() {
         banner.style.backgroundPosition = 'center';
       }
       document.getElementById('bannerText').textContent = profile.username || '';
-      window.channelStats = { videos: 0, views: profile.total_views || 0, likes: 0, emo_coins: profile.emo_coins || 0, subscribers: profile.subscribers || 0 };
+      window.channelStats = { videos: 0, views: profile.total_views || 0, likes: 0, emo_coins: profile.emo_coins || 0, subscribers: subCount };
       renderAbout({
         bio: profile.bio,
         location: profile.location,
