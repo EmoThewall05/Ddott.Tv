@@ -88,7 +88,7 @@ function openVideo(el) {
 }
 async function loadFeed() {
   try {
-    const res = await db.from('videos').select('*, profiles(username)').order('created_at',{ascending:false}).limit(50);
+    const res = await db.from('videos').select('*').order('created_at',{ascending:false}).limit(50);
     allVideos = res.data || [];
     renderFeed();
   } catch(e) {
