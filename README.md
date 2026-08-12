@@ -1,235 +1,286 @@
-# 📺 Ddott.TV
+# ⬡ THE WALL — Web3 Wallet
 
-> **The Creator Platform built on mobile. No laptop. No excuses.**
-> Videos · Live · Community · AI · Web3 — all in one.
+> **Protect your invisible valuable currencies.**
 
-![Platform](https://img.shields.io/badge/Platform-Web-cyan?style=flat-square)
-![Stack](https://img.shields.io/badge/Stack-Supabase%20%2B%20Vanilla%20JS-purple?style=flat-square)
-![Built on](https://img.shields.io/badge/Built%20on-Termux%20%2B%20Acode-green?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Active%20Development-orange?style=flat-square)
+![Web3](https://img.shields.io/badge/Web3-Wallet-blueviolet?style=flat-square)
+![Chains](https://img.shields.io/badge/Chains-6-cyan?style=flat-square)
+![Gasless](https://img.shields.io/badge/Gasless-✓-green?style=flat-square)
+![No Seed Phrase](https://img.shields.io/badge/No%20Seed%20Phrase-✓-orange?style=flat-square)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
+
+Built by **Thewin (Dwin 05)** · India 🇮🇳 → Dubai 🇦🇪  
+Built entirely on phone using **Termux + Acode**
 
 ---
 
-## 🌐 Live
+## 🌍 Live Demo
 
-| Page | URL |
+🚀 **[thewall-web3.e-mobies.com](https://thewall-web3.e-mobies.com)**
+
+---
+
+## ⚡ Features
+
+| Feature | Description |
 |---|---|
-| **Platform** | https://ddott.live |
-| **Login** | https://ddott.live/ddott-login.html |
-| **Home** | https://ddott.live/ddott-home-v2.html |
-| **Video Player** | https://ddott.live/ddott-player-v2.html?id=<video_id> |
-| **Messages** | https://ddott.live/ddott-messages.html |
-| **Creator Channel** | https://ddott.live/ddott-creator-channel.html |
-| **Landing Page** | https://ddott.live/ddott-landing-v2.html |
-| **TheWall (Web3)** | https://thewall-web3-iie7.vercel.app |
+| 🔐 No Seed Phrase | Email + Google Auth (TOTP) login |
+| ⚡ Gasless | Zero gas fees via Alchemy Gas Manager |
+| 💰 Token Balances | Real-time multi-chain token balance tracking |
+| 🖼️ NFT Display | View your NFTs across all supported chains |
+| 🔄 Token Swap | 1inch DEX aggregator — best rates across chains |
+| 🌉 Cross-chain Bridge | LI.FI protocol — bridge assets across 6 chains |
+| 🧪 Tx Simulation | Simulate transactions before sending — zero risk |
+| 🦋 Emowall AI | AI-powered Web3 guardian |
+| 📊 Charts | CoinGecko candlestick 1D/7D/1M/3M/1Y |
+| 📰 News | CoinDesk live RSS feed |
+| 🔔 Alerts | Browser price notifications |
+| 🌐 DApps | Uniswap, OpenSea, Aave, 1inch, Raydium |
+| ❄️ Freeze | Emergency PIN wallet lock |
+| 🔗 Connect | WalletConnect 530+ wallets |
 
 ---
 
-## 🦋 What is Ddott.TV?
+## ⛓️ Supported Chains
 
-**Ddott.TV** is a community-owned video platform where creators **watch, create, and earn** — powered by **Emo Coins**, **Spot Payments**, and **TheWall Web3 Wallet**.
-
-Built entirely from a **phone** using **Termux + Acode**. No laptop. No desktop. Just pure will.
-
-### Core Features
-
-| Feature | Status |
-|---|---|
-| 🎬 Video Upload & Streaming | ✅ Live |
-| ⚡ Spot Payments (Web3) | ✅ Live |
-| 🪙 Emo Coin Economy | ✅ Live |
-| 💬 Real-time Messaging | ✅ Live |
-| 🦋 Emowall AI Integration | ✅ Live |
-| 🛡 SOS Safety Gate | ✅ Live |
-| 📚 "Hey Students" Learning | 🔄 Building |
-| 📺 Community Cinema (Offline) | 🔄 Building |
+| Name | Symbol | Network | RPC |
+|---|---|---|---|
+| 🌍 Earth | ETH | Ethereum | Alchemy |
+| 🌟 Soul | SOL | Solana | Helius |
+| 🌙 Moon | MON | Monad | Alchemy |
+| 🪐 Orbit | ARB | Arbitrum | Alchemy |
+| ₿ Birth | BTC | Bitcoin | Alchemy |
+| 🔵 Base | BASE | Base | Alchemy |
 
 ---
 
-## 🚀 Pipeline Vision
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  PHASE 1 ─── ✅ COMPLETED                               │
-│  Emowall App Verification + SOS Live Streaming Gate     │
-│  Encrypted approval · Parental biometric · PIN        │
-│  Data validation filter · System-level pre-configured   │
-├─────────────────────────────────────────────────────────┤
-│  PHASE 2 ─── ✅ COMPLETED                               │
-│  TheWall 5-Chain Web3 Wallet                            │
-│  ETH · SOL · MON · ARB · BTC                            │
-│  Perfect PWA score · Community AI Teacher nodes         │
-├─────────────────────────────────────────────────────────┤
-│  PHASE 3 ─── ● ACTIVE (NOW)                             │
-│  Ddott TV Platform Launch                               │
-│  Video · Streaming · Spot Payments · Creator Studio     │
-│  Script verification · 100+ offline screens planned     │
-├─────────────────────────────────────────────────────────┤
-│  PHASE 4 ─── ○ NEXT                                     │
-│  "Hey Students" Global Learning Node                    │
-│  Free decentralized education · AI Teacher nodes          │
-│  Learning checkpoints unlock utility tokens             │
-├─────────────────────────────────────────────────────────┤
-│  PHASE 5 ─── ○ VISION                                   │
-│  Community Cinema Worldwide                             │
-│  Offline screens in every village, town, city            │
-│  Ddott Originals · Global Spot Payment support          │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🏗 Architecture
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Ddott.TV  │────▶│  Supabase   │────▶│   TheWall   │
-│   (Frontend)│     │  (Backend)  │     │  (Web3)     │
-└─────────────┘     └─────────────┘     └─────────────┘
-       │                   │                   │
-       ▼                   ▼                   ▼
-  ┌─────────┐        ┌─────────┐        ┌─────────┐
-  │ Emowall │        │  Videos │        │ 5-Chain │
-  │   AI    │        │ Messages│        │  Wallet │
-  │ 8 Modes │        │ Comments│        │ ETH/SOL │
-  └─────────┘        │ Profiles│        │ ARB/BTC │
-                     │  Coins  │        └─────────┘
-                     └─────────┘
-```
-
----
-
-## 📁 Project Structure
-
-```
-Ddott.TV/
-├── ddott-home-v2.html          # Main app shell (iframe router)
-├── ddott-player-v2.html        # Video player with controls
-├── ddott-messages.html         # Real-time chat (Supabase)
-├── ddott-creator-channel.html  # Creator profile page
-├── ddott-login.html            # Auth / login page
-├── ddott-landing-v2.html       # Public marketing page
-├── ddott-feed.html             # Video feed
-├── ddott-community.html        # Community cinema
-├── ddott-emo-coins.html        # Coin economy dashboard
-├── ddott-ai-butterfly.html     # Emowall AI interface
-├── ddott-studio.html           # Creator upload studio
-├── supabase-config.js          # Supabase client config
-├── auth.js                     # Auth helpers
-├── manifest.json               # PWA manifest
-├── sw.js                       # Service worker
-└── README.md                   # This file
-```
-
----
-
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | Vanilla HTML5 + CSS3 + JS (no framework) |
-| **Backend** | Supabase (PostgreSQL + Auth + Realtime) |
-| **Storage** | Supabase Storage (videos, thumbnails) |
-| **Web3** | TheWall (5-chain wallet via Alchemy) |
-| **AI** | Emowall AI 2.0 (Claude + Gemini 7-brains) |
-| **Build** | Termux + Acode (Android) |
-| **Deploy** | Vercel |
+| Framework | Next.js 15 + React 19 |
+| Language | TypeScript 5.0 |
+| RPC + Gas | Alchemy (all 6 chains) |
+| Wallet Connect | Reown AppKit (530+ wallets) |
+| Token Swap | 1inch DEX Aggregator |
+| Cross-chain Bridge | LI.FI Protocol |
+| Tx Simulation | Pre-flight transaction simulation |
+| Market Data | CoinGecko + CoinDesk RSS |
+| AI Guardian | Emo-key |
+| Database | NileDB (Postgres) |
+| Deployment | Vercel |
+| Styling | TailwindCSS |
 
 ---
 
-## 🪙 Emo Coin Economy
+## 🚀 Quick Start
 
-| Action | Reward |
-|---|---|
-| Daily Login | +1 Emo Coin |
-| Watch Time | +⏱ Coins per minute |
-| Creator Views | +👁 Engagement bonus |
-| Spot Payment | ⚡ Direct from fans |
-| Convert | →₿ TheWall → Crypto → Cash |
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+
+### Clone & Install
+```bash
+git clone https://github.com/EmoThewall05/Thewall-web3.git
+cd Thewall-web3
+npm install
+```
+
+### Environment Variables
+
+Create `.env.local`:
+
+```env
+# Alchemy (All chains RPC + Gas Manager)
+ALCHEMY_API_KEY=your_alchemy_api_key
+ALCHEMY_GAS_POLICY_ID=your_gas_policy_id
+
+# WalletConnect (Reown)
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
+
+# Solana (Helius)
+HELIUS_API_KEY=your_helius_api_key
+
+# 1inch (Token Swap)
+ONEINCH_API_KEY=your_1inch_api_key
+
+# LI.FI (Cross-chain Bridge)
+LIFI_API_KEY=your_lifi_api_key
+
+# AI Guardian
+GROK_API_KEY=your_grok_api_key
+
+# Blockchain Explorers
+ETHERSCAN_API_KEY=your_etherscan_key
+
+# Database
+NILEDB_POSTGRES_URL=your_postgres_url
+
+# Security
+TOTP_SECRET=your_totp_secret
+```
+
+### Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000)
+
+### Build for Production
+```bash
+npm run build
+npm start
+```
 
 ---
 
-## 🛡 Safety System
+## 🔐 Security Features
 
-**Emowall SOS Live Streaming Gate**
-- Child Protection Emergency Protocol
-- Encrypted app-approval via companion app
-- Parental biometric / PIN clearance
-- Background AI filters malicious inputs
-- Decentralized crowd-support for rescue
-- Exact location: legal authorities only
-
----
-
-## 📚 Education Layer
-
-**"Hey Students" Learning Node**
-- Free Decentralized Global Learning
-- TheWall 5-chain backend → AI Teacher nodes
-- Cryptographic ledger math
-- Functional programming
-- Algorithmic architecture
-- **No fees. No limits.**
-- Learning checkpoints unlock utility tokens
+- ✅ **CodeQL Advanced** — Automated security scanning
+- ✅ **Snyk** — Vulnerability detection
+- ✅ **Semgrep** — Static analysis
+- ✅ **PIN-Based Freeze** — Emergency wallet lock
+- ✅ **Biometric 2FA** — Face/Fingerprint support
+- ✅ **Alchemy Webhooks** — Real-time monitoring
+- ✅ **Tx Simulation** — Preview transactions before execution
 
 ---
 
-## 📺 Community Cinema
+## 🦋 Emowall AI — Web3 Guardian
 
-> *"Your Community, Your Cinema"*
+AI-powered Web3 guardian built with Anthropic.
 
-Offline screens in villages, towns, and cities. Communities gather to watch **Ddott Originals** together. Spot Payments work offline too.
+Watches your wallet 24/7:
+- Ask about swaps, chains, gas fees
+- Get security alerts
+- Price monitoring
+- Transaction insights
+
+> *Always watching 🦋*
 
 ---
 
-## 🦋 Dwin Universe Ecosystem
+## 🪙 EmoCoins (EMC)
 
-| Product | Role | Status |
+TheWall is the **central hub** for EmoCoins — the unified currency of the Dwin Universe.
+
+- Earn EMC across all Dwin Universe apps
+- Redeem EMC exclusively through TheWall
+- Use EMC for swap fee discounts, premium features, and rewards
+
+---
+
+## 📺 Ddott.TV × TheWall Integration
+
+TheWall is natively connected to **[Ddott.TV](https://ddott.live)** — the Malayalam OTT & creator platform of the Dwin Universe.
+
+- 🪙 Earn EmoCoins by watching content on Ddott.TV
+- 🔄 Convert Ddott coins → EMC → redeem via TheWall
+- 🏆 Leaderboard rewards paid out in EMC
+- 📡 Live wallet balance visible inside the Ddott.TV app
+- 🎬 Creator tips and payments routed through TheWall
+
+> *Watch. Earn. Own. — Powered by EmoCoins 🪙*
+
+---
+
+## 🏆 Backed By
+
+- **Alchemy Ecosystem Fund**
+- Personal credits from **Mike Garland** (Head of Product, Solana @ Alchemy)
+
+---
+
+## 📱 Dwin Universe
+
+TheWall is one piece of a unified ecosystem. All apps share the **EmoCoins (EMC)** currency.
+
+| Project | Description | Link |
 |---|---|---|
-| **Ddott.TV** | Content Layer | ✅ Live |
-| **TheWall** | Web3 Wallet (5-chain) | ✅ Live |
-| **Emowall AI** | Safety AI (8 modes) | ✅ Live |
-| **Emo AI Pro** | AI Assistant | ✅ Live |
-| **Emobies** | Mobile Repair Platform | 🔄 Planning |
+| 📺 Ddott.TV | Malayalam OTT & creator platform | [ddott.live](https://ddott.live) |
+| 📱 Emobies | Mobile repair platform | [web.e-mobies.com](https://web.e-mobies.com) |
+| 🦋 Emowall AI 2.0 | Multi-generational family safety AI · Free for Kerala 💚 | [emowall-ai-2.0.emothewall.online](https://emowall-ai-2.0.emothewall.online) |
+| 🧱 TheWall | Web3 wallet · EMC hub (this) | [thewall-web3.e-mobies.com](https://thewall-web3.e-mobies.com) |
+| 🤖 Emo Robos | Robotics & automation | Coming Soon |
+| 🧠 Emo AI Pro | Advanced emotional AI platform | Coming Soon |
+| 🔑 Emo-Key API | Ecosystem key generator | Internal |
+
+---
+
+## 📊 API Reference
+
+### Authentication
+```
+POST /api/auth/login
+POST /api/auth/register
+POST /api/auth/verify-totp
+```
+
+### Wallet
+```
+GET  /api/wallet/balance/:address/:chain
+GET  /api/wallet/transactions/:address/:chain
+POST /api/wallet/send
+POST /api/wallet/simulate        ← Tx Simulation
+```
+
+### NFT
+```
+GET  /api/nft/:address/:chain
+GET  /api/nft/:address/:chain/:tokenId
+```
+
+### Swap & Bridge
+```
+GET  /api/swap/quote             ← 1inch
+POST /api/swap/execute
+GET  /api/bridge/quote           ← LI.FI
+POST /api/bridge/execute
+```
+
+### Market Data
+```
+GET /api/market/price/:token
+GET /api/market/chart/:token/:period
+GET /api/market/news
+```
+
+### AI Guardian
+```
+POST /api/ai/chat
+GET  /api/ai/alerts
+```
+
+---
+
+## 🎯 Roadmap
+
+- [ ] Mobile app (Flutter)
+- [ ] Multi-sig wallets
+- [ ] Advanced portfolio analytics
+- [ ] DeFi yield farming
+- [ ] NFT marketplace integration
+- [ ] Hardware wallet support
+- [ ] Ddott.TV deep integration — in-app wallet widget
+- [ ] EmoCoins staking
 
 ---
 
 ## 👤 Creator
 
-**Emobies05** — @divin
-- Dubai 🇦🇪 · Originally from India 🇮🇳
-- Self-taught dev building entire ecosystems from a phone
-- Termux + Acode + sheer will 🔥
+**Thewin (Emobies05)**
 
-**Ecosystem:** TheWall · Emowall AI 2.0 · Emobies · Emo AI Pro · Ddott TV
-
----
-
-## 🤝 Contributing
-
-Built in public. Open to collaborators.
-
-1. Fork the repo
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+🇮🇳 India → 🇦🇪 Dubai  
+Self-taught developer  
+Built entirely on phone using **Termux + Acode**  
+Journey: 0 coding knowledge → 3.5 months → Production Web3 wallet  
+GitHub: [@EmoThewall05](https://github.com/EmoThewall05)
 
 ---
 
-## 📜 License
+## 📄 License
 
-MIT License — Dwin Universe 2025
+MIT License — Built with ❤️
 
----
-
-<p align="center">
-  <b>Your Community. Your Cinema. Your Revenue.</b><br>
-  <span style="color:#00f5ff">🦋 Ddott.TV · Dwin Universe</span>
-</p>
-'''
-
-with open('/mnt/agents/output/README.md', 'w', encoding='utf-8') as f:
-    f.write(readme_content)
-
-print("Saved README.md —", len(readme_content), "chars")
+*Follow the flow 🦋*
