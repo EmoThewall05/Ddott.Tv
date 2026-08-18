@@ -7,7 +7,8 @@ const db = window.db
 async function getProfile() {
   const { data: { user } } = await db.auth.getUser()
   if (!user) return null
-  const { data } = await db.from('profiles').select('*').eq('id', user.id).single()
+  const { data, error } = await db.from('profiles').select('*').eq('id', user.id).single()
+  if (error) { console.error('getProfile error:', error); return null }
   return data
 }
 
@@ -31,6 +32,7 @@ async function claimDailyLogin() {
   const { data: { user } } = await db.auth.getUser()
   if (!user) return { error: 'Not logged in' }
   const profile = await getProfile()
+  if (!profile) return { error: 'Profile not found' }
   const today = new Date().toISOString().split('T')[0]
   if (profile.last_login === today) return { error: 'Already claimed' }
   const newStreak = (profile.streak_days || 0) + 1

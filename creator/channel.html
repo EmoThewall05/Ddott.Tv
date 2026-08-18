@@ -895,8 +895,12 @@ async function toggleSub() {
     if (typeof db === 'undefined') return;
 
     // Load profile
-    const { data: profile } = await db.from('profiles')
+    const { data: profile, error: profileError } = await db.from('profiles')
       .select('*').eq('id', creatorId).single();
+
+    if (profileError) {
+      console.error('loadChannel profile error:', profileError);
+    }
 
     if (profile) {
       document.getElementById('creatorName').textContent = profile.username || profile.full_name || 'Creator';

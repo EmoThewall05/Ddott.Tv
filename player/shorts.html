@@ -165,9 +165,24 @@
 </div>
 
 <script>
-const SUPA_URL = 'https://havmduragglvstlxrgag.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q';
+const SUPA_URL = 'https://kwciyiwdyotebdgyjxgt.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3Y2l5aXdkeW90ZWJkZ3lqeGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5OTQ0MjUsImV4cCI6MjEwMjU3MDQyNX0.cSxsDwEz-Lfy9YLFfQ5mSK15Ne0O3vbxJBz8IABmF08';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+async function persistLikeCount(videoId, newCount) {
+    try { await sb.from('videos').update({ likes: newCount }).eq('id', videoId); }
+    catch (e) { console.warn('Like persist failed:', e); }
+}
+
+function hasSuperLiked(videoId) {
+    try { return localStorage.getItem('superliked_' + videoId) === '1'; }
+    catch (e) { return false; }
+}
+
+function markSuperLiked(videoId) {
+    try { localStorage.setItem('superliked_' + videoId, '1'); } catch (e) {}
+}
+
 
 let drottsData = [];
 let currentIndex = 0;
@@ -439,6 +454,7 @@ function triggerSingleLike(element, isSplit) {
     st = { count: base + inc, state: newState };
     likeStates.set(s.id, st);
     updateLikeUI(s.id, st, element, isSplit);
+    persistLikeCount(s.id, st.count);
 }
 
 // ===== HEART BURST =====
@@ -451,6 +467,7 @@ function triggerHeartBurst(element, x, y, isSplit) {
     if (st.state !== 'heart') st = { count: base + 2, state: 'heart' };
     likeStates.set(s.id, st);
     updateLikeUI(s.id, st, element, isSplit);
+    persistLikeCount(s.id, st.count);
     const rect = element.getBoundingClientRect();
     for (let i = 0; i < 5; i++) {
         setTimeout(() => createFloatingHeart(element, '❤️', x-rect.left+(Math.random()-0.5)*60, y-rect.top+(Math.random()-0.5)*40), i*70);
@@ -467,6 +484,8 @@ function triggerSuperLike(element, x, y, isSplit) {
     st = { count: base + 3, state: 'super' };
     likeStates.set(s.id, st);
     updateLikeUI(s.id, st, element, isSplit);
+    persistLikeCount(s.id, st.count);
+    const alreadySuperLiked = hasSuperLiked(s.id);
 
     const rect = element.getBoundingClientRect();
     const lx = x - rect.left, ly = y - rect.top;
@@ -495,16 +514,21 @@ function triggerSuperLike(element, x, y, isSplit) {
         setTimeout(() => createFloatingHeart(element, '💛', lx+(Math.random()-0.5)*80, ly+(Math.random()-0.5)*60), i*60);
     }
 
-    // Update coins
-    emoCoins += 1;
-    coinCountEl.textContent = emoCoins.toLocaleString();
-    if (navigator.vibrate) navigator.vibrate([50,30,50,30,100]);
+    // Update coins (only first super-like per video per device)
+    if (!alreadySuperLiked) {
+        markSuperLiked(s.id);
+        emoCoins += 1;
+        coinCountEl.textContent = emoCoins.toLocaleString();
+        if (navigator.vibrate) navigator.vibrate([50,30,50,30,100]);
 
-    // Supabase sync
-    if (currentUserId) {
-        sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({ data }) => {
-            if (data) sb.from('profiles').update({ emo_coins: (data.emo_coins||0) + 1 }).eq('id', currentUserId).then(()=>sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({data:d})=>{if(d){emoCoins=d.emo_coins;coinCountEl.textContent=emoCoins.toLocaleString();}}));
-        });
+        // Supabase sync
+        if (currentUserId) {
+            sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({ data }) => {
+                if (data) sb.from('profiles').update({ emo_coins: (data.emo_coins||0) + 1 }).eq('id', currentUserId).then(()=>sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({data:d})=>{if(d){emoCoins=d.emo_coins;coinCountEl.textContent=emoCoins.toLocaleString();}}));
+            });
+        }
+    } else {
+        if (navigator.vibrate) navigator.vibrate(50);
     }
 }
 
