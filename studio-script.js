@@ -23,7 +23,9 @@ async function publishVideo() {
   // Upload to Cloudinary
   let videoUrl;
   try {
-    videoUrl = await uploadToCloudinary(file);
+    const streamResult = await uploadToCloudflareStream(file);
+    videoUrl = streamResult.videoUrl;
+    var thumbnailUrl = streamResult.thumbnailUrl;
   } catch (err) {
     console.error('Cloudinary error:', err);
     showToast('❌ CLOUDINARY: ' + (err.message || 'Upload failed'));
@@ -40,6 +42,7 @@ async function publishVideo() {
     category: category,
     tags: tags,
     video_url: videoUrl,
+    thumbnail_url: thumbnailUrl,
     views: 0,
     likes: 0,
     emo_coins_earned: 0,
