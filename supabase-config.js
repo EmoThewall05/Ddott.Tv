@@ -1,5 +1,5 @@
-window.SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co'
-window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q'
+window.SUPABASE_URL = 'https://kwciyiwdyotebdgyjxgt.supabase.co'
+window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3Y2l5aXdkeW90ZWJkZ3lqeGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5OTQ0MjUsImV4cCI6MjEwMjU3MDQyNX0.cSxsDwEz-Lfy9YLFfQ5mSK15Ne0O3vbxJBz8IABmF08'
 
 window.db = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 const db = window.db

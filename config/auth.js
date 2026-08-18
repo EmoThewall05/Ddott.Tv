@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://havmduragglvstlxrgag.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_FInfsWgHml8s9dAwiAKQ4Q_Tf79f3G8'
+const SUPABASE_URL = 'https://kwciyiwdyotebdgyjxgt.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_qxrCtkTQEnHgHKyqcI56GQ_twr7VGGW'
 
 async function signUp(email, password, username) {
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
