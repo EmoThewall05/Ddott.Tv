@@ -6,16 +6,6 @@ async function signUp(email, password, username) {
   const { data, error } = await client.auth.signUp({ email, password })
   if (error) return { error }
 
-  const { error: profileError } = await client.from('profiles').insert({
-    id: data.user.id,
-    username,
-    emo_coins: 100,
-    streak_days: 1,
-    last_login: new Date().toISOString().split('T')[0]
-  })
-
-  if (profileError) return { error: { message: 'Profile create failed: ' + profileError.message } }
-
   return { data }
 }
 
