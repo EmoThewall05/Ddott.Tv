@@ -525,25 +525,10 @@ async function publishVideo() {
   statusMsg.textContent = '📤 Uploading video...';
 
   try {
-    // Step 1: Upload to Cloudinary
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('upload_preset', 'ddott-tv-upload');
-    formData.append('folder', 'ddott-tv');
-
-    const cloudRes = await fetch('https://api.cloudinary.com/v1_1/dggip9tpp/video/upload', {
-      method: 'POST',
-      body: formData
-    });
-    const cloudData = await cloudRes.json();
-    if (!cloudData.secure_url) throw new Error('Cloudinary upload failed');
-
-    // Many phones record in HEVC (H.265), which most mobile browsers can't
-    // decode via <video>. Store the H.264-transcoded URL so playback works
-    // everywhere, instead of the raw upload URL.
-    const h264Url = cloudData.secure_url.includes('/video/upload/')
-      ? cloudData.secure_url.replace('/video/upload/', '/video/upload/f_mp4,vc_h264,q_auto/')
-      : cloudData.secure_url;
+    // Step 1: Upload to Cloudflare Stream
+    const streamResult = await uploadToCloudflareStream(selectedFile);
+    const h264Url = streamResult.videoUrl;
+    const streamThumbnailUrl = streamResult.thumbnailUrl;
 
     statusMsg.textContent = '💾 Saving to database...';
 
@@ -559,7 +544,7 @@ async function publishVideo() {
       category: document.getElementById('videoCategory').value,
       licence: document.getElementById('videoLicence').value,
       video_url: h264Url,
-      thumbnail_url: cloudData.secure_url.replace('/video/upload/', '/video/upload/so_0/').replace(/\.[^/.]+$/, '.jpg'),
+      thumbnail_url: streamThumbnailUrl,
       views: 0,
       likes: 0,
       is_short: isShort,
