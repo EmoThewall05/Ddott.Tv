@@ -3,7 +3,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_qxrCtkTQEnHgHKyqcI56GQ_twr7VGGW'
 
 async function signUp(email, password, username) {
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  const { data, error } = await client.auth.signUp({ email, password })
+  const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo: 'https://ddott.live/ddott-login.html' } })
   if (error) return { error }
 
   return { data }
