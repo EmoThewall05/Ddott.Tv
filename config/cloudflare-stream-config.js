@@ -160,13 +160,18 @@ function uploadViaTus(file, onProgress) {
           },
         });
 
-        upload.findPreviousUploads().then((previousUploads) => {
-          if (previousUploads.length > 0) {
-            _dbg('Found previous upload, resuming...');
-            upload.resumeFromPreviousUpload(previousUploads[0]);
-          }
-          upload.start();
-        });
+        upload.findPreviousUploads()
+          .then((previousUploads) => {
+            if (previousUploads.length > 0) {
+              _dbg('Found previous upload, resuming...');
+              upload.resumeFromPreviousUpload(previousUploads[0]);
+            }
+            upload.start();
+          })
+          .catch((err) => {
+            _dbg('findPreviousUploads failed (network issue), starting fresh: ' + err.message);
+            upload.start();
+          });
       }
 
       _dbg('calling get-tus-upload-url...');
