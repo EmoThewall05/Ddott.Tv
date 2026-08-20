@@ -29,6 +29,23 @@ async function uploadViaBasicPost(file) {
   return buildResult(uid);
 }
 
+function _dbgPanel() {
+  let el = document.getElementById('_tusDebugPanel');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = '_tusDebugPanel';
+    el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:40vh;overflow-y:auto;background:rgba(0,0,0,0.95);color:#0f0;font-family:monospace;font-size:11px;padding:8px;z-index:99999;white-space:pre-wrap;border-top:2px solid #0ff;';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function _dbg(msg) {
+  const el = _dbgPanel();
+  const t = new Date().toISOString().split('T')[1].split('.')[0];
+  el.textContent += '[' + t + '] ' + msg + '\n';
+  el.scrollTop = el.scrollHeight;
+}
+
 async function initTusSessionWithRetry(file, uploadMetadata, attempts) {
   let lastErr;
   for (let i = 0; i < attempts; i++) {
@@ -58,29 +75,42 @@ async function initTusSessionWithRetry(file, uploadMetadata, attempts) {
 function uploadViaTus(file, onProgress) {
   return new Promise(async (resolve, reject) => {
     try {
+      _dbg('TUS start, file=' + file.name + ' size=' + file.size);
       const metadataParts = [`name ${btoa(file.name || 'video')}`];
       const uploadMetadata = metadataParts.join(',');
 
+      _dbg('calling get-tus-upload-url...');
       const { uploadURL, uid } = await initTusSessionWithRetry(file, uploadMetadata, 3);
+      _dbg('got uploadURL, uid=' + uid);
+      _dbg('uploadURL=' + uploadURL);
 
-      // Smaller chunk size reduces per-chunk memory pressure on mobile
-      // browsers for very large files, without changing the file itself
-      // or its quality in any way.
+      _dbg('tus lib type=' + typeof tus + ' tus.Upload type=' + (typeof tus !== 'undefined' ? typeof tus.Upload : 'N/A'));
+
       const upload = new tus.Upload(file, {
         uploadUrl: uploadURL,
         chunkSize: 8 * 1024 * 1024,
         retryDelays: [0, 1000, 3000, 5000, 10000, 20000, 30000],
         metadata: { name: file.name || 'video' },
         removeFingerprintOnSuccess: true,
-        onError: (error) => reject(error),
+        onError: (error) => {
+          _dbg('ERROR: ' + error.message);
+          reject(error);
+        },
         onProgress: (bytesUploaded, bytesTotal) => {
+          _dbg('progress: ' + bytesUploaded + '/' + bytesTotal + ' (' + Math.round((bytesUploaded/bytesTotal)*100) + '%)');
           if (onProgress) onProgress(Math.round((bytesUploaded / bytesTotal) * 100));
         },
-        onSuccess: () => resolve(buildResult(uid)),
+        onSuccess: () => {
+          _dbg('SUCCESS');
+          resolve(buildResult(uid));
+        },
       });
 
+      _dbg('calling upload.start()...');
       upload.start();
+      _dbg('upload.start() returned (async, chunks should follow)');
     } catch (err) {
+      _dbg('CATCH: ' + err.message);
       reject(err);
     }
   });
