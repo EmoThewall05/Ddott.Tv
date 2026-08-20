@@ -72,6 +72,51 @@ async function initTusSessionWithRetry(file, uploadMetadata, attempts) {
   throw lastErr;
 }
 
+let _pendingResumeUpload = null;
+
+function _resumeBanner() {
+  let el = document.getElementById('_resumeUploadBanner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = '_resumeUploadBanner';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#1a1a2e;color:#fff;padding:12px;z-index:99998;display:none;align-items:center;justify-content:space-between;gap:8px;font-family:sans-serif;font-size:13px;';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function _showResumeBanner(onResume, onFreshStart) {
+  const el = _resumeBanner();
+  el.style.display = 'flex';
+  el.innerHTML = '';
+
+  const text = document.createElement('span');
+  text.textContent = '\u26a0\ufe0f Upload interrupted. Resume from where it stopped?';
+  el.appendChild(text);
+
+  const btnWrap = document.createElement('div');
+  btnWrap.style.cssText = 'display:flex;gap:8px;';
+
+  const resumeBtn = document.createElement('button');
+  resumeBtn.textContent = 'Resume Upload';
+  resumeBtn.style.cssText = 'background:#0f0;color:#000;border:none;padding:8px 14px;border-radius:6px;font-weight:bold;';
+  resumeBtn.onclick = () => { _hideResumeBanner(); onResume(); };
+
+  const freshBtn = document.createElement('button');
+  freshBtn.textContent = 'Start Fresh';
+  freshBtn.style.cssText = 'background:#333;color:#fff;border:1px solid #666;padding:8px 14px;border-radius:6px;';
+  freshBtn.onclick = () => { _hideResumeBanner(); onFreshStart(); };
+
+  btnWrap.appendChild(resumeBtn);
+  btnWrap.appendChild(freshBtn);
+  el.appendChild(btnWrap);
+}
+
+function _hideResumeBanner() {
+  const el = document.getElementById('_resumeUploadBanner');
+  if (el) el.style.display = 'none';
+}
+
 function uploadViaTus(file, onProgress) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -79,36 +124,56 @@ function uploadViaTus(file, onProgress) {
       const metadataParts = [`name ${btoa(file.name || 'video')}`];
       const uploadMetadata = metadataParts.join(',');
 
+      function startUpload(uploadURL, uid) {
+        const upload = new tus.Upload(file, {
+          uploadUrl: uploadURL,
+          chunkSize: 8 * 1024 * 1024,
+          retryDelays: [0, 1000, 3000, 5000, 10000, 20000, 30000],
+          metadata: { name: file.name || 'video' },
+          fingerprint: () => Promise.resolve(`${STREAM_WORKER_URL}-${file.name}-${file.size}-${file.lastModified}`),
+          storeFingerprintForResuming: true,
+          removeFingerprintOnSuccess: true,
+          onError: (error) => {
+            _dbg('ERROR: ' + error.message);
+            _pendingResumeUpload = upload;
+            _showResumeBanner(
+              () => {
+                _dbg('User chose: Resume Upload');
+                upload.start();
+              },
+              () => {
+                _dbg('User chose: Start Fresh');
+                _pendingResumeUpload = null;
+                upload.abort(true).then(() => uploadViaTus(file, onProgress).then(resolve).catch(reject));
+              }
+            );
+          },
+          onProgress: (bytesUploaded, bytesTotal) => {
+            _dbg('progress: ' + bytesUploaded + '/' + bytesTotal);
+            if (onProgress) onProgress(Math.round((bytesUploaded / bytesTotal) * 100));
+          },
+          onSuccess: () => {
+            _dbg('SUCCESS');
+            _pendingResumeUpload = null;
+            _hideResumeBanner();
+            resolve(buildResult(uid));
+          },
+        });
+
+        upload.findPreviousUploads().then((previousUploads) => {
+          if (previousUploads.length > 0) {
+            _dbg('Found previous upload, resuming...');
+            upload.resumeFromPreviousUpload(previousUploads[0]);
+          }
+          upload.start();
+        });
+      }
+
       _dbg('calling get-tus-upload-url...');
       const { uploadURL, uid } = await initTusSessionWithRetry(file, uploadMetadata, 3);
       _dbg('got uploadURL, uid=' + uid);
-      _dbg('uploadURL=' + uploadURL);
 
-      _dbg('tus lib type=' + typeof tus + ' tus.Upload type=' + (typeof tus !== 'undefined' ? typeof tus.Upload : 'N/A'));
-
-      const upload = new tus.Upload(file, {
-        uploadUrl: uploadURL,
-        chunkSize: 8 * 1024 * 1024,
-        retryDelays: [0, 1000, 3000, 5000, 10000, 20000, 30000],
-        metadata: { name: file.name || 'video' },
-        removeFingerprintOnSuccess: true,
-        onError: (error) => {
-          _dbg('ERROR: ' + error.message);
-          reject(error);
-        },
-        onProgress: (bytesUploaded, bytesTotal) => {
-          _dbg('progress: ' + bytesUploaded + '/' + bytesTotal + ' (' + Math.round((bytesUploaded/bytesTotal)*100) + '%)');
-          if (onProgress) onProgress(Math.round((bytesUploaded / bytesTotal) * 100));
-        },
-        onSuccess: () => {
-          _dbg('SUCCESS');
-          resolve(buildResult(uid));
-        },
-      });
-
-      _dbg('calling upload.start()...');
-      upload.start();
-      _dbg('upload.start() returned (async, chunks should follow)');
+      startUpload(uploadURL, uid);
     } catch (err) {
       _dbg('CATCH: ' + err.message);
       reject(err);
