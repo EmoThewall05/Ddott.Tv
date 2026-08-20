@@ -124,10 +124,22 @@ function uploadViaTus(file, onProgress) {
       const metadataParts = [`name ${btoa(file.name || 'video')}`];
       const uploadMetadata = metadataParts.join(',');
 
-      function startUpload(uploadURL, uid) {
+      function pickChunkSize(responseTimeMs) {
+        if (responseTimeMs > 2000) {
+          _dbg('Slow connection detected (' + responseTimeMs + 'ms) - using 2MB chunks');
+          return 2 * 1024 * 1024;
+        } else if (responseTimeMs > 800) {
+          _dbg('Medium connection detected (' + responseTimeMs + 'ms) - using 4MB chunks');
+          return 4 * 1024 * 1024;
+        }
+        _dbg('Fast connection detected (' + responseTimeMs + 'ms) - using 8MB chunks');
+        return 8 * 1024 * 1024;
+      }
+
+      function startUpload(uploadURL, uid, chunkSize) {
         const upload = new tus.Upload(file, {
           uploadUrl: uploadURL,
-          chunkSize: 8 * 1024 * 1024,
+          chunkSize: chunkSize,
           retryDelays: [0, 1000, 3000, 5000, 10000, 20000, 30000],
           metadata: { name: file.name || 'video' },
           fingerprint: () => Promise.resolve(`${STREAM_WORKER_URL}-${file.name}-${file.size}-${file.lastModified}`),
@@ -175,10 +187,13 @@ function uploadViaTus(file, onProgress) {
       }
 
       _dbg('calling get-tus-upload-url...');
+      const speedTestStart = Date.now();
       const { uploadURL, uid } = await initTusSessionWithRetry(file, uploadMetadata, 3);
-      _dbg('got uploadURL, uid=' + uid);
+      const responseTimeMs = Date.now() - speedTestStart;
+      _dbg('got uploadURL, uid=' + uid + ' (init took ' + responseTimeMs + 'ms)');
 
-      startUpload(uploadURL, uid);
+      const chunkSize = pickChunkSize(responseTimeMs);
+      startUpload(uploadURL, uid, chunkSize);
     } catch (err) {
       _dbg('CATCH: ' + err.message);
       reject(err);
