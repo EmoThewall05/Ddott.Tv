@@ -723,6 +723,16 @@ async function buyCoins() {
     return;
   }
 
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true
+    || document.referrer.includes('android-app://');
+
+  if (isStandalone) {
+    alert('Coin purchases are available on our website. Redirecting you now...');
+    window.open('https://ddott.live/advertiser/', '_blank');
+    return;
+  }
+
   let order;
   try {
     const orderRes = await fetch(PAYMENT_WORKER_URL + '/create-order', {
