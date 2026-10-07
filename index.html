@@ -251,16 +251,17 @@
   <div class="tab-item" id="t-community" onclick="nav('community')"><div class="tab-icon">🌐</div><div class="tab-label">COMMUNITY</div></div>
   <div class="tab-item" id="t-coins" onclick="nav('coins')"><div class="tab-icon">🪙</div><div class="tab-label">COINS</div></div>
   <div class="tab-item" id="t-messaging" onclick="window.location='/messaging/'"><div class="tab-icon">💬</div><div class="tab-label">MESSAGE</div></div>
+  <div class="tab-item" id="t-demos" onclick="nav('demos')"><div class="tab-icon">👥</div><div class="tab-label">DEMOS</div></div>
 </div>
 
 <script>
   const pages = {
     home:'/', feed:'/feed/', community:'/community/', player:'/player/player-v2.html', drotts:'/player/shorts.html', videos:'/player/player-v3.html',
     channel:'/creator/channel.html', messages:'/messaging/',
-    coins:'/coins/', ai:'/ai/',
+    coins:'/coins/', ai:'/ai/', demos:'/demos/',
     studio:'/studio', 'anchor-studio':'/community/studio/', landing:'/home/landing.html', advertiser:'/advertiser/', translate:'/community/translate/', news:'/community/news/', login:'/auth/login.html', 'ai-teacher':'/community/ai-teacher/', 'ai-podcasts':'/community/ai-podcasts/', 'ai-music-mixer':'/community/ai-music-mixer/', feedback:'/feedback/'
   };
-  const tabMap = { feed:'t-feed', player:'t-feed', channel:'t-home', messages:'t-home', coins:'t-coins', ai:'t-home', studio:'t-messaging', 'anchor-studio':'t-messaging', landing:'t-home', translate:'t-home', news:'t-home' };
+  const tabMap = { feed:'t-feed', player:'t-feed', channel:'t-home', messages:'t-home', coins:'t-coins', demos:'t-demos', ai:'t-home', studio:'t-messaging', 'anchor-studio':'t-messaging', landing:'t-home', translate:'t-home', news:'t-home' };
 
   // Inject into iframe to hide its own nav & tab bar
   const HIDE_CSS = `<style id="__sf__">

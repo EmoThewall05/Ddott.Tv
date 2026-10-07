@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Demos</title>
+<style>
+  :root { --terra:#C4623B; --terra-d:#A94E2B; --cream:#FBF3E4; --card:#FFFCF6; --line:#EADFCB; --ink:#3A2A22; --muted:#8C7A6B; --star:#4A86C5; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; padding:0; background:var(--cream); color:var(--ink); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; }
+  .dm-wrap { max-width:560px; margin:0 auto; padding:0 14px 110px; }
+  .dm-head { position:sticky; top:0; z-index:20; background:var(--cream); padding:16px 4px 0; }
+  .dm-title { margin:0 0 10px; font-size:26px; font-weight:800; color:var(--terra); letter-spacing:0.3px; }
+  .dm-tabs { display:flex; gap:6px; border-bottom:1px solid var(--line); }
+  .dm-tab { flex:1; text-align:center; padding:11px 4px; font-size:15px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-1px; }
+  .dm-tab.active { color:var(--terra); border-bottom-color:var(--terra); }
+  .dm-card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px; margin-top:14px; }
+  .dm-user { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .dm-av { width:42px; height:42px; border-radius:50%; background:#F0D3C6; color:var(--terra-d); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; overflow:hidden; flex-shrink:0; }
+  .dm-av img { width:100%; height:100%; object-fit:cover; }
+  .dm-name { font-weight:700; font-size:15px; }
+  .dm-time { font-size:12.5px; color:var(--muted); }
+  .dm-body { font-size:16px; line-height:1.55; margin:6px 0 10px; white-space:pre-wrap; word-wrap:break-word; }
+  .dm-media { width:100%; border-radius:12px; margin:4px 0 10px; display:block; background:#EFE3CE; max-height:420px; object-fit:cover; }
+  .dm-exp { display:inline-block; font-size:12px; color:var(--terra-d); background:#F6E0D5; padding:3px 9px; border-radius:20px; margin-bottom:8px; }
+  .dm-stars { display:flex; justify-content:space-between; padding:6px 2px 0; }
+  .dm-s { display:flex; flex-direction:column; align-items:center; gap:2px; flex:1; }
+  .dm-s span { font-size:13px; color:var(--ink); }
+  .dm-star { width:46px; height:46px; fill:var(--star); stroke:none; }
+  .dm-star text { fill:#fff; font-size:8.5px; font-weight:700; font-family:system-ui,sans-serif; }
+  .dm-star.mine { stroke:#2F5F96; stroke-width:1.6; }
+  .dm-rating.on .dm-star { cursor:pointer; animation:dmPulse 1s ease-in-out infinite; }
+  @keyframes dmPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  .dm-sum { display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--line); margin-top:10px; padding-top:10px; font-size:14px; color:var(--ink); }
+  .dm-sum small { color:var(--muted); font-size:14px; }
+  .dm-rate-btn { background:none; border:none; color:var(--terra); font-weight:700; font-size:15px; cursor:pointer; padding:4px 2px; }
+  .dm-fab { position:fixed; right:18px; bottom:18px; background:var(--terra); color:#fff; border:none; border-radius:30px; padding:14px 20px; font-size:16px; font-weight:700; box-shadow:0 6px 18px rgba(196,98,59,0.4); cursor:pointer; z-index:30; }
+  .dm-empty { text-align:center; color:var(--muted); padding:50px 10px; font-size:15px; line-height:1.6; }
+  .dm-empty a, .dm-empty button { color:var(--terra); font-weight:700; background:none; border:none; font-size:15px; cursor:pointer; text-decoration:underline; }
+  .dm-sheet-bg { position:fixed; inset:0; background:rgba(58,42,34,0.45); z-index:50; display:none; align-items:flex-end; justify-content:center; }
+  .dm-sheet-bg.show { display:flex; }
+  .dm-sheet { background:var(--cream); width:100%; max-width:560px; border-radius:22px 22px 0 0; padding:20px 16px 26px; max-height:88%; overflow-y:auto; }
+  .dm-sheet h3 { margin:0 0 12px; color:var(--terra); font-size:19px; }
+  .dm-sheet label { display:block; font-size:13px; color:var(--muted); margin:10px 0 4px; }
+  .dm-sheet input, .dm-sheet textarea, .dm-sheet select { width:100%; border:1px solid var(--line); background:var(--card); border-radius:12px; padding:12px; font-size:15px; color:var(--ink); font-family:inherit; }
+  .dm-sheet textarea { min-height:110px; resize:vertical; }
+  .dm-row { display:flex; gap:10px; margin-top:16px; }
+  .dm-btn { flex:1; padding:13px; border-radius:12px; font-size:15px; font-weight:700; border:none; cursor:pointer; }
+  .dm-btn.pri { background:var(--terra); color:#fff; }
+  .dm-btn.sec { background:#EFE3CE; color:var(--ink); }
+  .dm-btn:disabled { opacity:0.6; }
+  .dm-toast { position:fixed; left:50%; bottom:84px; transform:translateX(-50%); background:var(--ink); color:#fff; padding:10px 16px; border-radius:20px; font-size:14px; z-index:80; display:none; }
+</style>
+</head>
+<body>
+<div class="dm-wrap">
+  <div class="dm-head">
+    <h1 class="dm-title">Demos</h1>
+    <div class="dm-tabs">
+      <div class="dm-tab active" data-t="dwall">Dwall</div>
+      <div class="dm-tab" data-t="dreels">Dreels</div>
+      <div class="dm-tab" data-t="dlooks">Dlooks</div>
+    </div>
+  </div>
+  <div id="feed"></div>
+</div>
+
+<button class="dm-fab" id="fab">+ New post</button>
+
+<div class="dm-sheet-bg" id="sheetBg">
+  <div class="dm-sheet">
+    <h3 id="sheetTitle">New post</h3>
+    <div id="sheetForm"></div>
+    <div class="dm-row">
+      <button class="dm-btn sec" id="sheetCancel">Cancel</button>
+      <button class="dm-btn pri" id="sheetPost">Post</button>
+    </div>
+  </div>
+</div>
+<div class="dm-toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/supabase-config.js"></script>
+<script>
+(function(){
+  var DB = window.db;
+  var TABLE = { dwall:'demos_dwall', dreels:'demos_dreels', dlooks:'demos_dlooks' };
+  var FAB_TXT = { dwall:'+ New post', dreels:'+ New reel', dlooks:'+ New look' };
+  var STAR_PTS = '12,2 15.1,8.6 22,9.3 16.8,14 18.4,21 12,17.3 5.6,21 7.2,14 2,9.3 8.9,8.6';
+  var me = null, tab = 'dwall', S = {}, M = {};
+
+  function $(s){ return document.querySelector(s); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function safeUrl(u){ try { var x = new URL(u, location.href); return (x.protocol === 'https:' || x.protocol === 'http:') ? x.href : ''; } catch(e){ return ''; } }
+  function ago(t){
+    var s = (Date.now() - new Date(t).getTime()) / 1000;
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s/60) + ' min ago';
+    if (s < 86400) return Math.floor(s/3600) + ' hours ago';
+    return Math.floor(s/86400) + ' days ago';
+  }
+  function left(t){
+    var m = Math.max(0, Math.floor((new Date(t).getTime() - Date.now()) / 60000));
+    if (m >= 60) return Math.floor(m/60) + 'h ' + (m % 60) + 'm left';
+    return m + 'm left';
+  }
+  function toast(msg){
+    var t = $('#toast'); t.textContent = msg; t.style.display = 'block';
+    clearTimeout(toast._t); toast._t = setTimeout(function(){ t.style.display = 'none'; }, 2400);
+  }
+  function goLogin(){ try { window.top.location.href = '/auth/login.html'; } catch(e){ location.href = '/auth/login.html'; } }
+
+  function starSvg(n, mine){
+    return '<svg viewBox="0 0 24 24" class="dm-star' + (mine ? ' mine' : '') + '" data-s="' + n + '"><polygon points="' + STAR_PTS + '"/><text x="12" y="15.4" text-anchor="middle">' + n + '</text></svg>';
+  }
+  function ratingHTML(id, on){
+    var st = S[id] || {}, my = M[id], i, cols = '';
+    for (i = 1; i <= 5; i++) cols += '<div class="dm-s">' + starSvg(i, my === i) + '<span>' + (st['stars_' + i] || 0) + '</span></div>';
+    var avg = st.average_stars != null ? Number(st.average_stars).toFixed(1) : '–';
+    var total = st.total_reviews || 0;
+    return '<div class="dm-rating' + (on ? ' on' : '') + '" data-id="' + id + '">' +
+      '<div class="dm-stars">' + cols + '</div>' +
+      '<div class="dm-sum"><span>Average <b>' + avg + '</b> <small>· ' + total + ' reviews</small></span>' +
+      '<button class="dm-rate-btn">' + (on ? 'Tap a star' : (my ? 'Change' : 'Rate this')) + '</button></div></div>';
+  }
+
+  function cardHTML(r, prof){
+    var p = prof[r.user_id] || {};
+    var name = p.display_name || p.username || 'User';
+    var av = p.avatar_url && safeUrl(p.avatar_url) ? '<img src="' + esc(safeUrl(p.avatar_url)) + '" alt="">' : esc(name.slice(0,2).toUpperCase());
+    var media = '', body = '', exp = '';
+    if (tab === 'dwall') {
+      if (r.body) body = '<div class="dm-body">' + esc(r.body) + '</div>';
+      if (r.media_url && safeUrl(r.media_url)) media = '<img class="dm-media" loading="lazy" src="' + esc(safeUrl(r.media_url)) + '" alt="">';
+    } else if (tab === 'dreels') {
+      if (r.caption) body = '<div class="dm-body">' + esc(r.caption) + '</div>';
+      var poster = r.thumbnail_url && safeUrl(r.thumbnail_url) ? ' poster="' + esc(safeUrl(r.thumbnail_url)) + '"' : '';
+      if (safeUrl(r.video_url)) media = '<video class="dm-media" controls playsinline preload="metadata"' + poster + ' src="' + esc(safeUrl(r.video_url)) + '"></video>';
+    } else {
+      if (r.caption) body = '<div class="dm-body">' + esc(r.caption) + '</div>';
+      exp = '<div class="dm-exp">⏳ ' + esc(left(r.expires_at)) + '</div>';
+      if (safeUrl(r.media_url)) {
+        media = r.media_type === 'video'
+          ? '<video class="dm-media" controls playsinline preload="metadata" src="' + esc(safeUrl(r.media_url)) + '"></video>'
+          : '<img class="dm-media" loading="lazy" src="' + esc(safeUrl(r.media_url)) + '" alt="">';
+      }
+    }
+    return '<div class="dm-card"><div class="dm-user"><div class="dm-av">' + av + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + esc(ago(r.created_at)) + '</div></div></div>' +
+      exp + body + media + ratingHTML(r.id, false) + '</div>';
+  }
+
+  async function load(){
+    var feed = $('#feed');
+    $('#fab').textContent = FAB_TXT[tab];
+    feed.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var q = DB.from(TABLE[tab]).select('*').order('created_at', { ascending:false }).limit(40);
+    if (tab === 'dlooks') q = q.gt('expires_at', new Date().toISOString());
+    var res = await q;
+    if (res.error) { feed.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
+    var rows = res.data || [];
+    if (!rows.length) { feed.innerHTML = '<div class="dm-empty">Nothing here yet.<br>Be the first to post.</div>'; return; }
+    var uids = Array.from(new Set(rows.map(function(r){ return r.user_id; })));
+    var ids = rows.map(function(r){ return r.id; });
+    var out = await Promise.all([
+      DB.from('profiles').select('id,display_name,username,avatar_url').in('id', uids),
+      DB.from('demos_review_stats').select('*').eq('target_type', tab).in('target_id', ids),
+      me ? DB.from('demos_reviews').select('target_id,stars').eq('target_type', tab).eq('user_id', me.id).in('target_id', ids) : Promise.resolve({ data:[] })
+    ]);
+    var prof = {};
+    (out[0].data || []).forEach(function(p){ prof[p.id] = p; });
+    (out[1].data || []).forEach(function(s){ S[s.target_id] = s; });
+    (out[2].data || []).forEach(function(m){ M[m.target_id] = m.stars; });
+    feed.innerHTML = rows.map(function(r){ return cardHTML(r, prof); }).join('');
+  }
+
+  async function submitRating(id, stars){
+    if (!me) { goLogin(); return; }
+    var ex = await DB.from('demos_reviews').select('id').eq('target_type', tab).eq('target_id', id).eq('user_id', me.id).maybeSingle();
+    var r;
+    if (ex.data) r = await DB.from('demos_reviews').update({ stars: stars, updated_at: new Date().toISOString() }).eq('id', ex.data.id);
+    else r = await DB.from('demos_reviews').insert({ target_type: tab, target_id: id, user_id: me.id, stars: stars });
+    if (r.error) { toast('Rating failed'); return; }
+    M[id] = stars;
+    var st = await DB.from('demos_review_stats').select('*').eq('target_type', tab).eq('target_id', id).maybeSingle();
+    if (st.data) S[id] = st.data;
+    var box = document.querySelector('.dm-rating[data-id="' + id + '"]');
+    if (box) box.outerHTML = ratingHTML(id, false);
+    toast('Thanks for rating ' + stars + ' ★');
+  }
+
+  $('#feed').addEventListener('click', function(e){
+    var box = e.target.closest('.dm-rating'); if (!box) return;
+    var id = box.getAttribute('data-id');
+    if (e.target.closest('.dm-rate-btn')) {
+      if (!me) { goLogin(); return; }
+      var on = !box.classList.contains('on');
+      box.outerHTML = ratingHTML(id, on);
+      return;
+    }
+    var star = e.target.closest('.dm-star');
+    if (star && box.classList.contains('on')) submitRating(id, Number(star.getAttribute('data-s')));
+  });
+
+  document.querySelectorAll('.dm-tab').forEach(function(el){
+    el.addEventListener('click', function(){
+      tab = el.getAttribute('data-t');
+      document.querySelectorAll('.dm-tab').forEach(function(x){ x.classList.toggle('active', x === el); });
+      load();
+    });
+  });
+
+  function openSheet(){
+    if (!me) { goLogin(); return; }
+    var f = '';
+    if (tab === 'dwall') {
+      $('#sheetTitle').textContent = 'New Dwall post';
+      f = '<label>What is on your mind?</label><textarea id="f_body" maxlength="2000"></textarea><label>Image link (optional)</label><input id="f_media" type="url" placeholder="https://…">';
+    } else if (tab === 'dreels') {
+      $('#sheetTitle').textContent = 'New Dreel';
+      f = '<label>Video link</label><input id="f_video" type="url" placeholder="https://…"><label>Thumbnail link (optional)</label><input id="f_thumb" type="url" placeholder="https://…"><label>Caption (optional)</label><textarea id="f_cap" maxlength="500"></textarea>';
+    } else {
+      $('#sheetTitle').textContent = 'New Dlook (disappears in 12 hours)';
+      f = '<label>Media link</label><input id="f_media" type="url" placeholder="https://…"><label>Type</label><select id="f_type"><option value="image">Image</option><option value="video">Video</option></select><label>Caption (optional)</label><textarea id="f_cap" maxlength="300"></textarea>';
+    }
+    $('#sheetForm').innerHTML = f;
+    $('#sheetBg').classList.add('show');
+  }
+  function closeSheet(){ $('#sheetBg').classList.remove('show'); }
+  function val(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+  async function post(){
+    var row = { user_id: me.id }, btn = $('#sheetPost');
+    if (tab === 'dwall') {
+      row.body = val('f_body') || null;
+      var m = val('f_media'); row.media_url = m ? safeUrl(m) || null : null;
+      if (!row.body && !row.media_url) { toast('Write something or add an image link'); return; }
+    } else if (tab === 'dreels') {
+      row.video_url = safeUrl(val('f_video'));
+      if (!row.video_url) { toast('Enter a valid video link'); return; }
+      var t = val('f_thumb'); row.thumbnail_url = t ? safeUrl(t) || null : null;
+      row.caption = val('f_cap') || null;
+    } else {
+      row.media_url = safeUrl(val('f_media'));
+      if (!row.media_url) { toast('Enter a valid media link'); return; }
+      row.media_type = val('f_type') === 'video' ? 'video' : 'image';
+      row.caption = val('f_cap') || null;
+    }
+    btn.disabled = true;
+    var r = await DB.from(TABLE[tab]).insert(row);
+    btn.disabled = false;
+    if (r.error) { toast('Post failed: ' + r.error.message); return; }
+    closeSheet(); toast('Posted'); load();
+  }
+
+  $('#fab').addEventListener('click', openSheet);
+  $('#sheetCancel').addEventListener('click', closeSheet);
+  $('#sheetPost').addEventListener('click', post);
+  $('#sheetBg').addEventListener('click', function(e){ if (e.target.id === 'sheetBg') closeSheet(); });
+
+  (async function init(){
+    try {
+      var u = await DB.auth.getUser();
+      me = u && u.data ? u.data.user : null;
+    } catch(e){ me = null; }
+    await load();
+    if (!me) toast('Log in to post and rate');
+  })();
+})();
+</script>
+</body>
+</html>
