@@ -63,22 +63,67 @@
   .dm-pf-hint { font-size:12px; color:var(--muted); margin-top:4px; }
   .dm-pf-status { font-size:13px; color:var(--terra-d); margin-top:10px; min-height:16px; }
   .dm-sheet select { width:100%; border:1px solid var(--line); background:var(--card); border-radius:12px; padding:12px; font-size:15px; color:var(--ink); font-family:inherit; }
+  /* ===== DEMOS SOCIAL (CSS) ===== */
+  .dm-top { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .dm-top .dm-title { margin:0; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dm-back { width:38px; height:38px; border-radius:50%; border:none; background:#EFE3CE; color:var(--ink); font-size:20px; cursor:pointer; flex-shrink:0; }
+  .dm-me { width:40px; height:40px; border-radius:50%; border:2px solid var(--terra); background:#F0D3C6; color:var(--terra-d); font-weight:700; font-size:14px; overflow:hidden; padding:0; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .dm-me img { width:100%; height:100%; object-fit:cover; }
+  .dm-strip { display:flex; gap:12px; overflow-x:auto; padding:14px 2px 4px; }
+  .dm-bub { display:flex; flex-direction:column; align-items:center; gap:5px; width:64px; flex-shrink:0; cursor:pointer; }
+  .dm-bav { position:relative; width:58px; height:58px; border-radius:50%; background:#F0D3C6; color:var(--terra-d); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; border:3px solid var(--cream); box-shadow:0 0 0 2px #E7C9B8; }
+  .dm-bav.ring { box-shadow:0 0 0 2.5px var(--terra); }
+  .dm-bav img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+  .dm-plus { position:absolute; right:-2px; bottom:-2px; width:22px; height:22px; border-radius:50%; background:var(--terra); color:#fff; font-size:15px; line-height:20px; text-align:center; border:2px solid var(--cream); }
+  .dm-bn { font-size:12px; color:var(--ink); max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dm-user[data-uid] { cursor:pointer; }
+  .dm-star text { stroke:none; }
+  .dm-pbanner { height:130px; border-radius:16px; background:#EBCDBB; overflow:hidden; margin-top:6px; }
+  .dm-pbanner img { width:100%; height:100%; object-fit:cover; display:block; }
+  .dm-phead { display:flex; align-items:flex-end; justify-content:space-between; padding:0 6px; margin-top:-40px; }
+  .dm-pav { width:88px; height:88px; border-radius:50%; background:#F0D3C6; color:var(--terra-d); border:4px solid var(--cream); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:26px; overflow:hidden; }
+  .dm-pav img { width:100%; height:100%; object-fit:cover; }
+  .dm-pbtn { flex:none; padding:10px 18px; }
+  .dm-pname { font-size:20px; font-weight:800; margin:10px 6px 0; }
+  .dm-puser { font-size:14px; color:var(--muted); margin:0 6px; }
+  .dm-pbio { font-size:15px; line-height:1.5; margin:10px 6px 0; white-space:pre-wrap; word-wrap:break-word; }
+  .dm-pmeta { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:13.5px; color:var(--muted); margin:8px 6px 0; }
+  .dm-pmeta a { color:var(--terra-d); text-decoration:none; }
+  .dm-pstats { display:flex; margin:14px 0 4px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .dm-pstats div { flex:1; text-align:center; padding:10px 0; cursor:pointer; }
+  .dm-pstats b { display:block; font-size:18px; }
+  .dm-pstats span { font-size:12.5px; color:var(--muted); }
+  .dm-create { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; margin:12px 0 4px; }
+  .dm-cr-t { font-size:13px; color:var(--muted); margin-bottom:8px; }
+  .dm-cr-row { display:flex; gap:8px; }
+  .dm-cr-row button { flex:1; padding:11px 4px; border-radius:12px; border:1px solid var(--line); background:var(--cream); color:var(--terra-d); font-weight:700; font-size:14px; cursor:pointer; }
+  .dm-cr-col { display:flex; flex-direction:column; gap:10px; }
+  .dm-cr-col .dm-btn { flex:none; }
+  .dm-lrow { display:flex; align-items:center; gap:10px; padding:10px 2px; border-bottom:1px solid var(--line); cursor:pointer; }
 </style>
 </head>
 <body>
 <div class="dm-wrap">
   <div class="dm-head">
-    <h1 class="dm-title">Demos</h1>
-    <div class="dm-tabs">
-      <div class="dm-tab active" data-t="dwall">Dwall</div>
-      <div class="dm-tab" data-t="dreels">Dreels</div>
-      <div class="dm-tab" data-t="dlooks">Dlooks</div>
+    <div class="dm-top">
+      <button class="dm-back" id="backBtn" aria-label="Back" style="display:none">&#8592;</button>
+      <h1 class="dm-title" id="topTitle">Demos</h1>
+      <button class="dm-me" id="meBtn" aria-label="My profile"></button>
+    </div>
+    <div class="dm-tabs" id="feedTabs">
+      <div class="dm-tab active" data-m="foryou">For You</div>
+      <div class="dm-tab" data-m="following">Following</div>
     </div>
   </div>
-  <div id="feed"></div>
+  <div id="vFeed">
+    <div class="dm-strip" id="strip"></div>
+    <div id="feed"></div>
+    <div id="more"></div>
+  </div>
+  <div id="vProfile" style="display:none"></div>
 </div>
 
-<button class="dm-fab" id="fab">+ New post</button>
+<button class="dm-fab" id="fab">+ Create</button>
 
 <div class="dm-sheet-bg" id="sheetBg">
   <div class="dm-sheet">
@@ -89,6 +134,48 @@
     <div class="dm-row">
       <button class="dm-btn sec" id="sheetCancel">Cancel</button>
       <button class="dm-btn pri" id="sheetPost">Post</button>
+    </div>
+  </div>
+</div>
+<!-- DEMOS SOCIAL SHEETS -->
+<div class="dm-sheet-bg" id="crBg">
+  <div class="dm-sheet">
+    <h3>Create</h3>
+    <div class="dm-cr-col">
+      <button class="dm-btn sec" data-mk="dwall">Write a Dwall post</button>
+      <button class="dm-btn sec" data-mk="dreels">Upload a Dreel</button>
+      <button class="dm-btn sec" data-mk="dlooks">Add a Dlook (12 hours)</button>
+    </div>
+    <div class="dm-row"><button class="dm-btn sec" id="crCancel">Cancel</button></div>
+  </div>
+</div>
+<div class="dm-sheet-bg" id="lsBg">
+  <div class="dm-sheet">
+    <h3 id="lsTitle">Followers</h3>
+    <div id="lsList"></div>
+    <div class="dm-row"><button class="dm-btn sec" id="lsClose">Close</button></div>
+  </div>
+</div>
+<div class="dm-sheet-bg" id="edBg">
+  <div class="dm-sheet">
+    <h3>Edit profile</h3>
+    <p class="dm-pf-note" id="ed_un"></p>
+    <label>Name</label>
+    <input id="ed_name" maxlength="40">
+    <label>Bio</label>
+    <textarea id="ed_bio" maxlength="200" style="min-height:70px"></textarea>
+    <label>Location</label>
+    <input id="ed_loc" maxlength="60">
+    <label>Website</label>
+    <input id="ed_web" maxlength="200" autocapitalize="none" placeholder="https://...">
+    <label>Profile photo (leave empty to keep)</label>
+    <input id="ed_av" type="file" accept="image/*">
+    <label>Banner (leave empty to keep)</label>
+    <input id="ed_bn" type="file" accept="image/*">
+    <div class="dm-pf-status" id="ed_status"></div>
+    <div class="dm-row">
+      <button class="dm-btn sec" id="edCancel">Cancel</button>
+      <button class="dm-btn pri" id="edSave">Save</button>
     </div>
   </div>
 </div>
@@ -162,7 +249,7 @@
     var total = st.total_reviews || 0;
     return '<div class="dm-rating' + (on ? ' on' : '') + '" data-id="' + id + '">' +
       '<div class="dm-stars">' + cols + '</div>' +
-      '<div class="dm-sum"><span>Average <b>' + avg + '</b> <small>· ' + total + ' reviews</small></span>' +
+      '<div class="dm-sum"><span>Average <b>' + avg + '</b> <small>· ' + total + (total === 1 ? ' review' : ' reviews') + '</small></span>' +
       '<button class="dm-rate-btn">' + (on ? 'Tap a star' : (my ? 'Change' : 'Rate this')) + '</button></div></div>';
   }
 
@@ -181,15 +268,25 @@
     return u ? '<img class="dm-media" loading="lazy" src="' + esc(u) + '" alt="">' : '';
   }
 
+  /* ===== DEMOS SOCIAL (JS) ===== */
+  var K = {}, PV = null, mode = 'foryou', SEED = Math.random().toString(36).slice(2);
+  var stack = [{ v:'feed' }], feedOff = 0, feedTok = 0, stripTok = 0, profTok = 0, contTok = 0;
+  var feedDirty = true, FEED_N = 20, followingSet = {}, edBusy = false, folBusy = false;
+
+  function avInner(p, name){
+    if (p && p.avatar_url && safeUrl(p.avatar_url)) return '<img src="' + esc(safeUrl(p.avatar_url)) + '" alt="">';
+    return esc(String(name || 'U').slice(0, 2).toUpperCase());
+  }
+
   function cardHTML(r, prof){
+    var kind = r.kind || tab; K[r.id] = kind;
     var p = prof[r.user_id] || {};
     var name = p.display_name || p.username || 'User';
-    var av = p.avatar_url && safeUrl(p.avatar_url) ? '<img src="' + esc(safeUrl(p.avatar_url)) + '" alt="">' : esc(name.slice(0,2).toUpperCase());
     var media = '', body = '', exp = '';
-    if (tab === 'dwall') {
+    if (kind === 'dwall') {
       if (r.body) body = '<div class="dm-body">' + esc(r.body) + '</div>';
       if (r.media_url) media = imageHTML(r.media_url);
-    } else if (tab === 'dreels') {
+    } else if (kind === 'dreels') {
       if (r.caption) body = '<div class="dm-body">' + esc(r.caption) + '</div>';
       media = videoHTML(r.video_url, r.thumbnail_url);
     } else {
@@ -197,69 +294,368 @@
       exp = '<div class="dm-exp">⏳ ' + esc(left(r.expires_at)) + '</div>';
       media = r.media_type === 'video' ? videoHTML(r.media_url) : imageHTML(r.media_url);
     }
-    return '<div class="dm-card"><div class="dm-user"><div class="dm-av">' + av + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + esc(ago(r.created_at)) + '</div></div></div>' +
+    var sub = (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(r.created_at));
+    return '<div class="dm-card"><div class="dm-user" data-uid="' + esc(r.user_id) + '"><div class="dm-av">' + avInner(p, name) + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + sub + '</div></div></div>' +
       exp + body + media + ratingHTML(r.id, false) + '</div>';
   }
 
-  async function load(){
-    var feed = $('#feed');
-    $('#fab').textContent = FAB_TXT[tab];
-    feed.innerHTML = '<div class="dm-empty">Loading…</div>';
-    var q = DB.from(TABLE[tab]).select('*').order('created_at', { ascending:false }).limit(40);
-    if (tab === 'dlooks') q = q.gt('expires_at', new Date().toISOString());
-    var res = await q;
-    if (res.error) { feed.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
-    var rows = res.data || [];
-    if (!rows.length) { feed.innerHTML = '<div class="dm-empty">Nothing here yet.<br>Be the first to post.</div>'; return; }
+  async function hydrate(rows){
     var uids = Array.from(new Set(rows.map(function(r){ return r.user_id; })));
     var ids = rows.map(function(r){ return r.id; });
     var out = await Promise.all([
       DB.from('demos_profiles').select('user_id,display_name,username,avatar_url').in('user_id', uids),
-      DB.from('demos_review_stats').select('*').eq('target_type', tab).in('target_id', ids),
-      me ? DB.from('demos_reviews').select('target_id,stars').eq('target_type', tab).eq('user_id', me.id).in('target_id', ids) : Promise.resolve({ data:[] })
+      DB.from('demos_review_stats').select('*').in('target_id', ids),
+      me ? DB.from('demos_reviews').select('target_id,stars').eq('user_id', me.id).in('target_id', ids) : Promise.resolve({ data:[] })
     ]);
     var prof = {};
     (out[0].data || []).forEach(function(p){ prof[p.user_id] = p; });
     (out[1].data || []).forEach(function(s){ S[s.target_id] = s; });
     (out[2].data || []).forEach(function(m){ M[m.target_id] = m.stars; });
-    feed.innerHTML = rows.map(function(r){ return cardHTML(r, prof); }).join('');
+    return prof;
   }
 
+  /* ---------- feed ---------- */
+  async function loadFeed(append){
+    var list = $('#feed'), more = $('#more'), tok;
+    if (!append) { tok = ++feedTok; feedOff = 0; more.innerHTML = ''; loadStrip(); } else { tok = feedTok; }
+    if (!me) {
+      list.innerHTML = '<div class="dm-empty">Log in to see Demos.<br><button class="dm-btn pri" data-login="1" style="margin-top:14px;max-width:220px">Log in</button></div>';
+      return;
+    }
+    if (!append) list.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var res = await DB.rpc('demos_feed', { p_mode: mode, p_seed: SEED, p_limit: FEED_N, p_offset: feedOff });
+    if (tok !== feedTok) return;
+    if (res.error) { list.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
+    var rows = res.data || [];
+    if (!append && !rows.length) {
+      list.innerHTML = '<div class="dm-empty">' + (mode === 'following' ? 'Nothing here yet.<br>Follow people to see their posts here.' : 'Nothing here yet.<br>Be the first to create something.') + '</div>';
+      feedDirty = false;
+      return;
+    }
+    var prof = await hydrate(rows);
+    if (tok !== feedTok) return;
+    var html = rows.map(function(r){ return cardHTML(r, prof); }).join('');
+    if (append) list.insertAdjacentHTML('beforeend', html); else list.innerHTML = html;
+    feedOff += rows.length;
+    more.innerHTML = rows.length >= FEED_N ? '<button class="dm-btn sec" data-more="1" style="margin:16px 0">Load more</button>' : '';
+    feedDirty = false;
+  }
+
+  async function loadStrip(){
+    var el = $('#strip'), tok = ++stripTok;
+    if (!me) { el.innerHTML = ''; return; }
+    var out = await Promise.all([
+      DB.from('demos_dlooks').select('user_id,created_at').gt('expires_at', new Date().toISOString()).order('created_at', { ascending:false }).limit(100),
+      DB.from('demos_follows').select('following_id').eq('follower_id', me.id)
+    ]);
+    if (tok !== stripTok) return;
+    followingSet = {};
+    (out[1].data || []).forEach(function(f){ followingSet[f.following_id] = true; });
+    var seen = {}, uids = [];
+    (out[0].data || []).forEach(function(r){
+      if (r.user_id === me.id || seen[r.user_id]) return;
+      if (mode === 'following' && !followingSet[r.user_id]) return;
+      seen[r.user_id] = true; uids.push(r.user_id);
+    });
+    var prof = {};
+    if (uids.length) {
+      var pr = await DB.from('demos_profiles').select('user_id,display_name,username,avatar_url').in('user_id', uids);
+      if (tok !== stripTok) return;
+      (pr.data || []).forEach(function(p){ prof[p.user_id] = p; });
+    }
+    var html = '<div class="dm-bub" data-mk="dlooks"><div class="dm-bav">' + (myProfile ? avInner(myProfile, myProfile.display_name || myProfile.username) : '') + '<span class="dm-plus">+</span></div><div class="dm-bn">Your look</div></div>';
+    uids.forEach(function(u){
+      var p = prof[u] || {}, nm = p.username || p.display_name || 'User';
+      html += '<div class="dm-bub" data-uid="' + esc(u) + '" data-ctab="dlooks"><div class="dm-bav ring">' + avInner(p, nm) + '</div><div class="dm-bn">' + esc(nm) + '</div></div>';
+    });
+    el.innerHTML = html;
+  }
+
+  /* ---------- profile ---------- */
+  function renderHead(){
+    var p = PV.p, st = PV.st, name = p.display_name || p.username || 'User';
+    var banner = p.banner_url && safeUrl(p.banner_url) ? '<img src="' + esc(safeUrl(p.banner_url)) + '" alt="">' : '';
+    var web = p.website && safeUrl(p.website) ? safeUrl(p.website) : '';
+    var meta = '';
+    if (p.location) meta += '<span>📍 ' + esc(p.location) + '</span>';
+    if (web) meta += '<a href="' + esc(web) + '" target="_blank" rel="noopener nofollow">🔗 ' + esc(web.replace(/^https?:\/\//, '').replace(/\/$/, '')) + '</a>';
+    var btn = PV.isMe
+      ? '<button class="dm-btn sec dm-pbtn" data-act="edit">Edit profile</button>'
+      : '<button class="dm-btn ' + (PV.fol ? 'sec' : 'pri') + ' dm-pbtn" data-act="follow" id="fBtn">' + (PV.fol ? 'Following' : 'Follow') + '</button>';
+    var create = PV.isMe
+      ? '<div class="dm-create"><div class="dm-cr-t">Create</div><div class="dm-cr-row"><button data-mk="dwall">Dwall</button><button data-mk="dreels">Dreel</button><button data-mk="dlooks">Dlook</button></div></div>'
+      : '';
+    $('#pHead').innerHTML =
+      '<div class="dm-pbanner">' + banner + '</div>' +
+      '<div class="dm-phead"><div class="dm-pav">' + avInner(p, name) + '</div>' + btn + '</div>' +
+      '<div class="dm-pname">' + esc(name) + '</div><div class="dm-puser">@' + esc(p.username) + '</div>' +
+      (p.bio ? '<div class="dm-pbio">' + esc(p.bio) + '</div>' : '') +
+      (meta ? '<div class="dm-pmeta">' + meta + '</div>' : '') +
+      '<div class="dm-pstats"><div><b>' + Number(st.posts || 0) + '</b><span>Posts</span></div>' +
+      '<div data-act="followers"><b>' + Number(st.followers || 0) + '</b><span>Followers</span></div>' +
+      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + create;
+  }
+
+  function markPTab(k){
+    document.querySelectorAll('#ptabs .dm-tab').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-t') === k); });
+  }
+
+  async function showProfile(uid, ctab){
+    var el = $('#vProfile'), tok = ++profTok;
+    el.innerHTML = '<div id="pHead"><div class="dm-empty">Loading…</div></div>' +
+      '<div class="dm-tabs" id="ptabs"><div class="dm-tab" data-t="dwall">Dwall</div><div class="dm-tab" data-t="dreels">Dreels</div><div class="dm-tab" data-t="dlooks">Dlooks</div></div>' +
+      '<div id="pfeed"></div>';
+    markPTab(ctab || 'dwall');
+    var out = await Promise.all([
+      DB.from('demos_profiles').select('*').eq('user_id', uid).maybeSingle(),
+      DB.from('demos_profile_stats').select('*').eq('user_id', uid).maybeSingle(),
+      (me && me.id !== uid) ? DB.from('demos_follows').select('follower_id').eq('follower_id', me.id).eq('following_id', uid).maybeSingle() : Promise.resolve({ data:null })
+    ]);
+    if (tok !== profTok) return;
+    var p = out[0].data;
+    if (!p) { el.innerHTML = '<div class="dm-empty">This profile does not exist.</div>'; return; }
+    PV = { uid: uid, p: p, st: out[1].data || {}, isMe: !!(me && me.id === uid), fol: !!out[2].data, ctab: ctab || 'dwall' };
+    $('#topTitle').textContent = '@' + p.username;
+    renderHead();
+    markPTab(PV.ctab);
+    await loadContent();
+  }
+
+  async function loadContent(){
+    var kind = PV.ctab, uid = PV.uid, isMe = PV.isMe, list = $('#pfeed'), tok = ++contTok;
+    list.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var q = DB.from(TABLE[kind]).select('*').eq('user_id', uid).order('created_at', { ascending:false }).limit(40);
+    if (kind === 'dlooks') q = q.gt('expires_at', new Date().toISOString());
+    var res = await q;
+    if (tok !== contTok) return;
+    if (res.error) { list.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
+    var rows = res.data || [];
+    if (!rows.length) {
+      list.innerHTML = '<div class="dm-empty">' + (isMe ? 'Nothing here yet.<br>Use the Create buttons above.' : 'Nothing here yet.') + '</div>';
+      return;
+    }
+    rows.forEach(function(r){ r.kind = kind; });
+    var prof = await hydrate(rows);
+    if (tok !== contTok) return;
+    list.innerHTML = rows.map(function(r){ return cardHTML(r, prof); }).join('');
+  }
+
+  async function toggleFollow(){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    if (!PV || PV.isMe || folBusy) return;
+    folBusy = true;
+    var uid = PV.uid, r;
+    try {
+      if (PV.fol) {
+        r = await DB.from('demos_follows').delete().eq('follower_id', me.id).eq('following_id', uid);
+        if (r.error) { toast('Could not unfollow'); return; }
+        PV.fol = false; PV.st.followers = Math.max(0, Number(PV.st.followers || 0) - 1); delete followingSet[uid];
+      } else {
+        r = await DB.from('demos_follows').insert({ follower_id: me.id, following_id: uid });
+        if (r.error) { toast('Could not follow'); return; }
+        PV.fol = true; PV.st.followers = Number(PV.st.followers || 0) + 1; followingSet[uid] = true;
+      }
+      feedDirty = true;
+      renderHead();
+    } finally { folBusy = false; }
+  }
+
+  async function showList(kind){
+    var uid = PV.uid;
+    $('#lsTitle').textContent = kind === 'followers' ? 'Followers' : 'Following';
+    $('#lsList').innerHTML = '<div class="dm-empty">Loading…</div>';
+    $('#lsBg').classList.add('show');
+    var col = kind === 'followers' ? 'follower_id' : 'following_id';
+    var other = kind === 'followers' ? 'following_id' : 'follower_id';
+    var r = await DB.from('demos_follows').select(col).eq(other, uid).order('created_at', { ascending:false }).limit(200);
+    var ids = (r.data || []).map(function(x){ return x[col]; });
+    if (!ids.length) { $('#lsList').innerHTML = '<div class="dm-empty">Nobody here yet.</div>'; return; }
+    var pr = await DB.from('demos_profiles').select('user_id,display_name,username,avatar_url').in('user_id', ids);
+    var byId = {};
+    (pr.data || []).forEach(function(p){ byId[p.user_id] = p; });
+    $('#lsList').innerHTML = ids.map(function(id){
+      var p = byId[id]; if (!p) return '';
+      var nm = p.display_name || p.username || 'User';
+      return '<div class="dm-lrow" data-uid="' + esc(id) + '"><div class="dm-av">' + avInner(p, nm) + '</div><div><div class="dm-name">' + esc(nm) + '</div><div class="dm-time">@' + esc(p.username) + '</div></div></div>';
+    }).join('') || '<div class="dm-empty">Nobody here yet.</div>';
+  }
+
+  /* ---------- edit profile ---------- */
+  function edStatus(t){ $('#ed_status').textContent = t || ''; }
+  function openEdit(){
+    if (!myProfile) { openSetup(); return; }
+    var p = myProfile;
+    $('#ed_un').textContent = 'Username: @' + p.username + ' (cannot be changed)';
+    $('#ed_name').value = p.display_name || '';
+    $('#ed_bio').value = p.bio || '';
+    $('#ed_loc').value = p.location || '';
+    $('#ed_web').value = p.website || '';
+    $('#ed_av').value = ''; $('#ed_bn').value = '';
+    edStatus('');
+    $('#edBg').classList.add('show');
+  }
+  function closeEdit(){
+    if (edBusy) { toast('Saving… please wait'); return; }
+    $('#edBg').classList.remove('show');
+  }
+  async function saveEdit(){
+    if (edBusy) return;
+    if (!me) { goLogin(); return; }
+    var name = $('#ed_name').value.trim(), bio = $('#ed_bio').value.trim();
+    var loc = $('#ed_loc').value.trim(), web = $('#ed_web').value.trim();
+    if (!name || name.length > 40) { edStatus('Enter your name (up to 40 characters)'); return; }
+    if (web && !/^https?:\/\//i.test(web)) web = 'https://' + web;
+    if (web && (!safeUrl(web) || web.length > 200)) { edStatus('Enter a valid website link'); return; }
+    var avF = $('#ed_av').files && $('#ed_av').files[0] ? $('#ed_av').files[0] : null;
+    var bnF = $('#ed_bn').files && $('#ed_bn').files[0] ? $('#ed_bn').files[0] : null;
+    var btn = $('#edSave');
+    edBusy = true; btn.disabled = true;
+    try {
+      var upd = { display_name: name, bio: bio || null, location: loc || null, website: web || null };
+      if (avF) { edStatus('Uploading photo…'); upd.avatar_url = await upImage(avF); }
+      if (bnF) { edStatus('Uploading banner…'); upd.banner_url = await upImage(bnF); }
+      edStatus('Saving…');
+      var r = await DB.from('demos_profiles').update(upd).eq('user_id', me.id);
+      if (r.error) throw new Error(r.error.message);
+      await loadMyProfile();
+      edBusy = false;
+      $('#edBg').classList.remove('show');
+      toast('Profile updated');
+      feedDirty = true;
+      showProfile(me.id, PV ? PV.ctab : 'dwall');
+    } catch (err) {
+      edStatus((err && err.message) ? err.message : 'Could not save profile');
+    } finally {
+      edBusy = false; btn.disabled = false; hideProg();
+    }
+  }
+
+  /* ---------- rating ---------- */
   async function submitRating(id, stars){
     if (!me) { goLogin(); return; }
-    var ex = await DB.from('demos_reviews').select('id').eq('target_type', tab).eq('target_id', id).eq('user_id', me.id).maybeSingle();
+    var kind = K[id] || tab;
+    var ex = await DB.from('demos_reviews').select('id').eq('target_type', kind).eq('target_id', id).eq('user_id', me.id).maybeSingle();
     var r;
     if (ex.data) r = await DB.from('demos_reviews').update({ stars: stars, updated_at: new Date().toISOString() }).eq('id', ex.data.id);
-    else r = await DB.from('demos_reviews').insert({ target_type: tab, target_id: id, user_id: me.id, stars: stars });
+    else r = await DB.from('demos_reviews').insert({ target_type: kind, target_id: id, user_id: me.id, stars: stars });
     if (r.error) { toast('Rating failed'); return; }
     M[id] = stars;
-    var st = await DB.from('demos_review_stats').select('*').eq('target_type', tab).eq('target_id', id).maybeSingle();
+    var st = await DB.from('demos_review_stats').select('*').eq('target_type', kind).eq('target_id', id).maybeSingle();
     if (st.data) S[id] = st.data;
     var box = document.querySelector('.dm-rating[data-id="' + id + '"]');
     if (box) box.outerHTML = ratingHTML(id, false);
     toast('Thanks for rating ' + stars + ' ★');
   }
 
-  $('#feed').addEventListener('click', function(e){
-    var box = e.target.closest('.dm-rating'); if (!box) return;
-    var id = box.getAttribute('data-id');
-    if (e.target.closest('.dm-rate-btn')) {
-      if (!me) { goLogin(); return; }
-      var on = !box.classList.contains('on');
-      box.outerHTML = ratingHTML(id, on);
+  /* ---------- navigation ---------- */
+  function renderMe(){
+    var b = $('#meBtn');
+    if (!b) return;
+    if (myProfile) b.innerHTML = avInner(myProfile, myProfile.display_name || myProfile.username);
+    else b.textContent = '👤';
+  }
+  function applyView(){
+    var v = stack[stack.length - 1], isFeed = v.v === 'feed';
+    $('#vFeed').style.display = isFeed ? '' : 'none';
+    $('#vProfile').style.display = isFeed ? 'none' : '';
+    $('#feedTabs').style.display = isFeed ? '' : 'none';
+    $('#backBtn').style.display = isFeed ? 'none' : '';
+    $('#fab').style.display = isFeed ? '' : 'none';
+    if (isFeed) {
+      $('#topTitle').textContent = 'Demos';
+      if (feedDirty) loadFeed(false);
+    } else {
+      $('#topTitle').textContent = 'Profile';
+      showProfile(v.uid, v.ctab);
+    }
+    try { window.scrollTo(0, 0); } catch(e){}
+  }
+  function go(v){ stack.push(v); applyView(); }
+  function back(){ if (stack.length > 1) stack.pop(); applyView(); }
+  function openProfile(uid, ctab){ go({ v:'profile', uid: uid, ctab: ctab || 'dwall' }); }
+
+  function refreshView(){
+    var v = stack[stack.length - 1];
+    if (v.v === 'feed') return loadFeed(false);
+    return showProfile(v.uid, (PV && PV.uid === v.uid) ? PV.ctab : v.ctab);
+  }
+  async function load(){ return refreshView(); }
+
+  function afterPost(kind){
+    feedDirty = true;
+    var v = stack[stack.length - 1];
+    if (v.v === 'profile' && me && v.uid === me.id) showProfile(me.id, kind);
+    else if (me) go({ v:'profile', uid: me.id, ctab: kind });
+  }
+
+  function mk(k){
+    $('#crBg').classList.remove('show');
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    tab = k;
+    openSheet();
+  }
+  function openCreate(){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    $('#crBg').classList.add('show');
+  }
+
+  document.addEventListener('click', function(e){
+    var t = e.target, el;
+    var box = t.closest('.dm-rating');
+    if (box) {
+      var id = box.getAttribute('data-id');
+      if (t.closest('.dm-rate-btn')) {
+        if (!me) { goLogin(); return; }
+        box.outerHTML = ratingHTML(id, !box.classList.contains('on'));
+        return;
+      }
+      var star = t.closest('.dm-star');
+      if (star && box.classList.contains('on')) submitRating(id, Number(star.getAttribute('data-s')));
       return;
     }
-    var star = e.target.closest('.dm-star');
-    if (star && box.classList.contains('on')) submitRating(id, Number(star.getAttribute('data-s')));
+    if (t.closest('[data-login]')) { goLogin(); return; }
+    el = t.closest('[data-more]');
+    if (el) { el.textContent = 'Loading…'; loadFeed(true); return; }
+    el = t.closest('[data-mk]');
+    if (el) { mk(el.getAttribute('data-mk')); return; }
+    el = t.closest('[data-act]');
+    if (el) {
+      var a = el.getAttribute('data-act');
+      if (a === 'edit') openEdit();
+      else if (a === 'follow') toggleFollow();
+      else if (a === 'followers' || a === 'following') showList(a);
+      return;
+    }
+    el = t.closest('[data-uid]');
+    if (el) { $('#lsBg').classList.remove('show'); openProfile(el.getAttribute('data-uid'), el.getAttribute('data-ctab')); return; }
+    el = t.closest('#ptabs .dm-tab');
+    if (el && PV) { PV.ctab = el.getAttribute('data-t'); markPTab(PV.ctab); loadContent(); return; }
+    el = t.closest('#feedTabs .dm-tab');
+    if (el) {
+      mode = el.getAttribute('data-m');
+      document.querySelectorAll('#feedTabs .dm-tab').forEach(function(x){ x.classList.toggle('active', x === el); });
+      loadFeed(false);
+      return;
+    }
   });
 
-  document.querySelectorAll('.dm-tab').forEach(function(el){
-    el.addEventListener('click', function(){
-      tab = el.getAttribute('data-t');
-      document.querySelectorAll('.dm-tab').forEach(function(x){ x.classList.toggle('active', x === el); });
-      load();
-    });
+  $('#backBtn').addEventListener('click', back);
+  $('#meBtn').addEventListener('click', function(){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    openProfile(me.id, 'dwall');
   });
+  $('#crCancel').addEventListener('click', function(){ $('#crBg').classList.remove('show'); });
+  $('#lsClose').addEventListener('click', function(){ $('#lsBg').classList.remove('show'); });
+  $('#edCancel').addEventListener('click', closeEdit);
+  $('#edSave').addEventListener('click', saveEdit);
+  $('#crBg').addEventListener('click', function(e){ if (e.target.id === 'crBg') $('#crBg').classList.remove('show'); });
+  $('#lsBg').addEventListener('click', function(e){ if (e.target.id === 'lsBg') $('#lsBg').classList.remove('show'); });
+  $('#edBg').addEventListener('click', function(e){ if (e.target.id === 'edBg') closeEdit(); });
+  renderMe();
 
   /* ---------- upload helpers ---------- */
   function showProg(p, t){
@@ -385,7 +781,7 @@
       var r = await DB.from(TABLE[tab]).insert(row);
       if (r.error) throw new Error(r.error.message);
       busy = false;
-      closeSheet(); toast('Posted'); load();
+      closeSheet(); toast('Posted'); afterPost(tab);
     } catch (err) {
       toast((err && err.message) ? err.message : 'Upload failed');
     } finally {
@@ -400,6 +796,7 @@
     if (!me) { myProfile = null; return; }
     var r = await DB.from('demos_profiles').select('*').eq('user_id', me.id).maybeSingle();
     myProfile = r && r.data ? r.data : null;
+    renderMe();
   }
   function pfStatus(t){ $('#pf_status').textContent = t || ''; }
   function openSetup(){
@@ -448,7 +845,7 @@
   $('#pfCancel').addEventListener('click', closeSetup);
   $('#pfSave').addEventListener('click', saveProfile);
 
-  $('#fab').addEventListener('click', openSheet);
+  $('#fab').addEventListener('click', openCreate);
   $('#sheetCancel').addEventListener('click', closeSheet);
   $('#sheetPost').addEventListener('click', post);
   $('#sheetBg').addEventListener('click', function(e){ if (e.target.id === 'sheetBg') closeSheet(); });
