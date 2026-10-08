@@ -120,17 +120,6 @@
   .dm-bav { transition: transform .35s cubic-bezier(.34,1.8,.5,1); }
   .dm-bub:active .dm-bav { transform: scale(.86); transition: transform .12s ease-out; }
   @media (prefers-reduced-motion: reduce) { .dm-bub { animation: none; } }
-  /* ===== DLOOK VIEWER (CSS) ===== */
-  .dm-vw { position:fixed; top:0; right:0; bottom:0; left:0; z-index:99999; background:#000; display:none; flex-direction:column; }
-  .dm-vw.show { display:flex; }
-  .vw-bars { display:flex; gap:4px; padding:10px 10px 6px; }
-  .vw-bar { flex:1; height:3px; border-radius:2px; background:rgba(255,255,255,.3); overflow:hidden; }
-  .vw-fill { height:100%; width:0; background:#fff; }
-  .vw-top { display:flex; align-items:center; justify-content:space-between; padding:4px 12px; color:#fff; font-size:13px; }
-  .vw-x { background:none; border:none; color:#fff; font-size:26px; cursor:pointer; padding:4px 8px; }
-  .vw-stage { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; }
-  .vw-stage img, .vw-stage video { max-width:100%; max-height:100%; object-fit:contain; }
-  .vw-cap { color:#fff; padding:14px 16px 22px; font-size:15px; text-align:center; white-space:pre-wrap; word-wrap:break-word; }
 </style>
 </head>
 <body>
@@ -152,14 +141,6 @@
     <div id="more"></div>
   </div>
   <div id="vProfile" style="display:none"></div>
-</div>
-
-<!-- DLOOK VIEWER -->
-<div class="dm-vw" id="vw">
-  <div class="vw-bars" id="vwBars"></div>
-  <div class="vw-top"><span id="vwInfo"></span><button class="vw-x" aria-label="Close">&#10005;</button></div>
-  <div class="vw-stage" id="vwStage"></div>
-  <div class="vw-cap" id="vwCap"></div>
 </div>
 
 <button class="dm-fab" id="fab">+ Create</button>
@@ -582,68 +563,6 @@
     }
   }
 
-  /* ---------- DLOOK VIEWER (JS) ---------- */
-  var VW = { items: [], i: 0, timer: null };
-
-  async function openViewer(uid){
-    var res = await DB.from('demos_dlooks').select('*').eq('user_id', uid).gt('expires_at', new Date().toISOString()).order('created_at', { ascending:true }).limit(30);
-    var rows = (res && res.data) || [];
-    if (!rows.length) { toast('No active Dlook'); return; }
-    VW.items = rows; VW.i = 0;
-    var h = '';
-    rows.forEach(function(){ h += '<div class="vw-bar"><div class="vw-fill"></div></div>'; });
-    $('#vwBars').innerHTML = h;
-    $('#vw').classList.add('show');
-    vwShow();
-  }
-  function vwShow(){
-    clearTimeout(VW.timer);
-    var r = VW.items[VW.i];
-    var fills = document.querySelectorAll('#vwBars .vw-fill');
-    fills.forEach(function(f, k){ f.style.transition = 'none'; f.style.width = k < VW.i ? '100%' : '0'; });
-    $('#vwInfo').textContent = ago(r.created_at) + ' · ' + left(r.expires_at);
-    $('#vwCap').textContent = r.caption || '';
-    var st = $('#vwStage'); st.innerHTML = '';
-    var u = safeUrl(r.media_url);
-    if (!u) { vwNext(); return; }
-    var cur = fills[VW.i];
-    if (r.media_type === 'video') {
-      var v = document.createElement('video');
-      v.src = u; v.playsInline = true; v.autoplay = true; v.controls = false;
-      v.onended = vwNext;
-      v.onerror = vwNext;
-      v.ontimeupdate = function(){ if (v.duration) cur.style.width = (v.currentTime / v.duration * 100) + '%'; };
-      st.appendChild(v);
-      var p = v.play();
-      if (p && p.catch) p.catch(function(){ v.muted = true; v.play().catch(function(){}); });
-    } else {
-      var im = new Image();
-      im.alt = ''; im.src = u;
-      st.appendChild(im);
-      void cur.offsetWidth;
-      cur.style.transition = 'width 5s linear';
-      cur.style.width = '100%';
-      VW.timer = setTimeout(vwNext, 5000);
-    }
-  }
-  function vwNext(){
-    if (VW.i < VW.items.length - 1) { VW.i++; vwShow(); } else closeViewer();
-  }
-  function vwPrev(){
-    if (VW.i > 0) VW.i--;
-    vwShow();
-  }
-  function closeViewer(){
-    clearTimeout(VW.timer);
-    $('#vwStage').innerHTML = '';
-    $('#vw').classList.remove('show');
-  }
-  $('#vw').addEventListener('click', function(e){
-    if (e.target.closest('.vw-x')) { closeViewer(); return; }
-    var w = $('#vw').getBoundingClientRect().width;
-    if (e.clientX < w * 0.35) vwPrev(); else vwNext();
-  });
-
   /* ---------- rating ---------- */
   async function submitRating(id, stars){
     if (!me) { goLogin(); return; }
@@ -743,8 +662,6 @@
       else if (a === 'followers' || a === 'following') showList(a);
       return;
     }
-    el = t.closest('.dm-bub[data-uid]');
-    if (el) { openViewer(el.getAttribute('data-uid')); return; }
     el = t.closest('[data-uid]');
     if (el) { $('#lsBg').classList.remove('show'); openProfile(el.getAttribute('data-uid'), el.getAttribute('data-ctab')); return; }
     el = t.closest('#ptabs .dm-tab');
