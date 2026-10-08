@@ -268,36 +268,7 @@ async function pingLastSeen() {
   }
 }
 
-/* ─── Open chat from ?to=<user_id> ─── */
-async function openFromParam() {
-  try {
-    const to = new URLSearchParams(window.location.search).get('to')
-    if (!to || !currentUser || to === currentUser.id) return
-    const { data, error } = await db.from('profiles')
-      .select('id, username, display_name, is_creator, last_seen')
-      .eq('id', to)
-      .single()
-    if (error || !data) { alert('User not found'); return }
-    const existing = allChats.find(c => c.otherId === data.id)
-    if (!existing) {
-      allChats.unshift({
-        otherId: data.id,
-        username: data.username,
-        displayName: data.display_name || data.username,
-        isCreator: !!data.is_creator,
-        lastSeen: data.last_seen,
-        lastMsg: { content: '', created_at: new Date().toISOString() },
-        unreadCount: 0
-      })
-      renderChatList()
-    }
-    openChat(data.id, data.username, data.display_name || data.username)
-  } catch (err) {
-    console.error('openFromParam error:', err)
-  }
-}
-
-init().then(openFromParam).catch(console.error)
+init().catch(console.error)
 
 /* ─── Load Conversations ─── */
 async function loadConversations() {

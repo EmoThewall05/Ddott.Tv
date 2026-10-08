@@ -131,7 +131,6 @@
   .vw-stage { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; }
   .vw-stage img, .vw-stage video { max-width:100%; max-height:100%; object-fit:contain; }
   .vw-cap { color:#fff; padding:14px 16px 22px; font-size:15px; text-align:center; white-space:pre-wrap; word-wrap:break-word; }
-  .dm-msg { flex:none; width:auto; margin-top:10px; padding:9px 16px; }
 </style>
 </head>
 <body>
@@ -336,7 +335,7 @@
     }
     var sub = (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(r.created_at));
     return '<div class="dm-card"><div class="dm-user" data-uid="' + esc(r.user_id) + '"><div class="dm-av">' + avInner(p, name) + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + sub + '</div></div></div>' +
-      exp + body + media + ratingHTML(r.id, false) + ((me && r.user_id !== me.id) ? '<button class="dm-btn sec dm-msg" data-msg="' + esc(r.user_id) + '">💬 Message</button>' : '') + '</div>';
+      exp + body + media + ratingHTML(r.id, false) + '</div>';
   }
 
   async function hydrate(rows){
@@ -731,13 +730,6 @@
       return;
     }
     if (t.closest('[data-login]')) { goLogin(); return; }
-    el = t.closest('[data-msg]');
-    if (el) {
-      var to = el.getAttribute('data-msg');
-      var url = '/messaging/?to=' + encodeURIComponent(to);
-      try { window.top.location.href = url; } catch(e){ location.href = url; }
-      return;
-    }
     el = t.closest('[data-more]');
     if (el) { el.textContent = 'Loading…'; loadFeed(true); return; }
     el = t.closest('[data-mk]');
