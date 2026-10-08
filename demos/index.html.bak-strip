@@ -103,15 +103,11 @@
   .dm-logout { color:#C0392B; border-color:rgba(192,57,43,0.45); }
   /* ===== DLOOK FLOAT (CSS) ===== */
   .dm-strip { padding-bottom:12px; }
-  /* DLOOK STRIP V2 */
   @keyframes dmFloat {
-    0%   { transform: translate(0,0); }
-    25%  { transform: translate(5px,-7px); }
-    50%  { transform: translate(0,-14px); }
-    75%  { transform: translate(-5px,-7px); }
-    100% { transform: translate(0,0); }
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
   }
-  .dm-strip { padding-left:10px; padding-right:10px; padding-top:20px; }
   .dm-bub { animation: dmFloat 3.4s ease-in-out infinite; will-change: transform; }
   .dm-bub:nth-child(2n)  { animation-duration: 4.1s; animation-delay: -1.2s; }
   .dm-bub:nth-child(3n)  { animation-duration: 3.7s; animation-delay: -2.1s; }
@@ -371,10 +367,9 @@
     if (tok !== stripTok) return;
     followingSet = {};
     (out[1].data || []).forEach(function(f){ followingSet[f.following_id] = true; });
-    var seen = {}, uids = [], hasMine = false;
+    var seen = {}, uids = [];
     (out[0].data || []).forEach(function(r){
-      if (r.user_id === me.id) { hasMine = true; return; }
-      if (seen[r.user_id]) return;
+      if (r.user_id === me.id || seen[r.user_id]) return;
       if (mode === 'following' && !followingSet[r.user_id]) return;
       seen[r.user_id] = true; uids.push(r.user_id);
     });
@@ -384,10 +379,7 @@
       if (tok !== stripTok) return;
       (pr.data || []).forEach(function(p){ prof[p.user_id] = p; });
     }
-    var mine = myProfile ? avInner(myProfile, myProfile.display_name || myProfile.username) : '';
-    var html = hasMine
-      ? '<div class="dm-bub" data-uid="' + esc(me.id) + '" data-ctab="dlooks"><div class="dm-bav ring">' + mine + '<span class="dm-plus" data-mk="dlooks">+</span></div><div class="dm-bn">Your look</div></div>'
-      : '<div class="dm-bub" data-mk="dlooks"><div class="dm-bav">' + mine + '<span class="dm-plus">+</span></div><div class="dm-bn">Your look</div></div>';
+    var html = '<div class="dm-bub" data-mk="dlooks"><div class="dm-bav">' + (myProfile ? avInner(myProfile, myProfile.display_name || myProfile.username) : '') + '<span class="dm-plus">+</span></div><div class="dm-bn">Your look</div></div>';
     uids.forEach(function(u){
       var p = prof[u] || {}, nm = p.username || p.display_name || 'User';
       html += '<div class="dm-bub" data-uid="' + esc(u) + '" data-ctab="dlooks"><div class="dm-bav ring">' + avInner(p, nm) + '</div><div class="dm-bn">' + esc(nm) + '</div></div>';
