@@ -100,7 +100,6 @@
   .dm-cr-col { display:flex; flex-direction:column; gap:10px; }
   .dm-cr-col .dm-btn { flex:none; }
   .dm-lrow { display:flex; align-items:center; gap:10px; padding:10px 2px; border-bottom:1px solid var(--line); cursor:pointer; }
-  .dm-logout { color:#C0392B; border-color:rgba(192,57,43,0.45); }
 </style>
 </head>
 <body>
@@ -381,7 +380,7 @@
     if (p.location) meta += '<span>📍 ' + esc(p.location) + '</span>';
     if (web) meta += '<a href="' + esc(web) + '" target="_blank" rel="noopener nofollow">🔗 ' + esc(web.replace(/^https?:\/\//, '').replace(/\/$/, '')) + '</a>';
     var btn = PV.isMe
-      ? '<div style="display:flex;gap:8px;align-items:center"><button class="dm-btn sec dm-pbtn" data-act="edit">Edit profile</button><button class="dm-btn sec dm-pbtn dm-logout" data-act="logout">Logout</button></div>'
+      ? '<button class="dm-btn sec dm-pbtn" data-act="edit">Edit profile</button>'
       : '<button class="dm-btn ' + (PV.fol ? 'sec' : 'pri') + ' dm-pbtn" data-act="follow" id="fBtn">' + (PV.fol ? 'Following' : 'Follow') + '</button>';
     var create = PV.isMe
       ? '<div class="dm-create"><div class="dm-cr-t">Create</div><div class="dm-cr-row"><button data-mk="dwall">Dwall</button><button data-mk="dreels">Dreel</button><button data-mk="dlooks">Dlook</button></div></div>'
@@ -480,14 +479,6 @@
       var nm = p.display_name || p.username || 'User';
       return '<div class="dm-lrow" data-uid="' + esc(id) + '"><div class="dm-av">' + avInner(p, nm) + '</div><div><div class="dm-name">' + esc(nm) + '</div><div class="dm-time">@' + esc(p.username) + '</div></div></div>';
     }).join('') || '<div class="dm-empty">Nobody here yet.</div>';
-  }
-
-  /* ---------- logout ---------- */
-  async function doLogout(){
-    if (!confirm('Logout cheyyano?')) return;
-    try { await DB.auth.signOut(); } catch(e) { console.error('Signout error:', e); }
-    try { localStorage.clear(); sessionStorage.clear(); } catch(e){}
-    try { window.top.location.href = '/auth/login.html'; } catch(e){ location.href = '/auth/login.html'; }
   }
 
   /* ---------- edit profile ---------- */
@@ -634,7 +625,6 @@
     if (el) {
       var a = el.getAttribute('data-act');
       if (a === 'edit') openEdit();
-      else if (a === 'logout') doLogout();
       else if (a === 'follow') toggleFollow();
       else if (a === 'followers' || a === 'following') showList(a);
       return;
