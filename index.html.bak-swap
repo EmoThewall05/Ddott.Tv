@@ -176,8 +176,9 @@
     <div class="sec-title">DDOTT TV</div>
 
     <div class="pages-grid">
-      <div class="page-card" onclick="nav('demos')" style="border-color:rgba(217,119,87,0.25)">
-        <div class="pc-icon">👥</div><div class="pc-title">Demos</div><div class="pc-desc">Social feed, profiles &amp; Dlooks</div>
+      <div class="page-card" onclick="nav('player')" style="border-color:rgba(180,0,255,0.15)">
+        <div class="pc-badge b-new">V2</div>
+        <div class="pc-icon">📺</div><div class="pc-title">Video Player</div><div class="pc-desc">Neon player + stickers & comments</div>
       </div>
       <div class="page-card" onclick="nav('channel')">
         <div class="pc-icon">👤</div><div class="pc-title">Creator Channel</div><div class="pc-desc">Profile, videos & playlists</div>
@@ -229,9 +230,8 @@
       <div class="page-card" onclick="window.open('https://play.google.com/store/apps/details?id=com.emobies.emowall','_blank')" style="border-color:rgba(0,212,170,0.15)">
         <div class="pc-icon">🦋</div><div class="pc-title">Emowall AI 2.0</div><div class="pc-desc">Family safety · Free for Kerala 💚</div>
       </div>
-      <div class="page-card" onclick="nav('player')" style="border-color:rgba(180,0,255,0.15)">
-        <div class="pc-badge b-new">V2</div>
-        <div class="pc-icon">📺</div><div class="pc-title">Video Player</div><div class="pc-desc">Neon player + stickers & comments</div>
+      <div class="page-card" onclick="nav('demos')" style="border-color:rgba(217,119,87,0.25)">
+        <div class="pc-icon">👥</div><div class="pc-title">Demos</div><div class="pc-desc">Social feed, profiles &amp; Dlooks</div>
       </div>
     </div>
   </div>
