@@ -132,6 +132,19 @@
   .vw-stage img, .vw-stage video { max-width:100%; max-height:100%; object-fit:contain; }
   .vw-cap { color:#fff; padding:14px 16px 22px; font-size:15px; text-align:center; white-space:pre-wrap; word-wrap:break-word; }
   .dm-msg { flex:none; width:auto; margin-top:10px; padding:9px 16px; }
+  /* ===== COMMENTS (CSS) ===== */
+  .dm-cmbtn { display:block; width:100%; margin-top:10px; padding:10px 14px; border-radius:12px; border:1px solid var(--line); background:var(--cream); color:var(--terra-d); font-weight:700; font-size:14px; cursor:pointer; text-align:left; }
+  #cmList { max-height:48vh; overflow-y:auto; }
+  .dm-cm { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .dm-cm-av { width:36px; height:36px; font-size:13px; cursor:pointer; }
+  .dm-cm-b { flex:1; min-width:0; }
+  .dm-cm-h { display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; }
+  .dm-cm-h .dm-name { font-size:14px; cursor:pointer; }
+  .dm-cm-t { font-size:15px; line-height:1.5; margin-top:3px; white-space:pre-wrap; word-wrap:break-word; }
+  .dm-cm-del { margin-left:auto; background:none; border:none; font-size:15px; cursor:pointer; padding:2px 6px; opacity:.7; }
+  .dm-cm-form { display:flex; gap:8px; align-items:flex-end; margin-top:12px; }
+  .dm-sheet .dm-cm-form textarea { flex:1; min-height:46px; height:46px; resize:none; }
+  .dm-cm-form .dm-btn { flex:none; width:auto; padding:12px 18px; }
 </style>
 </head>
 <body>
@@ -242,6 +255,18 @@
     </div>
   </div>
 </div>
+<!-- DEMOS COMMENTS SHEET -->
+<div class="dm-sheet-bg" id="cmBg">
+  <div class="dm-sheet">
+    <h3>Comments</h3>
+    <div id="cmList"></div>
+    <div class="dm-cm-form">
+      <textarea id="cm_text" maxlength="500" placeholder="Write a comment…"></textarea>
+      <button class="dm-btn pri" id="cmSend">Send</button>
+    </div>
+    <div class="dm-row"><button class="dm-btn sec" id="cmClose">Close</button></div>
+  </div>
+</div>
 <div class="dm-toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -309,7 +334,7 @@
   }
 
   /* ===== DEMOS SOCIAL (JS) ===== */
-  var K = {}, PV = null, mode = 'foryou', SEED = Math.random().toString(36).slice(2);
+  var K = {}, CC = {}, PV = null, mode = 'foryou', SEED = Math.random().toString(36).slice(2);
   var stack = [{ v:'feed' }], feedOff = 0, feedTok = 0, stripTok = 0, profTok = 0, contTok = 0;
   var feedDirty = true, FEED_N = 20, followingSet = {}, edBusy = false, folBusy = false;
 
@@ -336,7 +361,7 @@
     }
     var sub = (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(r.created_at));
     return '<div class="dm-card"><div class="dm-user" data-uid="' + esc(r.user_id) + '"><div class="dm-av">' + avInner(p, name) + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + sub + '</div></div></div>' +
-      exp + body + media + ratingHTML(r.id, false) + ((me && r.user_id !== me.id) ? '<button class="dm-btn sec dm-msg" data-msg="' + esc(r.user_id) + '">💬 Message</button>' : '') + '</div>';
+      exp + body + media + ratingHTML(r.id, false) + cmBtn(r, kind) + ((me && r.user_id !== me.id) ? '<button class="dm-btn sec dm-msg" data-msg="' + esc(r.user_id) + '">💬 Message</button>' : '') + '</div>';
   }
 
   async function hydrate(rows){
@@ -345,12 +370,14 @@
     var out = await Promise.all([
       DB.from('demos_profiles').select('user_id,display_name,username,avatar_url').in('user_id', uids),
       DB.from('demos_review_stats').select('*').in('target_id', ids),
-      me ? DB.from('demos_reviews').select('target_id,stars').eq('user_id', me.id).in('target_id', ids) : Promise.resolve({ data:[] })
+      me ? DB.from('demos_reviews').select('target_id,stars').eq('user_id', me.id).in('target_id', ids) : Promise.resolve({ data:[] }),
+      DB.from('demos_comment_counts').select('target_id,comments').in('target_id', ids)
     ]);
     var prof = {};
     (out[0].data || []).forEach(function(p){ prof[p.user_id] = p; });
     (out[1].data || []).forEach(function(s){ S[s.target_id] = s; });
     (out[2].data || []).forEach(function(m){ M[m.target_id] = m.stars; });
+    (out[3].data || []).forEach(function(c){ CC[c.target_id] = c.comments; });
     return prof;
   }
 
@@ -645,6 +672,80 @@
     if (e.clientX < w * 0.35) vwPrev(); else vwNext();
   });
 
+  /* ===== DEMOS COMMENTS (JS) ===== */
+  var CM = { id:null, kind:null, owner:null, busy:false };
+  function cmLabel(id){ return '💬 Comments' + (CC[id] ? ' (' + CC[id] + ')' : ''); }
+  function cmBtn(r, kind){
+    if (kind === 'dlooks') return '';
+    return '<button class="dm-cmbtn" data-cm="' + esc(r.id) + '" data-ck="' + esc(kind) + '" data-co="' + esc(r.user_id) + '">' + cmLabel(r.id) + '</button>';
+  }
+  function cmUpdateBtns(id){
+    document.querySelectorAll('[data-cm]').forEach(function(b){
+      if (b.getAttribute('data-cm') === id) b.textContent = cmLabel(id);
+    });
+  }
+  async function openComments(id, kind, owner){
+    if (!me) { goLogin(); return; }
+    CM.id = id; CM.kind = kind; CM.owner = owner;
+    $('#cm_text').value = '';
+    $('#cmList').innerHTML = '<div class="dm-empty">Loading…</div>';
+    $('#cmBg').classList.add('show');
+    await loadComments();
+  }
+  async function loadComments(){
+    var id = CM.id, kind = CM.kind, list = $('#cmList');
+    var res = await DB.from('demos_comments').select('id,user_id,body,created_at').eq('target_type', kind).eq('target_id', id).order('created_at', { ascending:true }).limit(200);
+    if (CM.id !== id) return;
+    if (res.error) { list.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
+    var rows = res.data || [];
+    CC[id] = rows.length;
+    cmUpdateBtns(id);
+    if (!rows.length) { list.innerHTML = '<div class="dm-empty">No comments yet.<br>Be the first to comment.</div>'; return; }
+    var uids = Array.from(new Set(rows.map(function(c){ return c.user_id; })));
+    var pr = await DB.from('demos_profiles').select('user_id,display_name,username,avatar_url').in('user_id', uids);
+    if (CM.id !== id) return;
+    var byId = {};
+    (pr.data || []).forEach(function(p){ byId[p.user_id] = p; });
+    list.innerHTML = rows.map(function(c){
+      var p = byId[c.user_id] || {}, nm = p.display_name || p.username || 'User';
+      var canDel = me && (c.user_id === me.id || CM.owner === me.id);
+      return '<div class="dm-cm"><div class="dm-av dm-cm-av" data-uid="' + esc(c.user_id) + '">' + avInner(p, nm) + '</div>' +
+        '<div class="dm-cm-b"><div class="dm-cm-h"><span class="dm-name" data-uid="' + esc(c.user_id) + '">' + esc(nm) + '</span>' +
+        '<span class="dm-time">' + (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(c.created_at)) + '</span>' +
+        (canDel ? '<button class="dm-cm-del" data-cmdel="' + esc(c.id) + '" aria-label="Delete comment">🗑</button>' : '') + '</div>' +
+        '<div class="dm-cm-t">' + esc(c.body) + '</div></div></div>';
+    }).join('');
+    list.scrollTop = list.scrollHeight;
+  }
+  async function sendComment(){
+    if (CM.busy) return;
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { $('#cmBg').classList.remove('show'); openSetup(); return; }
+    var text = $('#cm_text').value.trim();
+    if (!text) { toast('Write a comment first'); return; }
+    CM.busy = true; $('#cmSend').disabled = true;
+    try {
+      var r = await DB.from('demos_comments').insert({ target_type: CM.kind, target_id: CM.id, user_id: me.id, body: text });
+      if (r.error) throw new Error(r.error.message);
+      $('#cm_text').value = '';
+      await loadComments();
+    } catch (err) {
+      toast((err && err.message) ? err.message : 'Could not send comment');
+    } finally {
+      CM.busy = false; $('#cmSend').disabled = false;
+    }
+  }
+  async function delComment(cid){
+    if (!confirm('Delete this comment?')) return;
+    var r = await DB.from('demos_comments').delete().eq('id', cid);
+    if (r.error) { toast('Could not delete comment'); return; }
+    await loadComments();
+  }
+  function closeComments(){ $('#cmBg').classList.remove('show'); CM.id = null; }
+  $('#cmSend').addEventListener('click', sendComment);
+  $('#cmClose').addEventListener('click', closeComments);
+  $('#cmBg').addEventListener('click', function(e){ if (e.target.id === 'cmBg') closeComments(); });
+
   /* ---------- rating ---------- */
   async function submitRating(id, stars){
     if (!me) { goLogin(); return; }
@@ -738,6 +839,10 @@
       try { window.top.location.href = url; } catch(e){ location.href = url; }
       return;
     }
+    el = t.closest('[data-cm]');
+    if (el) { openComments(el.getAttribute('data-cm'), el.getAttribute('data-ck'), el.getAttribute('data-co')); return; }
+    el = t.closest('[data-cmdel]');
+    if (el) { delComment(el.getAttribute('data-cmdel')); return; }
     el = t.closest('[data-more]');
     if (el) { el.textContent = 'Loading…'; loadFeed(true); return; }
     el = t.closest('[data-mk]');
@@ -754,7 +859,7 @@
     el = t.closest('.dm-bub[data-uid]');
     if (el) { openViewer(el.getAttribute('data-uid')); return; }
     el = t.closest('[data-uid]');
-    if (el) { $('#lsBg').classList.remove('show'); openProfile(el.getAttribute('data-uid'), el.getAttribute('data-ctab')); return; }
+    if (el) { $('#lsBg').classList.remove('show'); $('#cmBg').classList.remove('show'); openProfile(el.getAttribute('data-uid'), el.getAttribute('data-ctab')); return; }
     el = t.closest('#ptabs .dm-tab');
     if (el && PV) { PV.ctab = el.getAttribute('data-t'); markPTab(PV.ctab); loadContent(); return; }
     el = t.closest('#feedTabs .dm-tab');
