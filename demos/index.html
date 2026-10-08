@@ -361,7 +361,7 @@
     }
     var sub = (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(r.created_at));
     return '<div class="dm-card"><div class="dm-user" data-uid="' + esc(r.user_id) + '"><div class="dm-av">' + avInner(p, name) + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + sub + '</div></div></div>' +
-      exp + body + media + ratingHTML(r.id, false) + cmBtn(r, kind) + ((me && r.user_id !== me.id) ? '<button class="dm-btn sec dm-msg" data-msg="' + esc(r.user_id) + '">💬 Message</button>' : '') + '</div>';
+      exp + body + media + ratingHTML(r.id, false) + cmBtn(r, kind) + shBtn(r, kind) + ((me && r.user_id !== me.id) ? '<button class="dm-btn sec dm-msg" data-msg="' + esc(r.user_id) + '">💬 Message</button>' : '') + '</div>';
   }
 
   async function hydrate(rows){
@@ -464,7 +464,7 @@
       (meta ? '<div class="dm-pmeta">' + meta + '</div>' : '') +
       '<div class="dm-pstats"><div><b>' + Number(st.posts || 0) + '</b><span>Posts</span></div>' +
       '<div data-act="followers"><b>' + Number(st.followers || 0) + '</b><span>Followers</span></div>' +
-      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + create;
+      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + create;
   }
 
   function markPTab(k){
@@ -672,6 +672,73 @@
     if (e.clientX < w * 0.35) vwPrev(); else vwNext();
   });
 
+  /* ===== DEMOS SHARE (JS) ===== */
+  function shBtn(r, kind){
+    if (kind === 'dlooks') return '';
+    return '<button class="dm-cmbtn" data-sh="' + esc(r.id) + '" data-sk="' + esc(kind) + '">🔗 Share</button>';
+  }
+  function shareBase(){ return location.origin + '/demos/'; }
+  async function doShare(url, title){
+    try {
+      if (navigator.share) { await navigator.share({ title: title, url: url }); return; }
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+    try { await navigator.clipboard.writeText(url); toast('Link copied'); return; } catch (e) {}
+    var ta = document.createElement('textarea');
+    ta.value = url; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    if (ok) toast('Link copied'); else window.prompt('Copy this link', url);
+  }
+  function shareItem(id, kind){
+    if (kind !== 'dwall' && kind !== 'dreels') return;
+    doShare(shareBase() + '?post=' + kind + ':' + id, 'Demos post');
+  }
+  function shareProfile(){
+    if (!PV || !PV.p || !PV.p.username) return;
+    doShare(shareBase() + '?u=' + encodeURIComponent(PV.p.username), '@' + PV.p.username + ' on Demos');
+  }
+  async function showPost(kind, id){
+    var el = $('#vProfile'), tok = ++profTok;
+    $('#topTitle').textContent = 'Post';
+    if (!me) {
+      el.innerHTML = '<div class="dm-empty">Log in to see this post.<br><button class="dm-btn pri" data-login="1" style="margin-top:14px;max-width:220px">Log in</button></div>';
+      return;
+    }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var res = await DB.from(TABLE[kind]).select('*').eq('id', id).maybeSingle();
+    if (tok !== profTok) return;
+    if (res.error || !res.data) {
+      el.innerHTML = '<div class="dm-empty">This post is not available.</div><button class="dm-btn pri" data-home="1" style="margin:16px 0">Open Demos</button>';
+      return;
+    }
+    var r = res.data; r.kind = kind;
+    var prof = await hydrate([r]);
+    if (tok !== profTok) return;
+    el.innerHTML = cardHTML(r, prof) + '<button class="dm-btn pri" data-home="1" style="margin:16px 0">Open Demos</button>';
+  }
+  function goHome(){
+    stack = [{ v:'feed' }];
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    feedDirty = true;
+    applyView();
+  }
+  async function handleDeepLink(){
+    var q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    var post = q.get('post'), un = q.get('u');
+    if (post) {
+      var m = /^(dwall|dreels):([0-9a-f-]{36})$/i.exec(post);
+      if (m) go({ v:'post', kind: m[1].toLowerCase(), id: m[2].toLowerCase() });
+    } else if (un && /^[a-z0-9_]{3,20}$/i.test(un)) {
+      var r = await DB.from('demos_profiles').select('user_id').eq('username', un.toLowerCase()).maybeSingle();
+      if (r.data) openProfile(r.data.user_id, 'dwall'); else toast('Profile not found');
+    }
+  }
+
   /* ===== DEMOS COMMENTS (JS) ===== */
   var CM = { id:null, kind:null, owner:null, busy:false };
   function cmLabel(id){ return '💬 Comments' + (CC[id] ? ' (' + CC[id] + ')' : ''); }
@@ -782,7 +849,7 @@
       if (feedDirty) loadFeed(false);
     } else {
       $('#topTitle').textContent = 'Profile';
-      showProfile(v.uid, v.ctab);
+      if (v.v === 'post') showPost(v.kind, v.id); else showProfile(v.uid, v.ctab);
     }
     try { window.scrollTo(0, 0); } catch(e){}
   }
@@ -793,6 +860,7 @@
   function refreshView(){
     var v = stack[stack.length - 1];
     if (v.v === 'feed') return loadFeed(false);
+    if (v.v === 'post') return showPost(v.kind, v.id);
     return showProfile(v.uid, (PV && PV.uid === v.uid) ? PV.ctab : v.ctab);
   }
   async function load(){ return refreshView(); }
@@ -839,6 +907,12 @@
       try { window.top.location.href = url; } catch(e){ location.href = url; }
       return;
     }
+    el = t.closest('[data-sh]');
+    if (el) { shareItem(el.getAttribute('data-sh'), el.getAttribute('data-sk')); return; }
+    el = t.closest('[data-shp]');
+    if (el) { shareProfile(); return; }
+    el = t.closest('[data-home]');
+    if (el) { goHome(); return; }
     el = t.closest('[data-cm]');
     if (el) { openComments(el.getAttribute('data-cm'), el.getAttribute('data-ck'), el.getAttribute('data-co')); return; }
     el = t.closest('[data-cmdel]');
@@ -1089,6 +1163,7 @@
     else {
       try { await loadMyProfile(); } catch(e){ myProfile = null; }
       if (!myProfile) openSetup();
+      handleDeepLink();
     }
   })();
 })();
