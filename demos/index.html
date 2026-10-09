@@ -138,6 +138,36 @@
   .dm-terms a { color:var(--terra-d); font-weight:700; }
   .dm-rules { margin:0 0 6px; padding-left:20px; font-size:14.5px; line-height:1.55; color:var(--ink); }
   .dm-rules li { margin-bottom:6px; }
+  /* ===== MESSAGES (CSS) ===== */
+  #dmBg { z-index: 10050; }
+  .dmx-h { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; flex-wrap:wrap; }
+  .dmx-ht { font-weight:700; font-size:18px; }
+  .dmx-hr { display:flex; gap:8px; flex-wrap:wrap; }
+  .dmx-ib { display:flex; align-items:center; gap:12px; padding:12px 14px; cursor:pointer; border-bottom:1px solid rgba(128,128,128,.2); }
+  .dmx-ibm { flex:1; min-width:0; }
+  .dmx-ibl { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; opacity:.75; }
+  .dmx-ibn { background:var(--terra-d, #c0562b); color:#fff; border-radius:10px; font-size:11px; padding:2px 7px; }
+  .dmx-chat { height:calc(100vh - 215px); overflow-y:auto; padding:10px 14px; display:flex; flex-direction:column; gap:8px; }
+  .dmx-r { max-width:80%; display:flex; flex-direction:column; }
+  .dmx-r-me { align-self:flex-end; align-items:flex-end; }
+  .dmx-r-th { align-self:flex-start; }
+  .dmx-b { padding:8px 12px; border-radius:14px; background:rgba(128,128,128,.22); word-break:break-word; white-space:pre-wrap; }
+  .dmx-r-me .dmx-b { background:var(--terra-d, #c0562b); color:#fff; }
+  .dmx-t { font-size:11px; opacity:.6; margin-top:2px; }
+  .dmx-bar { display:flex; gap:8px; padding:10px 14px; align-items:flex-end; }
+  .dmx-bar textarea { flex:1; min-height:42px; max-height:110px; }
+  .dmx-adm { margin:10px 14px; padding:12px; border:1px solid rgba(128,128,128,.3); border-radius:12px; }
+  .dmx-snap { word-break:break-word; font-size:13px; opacity:.85; margin:6px 0; }
+  .dmx-ab { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .vw-reply { position:absolute; left:0; right:0; bottom:0; gap:8px; padding:10px 12px; background:rgba(0,0,0,.6); z-index:6; }
+  .vw-reply input { flex:1; min-width:0; padding:10px 12px; border-radius:20px; border:1px solid rgba(255,255,255,.3); background:rgba(0,0,0,.4); color:#fff; font-size:15px; }
+  .vw-reply button { border:0; border-radius:18px; padding:0 14px; background:#fff; color:#000; font-weight:600; }
+  /* ===== REPORT (CSS) ===== */
+  #mnBg { z-index: 10050; }
+  .dm-mn-sub { font-size:13px; opacity:.75; margin:2px 0 10px; }
+  .dm-mn-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+  #mnBlock, #mnCancel, .dm-mn-list .dm-btn { width:100%; }
+  #mnBlock { margin-bottom:8px; }
   /* ===== COMMENTS (CSS) ===== */
   .dm-cmbtn { display:block; width:100%; margin-top:10px; padding:10px 14px; border-radius:12px; border:1px solid var(--line); background:var(--cream); color:var(--terra-d); font-weight:700; font-size:14px; cursor:pointer; text-align:left; }
   #cmList { max-height:48vh; overflow-y:auto; }
@@ -159,6 +189,7 @@
     <div class="dm-top">
       <button class="dm-back" id="backBtn" aria-label="Back" style="display:none">&#8592;</button>
       <h1 class="dm-title" id="topTitle">Demos</h1>
+      <button class="dm-me" id="inbBtn" aria-label="Messages" style="font-size:18px">✉️</button>
       <button class="dm-me" id="meBtn" aria-label="My profile"></button>
     </div>
     <div class="dm-tabs" id="feedTabs">
@@ -172,6 +203,7 @@
     <div id="more"></div>
   </div>
   <div id="vProfile" style="display:none"></div>
+  <div id="vMsg" style="display:none"></div>
 </div>
 
 <!-- DLOOK VIEWER -->
@@ -180,6 +212,7 @@
   <div class="vw-top"><span id="vwInfo"></span><button class="vw-x" aria-label="Close">&#10005;</button></div>
   <div class="vw-stage" id="vwStage"></div>
   <div class="vw-cap" id="vwCap"></div>
+  <div class="vw-reply" id="vwReply" style="display:none"><input id="vwIn" maxlength="500" placeholder="Reply privately..."><button id="vwSend">Send</button><button id="vwRep" aria-label="Report">&#9873;</button></div>
 </div>
 
 <button class="dm-fab" id="fab">+ Create</button>
@@ -263,6 +296,38 @@
   </div>
 </div>
 <!-- DEMOS RULES SHEET -->
+<!-- REPORT BLOCK SHEET -->
+<div class="dm-sheet-bg" id="mnBg">
+  <div class="dm-sheet">
+    <h3>Report or block</h3>
+    <div class="dm-mn-sub">Why are you reporting this?</div>
+    <div class="dm-mn-list">
+      <button class="dm-btn sec" data-rs="nudity">Nudity or sexual content</button>
+      <button class="dm-btn sec" data-rs="harassment">Harassment or bullying</button>
+      <button class="dm-btn sec" data-rs="hate">Hate or abuse</button>
+      <button class="dm-btn sec" data-rs="violence">Violence or threats</button>
+      <button class="dm-btn sec" data-rs="spam">Spam</button>
+      <button class="dm-btn sec" data-rs="self_harm">Self-harm</button>
+      <button class="dm-btn sec" data-rs="other">Something else</button>
+    </div>
+    <button class="dm-btn sec" id="mnBlock">🚫 Block this user</button>
+    <button class="dm-btn sec" id="mnCancel">Cancel</button>
+  </div>
+</div>
+<!-- /REPORT BLOCK SHEET -->
+<!-- DM SETTING SHEET -->
+<div class="dm-sheet-bg" id="dmBg">
+  <div class="dm-sheet">
+    <h3>Who can message you?</h3>
+    <div class="dm-mn-list">
+      <button class="dm-btn sec" data-dmp="everyone">Everyone</button>
+      <button class="dm-btn sec" data-dmp="followers">Only my followers</button>
+      <button class="dm-btn sec" data-dmp="nobody">No one new (replies only)</button>
+    </div>
+    <button class="dm-btn sec" id="dmCancel">Close</button>
+  </div>
+</div>
+<!-- /DM SETTING SHEET -->
 <div class="dm-sheet-bg" id="ruBg">
   <div class="dm-sheet">
     <h3>Demos Rules</h3>
@@ -494,7 +559,7 @@
       (meta ? '<div class="dm-pmeta">' + meta + '</div>' : '') +
       '<div class="dm-pstats"><div><b>' + Number(st.posts || 0) + '</b><span>Posts</span></div>' +
       '<div data-act="followers"><b>' + Number(st.followers || 0) + '</b><span>Followers</span></div>' +
-      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + create;
+      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + mnProfBtn() + create;
   }
 
   function markPTab(k){
@@ -661,6 +726,7 @@
     fills.forEach(function(f, k){ f.style.transition = 'none'; f.style.width = k < VW.i ? '100%' : '0'; });
     $('#vwInfo').textContent = ago(r.created_at) + ' · ' + left(r.expires_at);
     $('#vwCap').textContent = r.caption || '';
+    var rb = $('#vwReply'); if (rb) rb.style.display = (me && r.user_id !== me.id) ? 'flex' : 'none';
     var st = $('#vwStage'); st.innerHTML = '';
     var u = safeUrl(r.media_url);
     if (!u) { vwNext(); return; }
@@ -704,8 +770,8 @@
 
   /* ===== DEMOS SHARE (JS) ===== */
   function shBtn(r, kind){
-    if (kind === 'dlooks') return '';
-    return '<button class="dm-cmbtn" data-sh="' + esc(r.id) + '" data-sk="' + esc(kind) + '">🔗 Share</button>';
+    if (kind === 'dlooks') return mnBtn(r, kind);
+    return '<button class="dm-cmbtn" data-sh="' + esc(r.id) + '" data-sk="' + esc(kind) + '">🔗 Share</button>' + mnBtn(r, kind);
   }
   function shareBase(){ return location.origin + '/demos/'; }
   async function doShare(url, title){
@@ -809,7 +875,7 @@
       return '<div class="dm-cm"><div class="dm-av dm-cm-av" data-uid="' + esc(c.user_id) + '">' + avInner(p, nm) + '</div>' +
         '<div class="dm-cm-b"><div class="dm-cm-h"><span class="dm-name" data-uid="' + esc(c.user_id) + '">' + esc(nm) + '</span>' +
         '<span class="dm-time">' + (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(c.created_at)) + '</span>' +
-        (canDel ? '<button class="dm-cm-del" data-cmdel="' + esc(c.id) + '" aria-label="Delete comment">🗑</button>' : '') + '</div>' +
+        ((me && c.user_id !== me.id) ? '<button class="dm-cm-del" data-mn="' + esc(c.id) + '" data-mt="comment" data-mu="' + esc(c.user_id) + '" aria-label="Report comment">⚑</button>' : '') + (canDel ? '<button class="dm-cm-del" data-cmdel="' + esc(c.id) + '" aria-label="Delete comment">🗑</button>' : '') + '</div>' +
         '<div class="dm-cm-t">' + esc(c.body) + '</div></div></div>';
     }).join('');
     list.scrollTop = list.scrollHeight;
@@ -835,6 +901,273 @@
       CM.busy = false; $('#cmSend').disabled = false;
     }
   }
+  /* ===== REPORT BLOCK (JS) ===== */
+  var MN = { t:null, id:null, u:null, snap:'', busy:false };
+  function mnBtn(r, kind){
+    if (!me || !r || r.user_id === me.id) return '';
+    return '<button class="dm-cmbtn" data-mn="' + esc(r.id) + '" data-mt="' + esc(kind) + '" data-mu="' + esc(r.user_id) + '">⋯ Report / Block</button>';
+  }
+  function mnProfBtn(){
+    var u = (PV && !PV.isMe) ? ((PV.p && PV.p.user_id) || PV.uid) : '';
+    if (!me || !u) return '';
+    return '<button class="dm-cmbtn" data-msg="' + esc(u) + '" style="margin-top:12px;margin-left:8px">💬 Message</button><button class="dm-cmbtn" data-mn="' + esc(u) + '" data-mt="profile" data-mu="' + esc(u) + '" style="margin-top:12px;margin-left:8px">⋯ Report / Block</button>';
+  }
+  function openMn(t, id, u, snap){
+    if (!me) { goLogin(); return; }
+    if (!u || u === me.id) return;
+    MN.t = t; MN.id = id; MN.u = u; MN.snap = snap || ''; MN.busy = false;
+    $('#mnBg').classList.add('show');
+  }
+  function closeMn(){ $('#mnBg').classList.remove('show'); MN.busy = false; }
+  async function sendReport(reason){
+    if (MN.busy || !MN.id) return;
+    MN.busy = true;
+    var row = { reporter_id: me.id, target_type: MN.t, target_id: MN.id, reported_user_id: MN.u, reason: reason };
+    if (MN.snap) row.snapshot = MN.snap.slice(0, 500);
+    var r = await DB.from('demos_reports').insert(row);
+    MN.busy = false;
+    if (r.error) { toast('Could not send report'); return; }
+    closeMn();
+    toast('Report sent. Thank you.');
+  }
+  async function blockUser(){
+    if (MN.busy || !MN.u) return;
+    if (!confirm('Block this user? You will no longer see their posts or comments.')) return;
+    MN.busy = true;
+    var r = await DB.from('demos_blocks').insert({ blocker_id: me.id, blocked_id: MN.u });
+    MN.busy = false;
+    if (r.error && r.error.code !== '23505') { toast('Could not block'); return; }
+    closeMn();
+    $('#cmBg').classList.remove('show');
+    toast('User blocked');
+    try { refreshView(); } catch(e){}
+  }
+  /* ===== /REPORT BLOCK (JS) ===== */
+  /* ===== MESSAGES + ADMIN (JS) ===== */
+  function stopChatPoll(){ if (window.__chT) { clearInterval(window.__chT); window.__chT = null; } }
+  function dmErr(e){
+    var m = (e && e.message) || '', c = (e && e.code) || '';
+    if (/too fast/i.test(m)) return m;
+    if (c === '42501' || /row-level|policy/i.test(m)) return 'This user is not accepting messages from you.';
+    return 'Could not send message';
+  }
+  async function isAdmin(){
+    if (!me) return false;
+    if (window.__admU === me.id) return !!window.__adm;
+    var ok = false;
+    try { var r = await DB.rpc('demos_is_admin'); ok = !!(r && r.data === true); } catch (e) {}
+    window.__adm = ok; window.__admU = me.id;
+    return ok;
+  }
+  async function getProfiles(ids){
+    var map = {};
+    ids = Array.from(new Set((ids || []).filter(Boolean)));
+    if (!ids.length) return map;
+    var r = await DB.from('demos_profiles').select('user_id,display_name,username,avatar_url').in('user_id', ids);
+    ((r && r.data) || []).forEach(function(p){ map[p.user_id] = p; });
+    return map;
+  }
+  async function refreshUnread(){
+    var b = $('#inbBtn');
+    if (!b || !me) return;
+    b.style.position = 'relative';
+    try {
+      var r = await DB.rpc('demos_inbox'), n = 0;
+      ((r && r.data) || []).forEach(function(x){ n += Number(x.unread || 0); });
+      b.innerHTML = '✉️' + (n ? '<span style="position:absolute;top:-4px;right:-4px;background:#e11d48;color:#fff;border-radius:9px;font-size:10px;padding:1px 5px;line-height:1.3">' + (n > 99 ? '99+' : n) + '</span>' : '');
+    } catch (e) {}
+  }
+  function openChat(uid){
+    if (!me) { goLogin(); return true; }
+    if (!myProfile) { openSetup(); return true; }
+    if (needsTerms()) { openRules(); return true; }
+    if (!/^[0-9a-f-]{36}$/i.test(String(uid || '')) || uid === me.id) return true;
+    $('#cmBg').classList.remove('show'); $('#lsBg').classList.remove('show');
+    var cur = stack[stack.length - 1];
+    if (cur.v === 'chat' && cur.uid === uid) return true;
+    go({ v:'chat', uid: uid });
+    return true;
+  }
+  async function showInbox(){
+    stopChatPoll();
+    $('#topTitle').textContent = 'Messages';
+    var el = $('#vMsg');
+    if (!me) { el.innerHTML = '<div class="dm-empty">Please log in to see messages.</div>'; return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var res = await DB.rpc('demos_inbox');
+    if (stack[stack.length - 1].v !== 'inbox') return;
+    if (res.error) { el.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
+    var rows = res.data || [];
+    var ad = await isAdmin();
+    var head = '<div class="dmx-h"><div class="dmx-ht">Messages</div><div class="dmx-hr"><button class="dm-cmbtn" data-dmset="1">⚙ Who can message me</button>' + (ad ? '<button class="dm-cmbtn" data-adm="1">🛡 Admin</button>' : '') + '</div></div>';
+    if (!rows.length) { el.innerHTML = head + '<div class="dm-empty">No messages yet.<br>Open a profile and tap Message to start.</div>'; refreshUnread(); return; }
+    var pm = await getProfiles(rows.map(function(x){ return x.peer_id; }));
+    if (stack[stack.length - 1].v !== 'inbox') return;
+    el.innerHTML = head + rows.map(function(x){
+      var p = pm[x.peer_id] || {}, nm = p.display_name || p.username || 'User';
+      var mine = me && x.last_sender === me.id;
+      return '<div class="dmx-ib" data-chat="' + esc(x.peer_id) + '"><div class="dm-av">' + avInner(p, nm) + '</div><div class="dmx-ibm"><div class="dm-name">' + esc(nm) + '</div><div class="dmx-ibl">' + (mine ? 'You: ' : '') + esc(x.last_body) + '</div></div><div><div class="dm-time">' + esc(ago(x.last_at)) + '</div>' + (x.unread ? '<span class="dmx-ibn">' + Number(x.unread) + '</span>' : '') + '</div></div>';
+    }).join('');
+    refreshUnread();
+  }
+  async function showChat(uid){
+    stopChatPoll();
+    var el = $('#vMsg');
+    if (!me) { goLogin(); return; }
+    window.__chPeer = uid; window.__chSig = ''; window.__chB = false;
+    el.innerHTML = '<div class="dmx-h"><div class="dmx-ht" id="chName" data-uid="' + esc(uid) + '"></div><div class="dmx-hr"><button class="dm-cmbtn" data-mn="' + esc(uid) + '" data-mt="profile" data-mu="' + esc(uid) + '">⋯ Report / Block</button></div></div>' +
+      '<div class="dmx-chat" id="chList"><div class="dm-empty">Loading…</div></div>' +
+      '<div class="dmx-bar"><textarea id="ch_text" maxlength="1000" placeholder="Write a message…"></textarea><button class="dm-btn pri" data-chsend="1" id="chSend">Send</button></div>';
+    var pm = await getProfiles([uid]);
+    var p = pm[uid] || {}, nm = p.display_name || p.username || 'User';
+    var cur = stack[stack.length - 1];
+    if (cur.v !== 'chat' || cur.uid !== uid) return;
+    if ($('#chName')) $('#chName').textContent = nm;
+    $('#topTitle').textContent = nm;
+    await loadChat(true);
+    cur = stack[stack.length - 1];
+    if (cur.v !== 'chat' || cur.uid !== uid) return;
+    stopChatPoll();
+    window.__chT = setInterval(function(){ loadChat(false); }, 5000);
+  }
+  async function loadChat(first){
+    var uid = window.__chPeer, list = $('#chList'), cur = stack[stack.length - 1];
+    if (!me || !uid || !list || !cur || cur.v !== 'chat' || cur.uid !== uid) { stopChatPoll(); return; }
+    var q = 'and(sender_id.eq.' + me.id + ',recipient_id.eq.' + uid + '),and(sender_id.eq.' + uid + ',recipient_id.eq.' + me.id + ')';
+    var res = await DB.from('demos_messages').select('id,sender_id,recipient_id,body,created_at,status,read_at,dlook_id').or(q).order('created_at', { ascending:true }).limit(200);
+    if (res.error) { if (first) list.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
+    var rows = res.data || [];
+    var last = rows.length ? rows[rows.length - 1] : null;
+    var sig = rows.length + ':' + (last ? last.id + last.status : '');
+    if (sig === window.__chSig && !first) return;
+    window.__chSig = sig;
+    var near = (list.scrollHeight - list.scrollTop - list.clientHeight) < 80;
+    if (!rows.length) list.innerHTML = '<div class="dm-empty">No messages yet. Say hi 👋</div>';
+    else list.innerHTML = rows.map(function(m){
+      var mine = m.sender_id === me.id;
+      var tag = (m.dlook_id ? '↩ Dlook reply · ' : '') + (m.status === 'blocked' ? '⛔ removed · ' : '');
+      var rep = (!mine && m.status === 'approved') ? ' <button class="dm-cm-del" data-mn="' + esc(m.id) + '" data-mt="message" data-mu="' + esc(m.sender_id) + '" aria-label="Report message">⚑</button>' : '';
+      return '<div class="dmx-r ' + (mine ? 'dmx-r-me' : 'dmx-r-th') + '"><div class="dmx-b">' + esc(m.body) + '</div><div class="dmx-t">' + tag + esc(ago(m.created_at)) + rep + '</div></div>';
+    }).join('');
+    if (first || near) list.scrollTop = list.scrollHeight;
+    var unread = rows.some(function(m){ return m.recipient_id === me.id && !m.read_at; });
+    if (unread) {
+      DB.from('demos_messages').update({ read_at: new Date().toISOString() }).eq('recipient_id', me.id).eq('sender_id', uid).is('read_at', null).then(function(){ refreshUnread(); }, function(){});
+    }
+  }
+  async function sendChat(){
+    if (window.__chB) return;
+    var uid = window.__chPeer, ta = $('#ch_text');
+    if (!ta || !uid) return;
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    if (needsTerms()) { openRules(); return; }
+    if (suspended()) { toast('Your Demos account is suspended.'); return; }
+    var text = ta.value.trim();
+    if (!text) { toast('Write a message first'); return; }
+    window.__chB = true;
+    var btn = $('#chSend'); if (btn) btn.disabled = true;
+    try {
+      var r = await DB.from('demos_messages').insert({ sender_id: me.id, recipient_id: uid, body: text }).select('id').single();
+      if (r.error) { toast(dmErr(r.error)); return; }
+      ta.value = '';
+      if (r.data && r.data.id) modCheck('message', r.data.id);
+      await loadChat(true);
+    } finally {
+      window.__chB = false; if (btn) btn.disabled = false;
+    }
+  }
+  async function vwSendReply(){
+    var r = VW.items[VW.i], inp = $('#vwIn');
+    if (!r || !inp) return;
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    if (needsTerms()) { openRules(); return; }
+    if (suspended()) { toast('Your Demos account is suspended.'); return; }
+    var text = inp.value.trim();
+    if (!text) return;
+    var x = await DB.from('demos_messages').insert({ sender_id: me.id, recipient_id: r.user_id, body: text, dlook_id: r.id }).select('id').single();
+    if (x.error) { toast(dmErr(x.error)); return; }
+    inp.value = '';
+    if (x.data && x.data.id) modCheck('message', x.data.id);
+    toast('Reply sent');
+    vwShow();
+  }
+  function openDmSet(){
+    var cur = (myProfile && myProfile.dm_policy) || 'everyone';
+    document.querySelectorAll('#dmBg [data-dmp]').forEach(function(b){ b.className = 'dm-btn ' + (b.getAttribute('data-dmp') === cur ? 'pri' : 'sec'); });
+    $('#dmBg').classList.add('show');
+  }
+  async function setDmPolicy(v){
+    if (!me || !myProfile) return;
+    var r = await DB.from('demos_profiles').update({ dm_policy: v }).eq('user_id', me.id);
+    if (r.error) { toast('Could not save'); return; }
+    myProfile.dm_policy = v;
+    $('#dmBg').classList.remove('show');
+    toast('Saved');
+  }
+  function snapHTML(t){
+    return String(t || '').split('\n').slice(0, 8).map(function(l){
+      l = l.slice(0, 300);
+      var u = /^https:\/\//.test(l) ? safeUrl(l) : '';
+      return u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener nofollow">🔗 Open media</a>' : esc(l);
+    }).join('<br>');
+  }
+  function admBtn(id, a, u, label){
+    return '<button class="dm-btn sec" data-ar="' + esc(id) + '" data-aa="' + a + '" data-au="' + esc(u || '') + '">' + label + '</button>';
+  }
+  async function showAdmin(){
+    stopChatPoll();
+    $('#topTitle').textContent = 'Admin';
+    var el = $('#vMsg');
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    if (!(await isAdmin())) { el.innerHTML = '<div class="dm-empty">Not allowed.</div>'; return; }
+    var rp = await DB.from('demos_reports').select('id,target_type,target_id,reported_user_id,reason,details,snapshot,created_at').eq('status', 'open').order('created_at', { ascending:false }).limit(50);
+    var sm = await DB.from('demos_user_mod').select('user_id,strikes,suspended,reason').or('suspended.eq.true,strikes.gt.0').order('updated_at', { ascending:false }).limit(50);
+    if (stack[stack.length - 1].v !== 'admin') return;
+    if (rp.error) { el.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(rp.error.message) + '</div>'; return; }
+    var rows = rp.data || [], mods = (sm && sm.data) || [];
+    var ids = rows.map(function(x){ return x.reported_user_id; }).concat(mods.map(function(m){ return m.user_id; }));
+    var pm = await getProfiles(ids);
+    if (stack[stack.length - 1].v !== 'admin') return;
+    var h = '<div class="dmx-h"><div class="dmx-ht">Open reports (' + rows.length + ')</div></div>';
+    if (!rows.length) h += '<div class="dm-empty">No open reports.</div>';
+    h += rows.map(function(x){
+      var p = pm[x.reported_user_id] || {}, nm = p.display_name || p.username || 'User';
+      return '<div class="dmx-adm"><div><b>' + esc(x.target_type) + '</b> · ' + esc(x.reason) + ' · ' + esc(ago(x.created_at)) + '</div>' +
+        '<div class="dm-time" data-uid="' + esc(x.reported_user_id) + '">User: ' + esc(nm) + (p.username ? ' (@' + esc(p.username) + ')' : '') + '</div>' +
+        (x.details ? '<div class="dmx-snap">Note: ' + esc(x.details) + '</div>' : '') +
+        '<div class="dmx-snap">' + snapHTML(x.snapshot) + '</div>' +
+        '<div class="dmx-ab">' + admBtn(x.id, 'remove', x.reported_user_id, 'Remove') + admBtn(x.id, 'strike', x.reported_user_id, 'Remove + strike') + admBtn(x.id, 'dismiss', x.reported_user_id, 'Keep') + admBtn(x.id, 'suspend', x.reported_user_id, 'Suspend user') + '</div></div>';
+    }).join('');
+    h += '<div class="dmx-h"><div class="dmx-ht">Strikes / suspended</div></div>';
+    if (!mods.length) h += '<div class="dm-empty">None.</div>';
+    h += mods.map(function(m){
+      var p = pm[m.user_id] || {}, nm = p.display_name || p.username || 'User';
+      return '<div class="dmx-adm"><div data-uid="' + esc(m.user_id) + '"><b>' + esc(nm) + '</b>' + (p.username ? ' (@' + esc(p.username) + ')' : '') + ' · strikes ' + Number(m.strikes || 0) + (m.suspended ? ' · ⛔ suspended' : '') + '</div>' +
+        '<div class="dmx-ab">' + (m.suspended ? admBtn(m.user_id, 'unsuspend', m.user_id, 'Unsuspend') : admBtn(m.user_id, 'suspend', m.user_id, 'Suspend')) + '</div></div>';
+    }).join('');
+    el.innerHTML = h;
+  }
+  async function adminAct(el){
+    var id = el.getAttribute('data-ar'), a = el.getAttribute('data-aa'), u = el.getAttribute('data-au');
+    if (a === 'suspend' || a === 'unsuspend') {
+      if (!u) { toast('No user'); return; }
+      if (!confirm(a === 'suspend' ? 'Suspend this user?' : 'Unsuspend this user?')) return;
+      var s2 = await DB.rpc('demos_admin_set_suspended', { p_user: u, p_suspended: a === 'suspend', p_reason: a === 'suspend' ? 'admin' : null });
+      if (s2.error) { toast(s2.error.message); return; }
+      toast(a === 'suspend' ? 'User suspended' : 'User unsuspended');
+      showAdmin();
+      return;
+    }
+    if (a === 'remove' || a === 'strike' || a === 'dismiss') {
+      var r2 = await DB.rpc('demos_admin_resolve', { p_report: id, p_action: a === 'dismiss' ? 'dismiss' : 'remove', p_strike: a === 'strike' });
+      if (r2.error) { toast(r2.error.message); return; }
+      toast('Done');
+      showAdmin();
+    }
+  }
+  /* ===== /MESSAGES + ADMIN (JS) ===== */
   async function delComment(cid){
     if (!confirm('Delete this comment?')) return;
     var r = await DB.from('demos_comments').delete().eq('id', cid);
@@ -873,7 +1206,10 @@
   function applyView(){
     var v = stack[stack.length - 1], isFeed = v.v === 'feed';
     $('#vFeed').style.display = isFeed ? '' : 'none';
-    $('#vProfile').style.display = isFeed ? 'none' : '';
+    var isMsg = v.v === 'inbox' || v.v === 'chat' || v.v === 'admin';
+    $('#vProfile').style.display = (isFeed || isMsg) ? 'none' : '';
+    $('#vMsg').style.display = isMsg ? '' : 'none';
+    stopChatPoll();
     $('#feedTabs').style.display = isFeed ? '' : 'none';
     $('#backBtn').style.display = isFeed ? 'none' : '';
     $('#fab').style.display = isFeed ? '' : 'none';
@@ -882,7 +1218,10 @@
       if (feedDirty) loadFeed(false);
     } else {
       $('#topTitle').textContent = 'Profile';
-      if (v.v === 'post') showPost(v.kind, v.id); else showProfile(v.uid, v.ctab);
+      if (v.v === 'inbox') showInbox();
+      else if (v.v === 'chat') showChat(v.uid);
+      else if (v.v === 'admin') showAdmin();
+      else if (v.v === 'post') showPost(v.kind, v.id); else showProfile(v.uid, v.ctab);
     }
     try { window.scrollTo(0, 0); } catch(e){}
   }
@@ -893,6 +1232,9 @@
   function refreshView(){
     var v = stack[stack.length - 1];
     if (v.v === 'feed') return loadFeed(false);
+    if (v.v === 'inbox') return showInbox();
+    if (v.v === 'chat') return showChat(v.uid);
+    if (v.v === 'admin') return showAdmin();
     if (v.v === 'post') return showPost(v.kind, v.id);
     return showProfile(v.uid, (PV && PV.uid === v.uid) ? PV.ctab : v.ctab);
   }
@@ -940,6 +1282,7 @@
     el = t.closest('[data-msg]');
     if (el) {
       var to = el.getAttribute('data-msg');
+      if (openChat(to)) return;
       var url = '/messaging/?to=' + encodeURIComponent(to);
       try { window.top.location.href = url; } catch(e){ location.href = url; }
       return;
@@ -954,6 +1297,25 @@
     if (el) { goHome(); return; }
     el = t.closest('[data-cm]');
     if (el) { openComments(el.getAttribute('data-cm'), el.getAttribute('data-ck'), el.getAttribute('data-co')); return; }
+    el = t.closest('[data-mn]');
+    if (el) {
+      var mnS = '';
+      var mnBox = el.closest('.dm-cm') || el.closest('.dm-card');
+      var mnTx = mnBox ? (mnBox.querySelector('.dm-cm-t') || mnBox.querySelector('.dm-body')) : null;
+      if (mnTx) mnS = mnTx.textContent;
+      openMn(el.getAttribute('data-mt'), el.getAttribute('data-mn'), el.getAttribute('data-mu'), mnS);
+      return;
+    }
+    el = t.closest('[data-chat]');
+    if (el) { openChat(el.getAttribute('data-chat')); return; }
+    el = t.closest('[data-chsend]');
+    if (el) { sendChat(); return; }
+    el = t.closest('[data-dmset]');
+    if (el) { openDmSet(); return; }
+    el = t.closest('[data-adm]');
+    if (el) { go({ v:'admin' }); return; }
+    el = t.closest('[data-ar]');
+    if (el) { adminAct(el); return; }
     el = t.closest('[data-cmdel]');
     if (el) { delComment(el.getAttribute('data-cmdel')); return; }
     el = t.closest('[data-more]');
@@ -997,6 +1359,25 @@
   $('#crBg').addEventListener('click', function(e){ if (e.target.id === 'crBg') $('#crBg').classList.remove('show'); });
   $('#lsBg').addEventListener('click', function(e){ if (e.target.id === 'lsBg') $('#lsBg').classList.remove('show'); });
   $('#edBg').addEventListener('click', function(e){ if (e.target.id === 'edBg') closeEdit(); });
+  $('#mnCancel').addEventListener('click', closeMn);
+  $('#mnBlock').addEventListener('click', blockUser);
+  $('#mnBg').addEventListener('click', function(e){ if (e.target.id === 'mnBg') closeMn(); });
+  $('#inbBtn').addEventListener('click', function(){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    if (stack[stack.length - 1].v === 'inbox') return;
+    $('#cmBg').classList.remove('show');
+    go({ v:'inbox' });
+  });
+  $('#dmCancel').addEventListener('click', function(){ $('#dmBg').classList.remove('show'); });
+  $('#dmBg').addEventListener('click', function(e){ if (e.target.id === 'dmBg') $('#dmBg').classList.remove('show'); });
+  document.querySelectorAll('#dmBg [data-dmp]').forEach(function(b){ b.addEventListener('click', function(){ setDmPolicy(b.getAttribute('data-dmp')); }); });
+  $('#vwSend').addEventListener('click', vwSendReply);
+  $('#vwRep').addEventListener('click', function(){ var r = VW.items[VW.i]; if (r) openMn('dlooks', r.id, r.user_id, r.caption || ''); });
+  $('#vwIn').addEventListener('focus', function(){ clearTimeout(VW.timer); });
+  ['click', 'touchstart', 'pointerdown', 'mousedown'].forEach(function(ev){ $('#vwReply').addEventListener(ev, function(e){ e.stopPropagation(); }); });
+  setTimeout(refreshUnread, 2500); setInterval(refreshUnread, 45000);
+  document.querySelectorAll('#mnBg [data-rs]').forEach(function(b){ b.addEventListener('click', function(){ sendReport(b.getAttribute('data-rs')); }); });
   renderMe();
 
   /* ---------- upload helpers ---------- */
