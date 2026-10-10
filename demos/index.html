@@ -138,6 +138,12 @@
   .dm-terms a { color:var(--terra-d); font-weight:700; }
   .dm-rules { margin:0 0 6px; padding-left:20px; font-size:14.5px; line-height:1.55; color:var(--ink); }
   .dm-rules li { margin-bottom:6px; }
+  /* ===== KEBAB (CSS) ===== */
+  .dm-card { position:relative; }
+  #kbBg { z-index: 10050; }
+  .dmx-k { position:absolute; top:6px; right:6px; width:38px; height:38px; border:0; background:transparent; color:inherit; font-size:22px; line-height:1; cursor:pointer; z-index:2; }
+  .dmx-kc { position:static; width:30px; height:30px; font-size:18px; }
+  #kbCancel { width:100%; }
   /* ===== MESSAGES (CSS) ===== */
   #dmBg { z-index: 10050; }
   .dmx-h { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; flex-wrap:wrap; }
@@ -328,6 +334,14 @@
   </div>
 </div>
 <!-- /DM SETTING SHEET -->
+<!-- KEBAB SHEET -->
+<div class="dm-sheet-bg" id="kbBg">
+  <div class="dm-sheet">
+    <div class="dm-mn-list" id="kbList"></div>
+    <button class="dm-btn sec" id="kbCancel">Cancel</button>
+  </div>
+</div>
+<!-- /KEBAB SHEET -->
 <div class="dm-sheet-bg" id="ruBg">
   <div class="dm-sheet">
     <h3>Demos Rules</h3>
@@ -455,7 +469,7 @@
       badge = '<div class="dm-exp">' + (r.status === 'pending' ? (r.mod_label ? '\ud83d\udd0e Under review' : '\u23f3 Safety check in progress') : '\u26d4 Removed: ' + esc(r.mod_label || 'policy')) + '</div>';
     }
     var sub = (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(r.created_at));
-    return '<div class="dm-card"><div class="dm-user" data-uid="' + esc(r.user_id) + '"><div class="dm-av">' + avInner(p, name) + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + sub + '</div></div></div>' +
+    return '<div class="dm-card">' + kebab(r, kind) + '<div class="dm-user" data-uid="' + esc(r.user_id) + '"><div class="dm-av">' + avInner(p, name) + '</div><div><div class="dm-name">' + esc(name) + '</div><div class="dm-time">' + sub + '</div></div></div>' +
       badge + exp + body + media + ratingHTML(r.id, false) + cmBtn(r, kind) + shBtn(r, kind) + ((me && r.user_id !== me.id) ? '<button class="dm-btn sec dm-msg" data-msg="' + esc(r.user_id) + '">💬 Message</button>' : '') + '</div>';
   }
 
@@ -770,8 +784,8 @@
 
   /* ===== DEMOS SHARE (JS) ===== */
   function shBtn(r, kind){
-    if (kind === 'dlooks') return mnBtn(r, kind);
-    return '<button class="dm-cmbtn" data-sh="' + esc(r.id) + '" data-sk="' + esc(kind) + '">🔗 Share</button>' + mnBtn(r, kind);
+    if (kind === 'dlooks') return '';
+    return '<button class="dm-cmbtn" data-sh="' + esc(r.id) + '" data-sk="' + esc(kind) + '">🔗 Share</button>';
   }
   function shareBase(){ return location.origin + '/demos/'; }
   async function doShare(url, title){
@@ -875,7 +889,7 @@
       return '<div class="dm-cm"><div class="dm-av dm-cm-av" data-uid="' + esc(c.user_id) + '">' + avInner(p, nm) + '</div>' +
         '<div class="dm-cm-b"><div class="dm-cm-h"><span class="dm-name" data-uid="' + esc(c.user_id) + '">' + esc(nm) + '</span>' +
         '<span class="dm-time">' + (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(c.created_at)) + '</span>' +
-        ((me && c.user_id !== me.id) ? '<button class="dm-cm-del" data-mn="' + esc(c.id) + '" data-mt="comment" data-mu="' + esc(c.user_id) + '" aria-label="Report comment">⚑</button>' : '') + (canDel ? '<button class="dm-cm-del" data-cmdel="' + esc(c.id) + '" aria-label="Delete comment">🗑</button>' : '') + '</div>' +
+        ((me && (canDel || c.user_id !== me.id)) ? '<button class="dmx-k dmx-kc" data-kb="' + esc(c.id) + '" data-kt="comment" data-ku="' + esc(c.user_id) + '" data-kd="' + (canDel ? '1' : '') + '" aria-label="More">⋮</button>' : '') + '</div>' +
         '<div class="dm-cm-t">' + esc(c.body) + '</div></div></div>';
     }).join('');
     list.scrollTop = list.scrollHeight;
@@ -1168,6 +1182,59 @@
     }
   }
   /* ===== /MESSAGES + ADMIN (JS) ===== */
+  /* ===== KEBAB (JS) ===== */
+  var KB = { t:null, id:null, u:null, snap:'' };
+  function kebab(r, kind){
+    if (!me || !r) return '';
+    return '<button class="dmx-k" data-kb="' + esc(r.id) + '" data-kt="' + esc(kind) + '" data-ku="' + esc(r.user_id) + '" data-kd="' + (r.user_id === me.id ? '1' : '') + '" aria-label="More">⋮</button>';
+  }
+  function closeKb(){ $('#kbBg').classList.remove('show'); }
+  function openKb(t, id, u, canDel, snap){
+    if (!me) { goLogin(); return; }
+    KB.t = t; KB.id = id; KB.u = u; KB.snap = snap || '';
+    var h = '';
+    if (canDel) h += '<button class="dm-btn sec" data-ka="delete">🗑 Delete</button>';
+    if (u !== me.id) h += '<button class="dm-btn sec" data-ka="report">⚑ Report</button><button class="dm-btn sec" data-ka="block">🚫 Block user</button>';
+    if (!h) return;
+    $('#kbList').innerHTML = h;
+    $('#kbBg').classList.add('show');
+  }
+  function stPath(u){
+    var m = String(u || '').match(/\/storage\/v1\/object\/public\/demos-media\/(.+?)(?:\?|$)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  async function doDelete(){
+    var t = KB.t, id = KB.id;
+    if (!me || !id) return;
+    if (!confirm(t === 'comment' ? 'Delete this comment?' : 'Delete this post? This cannot be undone.')) return;
+    closeKb();
+    if (t === 'comment') {
+      var rc = await DB.from('demos_comments').delete().eq('id', id);
+      if (rc.error) { toast('Could not delete'); return; }
+      toast('Deleted');
+      await loadComments();
+      return;
+    }
+    var table = TABLE[t];
+    if (!table) return;
+    var g = await DB.from(table).select('*').eq('id', id).maybeSingle();
+    var row = g && g.data;
+    try { await DB.from('demos_comments').delete().eq('target_type', t).eq('target_id', id); } catch (e) {}
+    var d = await DB.from(table).delete().eq('id', id);
+    if (d.error) { toast('Could not delete'); return; }
+    var paths = [];
+    if (row) [row.media_url, row.thumbnail_url].forEach(function(u){ var pp = stPath(u); if (pp) paths.push(pp); });
+    if (paths.length) { try { await DB.storage.from(BUCKET).remove(paths); } catch (e) {} }
+    toast('Deleted');
+    feedDirty = true;
+    if (stack[stack.length - 1].v === 'post') back(); else refreshView();
+  }
+  function kbAct(a){
+    if (a === 'delete') { doDelete(); return; }
+    if (a === 'report') { var t = KB.t, id = KB.id, u = KB.u, sn = KB.snap; closeKb(); openMn(t, id, u, sn); return; }
+    if (a === 'block') { MN.t = KB.t; MN.id = KB.id; MN.u = KB.u; MN.busy = false; closeKb(); blockUser(); }
+  }
+  /* ===== /KEBAB (JS) ===== */
   async function delComment(cid){
     if (!confirm('Delete this comment?')) return;
     var r = await DB.from('demos_comments').delete().eq('id', cid);
@@ -1306,6 +1373,14 @@
       openMn(el.getAttribute('data-mt'), el.getAttribute('data-mn'), el.getAttribute('data-mu'), mnS);
       return;
     }
+    el = t.closest('[data-kb]');
+    if (el) {
+      var kbBox = el.closest('.dm-cm') || el.closest('.dm-card'), kbS = '';
+      var kbTx = kbBox ? (kbBox.querySelector('.dm-cm-t') || kbBox.querySelector('.dm-body')) : null;
+      if (kbTx) kbS = kbTx.textContent;
+      openKb(el.getAttribute('data-kt'), el.getAttribute('data-kb'), el.getAttribute('data-ku'), el.getAttribute('data-kd') === '1', kbS);
+      return;
+    }
     el = t.closest('[data-chat]');
     if (el) { openChat(el.getAttribute('data-chat')); return; }
     el = t.closest('[data-chsend]');
@@ -1370,6 +1445,9 @@
     go({ v:'inbox' });
   });
   $('#dmCancel').addEventListener('click', function(){ $('#dmBg').classList.remove('show'); });
+  $('#kbCancel').addEventListener('click', closeKb);
+  $('#kbBg').addEventListener('click', function(e){ if (e.target.id === 'kbBg') closeKb(); });
+  $('#kbList').addEventListener('click', function(e){ var b = e.target.closest('[data-ka]'); if (b) kbAct(b.getAttribute('data-ka')); });
   $('#dmBg').addEventListener('click', function(e){ if (e.target.id === 'dmBg') $('#dmBg').classList.remove('show'); });
   document.querySelectorAll('#dmBg [data-dmp]').forEach(function(b){ b.addEventListener('click', function(){ setDmPolicy(b.getAttribute('data-dmp')); }); });
   $('#vwSend').addEventListener('click', vwSendReply);
