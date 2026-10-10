@@ -138,6 +138,40 @@
   .dm-terms a { color:var(--terra-d); font-weight:700; }
   .dm-rules { margin:0 0 6px; padding-left:20px; font-size:14.5px; line-height:1.55; color:var(--ink); }
   .dm-rules li { margin-bottom:6px; }
+  /* ===== AI CHAT (CSS) ===== */
+  .dmx-aifab { position:fixed; left:14px; bottom:18px; width:52px; height:52px; border-radius:50%; border:0; font-size:24px; color:#fff; background:linear-gradient(135deg,#6a5cff,#00c2ff); box-shadow:0 6px 18px rgba(80,90,255,.45); z-index:900; cursor:pointer; }
+  .dmx-ai { position:fixed; top:0; left:0; right:0; bottom:0; z-index:10040; flex-direction:column; background:radial-gradient(1200px 500px at 50% -10%,#1b1740 0%,#0b0b1a 55%,#07070f 100%); color:#e9e9f5; font-family:inherit; }
+  .dmx-ai-top { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); }
+  .dmx-ai-x { width:40px; height:40px; border-radius:50%; border:0; background:rgba(255,255,255,.08); color:#fff; font-size:20px; cursor:pointer; }
+  .dmx-ai-av { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#6a5cff,#00c2ff); box-shadow:0 0 16px rgba(106,92,255,.6); font-size:18px; }
+  .dmx-ai-n { font-weight:700; font-size:16px; }
+  .dmx-ai-s { font-size:12px; opacity:.65; }
+  .dmx-ai-modes { display:flex; gap:8px; padding:10px 14px; align-items:center; flex-wrap:wrap; }
+  .dmx-ai-m { border:1px solid rgba(255,255,255,.18); background:transparent; color:#cfd0ee; border-radius:18px; padding:7px 14px; font-size:14px; cursor:pointer; }
+  .dmx-ai-m.on { border-color:transparent; color:#fff; background:linear-gradient(135deg,#6a5cff,#00c2ff); }
+  .dmx-ai-lang { background:#14142a; color:#e9e9f5; border:1px solid rgba(255,255,255,.18); border-radius:14px; padding:6px 10px; font-size:13px; }
+  .dmx-ai-body { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .dmx-ai-r { display:flex; }
+  .dmx-ai-r.u { justify-content:flex-end; }
+  .dmx-ai-b { max-width:86%; padding:10px 14px; border-radius:16px; line-height:1.45; white-space:pre-wrap; word-break:break-word; font-size:15px; }
+  .dmx-ai-r.a .dmx-ai-b { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); }
+  .dmx-ai-r.u .dmx-ai-b { background:linear-gradient(135deg,#6a5cff,#3d8bff); color:#fff; border-bottom-right-radius:4px; }
+  .dmx-ai-r.e .dmx-ai-b { background:rgba(255,80,80,.14); border:1px solid rgba(255,80,80,.35); color:#ffb4b4; }
+  .dmx-ai-dots i { display:inline-block; width:7px; height:7px; margin:0 2px; border-radius:50%; background:#9aa0ff; animation:dmxdot 1s infinite ease-in-out; }
+  .dmx-ai-dots i:nth-child(2) { animation-delay:.15s; }
+  .dmx-ai-dots i:nth-child(3) { animation-delay:.3s; }
+  @keyframes dmxdot { 0%,80%,100% { transform:scale(.5); opacity:.4; } 40% { transform:scale(1); opacity:1; } }
+  .dmx-ai-wel { margin:auto; text-align:center; padding:20px 6px; }
+  .dmx-ai-glow { width:70px; height:70px; margin:0 auto 14px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px; background:linear-gradient(135deg,#6a5cff,#00c2ff); box-shadow:0 0 34px rgba(106,92,255,.7); }
+  .dmx-ai-wt { font-size:20px; font-weight:700; margin-bottom:6px; }
+  .dmx-ai-ws { font-size:14px; opacity:.7; margin-bottom:16px; }
+  .dmx-ai-qs { display:flex; flex-direction:column; gap:8px; }
+  .dmx-ai-q { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05); color:#e9e9f5; border-radius:14px; padding:11px 14px; font-size:14px; text-align:left; cursor:pointer; }
+  .dmx-ai-lim { margin:8px 0; padding:14px; text-align:center; border-radius:14px; background:rgba(255,200,80,.1); border:1px solid rgba(255,200,80,.35); }
+  .dmx-ai-coin { margin-top:10px; border:0; border-radius:18px; padding:9px 16px; background:rgba(255,255,255,.12); color:#ffe08a; font-size:14px; }
+  .dmx-ai-bar { display:flex; gap:8px; align-items:flex-end; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); }
+  .dmx-ai-bar textarea { flex:1; min-height:44px; max-height:120px; resize:none; padding:11px 14px; border-radius:22px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-size:15px; font-family:inherit; }
+  .dmx-ai-send { width:46px; height:46px; border-radius:50%; border:0; color:#fff; font-size:18px; background:linear-gradient(135deg,#6a5cff,#00c2ff); cursor:pointer; }
   /* ===== KEBAB (CSS) ===== */
   .dm-card { position:relative; }
   #kbBg { z-index: 10050; }
@@ -342,6 +376,33 @@
   </div>
 </div>
 <!-- /KEBAB SHEET -->
+<!-- AI CHAT -->
+<div class="dmx-ai" id="aiBg" style="display:none">
+  <div class="dmx-ai-top">
+    <button class="dmx-ai-x" id="aiClose" aria-label="Close">&#8592;</button>
+    <div class="dmx-ai-av">&#10024;</div>
+    <div class="dmx-ai-tt"><div class="dmx-ai-n">Demos Assistant</div><div class="dmx-ai-s" id="aiCnt"></div></div>
+  </div>
+  <div class="dmx-ai-modes">
+    <button class="dmx-ai-m on" data-aim="support">💬 Support</button>
+    <button class="dmx-ai-m" data-aim="translate">🌐 Translate</button>
+    <select id="aiLang" class="dmx-ai-lang" style="display:none">
+      <option value="">Auto (ML ⇄ EN)</option>
+      <option value="ml">Malayalam</option>
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+      <option value="ta">Tamil</option>
+      <option value="ar">Arabic</option>
+    </select>
+  </div>
+  <div class="dmx-ai-body" id="aiBody"></div>
+  <div class="dmx-ai-bar" id="aiBar">
+    <textarea id="aiIn" rows="1" maxlength="800" placeholder="Ask anything about Demos…"></textarea>
+    <button class="dmx-ai-send" id="aiSend" aria-label="Send">&#10148;</button>
+  </div>
+</div>
+<button class="dmx-aifab" id="aiFab" aria-label="Support chat">🤖</button>
+<!-- /AI CHAT -->
 <div class="dm-sheet-bg" id="ruBg">
   <div class="dm-sheet">
     <h3>Demos Rules</h3>
@@ -573,7 +634,7 @@
       (meta ? '<div class="dm-pmeta">' + meta + '</div>' : '') +
       '<div class="dm-pstats"><div><b>' + Number(st.posts || 0) + '</b><span>Posts</span></div>' +
       '<div data-act="followers"><b>' + Number(st.followers || 0) + '</b><span>Followers</span></div>' +
-      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + mnProfBtn() + create;
+      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + '<button class="dm-cmbtn" data-ai="1" style="margin-top:12px;margin-left:8px">🤖 Support</button>' + mnProfBtn() + create;
   }
 
   function markPTab(k){
@@ -1235,6 +1296,102 @@
     if (a === 'block') { MN.t = KB.t; MN.id = KB.id; MN.u = KB.u; MN.busy = false; closeKb(); blockUser(); }
   }
   /* ===== /KEBAB (JS) ===== */
+  /* ===== AI CHAT (JS) ===== */
+  var AI_WORKER = 'https://demos-ai-chat.meradivin.workers.dev';
+  var AI = { mode:'support', target:'', h:{ support:[], translate:[] }, busy:false, left:null, limit:5 };
+  var AIQS = ['How do I report or block someone?', 'How do I delete my post?', 'Who can message me?', 'What are the Demos rules?'];
+  async function aiToken(){
+    try { var s = await DB.auth.getSession(); if (s && s.data && s.data.session) return s.data.session.access_token; } catch (e) {}
+    try { var t = await authToken(); if (t) return (typeof t === 'string') ? t : (t.access_token || ''); } catch (e) {}
+    return '';
+  }
+  async function aiCall(path, body){
+    var tk = await aiToken();
+    if (!tk) return { status:401, data:{ ok:false, reason:'auth' } };
+    var opt = { method: body ? 'POST' : 'GET', headers:{ Authorization: 'Bearer ' + tk } };
+    if (body) { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+    try {
+      var r = await fetch(AI_WORKER + path, opt), d = null;
+      try { d = await r.json(); } catch (e) {}
+      return { status:r.status, data: d || {} };
+    } catch (e) { return { status:0, data:{ ok:false, reason:'network' } }; }
+  }
+  function aiGrow(){ var t = $('#aiIn'); if (!t) return; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px'; }
+  function aiMode(m){
+    AI.mode = (m === 'translate') ? 'translate' : 'support';
+    document.querySelectorAll('#aiBg [data-aim]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-aim') === AI.mode); });
+    $('#aiLang').style.display = AI.mode === 'translate' ? '' : 'none';
+    $('#aiIn').placeholder = AI.mode === 'translate' ? 'Type or paste text to translate…' : 'Ask anything about Demos…';
+    aiRender();
+  }
+  function aiRender(){
+    var body = $('#aiBody');
+    if (!body) return;
+    var h = AI.h[AI.mode], html = '';
+    if (!h.length && !AI.busy) {
+      var tr = AI.mode === 'translate';
+      html += '<div class="dmx-ai-wel"><div class="dmx-ai-glow">✨</div><div class="dmx-ai-wt">' + (tr ? 'Translate anything' : 'Hi 👋 How can I help?') + '</div><div class="dmx-ai-ws">' + (tr ? 'Type or paste text and I will translate it.' : 'Ask me about posts, messages, reporting, blocking, deleting and the Demos rules. Malayalam or English, both work.') + '</div>';
+      if (!tr) html += '<div class="dmx-ai-qs">' + AIQS.map(function(q){ return '<button class="dmx-ai-q" data-aiq="' + esc(q) + '">' + esc(q) + '</button>'; }).join('') + '</div>';
+      html += '</div>';
+    } else {
+      h.forEach(function(m){
+        html += '<div class="dmx-ai-r ' + (m.role === 'user' ? 'u' : (m.role === 'err' ? 'e' : 'a')) + '"><div class="dmx-ai-b">' + esc(m.content) + '</div></div>';
+      });
+      if (AI.busy) html += '<div class="dmx-ai-r a"><div class="dmx-ai-b dmx-ai-dots"><i></i><i></i><i></i></div></div>';
+    }
+    var out = AI.left === 0;
+    if (out) html += '<div class="dmx-ai-lim"><b>Today\'s free chats are used up</b><div style="font-size:13px;opacity:.8;margin-top:4px">They reset at midnight (Dubai time).</div><button class="dmx-ai-coin" disabled>🪙 Use Emo coin (coming soon)</button></div>';
+    body.innerHTML = html;
+    body.scrollTop = body.scrollHeight;
+    $('#aiBar').style.display = out ? 'none' : 'flex';
+    $('#aiCnt').textContent = AI.left == null ? 'Free chats: 5 per day' : (AI.left + ' of ' + AI.limit + ' free chats left today');
+  }
+  async function aiSend(text){
+    if (AI.busy) return;
+    var inp = $('#aiIn');
+    text = String(text != null ? text : inp.value).trim();
+    if (!text) return;
+    if (!me) { closeAi(); goLogin(); return; }
+    if (AI.left === 0) { aiRender(); return; }
+    var mode = AI.mode, h = AI.h[mode];
+    h.push({ role:'user', content: text.slice(0, 800) });
+    if (h.length > 20) h.splice(0, h.length - 20);
+    inp.value = ''; aiGrow();
+    AI.busy = true; aiRender();
+    var msgs = h.filter(function(m){ return m.role === 'user' || m.role === 'assistant'; }).slice(-6);
+    var body = { mode: mode, messages: msgs };
+    if (mode === 'translate' && AI.target) body.target = AI.target;
+    var res = await aiCall('/chat', body);
+    var d = res.data || {};
+    AI.busy = false;
+    if (d.ok) {
+      h.push({ role:'assistant', content: d.reply });
+      AI.left = d.left; AI.limit = d.limit;
+    } else if (d.reason === 'limit') {
+      AI.left = 0; AI.limit = d.limit || AI.limit;
+    } else if (d.reason === 'auth') {
+      h.push({ role:'err', content:'Please log in again to use the assistant.' });
+    } else if (d.reason === 'ai_error') {
+      if (d.left != null) AI.left = d.left;
+      h.push({ role:'err', content:'The assistant is busy right now. Please try again in a moment.' });
+    } else {
+      h.push({ role:'err', content:'Could not reach the assistant. Check your connection and try again.' });
+    }
+    aiRender();
+  }
+  async function openAi(){
+    if (!me) { goLogin(); return; }
+    $('#aiBg').style.display = 'flex';
+    try { document.body.style.overflow = 'hidden'; } catch (e) {}
+    aiRender();
+    var s = await aiCall('/status');
+    if (s.data && s.data.ok) { AI.left = s.data.left; AI.limit = s.data.limit; aiRender(); }
+  }
+  function closeAi(){
+    $('#aiBg').style.display = 'none';
+    try { document.body.style.overflow = ''; } catch (e) {}
+  }
+  /* ===== /AI CHAT (JS) ===== */
   async function delComment(cid){
     if (!confirm('Delete this comment?')) return;
     var r = await DB.from('demos_comments').delete().eq('id', cid);
@@ -1373,6 +1530,8 @@
       openMn(el.getAttribute('data-mt'), el.getAttribute('data-mn'), el.getAttribute('data-mu'), mnS);
       return;
     }
+    el = t.closest('[data-ai]');
+    if (el) { openAi(); return; }
     el = t.closest('[data-kb]');
     if (el) {
       var kbBox = el.closest('.dm-cm') || el.closest('.dm-card'), kbS = '';
@@ -1446,6 +1605,17 @@
   });
   $('#dmCancel').addEventListener('click', function(){ $('#dmBg').classList.remove('show'); });
   $('#kbCancel').addEventListener('click', closeKb);
+  $('#aiFab').addEventListener('click', openAi);
+  $('#aiClose').addEventListener('click', closeAi);
+  $('#aiSend').addEventListener('click', function(){ aiSend(); });
+  $('#aiIn').addEventListener('input', aiGrow);
+  $('#aiLang').addEventListener('change', function(){ AI.target = this.value; });
+  $('#aiBg').addEventListener('click', function(e){
+    var m = e.target.closest('[data-aim]');
+    if (m) { aiMode(m.getAttribute('data-aim')); return; }
+    var q = e.target.closest('[data-aiq]');
+    if (q) aiSend(q.getAttribute('data-aiq'));
+  });
   $('#kbBg').addEventListener('click', function(e){ if (e.target.id === 'kbBg') closeKb(); });
   $('#kbList').addEventListener('click', function(e){ var b = e.target.closest('[data-ka]'); if (b) kbAct(b.getAttribute('data-ka')); });
   $('#dmBg').addEventListener('click', function(e){ if (e.target.id === 'dmBg') $('#dmBg').classList.remove('show'); });
