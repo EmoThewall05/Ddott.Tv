@@ -138,6 +138,11 @@
   .dm-terms a { color:var(--terra-d); font-weight:700; }
   .dm-rules { margin:0 0 6px; padding-left:20px; font-size:14.5px; line-height:1.55; color:var(--ink); }
   .dm-rules li { margin-bottom:6px; }
+  /* ===== PROFILE RATING (CSS) ===== */
+  #rvBg { z-index: 10050; }
+  .dmx-prr { margin-top:14px; }
+  .dmx-prt { font-weight:700; margin-bottom:4px; }
+  .dmx-prs { margin-top:12px; font-size:15px; }
   /* ===== AI CHAT (CSS) ===== */
   .dmx-aifab { position:fixed; left:14px; bottom:18px; width:52px; height:52px; border-radius:50%; border:0; font-size:24px; color:#fff; background:linear-gradient(135deg,#6a5cff,#00c2ff); box-shadow:0 6px 18px rgba(80,90,255,.45); z-index:900; cursor:pointer; }
   .dmx-ai { position:fixed; top:0; left:0; right:0; bottom:0; z-index:10040; flex-direction:column; background:radial-gradient(1200px 500px at 50% -10%,#1b1740 0%,#0b0b1a 55%,#07070f 100%); color:#e9e9f5; font-family:inherit; }
@@ -376,6 +381,20 @@
   </div>
 </div>
 <!-- /KEBAB SHEET -->
+<!-- RATING REASON SHEET -->
+<div class="dm-sheet-bg" id="rvBg">
+  <div class="dm-sheet">
+    <h3>Why this rating?</h3>
+    <div class="dm-mn-sub" id="rvSub"></div>
+    <textarea id="rv_text" maxlength="300" placeholder="Describe what happened (at least 15 characters)…" style="min-height:90px"></textarea>
+    <div class="dm-pf-status" id="rv_status"></div>
+    <div class="dm-row">
+      <button class="dm-btn sec" id="rvCancel">Cancel</button>
+      <button class="dm-btn pri" id="rvSend">Submit</button>
+    </div>
+  </div>
+</div>
+<!-- /RATING REASON SHEET -->
 <!-- AI CHAT -->
 <div class="dmx-ai" id="aiBg" style="display:none">
   <div class="dmx-ai-top">
@@ -478,6 +497,7 @@
     for (i = 1; i <= 5; i++) cols += '<div class="dm-s">' + starSvg(i, my === i) + '<span>' + (st['stars_' + i] || 0) + '</span></div>';
     var avg = st.average_stars != null ? Number(st.average_stars).toFixed(1) : '–';
     var total = st.total_reviews || 0;
+    if (K[id] === 'profile' && total < 3) avg = '–';
     return '<div class="dm-rating' + (on ? ' on' : '') + '" data-id="' + id + '">' +
       '<div class="dm-stars">' + cols + '</div>' +
       '<div class="dm-sum"><span>Average <b>' + avg + '</b> <small>· ' + total + (total === 1 ? ' review' : ' reviews') + '</small></span>' +
@@ -634,7 +654,7 @@
       (meta ? '<div class="dm-pmeta">' + meta + '</div>' : '') +
       '<div class="dm-pstats"><div><b>' + Number(st.posts || 0) + '</b><span>Posts</span></div>' +
       '<div data-act="followers"><b>' + Number(st.followers || 0) + '</b><span>Followers</span></div>' +
-      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + '<button class="dm-cmbtn" data-ai="1" style="margin-top:12px;margin-left:8px">🤖 Support</button>' + mnProfBtn() + create;
+      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + '<button class="dm-cmbtn" data-ai="1" style="margin-top:12px;margin-left:8px">🤖 Support</button>' + mnProfBtn() + profRating() + create;
   }
 
   function markPTab(k){
@@ -656,6 +676,16 @@
     var p = out[0].data;
     if (!p) { el.innerHTML = '<div class="dm-empty">This profile does not exist.</div>'; return; }
     PV = { uid: uid, p: p, st: out[1].data || {}, isMe: !!(me && me.id === uid), fol: !!out[2].data, ctab: ctab || 'dwall' };
+    K[uid] = 'profile';
+    try {
+      var rq = await Promise.all([
+        DB.from('demos_review_stats').select('*').eq('target_type', 'profile').eq('target_id', uid).maybeSingle(),
+        (me && me.id !== uid) ? DB.from('demos_reviews').select('stars').eq('target_type', 'profile').eq('target_id', uid).eq('user_id', me.id).maybeSingle() : Promise.resolve({ data:null })
+      ]);
+      if (rq[0].data) S[uid] = rq[0].data; else delete S[uid];
+      if (rq[1].data) M[uid] = rq[1].data.stars; else delete M[uid];
+    } catch (e) {}
+    if (tok !== profTok) return;
     $('#topTitle').textContent = '@' + p.username;
     renderHead();
     markPTab(PV.ctab);
@@ -1392,6 +1422,68 @@
     try { document.body.style.overflow = ''; } catch (e) {}
   }
   /* ===== /AI CHAT (JS) ===== */
+  /* ===== PROFILE RATING (JS) ===== */
+  var RV = { id:null, stars:0, busy:false };
+  function profSum(uid){
+    var st = S[uid] || {}, n = Number(st.total_reviews || 0);
+    if (n < 3) return '⭐ New profile' + (n ? ' · ' + n + (n === 1 ? ' rating' : ' ratings') : '');
+    return '⭐ <b>' + Number(st.average_stars).toFixed(1) + '</b> · ' + n + ' ratings';
+  }
+  function profRating(){
+    if (!PV) return '';
+    var uid = PV.uid;
+    if (PV.isMe) return '<div class="dmx-prs">' + profSum(uid) + '</div>';
+    return '<div class="dmx-prr"><div class="dmx-prt">Rate this profile</div>' + ratingHTML(uid, false) + '</div>';
+  }
+  function openRv(id, stars){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    if (needsTerms()) { openRules(); return; }
+    if (suspended()) { toast('Your Demos account is suspended.'); return; }
+    RV.id = id; RV.stars = stars; RV.busy = false;
+    $('#rv_text').value = ''; $('#rv_status').textContent = '';
+    $('#rvSub').textContent = 'You chose ' + stars + ' ★. A rating below 3 needs a clear reason. We check it before the rating is added.';
+    $('#rvBg').classList.add('show');
+  }
+  function closeRv(){ $('#rvBg').classList.remove('show'); RV.busy = false; }
+  async function sendRv(){
+    if (RV.busy) return;
+    var text = $('#rv_text').value.trim();
+    if (text.length < 15) { $('#rv_status').textContent = 'Please write at least 15 characters.'; return; }
+    var btn = $('#rvSend');
+    RV.busy = true; btn.disabled = true;
+    $('#rv_status').textContent = 'Checking your reason…';
+    var id = RV.id, stars = RV.stars;
+    var res = await aiCall('/review', { target: id, stars: stars, reason: text });
+    var d = res.data || {};
+    RV.busy = false; btn.disabled = false;
+    if (d.ok && d.approved) {
+      closeRv();
+      M[id] = stars;
+      var st = await DB.from('demos_review_stats').select('*').eq('target_type', 'profile').eq('target_id', id).maybeSingle();
+      if (st.data) S[id] = st.data;
+      var box = document.querySelector('.dm-rating[data-id="' + id + '"]');
+      if (box) box.outerHTML = ratingHTML(id, false);
+      toast('Thanks, your rating was added');
+      return;
+    }
+    var msgs = {
+      rules: 'Please accept the Demos rules first.',
+      too_new: 'Your profile must be at least 1 day old to rate profiles.',
+      blocked: 'You cannot rate this profile.',
+      suspended: 'Your Demos account is suspended.',
+      rate_limit: 'Too many attempts today. Please try again tomorrow.',
+      ai_error: 'The checker is busy right now. Please try again.',
+      auth: 'Please log in again.',
+      self: 'You cannot rate your own profile.',
+      too_short: 'Please write at least 15 characters.',
+      not_configured: 'This is not available right now.',
+      network: 'Could not reach the server. Check your connection.'
+    };
+    if (d.ok && !d.approved) $('#rv_status').textContent = 'We could not add this rating. Please explain the specific problem clearly: what happened, and why it deserves this rating.';
+    else $('#rv_status').textContent = msgs[d.reason] || 'Could not submit. Please try again.';
+  }
+  /* ===== /PROFILE RATING (JS) ===== */
   async function delComment(cid){
     if (!confirm('Delete this comment?')) return;
     var r = await DB.from('demos_comments').delete().eq('id', cid);
@@ -1407,11 +1499,12 @@
   async function submitRating(id, stars){
     if (!me) { goLogin(); return; }
     var kind = K[id] || tab;
+    if (kind === 'profile' && stars < 3) { openRv(id, stars); return; }
     var ex = await DB.from('demos_reviews').select('id').eq('target_type', kind).eq('target_id', id).eq('user_id', me.id).maybeSingle();
     var r;
     if (ex.data) r = await DB.from('demos_reviews').update({ stars: stars, updated_at: new Date().toISOString() }).eq('id', ex.data.id);
     else r = await DB.from('demos_reviews').insert({ target_type: kind, target_id: id, user_id: me.id, stars: stars });
-    if (r.error) { toast('Rating failed'); return; }
+    if (r.error) { toast(kind === 'profile' && r.error.message ? r.error.message : 'Rating failed'); return; }
     M[id] = stars;
     var st = await DB.from('demos_review_stats').select('*').eq('target_type', kind).eq('target_id', id).maybeSingle();
     if (st.data) S[id] = st.data;
@@ -1606,6 +1699,9 @@
   $('#dmCancel').addEventListener('click', function(){ $('#dmBg').classList.remove('show'); });
   $('#kbCancel').addEventListener('click', closeKb);
   $('#aiFab').addEventListener('click', openAi);
+  $('#rvCancel').addEventListener('click', closeRv);
+  $('#rvSend').addEventListener('click', sendRv);
+  $('#rvBg').addEventListener('click', function(e){ if (e.target.id === 'rvBg') closeRv(); });
   $('#aiClose').addEventListener('click', closeAi);
   $('#aiSend').addEventListener('click', function(){ aiSend(); });
   $('#aiIn').addEventListener('input', aiGrow);
