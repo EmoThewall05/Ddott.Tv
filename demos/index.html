@@ -178,6 +178,8 @@
   .dmx-ai-bar textarea { flex:1; min-height:44px; max-height:120px; resize:none; padding:11px 14px; border-radius:22px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-size:15px; font-family:inherit; }
   .dmx-ai-send { width:46px; height:46px; border-radius:50%; border:0; color:#fff; font-size:18px; background:linear-gradient(135deg,#6a5cff,#00c2ff); cursor:pointer; }
   /* ===== UI FIX (CSS) ===== */
+  .dmx-aifab { display:none !important; }
+  #aiHdr { font-size:18px; }
   .dmx-aifab { left:auto !important; right:14px !important; bottom:84px !important; width:46px; height:46px; font-size:21px; opacity:.94; }
   .dm-cmbtn[style*="margin-left"] { margin-left:0 !important; box-sizing:border-box; }
   /* ===== KEBAB (CSS) ===== */
@@ -237,6 +239,7 @@
     <div class="dm-top">
       <button class="dm-back" id="backBtn" aria-label="Back" style="display:none">&#8592;</button>
       <h1 class="dm-title" id="topTitle">Demos</h1>
+      <button class="dm-me" id="aiHdr" aria-label="Assistant" style="font-size:18px">🦋</button>
       <button class="dm-me" id="inbBtn" aria-label="Messages" style="font-size:18px">✉️</button>
       <button class="dm-me" id="meBtn" aria-label="My profile"></button>
     </div>
@@ -402,7 +405,7 @@
 <div class="dmx-ai" id="aiBg" style="display:none">
   <div class="dmx-ai-top">
     <button class="dmx-ai-x" id="aiClose" aria-label="Close">&#8592;</button>
-    <div class="dmx-ai-av">&#10024;</div>
+    <div class="dmx-ai-av">🦋</div>
     <div class="dmx-ai-tt"><div class="dmx-ai-n">Demos Assistant</div><div class="dmx-ai-s" id="aiCnt"></div></div>
   </div>
   <div class="dmx-ai-modes">
@@ -657,7 +660,7 @@
       (meta ? '<div class="dm-pmeta">' + meta + '</div>' : '') +
       '<div class="dm-pstats"><div><b>' + Number(st.posts || 0) + '</b><span>Posts</span></div>' +
       '<div data-act="followers"><b>' + Number(st.followers || 0) + '</b><span>Followers</span></div>' +
-      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + '<button class="dm-cmbtn" data-ai="1" style="margin-top:12px;margin-left:8px">🤖 Support</button>' + mnProfBtn() + profRating() + create;
+      '<div data-act="following"><b>' + Number(st.following || 0) + '</b><span>Following</span></div></div>' + '<button class="dm-cmbtn" data-shp="1" style="margin-top:12px">🔗 Share profile</button>' + '<button class="dm-cmbtn" data-ai="1" style="margin-top:12px;margin-left:8px">🦋 Support</button>' + mnProfBtn() + profRating() + create;
   }
 
   function markPTab(k){
@@ -1363,7 +1366,7 @@
     var h = AI.h[AI.mode], html = '';
     if (!h.length && !AI.busy) {
       var tr = AI.mode === 'translate';
-      html += '<div class="dmx-ai-wel"><div class="dmx-ai-glow">✨</div><div class="dmx-ai-wt">' + (tr ? 'Translate anything' : 'Hi 👋 How can I help?') + '</div><div class="dmx-ai-ws">' + (tr ? 'Type or paste text and I will translate it.' : 'Ask me about posts, messages, reporting, blocking, deleting and the Demos rules. Malayalam or English, both work.') + '</div>';
+      html += '<div class="dmx-ai-wel"><div class="dmx-ai-glow">🦋</div><div class="dmx-ai-wt">' + (tr ? 'Translate anything' : 'Hi 👋 How can I help?') + '</div><div class="dmx-ai-ws">' + (tr ? 'Type or paste text and I will translate it.' : 'Ask me about posts, messages, reporting, blocking, deleting and the Demos rules. Malayalam or English, both work.') + '</div>';
       if (!tr) html += '<div class="dmx-ai-qs">' + AIQS.map(function(q){ return '<button class="dmx-ai-q" data-aiq="' + esc(q) + '">' + esc(q) + '</button>'; }).join('') + '</div>';
       html += '</div>';
     } else {
@@ -1702,6 +1705,7 @@
   $('#dmCancel').addEventListener('click', function(){ $('#dmBg').classList.remove('show'); });
   $('#kbCancel').addEventListener('click', closeKb);
   $('#aiFab').addEventListener('click', openAi);
+  $('#aiHdr').addEventListener('click', openAi);
   $('#rvCancel').addEventListener('click', closeRv);
   $('#rvSend').addEventListener('click', sendRv);
   $('#rvBg').addEventListener('click', function(e){ if (e.target.id === 'rvBg') closeRv(); });
