@@ -138,6 +138,16 @@
   .dm-terms a { color:var(--terra-d); font-weight:700; }
   .dm-rules { margin:0 0 6px; padding-left:20px; font-size:14.5px; line-height:1.55; color:var(--ink); }
   .dm-rules li { margin-bottom:6px; }
+  /* ===== PEOPLE SEARCH (CSS) ===== */
+  .dmx-sb { display:flex; gap:8px; align-items:center; padding:8px 4px 4px; }
+  .dmx-sb input { flex:1; min-width:0; box-sizing:border-box; padding:10px 16px; border-radius:22px; border:1px solid rgba(128,128,128,.35); background:rgba(255,255,255,.55); font-size:15px; font-family:inherit; color:inherit; }
+  #srX { border:0; border-radius:50%; width:38px; height:38px; background:rgba(128,128,128,.2); color:inherit; font-size:15px; cursor:pointer; }
+  .dmx-sp { display:flex; align-items:center; gap:12px; padding:10px 6px; border-bottom:1px solid rgba(128,128,128,.18); cursor:pointer; }
+  .dmx-spm { flex:1; min-width:0; }
+  .dmx-sps { font-size:12px; opacity:.7; }
+  .dmx-sph { padding:10px 6px 4px; font-weight:700; font-size:14px; opacity:.8; }
+  .dmx-fl { border:0; border-radius:16px; padding:7px 14px; font-size:13px; font-weight:600; background:var(--terra-d,#c0562b); color:#fff; cursor:pointer; }
+  .dmx-fl.on { background:rgba(128,128,128,.22); color:inherit; }
   /* ===== PROFILE RATING (CSS) ===== */
   #rvBg { z-index: 10050; }
   .dmx-prr { margin-top:14px; }
@@ -249,6 +259,8 @@
     </div>
   </div>
   <div id="vFeed">
+    <div class="dmx-sb" id="srBox"><input id="srIn" type="search" autocomplete="off" autocapitalize="none" placeholder="🔍 Search people…" maxlength="40"><button id="srX" style="display:none" aria-label="Close search">&#10005;</button></div>
+    <div id="srOut" style="display:none"></div>
     <div class="dm-strip" id="strip"></div>
     <div id="feed"></div>
     <div id="more"></div>
@@ -1490,6 +1502,63 @@
     else $('#rv_status').textContent = msgs[d.reason] || 'Could not submit. Please try again.';
   }
   /* ===== /PROFILE RATING (JS) ===== */
+  /* ===== PEOPLE SEARCH (JS) ===== */
+  var SR = { t:null, tok:0, open:false };
+  function srShow(on){
+    SR.open = on;
+    ['#strip', '#feed', '#more'].forEach(function(q){ var e = $(q); if (e) e.style.display = on ? 'none' : ''; });
+    $('#srOut').style.display = on ? '' : 'none';
+    $('#srX').style.display = on ? '' : 'none';
+  }
+  function srLabel(st){ return st === 'following' ? 'Following' : (st === 'requested' ? 'Requested' : 'Follow'); }
+  function srRow(p){
+    var nm = p.display_name || p.username || 'User';
+    var rate = Number(p.total_reviews || 0) >= 3 ? ' · ⭐ ' + Number(p.avg_stars).toFixed(1) : '';
+    var btn = me ? '<button class="dmx-fl' + (p.rel !== 'none' ? ' on' : '') + '" data-fl="' + esc(p.user_id) + '" data-fs="' + esc(p.rel) + '">' + srLabel(p.rel) + '</button>' : '';
+    return '<div class="dmx-sp" data-uid="' + esc(p.user_id) + '"><div class="dm-av">' + avInner(p, nm) + '</div><div class="dmx-spm"><div class="dm-name">' + esc(nm) + (p.is_private ? ' 🔒' : '') + '</div><div class="dmx-sps">@' + esc(p.username) + rate + '</div></div>' + btn + '</div>';
+  }
+  async function srRun(q){
+    var tok = ++SR.tok, out = $('#srOut');
+    var r = await DB.rpc('demos_search_people', { p_q: q, p_limit: 20 });
+    if (tok !== SR.tok) return;
+    if (r.error) { out.innerHTML = '<div class="dm-empty">Could not search.</div>'; return; }
+    var rows = r.data || [];
+    if (!rows.length) { out.innerHTML = '<div class="dm-empty">' + (q ? 'No people found.' : 'No suggestions yet.') + '</div>'; return; }
+    out.innerHTML = (q ? '' : '<div class="dmx-sph">Suggested people</div>') + rows.map(srRow).join('');
+  }
+  function srInput(){
+    var q = $('#srIn').value.trim();
+    clearTimeout(SR.t);
+    srShow(true);
+    SR.t = setTimeout(function(){ srRun(q); }, q ? 300 : 50);
+  }
+  async function srFollow(btn){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    if (needsTerms()) { openRules(); return; }
+    if (suspended()) { toast('Your Demos account is suspended.'); return; }
+    if (btn.disabled) return;
+    var uid = btn.getAttribute('data-fl'), st = btn.getAttribute('data-fs');
+    if (st === 'following' && !confirm('Unfollow this person?')) return;
+    btn.disabled = true;
+    try {
+      if (st === 'none') {
+        var r = await DB.from('demos_follows').insert({ follower_id: me.id, following_id: uid }).select('status').single();
+        if (r.error && r.error.code !== '23505') { toast('Could not follow'); return; }
+        st = (r.data && r.data.status === 'pending') ? 'requested' : 'following';
+        toast(st === 'requested' ? 'Follow request sent' : 'Following');
+      } else {
+        var d = await DB.from('demos_follows').delete().eq('follower_id', me.id).eq('following_id', uid);
+        if (d.error) { toast('Could not update'); return; }
+        st = 'none';
+      }
+      btn.setAttribute('data-fs', st);
+      btn.textContent = srLabel(st);
+      btn.classList.toggle('on', st !== 'none');
+      feedDirty = true;
+    } finally { btn.disabled = false; }
+  }
+  /* ===== /PEOPLE SEARCH (JS) ===== */
   async function delComment(cid){
     if (!confirm('Delete this comment?')) return;
     var r = await DB.from('demos_comments').delete().eq('id', cid);
@@ -1629,6 +1698,8 @@
       openMn(el.getAttribute('data-mt'), el.getAttribute('data-mn'), el.getAttribute('data-mu'), mnS);
       return;
     }
+    el = t.closest('[data-fl]');
+    if (el) { srFollow(el); return; }
     el = t.closest('[data-ai]');
     if (el) { openAi(); return; }
     el = t.closest('[data-kb]');
@@ -1709,6 +1780,9 @@
   $('#rvCancel').addEventListener('click', closeRv);
   $('#rvSend').addEventListener('click', sendRv);
   $('#rvBg').addEventListener('click', function(e){ if (e.target.id === 'rvBg') closeRv(); });
+  $('#srIn').addEventListener('input', srInput);
+  $('#srIn').addEventListener('focus', function(){ if (!SR.open) srInput(); });
+  $('#srX').addEventListener('click', function(){ $('#srIn').value = ''; SR.tok++; clearTimeout(SR.t); srShow(false); try { $('#srIn').blur(); } catch (e) {} });
   $('#aiClose').addEventListener('click', closeAi);
   $('#aiSend').addEventListener('click', function(){ aiSend(); });
   $('#aiIn').addEventListener('input', aiGrow);
