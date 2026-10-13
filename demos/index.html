@@ -202,7 +202,7 @@
   #kbCancel { width:100%; }
   /* ===== MESSAGES (CSS) ===== */
   #dmBg { z-index: 10050; }
-  #abBg, #cmpBg, #rtpBg, #dpBg { z-index: 10050; }
+  #abBg, #cmpBg, #rtpBg, #dpBg, #limBg, #deBg { z-index: 10050; }
   .dmx-h { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; flex-wrap:wrap; }
   .dmx-ht { font-weight:700; font-size:18px; }
   .dmx-hr { display:flex; gap:8px; flex-wrap:wrap; }
@@ -276,6 +276,7 @@
     <div class="dm-tabs" id="feedTabs">
       <div class="dm-tab active" data-m="foryou">For You</div>
       <div class="dm-tab" data-m="following">Following</div>
+      <div class="dm-tab" data-m="favorites">Favorites</div>
     </div>
   </div>
   <div id="vFeed">
@@ -475,6 +476,34 @@
   </div>
 </div>
 <!-- /DELETE PROFILE SHEET -->
+<!-- LIMIT INTERACTIONS SHEET -->
+<div class="dm-sheet-bg" id="limBg">
+  <div class="dm-sheet">
+    <h3>Limit interactions</h3>
+    <div style="font-size:14.5px;line-height:1.55;color:var(--ink);margin:0 0 12px">
+      <div>For a while, people who do not follow you cannot start new comments or messages. Your followers and ongoing chats are not affected.</div>
+      <div id="limCur" style="margin-top:8px;font-weight:600"></div>
+    </div>
+    <div class="dm-mn-list">
+      <button class="dm-btn sec" data-lim="1">1 day</button>
+      <button class="dm-btn sec" data-lim="3">3 days</button>
+      <button class="dm-btn sec" data-lim="7">7 days</button>
+      <button class="dm-btn sec" data-lim="0">Turn off</button>
+    </div>
+    <button class="dm-btn sec" id="limClose">Close</button>
+  </div>
+</div>
+<!-- /LIMIT INTERACTIONS SHEET -->
+<!-- DEACTIVATE SHEET -->
+<div class="dm-sheet-bg" id="deBg">
+  <div class="dm-sheet">
+    <h3 id="deT">Deactivate profile?</h3>
+    <div id="deTx" style="font-size:14.5px;line-height:1.55;color:var(--ink);margin:0 0 12px"></div>
+    <button class="dm-btn pri" id="deGo" style="margin-bottom:8px">Deactivate</button>
+    <button class="dm-btn sec" id="deCancel">Cancel</button>
+  </div>
+</div>
+<!-- /DEACTIVATE SHEET -->
 <!-- KEBAB SHEET -->
 <div class="dm-sheet-bg" id="kbBg">
   <div class="dm-sheet">
@@ -696,7 +725,7 @@
     if (res.error) { list.innerHTML = '<div class="dm-empty">Could not load.<br>' + esc(res.error.message) + '</div>'; return; }
     var rows = res.data || [];
     if (!append && !rows.length) {
-      list.innerHTML = '<div class="dm-empty">' + (mode === 'following' ? 'Nothing here yet.<br>Follow people to see their posts here.' : 'Nothing here yet.<br>Be the first to create something.') + '</div>';
+      list.innerHTML = '<div class="dm-empty">' + (mode === 'following' ? 'Nothing here yet.<br>Follow people to see their posts here.' : (mode === 'favorites' ? 'Nothing here yet.<br>Add favorites from a profile or the ⋮ menu on a post.' : 'Nothing here yet.<br>Be the first to create something.')) + '</div>';
       feedDirty = false;
       return;
     }
@@ -822,7 +851,7 @@
   async function loadContent(){
     var kind = PV.ctab, uid = PV.uid, isMe = PV.isMe, list = $('#pfeed'), tok = ++contTok;
     list.innerHTML = '<div class="dm-empty">Loading…</div>';
-    var q = DB.from(TABLE[kind]).select('*').eq('user_id', uid).order('created_at', { ascending:false }).limit(40);
+    var q = DB.from(TABLE[kind]).select('*').eq('user_id', uid).eq('archived', false).order('created_at', { ascending:false }).limit(40);
     if (kind === 'dlooks') q = q.gt('expires_at', new Date().toISOString());
     var res = await q;
     if (tok !== contTok) return;
@@ -902,7 +931,7 @@
     }
     function sec(t, rows){ return '<div class="dm-ssec">' + t + '</div><div class="dm-sgrp">' + rows + '</div>'; }
     el.innerHTML =
-      sec('Your account', row('👤', 'Edit profile', '', 'edit')) +
+      sec('Your account', row('👤', 'Edit profile', '', 'edit') + row('🛡️', 'Account status', '', 'acst') + row('🕘', 'Activity log', '', 'alog') + row('📦', 'Download your information', '', 'dlinfo') + row('🗄️', 'Archive', '', 'arset')) +
       sec('Who can see your content',
         row('🔒', 'Account privacy', p.is_private ? 'Private' : 'Public', 'privacy') +
         row('🚫', 'Blocked accounts', '', 'blocked')) +
@@ -910,14 +939,14 @@
         row('💬', 'Messages', dmLab[p.dm_policy || 'everyone'] || 'Everyone', 'dm') +
         row('🗨️', 'Comments', ({ everyone:'Everyone', followers:'Followers', nobody:'No one' })[p.comment_policy || 'everyone'] || 'Everyone', 'cmset') +
         row('⭐', 'Rating', ({ everyone:'Everyone', followers:'Followers', nobody:'No one' })[p.rating_policy || 'everyone'] || 'Everyone', 'rtset') +
-        row('🔤', 'Hidden words', HW.list.length ? String(HW.list.length) : '', 'hwset')) +
-      sec('What you see', row('🔕', 'Muted accounts', Object.keys(MU).length ? String(Object.keys(MU).length) : '', 'muset')) +
+        row('🔤', 'Hidden words', HW.list.length ? String(HW.list.length) : '', 'hwset') + row('🚧', 'Limit interactions', limLabel(), 'limset') + row('🚷', 'Restricted accounts', Object.keys(RS).length ? String(Object.keys(RS).length) : '', 'rsset')) +
+      sec('What you see', row('🔕', 'Muted accounts', Object.keys(MU).length ? String(Object.keys(MU).length) : '', 'muset') + row('⭐', 'Favorites', Object.keys(FV).length ? String(Object.keys(FV).length) : '', 'fvset') + row('🔖', 'Saved', Object.keys(SV).length ? String(Object.keys(SV).length) : '', 'svset')) +
       sec('Notifications', row('🔔', 'Notifications', '', 'ntset')) +
       sec('More info and support',
         row('📜', 'Demos Rules', '', 'rules') +
         row('🛟', 'Help and support', '', 'help') +
         row('ℹ️', 'About', '', 'about')) +
-      sec('Account', row('🗑️', 'Delete Demos profile', '', 'delprof'));
+      sec('Account', row('⏸️', 'Deactivate profile', deActive() ? 'Deactivated' : '', 'deact') + row('🗑️', 'Delete Demos profile', '', 'delprof'));
   }
   async function showBlocked(){
     var el = $('#vMsg');
@@ -962,6 +991,15 @@
     else if (k === 'muset') go({ v:'muted' });
     else if (k === 'ntset') go({ v:'notifset' });
     else if (k === 'delprof') openDelProfile();
+    else if (k === 'acst') go({ v:'acstatus' });
+    else if (k === 'alog') go({ v:'actlog', tab:'comments' });
+    else if (k === 'dlinfo') downloadMyInfo();
+    else if (k === 'limset') openLimSet();
+    else if (k === 'rsset') go({ v:'restricted' });
+    else if (k === 'svset') go({ v:'saved' });
+    else if (k === 'fvset') go({ v:'favs' });
+    else if (k === 'arset') go({ v:'archive' });
+    else if (k === 'deact') openDeSet();
     else toast('Coming soon');
   }
 
@@ -1232,7 +1270,7 @@
   function mnProfBtn(){
     var u = (PV && !PV.isMe) ? ((PV.p && PV.p.user_id) || PV.uid) : '';
     if (!me || !u) return '';
-    return '<button class="dm-cmbtn" data-msg="' + esc(u) + '" style="margin-top:12px;margin-left:8px">💬 Message</button><button class="dm-cmbtn" data-mn="' + esc(u) + '" data-mt="profile" data-mu="' + esc(u) + '" style="margin-top:12px;margin-left:8px">⋯ Report / Block</button>' + '<button class="dm-cmbtn" data-kmute="' + esc(u) + '" style="margin-top:12px;margin-left:8px">' + (MU[u] ? '🔊 Unmute' : '🔇 Mute') + '</button>';
+    return '<button class="dm-cmbtn" data-msg="' + esc(u) + '" style="margin-top:12px;margin-left:8px">💬 Message</button><button class="dm-cmbtn" data-mn="' + esc(u) + '" data-mt="profile" data-mu="' + esc(u) + '" style="margin-top:12px;margin-left:8px">⋯ Report / Block</button>' + '<button class="dm-cmbtn" data-kmute="' + esc(u) + '" style="margin-top:12px;margin-left:8px">' + (MU[u] ? '🔊 Unmute' : '🔇 Mute') + '</button>' + '<button class="dm-cmbtn" data-krestrict="' + esc(u) + '" style="margin-top:12px;margin-left:8px">' + (RS[u] ? '✅ Unrestrict' : '🚷 Restrict') + '</button>' + '<button class="dm-cmbtn" data-kfav="' + esc(u) + '" style="margin-top:12px;margin-left:8px">' + (FV[u] ? '⭐ Remove favorite' : '⭐ Favorite') + '</button>';
   }
   function openMn(t, id, u, snap){
     if (!me) { goLogin(); return; }
@@ -1294,10 +1332,18 @@
     if (!b || !me) return;
     b.style.position = 'relative';
     try {
-      var r = await DB.rpc('demos_inbox'), n = 0;
-      ((r && r.data) || []).forEach(function(x){ n += Number(x.unread || 0); });
+      var r = await DB.rpc('demos_inbox'), n = 0, rq = await reqSet();
+      ((r && r.data) || []).forEach(function(x){ if (!rq[x.peer_id]) n += Number(x.unread || 0); });
       b.innerHTML = '✉️' + (n ? '<span style="position:absolute;top:-4px;right:-4px;background:#e11d48;color:#fff;border-radius:9px;font-size:10px;padding:1px 5px;line-height:1.3">' + (n > 99 ? '99+' : n) + '</span>' : '');
     } catch (e) {}
+  }
+  async function reqSet(){
+    var o = {};
+    try {
+      var q = await DB.rpc('demos_message_requests');
+      ((q && q.data) || []).forEach(function(x){ o[x.peer_id] = 1; });
+    } catch (e) {}
+    return o;
   }
   function openChat(uid){
     if (!me) { goLogin(); return true; }
@@ -1322,7 +1368,12 @@
     var rows = res.data || [];
     var ad = await isAdmin();
     var head = '<div class="dmx-h"><div class="dmx-ht">Messages</div><div class="dmx-hr"><button class="dm-cmbtn" data-dmset="1">⚙ Who can message me</button>' + (ad ? '<button class="dm-cmbtn" data-adm="1">🛡 Admin</button>' : '') + '</div></div>';
-    if (!rows.length) { el.innerHTML = head + '<div class="dm-empty">No messages yet.<br>Open a profile and tap Message to start.</div>'; refreshUnread(); return; }
+    var rq = await reqSet(), inReq = !!window.__inboxReq;
+    var nReq = rows.filter(function(x){ return rq[x.peer_id]; }).length;
+    rows = rows.filter(function(x){ return inReq ? !!rq[x.peer_id] : !rq[x.peer_id]; });
+    if (inReq) head += '<div class="dmx-h"><div class="dmx-ht">Message requests</div><div class="dmx-hr"><button class="dm-cmbtn" data-inreq="0">\u2190 Messages</button></div></div>';
+    else if (nReq) head += '<div class="dmx-ib" data-inreq="1"><div class="dmx-ibm"><div class="dm-name">\ud83d\udce5 Message requests</div><div class="dmx-ibl">' + nReq + (nReq === 1 ? ' chat' : ' chats') + ' from restricted accounts</div></div></div>';
+    if (!rows.length) { el.innerHTML = head + '<div class="dm-empty">' + (inReq ? 'No message requests.' : 'No messages yet.<br>Open a profile and tap Message to start.') + '</div>'; refreshUnread(); return; }
     var pm = await getProfiles(rows.map(function(x){ return x.peer_id; }));
     if (stack[stack.length - 1].v !== 'inbox') return;
     el.innerHTML = head + rows.map(function(x){
@@ -1503,8 +1554,11 @@
     KB.t = t; KB.id = id; KB.u = u; KB.snap = snap || '';
     var h = '';
     if (canDel) h += '<button class="dm-btn sec" data-ka="delete">🗑 Delete</button>';
-    if (u !== me.id) h += '<button class="dm-btn sec" data-ka="report">⚑ Report</button><button class="dm-btn sec" data-ka="block">🚫 Block user</button>' + '<button class="dm-btn sec" data-kmute="' + esc(u) + '">' + (MU[u] ? '🔊 Unmute' : '🔇 Mute') + '</button>';
+    if (canDel && (t === 'dwall' || t === 'dreels')) h += '<button class="dm-btn sec" data-karch="' + esc(t) + '|' + esc(id) + '">' + (AR[t + ':' + id] ? '↩ Unarchive' : '📦 Archive') + '</button>';
+    if (u !== me.id) h += '<button class="dm-btn sec" data-ka="report">⚑ Report</button><button class="dm-btn sec" data-ka="block">🚫 Block user</button>' + '<button class="dm-btn sec" data-kmute="' + esc(u) + '">' + (MU[u] ? '🔊 Unmute' : '🔇 Mute') + '</button>' + '<button class="dm-btn sec" data-krestrict="' + esc(u) + '">' + (RS[u] ? '✅ Unrestrict' : '🚷 Restrict') + '</button>';
     if (!h) return;
+    if (t === 'dwall' || t === 'dreels') h += '<button class="dm-btn sec" data-ksave="' + esc(t) + '|' + esc(id) + '">' + (SV[t + ':' + id] ? '🔖 Remove from saved' : '🔖 Save') + '</button>';
+    if (u !== me.id) h += '<button class="dm-btn sec" data-kfav="' + esc(u) + '">' + (FV[u] ? '⭐ Remove favorite' : '⭐ Favorite') + '</button>';
     $('#kbList').innerHTML = h;
     $('#kbBg').classList.add('show');
   }
@@ -1845,13 +1899,13 @@
   function applyView(){
     var v = stack[stack.length - 1], isFeed = v.v === 'feed';
     $('#vFeed').style.display = isFeed ? '' : 'none';
-    var isMsg = v.v === 'inbox' || v.v === 'chat' || v.v === 'admin' || v.v === 'settings' || v.v === 'blocked' || v.v === 'hidden' || v.v === 'muted' || v.v === 'notifs' || v.v === 'notifset';
+    var isMsg = v.v === 'inbox' || v.v === 'chat' || v.v === 'admin' || v.v === 'settings' || v.v === 'blocked' || v.v === 'hidden' || v.v === 'muted' || v.v === 'notifs' || v.v === 'notifset' || v.v === 'acstatus' || v.v === 'actlog' || v.v === 'restricted' || v.v === 'saved' || v.v === 'favs' || v.v === 'archive';
     $('#vProfile').style.display = (isFeed || isMsg) ? 'none' : '';
     $('#vMsg').style.display = isMsg ? '' : 'none';
     stopChatPoll();
     $('#feedTabs').style.display = isFeed ? '' : 'none';
     $('#backBtn').style.display = isFeed ? 'none' : '';
-    $('#setBtn').style.display = (v.v === 'settings' || v.v === 'blocked' || v.v === 'hidden' || v.v === 'muted' || v.v === 'notifset') ? 'none' : '';
+    $('#setBtn').style.display = (v.v === 'settings' || v.v === 'blocked' || v.v === 'hidden' || v.v === 'muted' || v.v === 'notifset' || v.v === 'acstatus' || v.v === 'actlog' || v.v === 'restricted' || v.v === 'saved' || v.v === 'favs' || v.v === 'archive') ? 'none' : '';
     $('#fab').style.display = isFeed ? '' : 'none';
     if (isFeed) {
       $('#topTitle').textContent = 'Demos';
@@ -1867,6 +1921,12 @@
       else if (v.v === 'muted') showMuted();
       else if (v.v === 'notifs') showNotifs();
       else if (v.v === 'notifset') showNotifSet();
+      else if (v.v === 'acstatus') showAcStatus();
+      else if (v.v === 'actlog') showActLog();
+      else if (v.v === 'restricted') showRestricted();
+      else if (v.v === 'saved') showSaved();
+      else if (v.v === 'favs') showFavs();
+      else if (v.v === 'archive') showArchive();
       else if (v.v === 'post') showPost(v.kind, v.id); else showProfile(v.uid, v.ctab);
     }
     try { window.scrollTo(0, 0); } catch(e){}
@@ -1887,6 +1947,12 @@
     if (v.v === 'muted') return showMuted();
     if (v.v === 'notifs') return showNotifs();
     if (v.v === 'notifset') return showNotifSet();
+    if (v.v === 'acstatus') return showAcStatus();
+    if (v.v === 'actlog') return showActLog();
+    if (v.v === 'restricted') return showRestricted();
+    if (v.v === 'saved') return showSaved();
+    if (v.v === 'favs') return showFavs();
+    if (v.v === 'archive') return showArchive();
     if (v.v === 'post') return showPost(v.kind, v.id);
     return showProfile(v.uid, (PV && PV.uid === v.uid) ? PV.ctab : v.ctab);
   }
@@ -1978,6 +2044,8 @@
     if (el) { openChat(el.getAttribute('data-chat')); return; }
     el = t.closest('[data-chsend]');
     if (el) { sendChat(); return; }
+    el = t.closest('[data-inreq]');
+    if (el) { window.__inboxReq = el.getAttribute('data-inreq') === '1'; showInbox(); return; }
     el = t.closest('[data-dmset]');
     if (el) { openDmSet(); return; }
     el = t.closest('[data-adm]');
@@ -2133,6 +2201,91 @@
   $('#dpCancel').addEventListener('click', function(){ if (!DP.busy) $('#dpBg').classList.remove('show'); });
   $('#dpBg').addEventListener('click', function(e){ if (e.target.id === 'dpBg' && !DP.busy) $('#dpBg').classList.remove('show'); });
   /* ===== /DELETE PROFILE LISTENERS ===== */
+  /* ===== ACTIVITY LOG LISTENERS ===== */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var a = t.closest('[data-altab],[data-alopen],[data-alprof],[data-aldelc],[data-aldelr]');
+    if (!a) return;
+    if (a.hasAttribute('data-altab')) {
+      var top = stack[stack.length - 1];
+      if (top && top.v === 'actlog') { top.tab = a.getAttribute('data-altab'); showActLog(); }
+      return;
+    }
+    if (a.hasAttribute('data-alopen')) { go({ v:'post', kind: a.getAttribute('data-alk'), id: a.getAttribute('data-alopen') }); return; }
+    if (a.hasAttribute('data-alprof')) { openProfile(a.getAttribute('data-alprof')); return; }
+    if (a.hasAttribute('data-aldelc')) { alDelComment(a.getAttribute('data-aldelc')); return; }
+    if (a.hasAttribute('data-aldelr')) { alDelRating(a.getAttribute('data-aldelr')); return; }
+  });
+  /* ===== /ACTIVITY LOG LISTENERS ===== */
+  /* ===== LIMIT LISTENERS ===== */
+  $('#limClose').addEventListener('click', function(){ $('#limBg').classList.remove('show'); });
+  $('#limBg').addEventListener('click', function(e){ if (e.target.id === 'limBg') $('#limBg').classList.remove('show'); });
+  document.querySelectorAll('#limBg [data-lim]').forEach(function(b){ b.addEventListener('click', function(){ setLimit(b.getAttribute('data-lim')); }); });
+  /* ===== /LIMIT LISTENERS ===== */
+  /* ===== RESTRICT LISTENERS ===== */
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('[data-krestrict],[data-unrestrict]') : null;
+    if (!a) return;
+    var uid = a.getAttribute('data-krestrict') || a.getAttribute('data-unrestrict');
+    if (a.hasAttribute('data-krestrict')) { try { closeKb(); } catch (e2) {} }
+    rsToggle(uid);
+  });
+  (function rsBoot(){
+    var n = 0;
+    var t = setInterval(function(){
+      n++;
+      if (typeof me !== 'undefined' && me && me.id) { clearInterval(t); rsLoad(); }
+      else if (n > 60) clearInterval(t);
+    }, 500);
+  })();
+  /* ===== /RESTRICT LISTENERS ===== */
+  /* ===== SAVED + FAVORITES LISTENERS ===== */
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('[data-ksave],[data-kfav],[data-unfav]') : null;
+    if (!a) return;
+    if (a.hasAttribute('data-ksave')) {
+      var parts = String(a.getAttribute('data-ksave')).split('|');
+      try { closeKb(); } catch (e2) {}
+      svToggle(parts[0], parts[1]);
+      return;
+    }
+    if (a.hasAttribute('data-kfav')) { try { closeKb(); } catch (e3) {} }
+    fvToggle(a.getAttribute('data-kfav') || a.getAttribute('data-unfav'));
+  });
+  (function svBoot(){
+    var n = 0;
+    var t = setInterval(function(){
+      n++;
+      if (typeof me !== 'undefined' && me && me.id) { clearInterval(t); svLoad(); fvLoad(); }
+      else if (n > 60) clearInterval(t);
+    }, 500);
+  })();
+  /* ===== /SAVED + FAVORITES LISTENERS ===== */
+  /* ===== ARCHIVE LISTENERS ===== */
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('[data-karch]') : null;
+    if (!a) return;
+    var parts = String(a.getAttribute('data-karch')).split('|');
+    try { closeKb(); } catch (e2) {}
+    arToggle(parts[0], parts[1]);
+  });
+  /* ===== /ARCHIVE LISTENERS ===== */
+  /* ===== DEACTIVATE LISTENERS ===== */
+  $('#deGo').addEventListener('click', function(){ setDeactivated(!deActive()); });
+  $('#deCancel').addEventListener('click', function(){ $('#deBg').classList.remove('show'); });
+  $('#deBg').addEventListener('click', function(e){ if (e.target.id === 'deBg') $('#deBg').classList.remove('show'); });
+  (function deBoot(){
+    var n = 0;
+    var t = setInterval(function(){
+      n++;
+      if (typeof myProfile !== 'undefined' && myProfile) {
+        clearInterval(t);
+        if (myProfile.deactivated_at) toast('Your profile is deactivated. Reactivate in Settings.');
+      } else if (n > 60) clearInterval(t);
+    }, 500);
+  })();
+  /* ===== /DEACTIVATE LISTENERS ===== */
   $('#kbCancel').addEventListener('click', closeKb);
   $('#aiFab').addEventListener('click', openAi);
   $('#aiHdr').addEventListener('click', openAi);
@@ -2269,8 +2422,13 @@
   async function cmBlockReason(kind, id, owner){
     try {
       if (!owner || !me || owner === me.id) return '';
-      var pr = await DB.from('demos_profiles').select('comment_policy').eq('user_id', owner).maybeSingle();
+      var pr = await DB.from('demos_profiles').select('comment_policy,limit_until').eq('user_id', owner).maybeSingle();
       var pol = (pr && pr.data && pr.data.comment_policy) || 'everyone';
+      var lu = pr && pr.data && pr.data.limit_until;
+      if (lu && new Date(lu) > new Date()) {
+        var fl = await DB.from('demos_follows').select('status').eq('follower_id', me.id).eq('following_id', owner).maybeSingle();
+        if (!(fl && fl.data && fl.data.status === 'accepted')) return 'Comments are limited on this profile right now.';
+      }
       if (pol === 'nobody') return 'Comments are turned off for this post.';
       if (pol === 'followers') {
         var f = await DB.from('demos_follows').select('status').eq('follower_id', me.id).eq('following_id', owner).maybeSingle();
@@ -2572,6 +2730,443 @@
     setTimeout(function(){ try { location.reload(); } catch (e) {} }, 1400);
   }
   /* ===== /DELETE PROFILE ===== */
+  /* ===== ACCOUNT STATUS ===== */
+  async function showAcStatus(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Account status';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var out = await Promise.all([
+      DB.from('demos_user_mod').select('strikes,suspended,reason').eq('user_id', me.id).maybeSingle(),
+      DB.from('demos_dwall').select('id,body,status,mod_label,created_at').eq('user_id', me.id).neq('status', 'approved').order('created_at', { ascending:false }).limit(30),
+      DB.from('demos_dreels').select('id,caption,status,mod_label,created_at').eq('user_id', me.id).neq('status', 'approved').order('created_at', { ascending:false }).limit(30),
+      DB.from('demos_dlooks').select('id,caption,status,mod_label,created_at').eq('user_id', me.id).neq('status', 'approved').order('created_at', { ascending:false }).limit(30)
+    ]);
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'acstatus') return;
+    var m = (out[0] && out[0].data) || {};
+    var strikes = Number(m.strikes) || 0;
+    var items = [];
+    [[1, 'Dwall', 'body'], [2, 'Dreels', 'caption'], [3, 'Dlooks', 'caption']].forEach(function(d){
+      ((out[d[0]] && out[d[0]].data) || []).forEach(function(x){
+        items.push({ k: d[1], t: String(x[d[2]] || ''), st: x.status, lb: x.mod_label, at: x.created_at });
+      });
+    });
+    items.sort(function(a, b){ return String(b.at).localeCompare(String(a.at)); });
+    function line(ic, lb, val){
+      return '<div class="dm-srow" style="cursor:default"><span class="dm-sic">' + ic + '</span><span class="dm-slb">' + lb + '</span><span class="dm-sval">' + val + '</span></div>';
+    }
+    var h = '<div class="dm-ssec">Your account</div><div class="dm-sgrp">' +
+      line(m.suspended ? '⛔' : '✅', 'Status', m.suspended ? 'Suspended' : 'In good standing') +
+      line('⚠️', 'Strikes', String(strikes)) +
+      (m.suspended && m.reason ? line('📝', 'Reason', esc(m.reason)) : '') +
+      '</div>';
+    if (items.length) {
+      h += '<div class="dm-ssec">Removed or under review</div><div class="dm-sgrp">' + items.map(function(x){
+        var why = x.st === 'pending' ? (x.lb ? 'Under review' : 'Safety check in progress') : 'Removed: ' + esc(x.lb || 'policy');
+        var sn = x.t ? esc(x.t.slice(0, 60)) + (x.t.length > 60 ? '…' : '') : '(photo or video only)';
+        return '<div class="dm-brow"><div class="dm-bnm"><div class="dm-name">' + esc(x.k) + ' · ' + why + '</div><div class="dm-time">' + sn + ' · ' + esc(ago(x.at)) + '</div></div></div>';
+      }).join('') + '</div>';
+    } else {
+      h += '<div class="dm-empty">Nothing has been removed.</div>';
+    }
+    h += '<div class="dm-ssec">Learn more</div><div class="dm-sgrp"><div class="dm-srow" data-st="rules"><span class="dm-sic">📜</span><span class="dm-slb">Demos Rules</span><span class="dm-sval"></span><span class="dm-sch">&#8250;</span></div></div>' +
+      '<div class="dm-time" style="padding:8px 14px">Posts that break the rules are removed. Repeated violations add strikes and can lead to a suspension.</div>';
+    el.innerHTML = h;
+  }
+  /* ===== /ACCOUNT STATUS ===== */
+  /* ===== ACTIVITY LOG ===== */
+  var ALK = { dwall:'Dwall post', dreels:'Dreel', dlooks:'Dlook', profile:'Profile' };
+  async function showActLog(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Activity log';
+    if (!me) { goLogin(); return; }
+    var top0 = stack[stack.length - 1];
+    var tab = (top0 && top0.tab) || 'comments';
+    var tabs = '<div style="display:flex;gap:8px;padding:12px 14px"><button class="dm-btn ' + (tab === 'comments' ? 'pri' : 'sec') + '" data-altab="comments">Comments</button><button class="dm-btn ' + (tab === 'ratings' ? 'pri' : 'sec') + '" data-altab="ratings">Ratings</button></div>';
+    el.innerHTML = tabs + '<div class="dm-empty">Loading…</div>';
+    var body = '';
+    if (tab === 'comments') {
+      var r = await DB.from('demos_comments').select('id,target_type,target_id,body,status,created_at').eq('user_id', me.id).order('created_at', { ascending:false }).limit(50);
+      var cv = stack[stack.length - 1];
+      if (!cv || cv.v !== 'actlog' || (cv.tab || 'comments') !== 'comments') return;
+      if (r.error) { el.innerHTML = tabs + '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+      var rows = r.data || [];
+      if (!rows.length) body = '<div class="dm-empty">You have not commented yet.</div>';
+      else body = '<div class="dm-sgrp">' + rows.map(function(x){
+        var t = String(x.body || '');
+        var tag = x.status && x.status !== 'approved' ? ' · ⛔ Removed' : '';
+        return '<div class="dm-brow" style="align-items:flex-start"><div class="dm-bnm"><div class="dm-name">' + esc(t.slice(0, 120)) + (t.length > 120 ? '…' : '') + '</div><div class="dm-time">' + esc(ALK[x.target_type] || 'Post') + ' · ' + esc(ago(x.created_at)) + tag + '</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="dm-btn sec" data-alopen="' + esc(x.target_id) + '" data-alk="' + esc(x.target_type) + '">Open</button><button class="dm-btn sec" data-aldelc="' + esc(x.id) + '">Delete</button></div></div>';
+      }).join('') + '</div>';
+    } else {
+      var r2 = await DB.from('demos_reviews').select('id,target_type,target_id,stars,created_at,updated_at').eq('user_id', me.id).order('updated_at', { ascending:false }).limit(50);
+      var cv2 = stack[stack.length - 1];
+      if (!cv2 || cv2.v !== 'actlog' || cv2.tab !== 'ratings') return;
+      if (r2.error) { el.innerHTML = tabs + '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+      var rows2 = r2.data || [];
+      var pids = rows2.filter(function(x){ return x.target_type === 'profile'; }).map(function(x){ return x.target_id; });
+      var names = {};
+      if (pids.length) {
+        var pr = await DB.from('demos_profiles').select('user_id,display_name,username').in('user_id', pids);
+        ((pr && pr.data) || []).forEach(function(q){ names[q.user_id] = q.display_name || q.username || 'User'; });
+        var cv3 = stack[stack.length - 1];
+        if (!cv3 || cv3.v !== 'actlog' || cv3.tab !== 'ratings') return;
+      }
+      if (!rows2.length) body = '<div class="dm-empty">You have not rated anything yet.</div>';
+      else body = '<div class="dm-sgrp">' + rows2.map(function(x){
+        var st = Math.max(0, Math.min(5, Number(x.stars) || 0));
+        var who = x.target_type === 'profile' ? esc(names[x.target_id] || 'a profile') : esc(ALK[x.target_type] || 'a post');
+        var open = x.target_type === 'profile' ? '<button class="dm-btn sec" data-alprof="' + esc(x.target_id) + '">Open</button>'
+          : ((x.target_type === 'dwall' || x.target_type === 'dreels') ? '<button class="dm-btn sec" data-alopen="' + esc(x.target_id) + '" data-alk="' + esc(x.target_type) + '">Open</button>' : '');
+        return '<div class="dm-brow" style="align-items:flex-start"><div class="dm-bnm"><div class="dm-name">' + new Array(st + 1).join('★') + ' <span style="font-weight:400">' + st + '/5</span></div><div class="dm-time">' + who + ' · ' + esc(ago(x.updated_at || x.created_at)) + '</div></div><div style="display:flex;flex-direction:column;gap:6px">' + open + '<button class="dm-btn sec" data-aldelr="' + esc(x.id) + '">Remove</button></div></div>';
+      }).join('') + '</div>';
+    }
+    el.innerHTML = tabs + body;
+  }
+  async function alDelComment(id){
+    if (!me || !id) return;
+    if (!confirm('Delete this comment?')) return;
+    var r = await DB.from('demos_comments').delete().eq('id', id).eq('user_id', me.id);
+    if (r.error) { toast('Could not delete'); return; }
+    toast('Deleted');
+    feedDirty = true;
+    showActLog();
+  }
+  async function alDelRating(id){
+    if (!me || !id) return;
+    if (!confirm('Remove this rating?')) return;
+    var r = await DB.from('demos_reviews').delete().eq('id', id).eq('user_id', me.id);
+    if (r.error) { toast('Could not remove'); return; }
+    toast('Rating removed');
+    feedDirty = true;
+    showActLog();
+  }
+  /* ===== /ACTIVITY LOG ===== */
+  /* ===== DOWNLOAD MY INFO ===== */
+  var DL = { busy:false };
+  async function dlNames(ids){
+    var map = {};
+    ids = Array.from(new Set(ids)).filter(Boolean);
+    for (var i = 0; i < ids.length; i += 100) {
+      try {
+        var r = await DB.from('demos_profiles').select('user_id,display_name,username').in('user_id', ids.slice(i, i + 100));
+        ((r && r.data) || []).forEach(function(q){ map[q.user_id] = { username: q.username || null, name: q.display_name || null }; });
+      } catch (e) {}
+    }
+    return map;
+  }
+  async function downloadMyInfo(){
+    if (DL.busy) return;
+    if (!me) { goLogin(); return; }
+    if (!confirm('Download a copy of your Demos information as a file?')) return;
+    DL.busy = true;
+    toast('Preparing your file…');
+    var uid = me.id, errs = [];
+    async function get(label, q, fb){
+      try {
+        var r = await q();
+        if (r && r.error) { errs.push(label + ': ' + r.error.message); return fb; }
+        return (r && r.data != null) ? r.data : fb;
+      } catch (e) { errs.push(label + ': ' + ((e && e.message) || 'failed')); return fb; }
+    }
+    try {
+      var L = 1000;
+      var res = await Promise.all([
+        get('profile', function(){ return DB.from('demos_profiles').select('*').eq('user_id', uid).maybeSingle(); }, null),
+        get('dwall', function(){ return DB.from('demos_dwall').select('id,body,media_url,status,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('dreels', function(){ return DB.from('demos_dreels').select('id,caption,video_url,thumbnail_url,status,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('dlooks', function(){ return DB.from('demos_dlooks').select('id,caption,media_url,media_type,status,created_at,expires_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('comments', function(){ return DB.from('demos_comments').select('target_type,target_id,body,status,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('ratings', function(){ return DB.from('demos_reviews').select('target_type,target_id,stars,created_at,updated_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('followers', function(){ return DB.from('demos_follows').select('follower_id,status,created_at').eq('following_id', uid).limit(L); }, []),
+        get('following', function(){ return DB.from('demos_follows').select('following_id,status,created_at').eq('follower_id', uid).limit(L); }, []),
+        get('blocked', function(){ return DB.from('demos_blocks').select('blocked_id,created_at').eq('blocker_id', uid).limit(L); }, []),
+        get('muted', function(){ return DB.from('demos_mutes').select('muted_id,created_at').eq('muter_id', uid).limit(L); }, []),
+        get('hidden_words', function(){ return DB.from('demos_hidden_words').select('word,created_at').eq('user_id', uid).limit(L); }, []),
+        get('messages_sent', function(){ return DB.from('demos_messages').select('recipient_id,body,status,created_at').eq('sender_id', uid).order('created_at', { ascending:false }).limit(L); }, [])
+      ]);
+      var ids = [];
+      res[6].forEach(function(x){ ids.push(x.follower_id); });
+      res[7].forEach(function(x){ ids.push(x.following_id); });
+      res[8].forEach(function(x){ ids.push(x.blocked_id); });
+      res[9].forEach(function(x){ ids.push(x.muted_id); });
+      res[11].forEach(function(x){ ids.push(x.recipient_id); });
+      res[5].forEach(function(x){ if (x.target_type === 'profile') ids.push(x.target_id); });
+      var nm = await dlNames(ids);
+      function who(id){ return nm[id] ? { username: nm[id].username, name: nm[id].name } : { unavailable: true }; }
+      var data = {
+        app: 'Demos by Ddott',
+        exported_at: new Date().toISOString(),
+        user_id: uid,
+        note: 'Your own Demos data. Messages include only the ones you sent. Other people are listed by username/name only. Up to 1000 items per section. Photos and videos are links, not files.',
+        profile: res[0],
+        posts: { dwall: res[1], dreels: res[2], dlooks: res[3] },
+        comments: res[4],
+        ratings: res[5].map(function(x){ return { target_type: x.target_type, target: x.target_type === 'profile' ? who(x.target_id) : { id: x.target_id }, stars: x.stars, created_at: x.created_at, updated_at: x.updated_at }; }),
+        followers: res[6].map(function(x){ return { user: who(x.follower_id), status: x.status, since: x.created_at }; }),
+        following: res[7].map(function(x){ return { user: who(x.following_id), status: x.status, since: x.created_at }; }),
+        blocked: res[8].map(function(x){ return { user: who(x.blocked_id), since: x.created_at }; }),
+        muted: res[9].map(function(x){ return { user: who(x.muted_id), since: x.created_at }; }),
+        hidden_words: res[10],
+        messages_sent: res[11].map(function(x){ return { to: who(x.recipient_id), body: x.body, status: x.status, created_at: x.created_at }; }),
+        errors: errs
+      };
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'demos-my-data-' + new Date().toISOString().slice(0, 10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ try { URL.revokeObjectURL(url); } catch (e) {} }, 60000);
+      toast(errs.length ? 'File ready, but ' + errs.length + ' section(s) could not be read' : 'Your file is ready. Check Downloads.');
+    } catch (e) {
+      toast('Could not prepare the file');
+    }
+    DL.busy = false;
+  }
+  /* ===== /DOWNLOAD MY INFO ===== */
+  /* ===== LIMIT INTERACTIONS ===== */
+  function limActive(){
+    return !!(myProfile && myProfile.limit_until && new Date(myProfile.limit_until) > new Date());
+  }
+  function limLabel(){
+    if (!limActive()) return 'Off';
+    try { return 'Until ' + new Date(myProfile.limit_until).toLocaleString([], { weekday:'short', hour:'2-digit', minute:'2-digit' }); } catch (e) { return 'On'; }
+  }
+  function openLimSet(){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    $('#limCur').textContent = limActive() ? ('Currently on · ' + limLabel()) : 'Currently off';
+    $('#limBg').classList.add('show');
+  }
+  async function setLimit(days){
+    if (!me || !myProfile) return;
+    days = Number(days) || 0;
+    var until = days ? new Date(Date.now() + days * 86400000).toISOString() : null;
+    var r = await DB.from('demos_profiles').update({ limit_until: until }).eq('user_id', me.id);
+    if (r.error) { toast('Could not save'); return; }
+    myProfile.limit_until = until;
+    try { var cv = stack[stack.length - 1]; if (cv && cv.v === 'settings') showSettings(); } catch (e) {}
+    $('#limBg').classList.remove('show');
+    toast(days ? 'Limit is on for ' + days + (days === 1 ? ' day' : ' days') : 'Limit turned off');
+  }
+  /* ===== /LIMIT INTERACTIONS ===== */
+  /* ===== RESTRICTED ACCOUNTS ===== */
+  var RS = {};
+  async function rsLoad(){
+    try {
+      if (!me) { RS = {}; return; }
+      var r = await DB.from('demos_restricts').select('restricted_id').eq('restrictor_id', me.id);
+      if (!r.error) { RS = {}; (r.data || []).forEach(function(x){ RS[x.restricted_id] = true; }); }
+    } catch (e) {}
+  }
+  async function rsToggle(uid){
+    if (!me) { goLogin(); return; }
+    if (!uid || uid === me.id) return;
+    var was = !!RS[uid];
+    var r = was
+      ? await DB.from('demos_restricts').delete().eq('restrictor_id', me.id).eq('restricted_id', uid)
+      : await DB.from('demos_restricts').insert({ restrictor_id: me.id, restricted_id: uid });
+    if (r.error && r.error.code !== '23505') { toast('Could not ' + (was ? 'unrestrict' : 'restrict')); return; }
+    if (was) delete RS[uid]; else RS[uid] = true;
+    toast(was ? 'Unrestricted' : 'Restricted. Their comments on your posts are now visible only to them and you. They will not be told.');
+    try {
+      var cv = stack[stack.length - 1];
+      if (cv && cv.v === 'restricted') showRestricted(); else refreshView();
+    } catch (e) {}
+  }
+  async function showRestricted(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Restricted accounts';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var r = await DB.from('demos_restricts').select('restricted_id, created_at').eq('restrictor_id', me.id).order('created_at', { ascending:false });
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'restricted') return;
+    if (r.error) { el.innerHTML = '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+    var ids = (r.data || []).map(function(x){ return x.restricted_id; });
+    RS = {}; ids.forEach(function(i){ RS[i] = true; });
+    if (!ids.length) { el.innerHTML = '<div class="dm-empty">You have not restricted anyone.<br>Use ⋮ on a post or comment, or the profile page.</div>'; return; }
+    var pr = await DB.from('demos_profiles').select('*').in('user_id', ids);
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'restricted') return;
+    var byId = {};
+    ((pr && pr.data) || []).forEach(function(q){ byId[q.user_id] = q; });
+    el.innerHTML = '<div class="dm-ssec">People you restricted</div><div class="dm-sgrp">' + ids.map(function(id){
+      var q = byId[id] || {}, nm = q.display_name || q.username || 'User';
+      return '<div class="dm-brow"><div class="dm-av">' + avInner(q, nm) + '</div><div class="dm-bnm"><div class="dm-name">' + esc(nm) + '</div><div class="dm-time">' + (q.username ? '@' + esc(q.username) : '') + '</div></div><button class="dm-btn sec" data-unrestrict="' + esc(id) + '">Unrestrict</button></div>';
+    }).join('') + '</div><div class="dm-time" style="padding:8px 14px">Their comments on your posts are visible only to them and you. You get no notifications from them. They are not told. They can still see your profile. For full protection, use Block.</div>';
+  }
+  /* ===== /RESTRICTED ACCOUNTS ===== */
+  /* ===== SAVED + FAVORITES ===== */
+  var SV = {}, FV = {};
+  async function svLoad(){
+    try {
+      if (!me) { SV = {}; return; }
+      var r = await DB.from('demos_saves').select('target_type,target_id').eq('user_id', me.id).limit(1000);
+      if (!r.error) { SV = {}; (r.data || []).forEach(function(x){ SV[x.target_type + ':' + x.target_id] = true; }); }
+    } catch (e) {}
+  }
+  async function fvLoad(){
+    try {
+      if (!me) { FV = {}; return; }
+      var r = await DB.from('demos_favorites').select('favorite_id').eq('user_id', me.id).limit(1000);
+      if (!r.error) { FV = {}; (r.data || []).forEach(function(x){ FV[x.favorite_id] = true; }); }
+    } catch (e) {}
+  }
+  async function svToggle(kind, id){
+    if (!me) { goLogin(); return; }
+    if (!kind || !id) return;
+    var key = kind + ':' + id, was = !!SV[key];
+    var r = was
+      ? await DB.from('demos_saves').delete().eq('user_id', me.id).eq('target_type', kind).eq('target_id', id)
+      : await DB.from('demos_saves').insert({ user_id: me.id, target_type: kind, target_id: id });
+    if (r.error && r.error.code !== '23505') { toast('Could not ' + (was ? 'remove' : 'save')); return; }
+    if (was) delete SV[key]; else SV[key] = true;
+    toast(was ? 'Removed from saved' : 'Saved');
+    try { var cv = stack[stack.length - 1]; if (cv && cv.v === 'saved') showSaved(); } catch (e) {}
+  }
+  async function fvToggle(uid){
+    if (!me) { goLogin(); return; }
+    if (!uid || uid === me.id) return;
+    var was = !!FV[uid];
+    var r = was
+      ? await DB.from('demos_favorites').delete().eq('user_id', me.id).eq('favorite_id', uid)
+      : await DB.from('demos_favorites').insert({ user_id: me.id, favorite_id: uid });
+    if (r.error && r.error.code !== '23505') { toast('Could not ' + (was ? 'remove' : 'add') + ' favorite'); return; }
+    if (was) delete FV[uid]; else FV[uid] = true;
+    toast(was ? 'Removed from favorites' : 'Added to favorites. They will not be told.');
+    feedDirty = true;
+    try {
+      var cv = stack[stack.length - 1];
+      if (cv && cv.v === 'favs') showFavs(); else refreshView();
+    } catch (e) {}
+  }
+  async function showSaved(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Saved';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var r = await DB.from('demos_saves').select('target_type,target_id,created_at').eq('user_id', me.id).order('created_at', { ascending:false }).limit(100);
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'saved') return;
+    if (r.error) { el.innerHTML = '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+    var rows = r.data || [];
+    SV = {}; rows.forEach(function(x){ SV[x.target_type + ':' + x.target_id] = true; });
+    if (!rows.length) { el.innerHTML = '<div class="dm-empty">Nothing saved yet.<br>Use ⋮ on a post and choose Save.</div>'; return; }
+    var ids = { dwall: [], dreels: [] };
+    rows.forEach(function(x){ if (ids[x.target_type]) ids[x.target_type].push(x.target_id); });
+    var kinds = ['dwall', 'dreels'];
+    var outs = await Promise.all(kinds.map(function(k){
+      return ids[k].length ? DB.from(TABLE[k]).select('*').in('id', ids[k]).eq('status', 'approved') : Promise.resolve({ data: [] });
+    }));
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'saved') return;
+    var byKey = {};
+    kinds.forEach(function(k, i){ ((outs[i] && outs[i].data) || []).forEach(function(x){ x.kind = k; byKey[k + ':' + x.id] = x; }); });
+    var posts = [];
+    rows.forEach(function(x){ var q = byKey[x.target_type + ':' + x.target_id]; if (q) posts.push(q); });
+    if (!posts.length) { el.innerHTML = '<div class="dm-empty">Your saved posts are no longer available.</div>'; return; }
+    var prof = await hydrate(posts);
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'saved') return;
+    el.innerHTML = posts.map(function(q){ return cardHTML(q, prof); }).join('');
+  }
+  async function showFavs(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Favorites';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var r = await DB.from('demos_favorites').select('favorite_id, created_at').eq('user_id', me.id).order('created_at', { ascending:false });
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'favs') return;
+    if (r.error) { el.innerHTML = '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+    var ids = (r.data || []).map(function(x){ return x.favorite_id; });
+    FV = {}; ids.forEach(function(i){ FV[i] = true; });
+    if (!ids.length) { el.innerHTML = '<div class="dm-empty">No favorites yet.<br>Use ⋮ on a post or the profile page to add one.</div>'; return; }
+    var pr = await DB.from('demos_profiles').select('*').in('user_id', ids);
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'favs') return;
+    var byId = {};
+    ((pr && pr.data) || []).forEach(function(q){ byId[q.user_id] = q; });
+    el.innerHTML = '<div class="dm-ssec">Your favorites</div><div class="dm-sgrp">' + ids.map(function(id){
+      var q = byId[id] || {}, nm = q.display_name || q.username || 'User';
+      return '<div class="dm-brow"><div class="dm-av">' + avInner(q, nm) + '</div><div class="dm-bnm"><div class="dm-name">' + esc(nm) + '</div><div class="dm-time">' + (q.username ? '@' + esc(q.username) : '') + '</div></div><button class="dm-btn sec" data-unfav="' + esc(id) + '">Remove</button></div>';
+    }).join('') + '</div><div class="dm-time" style="padding:8px 14px">Their posts also appear in the Favorites tab on the home feed. They are not told.</div>';
+  }
+  /* ===== /SAVED + FAVORITES ===== */
+  /* ===== ARCHIVE ===== */
+  var AR = {};
+  async function arToggle(kind, id){
+    if (!me) { goLogin(); return; }
+    if (!kind || !id || !TABLE[kind]) return;
+    var key = kind + ':' + id, was = !!AR[key];
+    if (!was && !confirm('Archive this post? Only you will see it. You can restore it from Settings → Archive.')) return;
+    var r = await DB.from(TABLE[kind]).update({ archived: !was }).eq('id', id).eq('user_id', me.id).select('id');
+    if (r.error || !(r.data && r.data.length)) { toast('Could not ' + (was ? 'unarchive' : 'archive')); return; }
+    if (was) delete AR[key]; else AR[key] = true;
+    toast(was ? 'Post restored' : 'Post archived');
+    feedDirty = true;
+    try {
+      var cv = stack[stack.length - 1];
+      if (cv && cv.v === 'archive') showArchive(); else refreshView();
+    } catch (e) {}
+  }
+  async function showArchive(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Archive';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var kinds = ['dwall', 'dreels'];
+    var outs = await Promise.all(kinds.map(function(k){
+      return DB.from(TABLE[k]).select('*').eq('user_id', me.id).eq('archived', true).order('created_at', { ascending:false }).limit(50);
+    }));
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'archive') return;
+    if (outs.some(function(o){ return o && o.error; })) { el.innerHTML = '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+    var posts = [];
+    AR = {};
+    kinds.forEach(function(k, i){
+      ((outs[i] && outs[i].data) || []).forEach(function(x){ x.kind = k; AR[k + ':' + x.id] = true; posts.push(x); });
+    });
+    posts.sort(function(a, b){ return String(b.created_at).localeCompare(String(a.created_at)); });
+    if (!posts.length) { el.innerHTML = '<div class="dm-empty">No archived posts.<br>Use ⋮ on your post and choose Archive.</div>'; return; }
+    var prof = await hydrate(posts);
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'archive') return;
+    el.innerHTML = '<div class="dm-time" style="padding:8px 14px">Only you can see archived posts. They are hidden from your profile and the feed. Comments and ratings come back if you restore a post.</div>' +
+      posts.map(function(q){
+        return cardHTML(q, prof) + '<button class="dm-btn pri" data-karch="' + esc(q.kind) + '|' + esc(q.id) + '" style="margin:-4px 0 16px">↩ Unarchive</button>';
+      }).join('');
+  }
+  /* ===== /ARCHIVE ===== */
+  /* ===== DEACTIVATE ===== */
+  function deActive(){ return !!(myProfile && myProfile.deactivated_at); }
+  function openDeSet(){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    var on = deActive();
+    $('#deT').textContent = on ? 'Reactivate profile?' : 'Deactivate profile?';
+    $('#deTx').innerHTML = on
+      ? '<div>Your profile, posts and comments will be visible to everyone again.</div>'
+      : '<div>Your profile, posts, Dlooks and comments are hidden from everyone else, and you will not appear in search.</div><ul class="dm-rules" style="margin-top:6px"><li>You cannot post, comment, rate or message while deactivated</li><li>Nothing is deleted</li><li>Reactivate any time in Settings</li></ul>';
+    $('#deGo').textContent = on ? 'Reactivate' : 'Deactivate';
+    $('#deBg').classList.add('show');
+  }
+  async function setDeactivated(on){
+    if (!me || !myProfile) return;
+    var ts = on ? new Date().toISOString() : null;
+    var r = await DB.from('demos_profiles').update({ deactivated_at: ts }).eq('user_id', me.id);
+    if (r.error) { toast('Could not save'); return; }
+    myProfile.deactivated_at = ts;
+    feedDirty = true;
+    try { var cv = stack[stack.length - 1]; if (cv && cv.v === 'settings') showSettings(); } catch (e) {}
+    $('#deBg').classList.remove('show');
+    toast(on ? 'Profile deactivated. Only you can see it now.' : 'Welcome back! Your profile is visible again.');
+  }
+  /* ===== /DEACTIVATE ===== */
   function openRules(){ $('#ruBg').classList.add('show'); }
   async function acceptRules(){
     if (me && myProfile && !myProfile.terms_accepted_at) {
