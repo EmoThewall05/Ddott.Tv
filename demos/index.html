@@ -202,6 +202,7 @@
   #kbCancel { width:100%; }
   /* ===== MESSAGES (CSS) ===== */
   #dmBg { z-index: 10050; }
+  #abBg, #cmpBg, #rtpBg, #dpBg { z-index: 10050; }
   .dmx-h { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; flex-wrap:wrap; }
   .dmx-ht { font-weight:700; font-size:18px; }
   .dmx-hr { display:flex; gap:8px; flex-wrap:wrap; }
@@ -243,6 +244,21 @@
   .dm-cm-form { display:flex; gap:8px; align-items:flex-end; margin-top:12px; }
   .dm-sheet .dm-cm-form textarea { flex:1; min-height:46px; height:46px; resize:none; }
   .dm-cm-form .dm-btn { flex:none; width:auto; padding:12px 18px; }
+  /* ===== DEMOS SETTINGS (CSS) ===== */
+  .dm-ssec { font-size:13px; font-weight:700; color:var(--muted); margin:18px 6px 6px; }
+  .dm-sgrp { background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+  .dm-srow { display:flex; align-items:center; gap:12px; padding:14px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .dm-srow:last-child { border-bottom:none; }
+  .dm-srow:active { background:#F6EBD6; }
+  .dm-sic { width:24px; text-align:center; font-size:18px; }
+  .dm-slb { flex:1; font-size:15.5px; font-weight:600; }
+  .dm-sval { font-size:13.5px; color:var(--muted); }
+  .dm-sch { font-size:22px; color:var(--muted); line-height:1; }
+  .dm-brow { display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:1px solid var(--line); }
+  .dm-brow:last-child { border-bottom:none; }
+  .dm-bnm { flex:1; min-width:0; }
+  .dm-bnm .dm-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dm-unb { flex:none; padding:9px 16px; font-size:14px; }
 </style>
 </head>
 <body>
@@ -251,7 +267,9 @@
     <div class="dm-top">
       <button class="dm-back" id="backBtn" aria-label="Back" style="display:none">&#8592;</button>
       <h1 class="dm-title" id="topTitle">Demos</h1>
+      <button class="dm-me" id="setBtn" data-act="settings" aria-label="Settings" style="font-size:18px">⚙️</button>
       <button class="dm-me" id="aiHdr" aria-label="Assistant" style="font-size:18px">🦋</button>
+      <span style="position:relative;display:flex;flex-shrink:0"><button class="dm-me" id="ntBtn" aria-label="Notifications" style="font-size:18px">🔔</button><span id="ntN" style="display:none;position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--terra-d);color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;pointer-events:none"></span></span>
       <button class="dm-me" id="inbBtn" aria-label="Messages" style="font-size:18px">✉️</button>
       <button class="dm-me" id="meBtn" aria-label="My profile"></button>
     </div>
@@ -394,6 +412,69 @@
   </div>
 </div>
 <!-- /DM SETTING SHEET -->
+<!-- ABOUT SHEET -->
+<div class="dm-sheet-bg" id="abBg">
+  <div class="dm-sheet">
+    <h3>About Demos</h3>
+    <div style="font-size:14.5px;line-height:1.55;color:var(--ink);margin:0 0 12px">
+      <div style="font-weight:700;margin-bottom:4px">Demos by Ddott</div>
+      <div>Share, connect, discover. Dwall, Dreels and Dlooks in one place.</div>
+      <div style="margin-top:8px;opacity:.7">Version 1.0</div>
+    </div>
+    <div class="dm-mn-list">
+      <button class="dm-btn sec" id="abRules">Demos Rules</button>
+      <button class="dm-btn sec" id="abPrivacy">Privacy Policy</button>
+    </div>
+    <button class="dm-btn sec" id="abClose">Close</button>
+  </div>
+</div>
+<!-- /ABOUT SHEET -->
+<!-- COMMENT SETTING SHEET -->
+<div class="dm-sheet-bg" id="cmpBg">
+  <div class="dm-sheet">
+    <h3>Who can comment on your posts?</h3>
+    <div class="dm-mn-list">
+      <button class="dm-btn sec" data-cmp="everyone">Everyone</button>
+      <button class="dm-btn sec" data-cmp="followers">Only my followers</button>
+      <button class="dm-btn sec" data-cmp="nobody">No one</button>
+    </div>
+    <button class="dm-btn sec" id="cmpClose">Close</button>
+  </div>
+</div>
+<!-- /COMMENT SETTING SHEET -->
+<!-- RATING SETTING SHEET -->
+<div class="dm-sheet-bg" id="rtpBg">
+  <div class="dm-sheet">
+    <h3>Who can rate you?</h3>
+    <div class="dm-mn-list">
+      <button class="dm-btn sec" data-rtp="everyone">Everyone</button>
+      <button class="dm-btn sec" data-rtp="followers">Only my followers</button>
+      <button class="dm-btn sec" data-rtp="nobody">No one</button>
+    </div>
+    <button class="dm-btn sec" id="rtpClose">Close</button>
+  </div>
+</div>
+<!-- /RATING SETTING SHEET -->
+<!-- DELETE PROFILE SHEET -->
+<div class="dm-sheet-bg" id="dpBg">
+  <div class="dm-sheet">
+    <h3>Delete Demos profile?</h3>
+    <div style="font-size:14.5px;line-height:1.55;color:var(--ink);margin:0 0 12px">
+      <div>This permanently deletes your Demos profile and everything in it:</div>
+      <ul class="dm-rules" style="margin-top:6px">
+        <li>Your Dwall posts, Dreels and Dlooks</li>
+        <li>Your comments, ratings and messages (the other person loses that chat too)</li>
+        <li>Your followers, following, blocks, mutes and notifications</li>
+        <li>Your photos and videos</li>
+      </ul>
+      <div>This cannot be undone. Your Ddott.TV account is not affected.</div>
+    </div>
+    <input id="dpIn" placeholder="Type DELETE to confirm" autocomplete="off" autocapitalize="characters" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(0,0,0,.18);border-radius:10px;font-size:15px;background:transparent;color:inherit;margin-bottom:10px">
+    <button class="dm-btn pri" id="dpGo" disabled style="background:#B3261E;border-color:#B3261E;margin-bottom:8px;opacity:.5">Delete my Demos profile</button>
+    <button class="dm-btn sec" id="dpCancel">Cancel</button>
+  </div>
+</div>
+<!-- /DELETE PROFILE SHEET -->
 <!-- KEBAB SHEET -->
 <div class="dm-sheet-bg" id="kbBg">
   <div class="dm-sheet">
@@ -691,6 +772,20 @@
     document.querySelectorAll('#ptabs .dm-tab').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-t') === k); });
   }
 
+  /* ---------- block set ---------- */
+  async function blockSet(){
+    var s = {};
+    if (!me) return s;
+    try {
+      var r = await DB.rpc('demos_my_block_ids');
+      ((r && r.data) || []).forEach(function(x){
+        var id = (typeof x === 'string') ? x : (x && x.demos_my_block_ids) || '';
+        if (id) s[id] = 1;
+      });
+    } catch (e) {}
+    return s;
+  }
+
   async function showProfile(uid, ctab){
     var el = $('#vProfile'), tok = ++profTok;
     el.innerHTML = '<div id="pHead"><div class="dm-empty">Loading…</div></div>' +
@@ -704,7 +799,9 @@
     ]);
     if (tok !== profTok) return;
     var p = out[0].data;
-    if (!p) { el.innerHTML = '<div class="dm-empty">This profile does not exist.</div>'; return; }
+    var blk = false;
+    if (p && me && me.id !== uid) { var bs0 = await blockSet(); if (tok !== profTok) return; blk = !!bs0[uid]; }
+    if (!p || blk) { el.innerHTML = '<div class="dm-empty">' + (blk ? 'This profile is not available.' : 'This profile does not exist.') + '</div>'; return; }
     PV = { uid: uid, p: p, st: out[1].data || {}, isMe: !!(me && me.id === uid), fol: !!(out[2].data && out[2].data.status === 'accepted'), req: !!(out[2].data && out[2].data.status === 'pending'), ctab: ctab || 'dwall' };
     K[uid] = 'profile';
     try {
@@ -773,6 +870,8 @@
     var other = kind === 'followers' ? 'following_id' : 'follower_id';
     var r = await DB.from('demos_follows').select(col).eq(other, uid).eq('status', 'accepted').order('created_at', { ascending:false }).limit(200);
     var ids = (r.data || []).map(function(x){ return x[col]; });
+    var bsL = await blockSet();
+    ids = ids.filter(function(id){ return !bsL[id]; });
     if (!ids.length) { $('#lsList').innerHTML = '<div class="dm-empty">Nobody here yet.</div>'; return; }
     var pr = await DB.from('demos_profiles').select('user_id,display_name,username,avatar_url').in('user_id', ids);
     var byId = {};
@@ -782,6 +881,88 @@
       var nm = p.display_name || p.username || 'User';
       return '<div class="dm-lrow" data-uid="' + esc(id) + '"><div class="dm-av">' + avInner(p, nm) + '</div><div><div class="dm-name">' + esc(nm) + '</div><div class="dm-time">@' + esc(p.username) + '</div></div></div>';
     }).join('') || '<div class="dm-empty">Nobody here yet.</div>';
+  }
+
+  /* ---------- settings ---------- */
+  function openSettings(){
+    if (!me) { goLogin(); return; }
+    if (!myProfile) { openSetup(); return; }
+    var top = stack[stack.length - 1];
+    if (top && top.v === 'settings') return;
+    go({ v:'settings' });
+  }
+  function showSettings(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Settings';
+    var p = myProfile || {};
+    var dmLab = { everyone:'Everyone', followers:'Followers', nobody:'No one new' };
+    function row(ic, lb, val, key){
+      if (key === 'soon') val = 'Soon';
+      return '<div class="dm-srow" data-st="' + key + '"><span class="dm-sic">' + ic + '</span><span class="dm-slb">' + lb + '</span><span class="dm-sval">' + val + '</span><span class="dm-sch">&#8250;</span></div>';
+    }
+    function sec(t, rows){ return '<div class="dm-ssec">' + t + '</div><div class="dm-sgrp">' + rows + '</div>'; }
+    el.innerHTML =
+      sec('Your account', row('👤', 'Edit profile', '', 'edit')) +
+      sec('Who can see your content',
+        row('🔒', 'Account privacy', p.is_private ? 'Private' : 'Public', 'privacy') +
+        row('🚫', 'Blocked accounts', '', 'blocked')) +
+      sec('How others can interact with you',
+        row('💬', 'Messages', dmLab[p.dm_policy || 'everyone'] || 'Everyone', 'dm') +
+        row('🗨️', 'Comments', ({ everyone:'Everyone', followers:'Followers', nobody:'No one' })[p.comment_policy || 'everyone'] || 'Everyone', 'cmset') +
+        row('⭐', 'Rating', ({ everyone:'Everyone', followers:'Followers', nobody:'No one' })[p.rating_policy || 'everyone'] || 'Everyone', 'rtset') +
+        row('🔤', 'Hidden words', HW.list.length ? String(HW.list.length) : '', 'hwset')) +
+      sec('What you see', row('🔕', 'Muted accounts', Object.keys(MU).length ? String(Object.keys(MU).length) : '', 'muset')) +
+      sec('Notifications', row('🔔', 'Notifications', '', 'ntset')) +
+      sec('More info and support',
+        row('📜', 'Demos Rules', '', 'rules') +
+        row('🛟', 'Help and support', '', 'help') +
+        row('ℹ️', 'About', '', 'about')) +
+      sec('Account', row('🗑️', 'Delete Demos profile', '', 'delprof'));
+  }
+  async function showBlocked(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Blocked accounts';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var r = await DB.from('demos_blocks').select('blocked_id, created_at').eq('blocker_id', me.id).order('created_at', { ascending:false });
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'blocked') return;
+    if (r.error) { el.innerHTML = '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+    var ids = (r.data || []).map(function(x){ return x.blocked_id; });
+    if (!ids.length) { el.innerHTML = '<div class="dm-empty">You have not blocked anyone.</div>'; return; }
+    var pr = await DB.from('demos_profiles').select('*').in('user_id', ids);
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'blocked') return;
+    var byId = {};
+    ((pr && pr.data) || []).forEach(function(q){ byId[q.user_id] = q; });
+    el.innerHTML = '<div class="dm-ssec">People you blocked</div><div class="dm-sgrp">' + ids.map(function(id){
+      var q = byId[id] || {}, nm = q.display_name || q.username || 'User';
+      return '<div class="dm-brow"><div class="dm-av">' + avInner(q, nm) + '</div><div class="dm-bnm"><div class="dm-name">' + esc(nm) + '</div><div class="dm-time">' + (q.username ? '@' + esc(q.username) : '') + '</div></div><button class="dm-btn sec dm-unb" data-unb="' + esc(id) + '">Unblock</button></div>';
+    }).join('') + '</div>';
+  }
+  async function unblockUser(id){
+    if (!me || !id) return;
+    if (!confirm('Unblock this user?')) return;
+    var r = await DB.from('demos_blocks').delete().eq('blocker_id', me.id).eq('blocked_id', id);
+    if (r.error) { toast('Could not unblock'); return; }
+    toast('Unblocked');
+    feedDirty = true;
+    showBlocked();
+  }
+  function settingsAct(k){
+    if (k === 'edit' || k === 'privacy') openEdit();
+    else if (k === 'dm') openDmSet();
+    else if (k === 'blocked') go({ v:'blocked' });
+    else if (k === 'rules') openRules();
+    else if (k === 'help') openAi();
+    else if (k === 'about') openAbout();
+    else if (k === 'cmset') openCmSet();
+    else if (k === 'rtset') openRtSet();
+    else if (k === 'hwset') go({ v:'hidden' });
+    else if (k === 'muset') go({ v:'muted' });
+    else if (k === 'ntset') go({ v:'notifset' });
+    else if (k === 'delprof') openDelProfile();
+    else toast('Coming soon');
   }
 
   /* ---------- logout ---------- */
@@ -834,6 +1015,7 @@
       edBusy = false;
       $('#edBg').classList.remove('show');
       toast('Profile updated'); modCheck('profile', me.id);
+      try { var cv2 = stack[stack.length - 1]; if (cv2 && cv2.v === 'settings') showSettings(); } catch(e){}
       feedDirty = true;
       showProfile(me.id, PV ? PV.ctab : 'dwall');
     } catch (err) {
@@ -1014,7 +1196,7 @@
         '<div class="dm-cm-b"><div class="dm-cm-h"><span class="dm-name" data-uid="' + esc(c.user_id) + '">' + esc(nm) + '</span>' +
         '<span class="dm-time">' + (p.username ? '@' + esc(p.username) + ' · ' : '') + esc(ago(c.created_at)) + '</span>' +
         ((me && (canDel || c.user_id !== me.id)) ? '<button class="dmx-k dmx-kc" data-kb="' + esc(c.id) + '" data-kt="comment" data-ku="' + esc(c.user_id) + '" data-kd="' + (canDel ? '1' : '') + '" aria-label="More">⋮</button>' : '') + '</div>' +
-        '<div class="dm-cm-t">' + esc(c.body) + '</div></div></div>';
+        '<div class="dm-cm-t">' + ((me && c.user_id === me.id) ? esc(c.body) : hwMask(c.body)) + '</div></div></div>';
     }).join('');
     list.scrollTop = list.scrollHeight;
   }
@@ -1027,6 +1209,8 @@
     var text = $('#cm_text').value.trim();
     if (!text) { toast('Write a comment first'); return; }
     CM.busy = true; $('#cmSend').disabled = true;
+    var cmBlk = await cmBlockReason(CM.kind, CM.id, CM.owner);
+    if (cmBlk) { CM.busy = false; $('#cmSend').disabled = false; toast(cmBlk); return; }
     try {
       var r = await DB.from('demos_comments').insert({ target_type: CM.kind, target_id: CM.id, user_id: me.id, body: text }).select('id').single();
       if (r.data && r.data.id) modCheck('comment', r.data.id);
@@ -1048,7 +1232,7 @@
   function mnProfBtn(){
     var u = (PV && !PV.isMe) ? ((PV.p && PV.p.user_id) || PV.uid) : '';
     if (!me || !u) return '';
-    return '<button class="dm-cmbtn" data-msg="' + esc(u) + '" style="margin-top:12px;margin-left:8px">💬 Message</button><button class="dm-cmbtn" data-mn="' + esc(u) + '" data-mt="profile" data-mu="' + esc(u) + '" style="margin-top:12px;margin-left:8px">⋯ Report / Block</button>';
+    return '<button class="dm-cmbtn" data-msg="' + esc(u) + '" style="margin-top:12px;margin-left:8px">💬 Message</button><button class="dm-cmbtn" data-mn="' + esc(u) + '" data-mt="profile" data-mu="' + esc(u) + '" style="margin-top:12px;margin-left:8px">⋯ Report / Block</button>' + '<button class="dm-cmbtn" data-kmute="' + esc(u) + '" style="margin-top:12px;margin-left:8px">' + (MU[u] ? '🔊 Unmute' : '🔇 Mute') + '</button>';
   }
   function openMn(t, id, u, snap){
     if (!me) { goLogin(); return; }
@@ -1144,7 +1328,7 @@
     el.innerHTML = head + rows.map(function(x){
       var p = pm[x.peer_id] || {}, nm = p.display_name || p.username || 'User';
       var mine = me && x.last_sender === me.id;
-      return '<div class="dmx-ib" data-chat="' + esc(x.peer_id) + '"><div class="dm-av">' + avInner(p, nm) + '</div><div class="dmx-ibm"><div class="dm-name">' + esc(nm) + '</div><div class="dmx-ibl">' + (mine ? 'You: ' : '') + esc(x.last_body) + '</div></div><div><div class="dm-time">' + esc(ago(x.last_at)) + '</div>' + (x.unread ? '<span class="dmx-ibn">' + Number(x.unread) + '</span>' : '') + '</div></div>';
+      return '<div class="dmx-ib" data-chat="' + esc(x.peer_id) + '"><div class="dm-av">' + avInner(p, nm) + '</div><div class="dmx-ibm"><div class="dm-name">' + esc(nm) + '</div><div class="dmx-ibl">' + (mine ? 'You: ' : '') + (mine ? esc(x.last_body) : hwInbox(x.last_body)) + '</div></div><div><div class="dm-time">' + esc(ago(x.last_at)) + '</div>' + (x.unread ? '<span class="dmx-ibn">' + Number(x.unread) + '</span>' : '') + '</div></div>';
     }).join('');
     refreshUnread();
   }
@@ -1185,7 +1369,7 @@
       var mine = m.sender_id === me.id;
       var tag = (m.dlook_id ? '↩ Dlook reply · ' : '') + (m.status === 'blocked' ? '⛔ removed · ' : '');
       var rep = (!mine && m.status === 'approved') ? ' <button class="dm-cm-del" data-mn="' + esc(m.id) + '" data-mt="message" data-mu="' + esc(m.sender_id) + '" aria-label="Report message">⚑</button>' : '';
-      return '<div class="dmx-r ' + (mine ? 'dmx-r-me' : 'dmx-r-th') + '"><div class="dmx-b">' + esc(m.body) + '</div><div class="dmx-t">' + tag + esc(ago(m.created_at)) + rep + '</div></div>';
+      return '<div class="dmx-r ' + (mine ? 'dmx-r-me' : 'dmx-r-th') + '"><div class="dmx-b">' + (mine ? esc(m.body) : hwMask(m.body)) + '</div><div class="dmx-t">' + tag + esc(ago(m.created_at)) + rep + '</div></div>';
     }).join('');
     if (first || near) list.scrollTop = list.scrollHeight;
     var unread = rows.some(function(m){ return m.recipient_id === me.id && !m.read_at; });
@@ -1241,6 +1425,7 @@
     var r = await DB.from('demos_profiles').update({ dm_policy: v }).eq('user_id', me.id);
     if (r.error) { toast('Could not save'); return; }
     myProfile.dm_policy = v;
+    try { var cv = stack[stack.length - 1]; if (cv && cv.v === 'settings') showSettings(); } catch(e){}
     $('#dmBg').classList.remove('show');
     toast('Saved');
   }
@@ -1318,7 +1503,7 @@
     KB.t = t; KB.id = id; KB.u = u; KB.snap = snap || '';
     var h = '';
     if (canDel) h += '<button class="dm-btn sec" data-ka="delete">🗑 Delete</button>';
-    if (u !== me.id) h += '<button class="dm-btn sec" data-ka="report">⚑ Report</button><button class="dm-btn sec" data-ka="block">🚫 Block user</button>';
+    if (u !== me.id) h += '<button class="dm-btn sec" data-ka="report">⚑ Report</button><button class="dm-btn sec" data-ka="block">🚫 Block user</button>' + '<button class="dm-btn sec" data-kmute="' + esc(u) + '">' + (MU[u] ? '🔊 Unmute' : '🔇 Mute') + '</button>';
     if (!h) return;
     $('#kbList').innerHTML = h;
     $('#kbBg').classList.add('show');
@@ -1634,6 +1819,8 @@
   async function submitRating(id, stars){
     if (!me) { goLogin(); return; }
     var kind = K[id] || tab;
+    var rtBlk = await rtBlockReason(kind, id);
+    if (rtBlk) { toast(rtBlk); return; }
     if (kind === 'profile' && stars < 3) { openRv(id, stars); return; }
     var ex = await DB.from('demos_reviews').select('id').eq('target_type', kind).eq('target_id', id).eq('user_id', me.id).maybeSingle();
     var r;
@@ -1658,12 +1845,13 @@
   function applyView(){
     var v = stack[stack.length - 1], isFeed = v.v === 'feed';
     $('#vFeed').style.display = isFeed ? '' : 'none';
-    var isMsg = v.v === 'inbox' || v.v === 'chat' || v.v === 'admin';
+    var isMsg = v.v === 'inbox' || v.v === 'chat' || v.v === 'admin' || v.v === 'settings' || v.v === 'blocked' || v.v === 'hidden' || v.v === 'muted' || v.v === 'notifs' || v.v === 'notifset';
     $('#vProfile').style.display = (isFeed || isMsg) ? 'none' : '';
     $('#vMsg').style.display = isMsg ? '' : 'none';
     stopChatPoll();
     $('#feedTabs').style.display = isFeed ? '' : 'none';
     $('#backBtn').style.display = isFeed ? 'none' : '';
+    $('#setBtn').style.display = (v.v === 'settings' || v.v === 'blocked' || v.v === 'hidden' || v.v === 'muted' || v.v === 'notifset') ? 'none' : '';
     $('#fab').style.display = isFeed ? '' : 'none';
     if (isFeed) {
       $('#topTitle').textContent = 'Demos';
@@ -1673,6 +1861,12 @@
       if (v.v === 'inbox') showInbox();
       else if (v.v === 'chat') showChat(v.uid);
       else if (v.v === 'admin') showAdmin();
+      else if (v.v === 'settings') showSettings();
+      else if (v.v === 'blocked') showBlocked();
+      else if (v.v === 'hidden') showHidden();
+      else if (v.v === 'muted') showMuted();
+      else if (v.v === 'notifs') showNotifs();
+      else if (v.v === 'notifset') showNotifSet();
       else if (v.v === 'post') showPost(v.kind, v.id); else showProfile(v.uid, v.ctab);
     }
     try { window.scrollTo(0, 0); } catch(e){}
@@ -1687,6 +1881,12 @@
     if (v.v === 'inbox') return showInbox();
     if (v.v === 'chat') return showChat(v.uid);
     if (v.v === 'admin') return showAdmin();
+    if (v.v === 'settings') return showSettings();
+    if (v.v === 'blocked') return showBlocked();
+    if (v.v === 'hidden') return showHidden();
+    if (v.v === 'muted') return showMuted();
+    if (v.v === 'notifs') return showNotifs();
+    if (v.v === 'notifset') return showNotifSet();
     if (v.v === 'post') return showPost(v.kind, v.id);
     return showProfile(v.uid, (PV && PV.uid === v.uid) ? PV.ctab : v.ctab);
   }
@@ -1790,11 +1990,16 @@
     if (el) { el.textContent = 'Loading…'; loadFeed(true); return; }
     el = t.closest('[data-mk]');
     if (el) { mk(el.getAttribute('data-mk')); return; }
+    el = t.closest('[data-unb]');
+    if (el) { unblockUser(el.getAttribute('data-unb')); return; }
+    el = t.closest('[data-st]');
+    if (el) { settingsAct(el.getAttribute('data-st')); return; }
     el = t.closest('[data-act]');
     if (el) {
       var a = el.getAttribute('data-act');
       if (a === 'edit') openEdit();
       else if (a === 'logout') doLogout();
+      else if (a === 'settings') openSettings();
       else if (a === 'follow') toggleFollow();
       else if (a === 'followers' || a === 'following') showList(a);
       return;
@@ -1838,6 +2043,96 @@
     go({ v:'inbox' });
   });
   $('#dmCancel').addEventListener('click', function(){ $('#dmBg').classList.remove('show'); });
+  /* ===== ABOUT LISTENERS ===== */
+  $('#abClose').addEventListener('click', function(){ $('#abBg').classList.remove('show'); });
+  $('#abBg').addEventListener('click', function(e){ if (e.target.id === 'abBg') $('#abBg').classList.remove('show'); });
+  $('#abRules').addEventListener('click', function(){ $('#abBg').classList.remove('show'); openRules(); });
+  $('#abPrivacy').addEventListener('click', function(){ window.open('/privacy-policy.html', '_blank'); });
+  $('#cmpClose').addEventListener('click', function(){ $('#cmpBg').classList.remove('show'); });
+  $('#cmpBg').addEventListener('click', function(e){ if (e.target.id === 'cmpBg') $('#cmpBg').classList.remove('show'); });
+  document.querySelectorAll('#cmpBg [data-cmp]').forEach(function(b){ b.addEventListener('click', function(){ setCmPolicy(b.getAttribute('data-cmp')); }); });
+  $('#rtpClose').addEventListener('click', function(){ $('#rtpBg').classList.remove('show'); });
+  $('#rtpBg').addEventListener('click', function(e){ if (e.target.id === 'rtpBg') $('#rtpBg').classList.remove('show'); });
+  document.querySelectorAll('#rtpBg [data-rtp]').forEach(function(b){ b.addEventListener('click', function(){ setRtPolicy(b.getAttribute('data-rtp')); }); });
+  /* ===== HIDDEN WORDS LISTENERS ===== */
+  document.addEventListener('click', function(e){
+    var t = e.target && e.target.closest ? e.target.closest('[data-hwr]') : null;
+    if (!t) return;
+    e.stopPropagation();
+    t.textContent = t.getAttribute('data-hwr');
+    t.removeAttribute('data-hwr');
+    t.style.cssText = '';
+  }, true);
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('[data-hwadd],[data-hwdel]') : null;
+    if (!a) return;
+    if (a.hasAttribute('data-hwadd')) hwAdd(); else hwDel(a.getAttribute('data-hwdel'));
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && e.target && e.target.id === 'hwIn') { e.preventDefault(); hwAdd(); }
+  });
+  (function hwBoot(){
+    var n = 0;
+    var t = setInterval(function(){
+      n++;
+      if (typeof me !== 'undefined' && me && me.id) { clearInterval(t); hwLoad(); }
+      else if (n > 60) clearInterval(t);
+    }, 500);
+  })();
+  /* ===== /HIDDEN WORDS LISTENERS ===== */
+  /* ===== MUTE LISTENERS ===== */
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('[data-kmute],[data-unmute]') : null;
+    if (!a) return;
+    var uid = a.getAttribute('data-kmute') || a.getAttribute('data-unmute');
+    if (a.hasAttribute('data-kmute')) { try { closeKb(); } catch (e2) {} }
+    muToggle(uid);
+  });
+  (function muBoot(){
+    var n = 0;
+    var t = setInterval(function(){
+      n++;
+      if (typeof me !== 'undefined' && me && me.id) { clearInterval(t); muLoad(); }
+      else if (n > 60) clearInterval(t);
+    }, 500);
+  })();
+  /* ===== /MUTE LISTENERS ===== */
+  /* ===== NOTIFICATION LISTENERS ===== */
+  document.addEventListener('click', function(e){
+    var tg = e.target;
+    if (!tg || !tg.closest) return;
+    if (tg.closest('#ntBtn')) {
+      if (!me) { goLogin(); return; }
+      var top = stack[stack.length - 1];
+      if (!(top && top.v === 'notifs')) go({ v:'notifs' });
+      return;
+    }
+    var row = tg.closest('[data-nt]');
+    if (row) { ntOpen(row); return; }
+    if (tg.closest('[data-ntclear]')) ntClear();
+  });
+  document.addEventListener('change', function(e){
+    var t = e.target;
+    if (t && t.getAttribute && t.getAttribute('data-ntp')) ntSetPref(t.getAttribute('data-ntp'), t.checked, t);
+  });
+  (function ntBoot(){
+    var n = 0;
+    var t = setInterval(function(){
+      n++;
+      if (typeof me !== 'undefined' && me && me.id) {
+        clearInterval(t);
+        ntRefresh();
+        setInterval(function(){ if (!document.hidden) ntRefresh(); }, 60000);
+      } else if (n > 60) clearInterval(t);
+    }, 500);
+  })();
+  /* ===== /NOTIFICATION LISTENERS ===== */
+  /* ===== DELETE PROFILE LISTENERS ===== */
+  $('#dpIn').addEventListener('input', dpCheck);
+  $('#dpGo').addEventListener('click', doDelProfile);
+  $('#dpCancel').addEventListener('click', function(){ if (!DP.busy) $('#dpBg').classList.remove('show'); });
+  $('#dpBg').addEventListener('click', function(e){ if (e.target.id === 'dpBg' && !DP.busy) $('#dpBg').classList.remove('show'); });
+  /* ===== /DELETE PROFILE LISTENERS ===== */
   $('#kbCancel').addEventListener('click', closeKb);
   $('#aiFab').addEventListener('click', openAi);
   $('#aiHdr').addEventListener('click', openAi);
@@ -1955,6 +2250,328 @@
   /* ===== DEMOS SAFETY (JS) ===== */
   function needsTerms(){ return !!(me && myProfile && !myProfile.terms_accepted_at); }
   function suspended(){ return !!(myMod && myMod.suspended); }
+  function openAbout(){ $('#abBg').classList.add('show'); }
+  /* ===== COMMENT POLICY ===== */
+  function openCmSet(){
+    var cur = (myProfile && myProfile.comment_policy) || 'everyone';
+    document.querySelectorAll('#cmpBg [data-cmp]').forEach(function(b){ b.className = 'dm-btn ' + (b.getAttribute('data-cmp') === cur ? 'pri' : 'sec'); });
+    $('#cmpBg').classList.add('show');
+  }
+  async function setCmPolicy(v){
+    if (!me || !myProfile) return;
+    var r = await DB.from('demos_profiles').update({ comment_policy: v }).eq('user_id', me.id);
+    if (r.error) { toast('Could not save'); return; }
+    myProfile.comment_policy = v;
+    try { var cv = stack[stack.length - 1]; if (cv && cv.v === 'settings') showSettings(); } catch(e){}
+    $('#cmpBg').classList.remove('show');
+    toast('Saved');
+  }
+  async function cmBlockReason(kind, id, owner){
+    try {
+      if (!owner || !me || owner === me.id) return '';
+      var pr = await DB.from('demos_profiles').select('comment_policy').eq('user_id', owner).maybeSingle();
+      var pol = (pr && pr.data && pr.data.comment_policy) || 'everyone';
+      if (pol === 'nobody') return 'Comments are turned off for this post.';
+      if (pol === 'followers') {
+        var f = await DB.from('demos_follows').select('status').eq('follower_id', me.id).eq('following_id', owner).maybeSingle();
+        if (!(f && f.data && f.data.status === 'accepted')) return 'Only followers can comment on this post.';
+      }
+    } catch (e) {}
+    return '';
+  }
+  /* ===== /COMMENT POLICY ===== */
+  /* ===== RATING POLICY ===== */
+  function openRtSet(){
+    var cur = (myProfile && myProfile.rating_policy) || 'everyone';
+    document.querySelectorAll('#rtpBg [data-rtp]').forEach(function(b){ b.className = 'dm-btn ' + (b.getAttribute('data-rtp') === cur ? 'pri' : 'sec'); });
+    $('#rtpBg').classList.add('show');
+  }
+  async function setRtPolicy(v){
+    if (!me || !myProfile) return;
+    var r = await DB.from('demos_profiles').update({ rating_policy: v }).eq('user_id', me.id);
+    if (r.error) { toast('Could not save'); return; }
+    myProfile.rating_policy = v;
+    try { var cv = stack[stack.length - 1]; if (cv && cv.v === 'settings') showSettings(); } catch(e){}
+    $('#rtpBg').classList.remove('show');
+    toast('Saved');
+  }
+  async function rtBlockReason(kind, id){
+    try {
+      if (!me) return '';
+      var owner = null;
+      if (kind === 'profile') owner = id;
+      else {
+        var tb = ({ dwall:'demos_dwall', dreels:'demos_dreels', dlooks:'demos_dlooks' })[kind];
+        if (!tb) return '';
+        var o = await DB.from(tb).select('user_id').eq('id', id).maybeSingle();
+        owner = o && o.data && o.data.user_id;
+      }
+      if (!owner || owner === me.id) return '';
+      var pr = await DB.from('demos_profiles').select('rating_policy').eq('user_id', owner).maybeSingle();
+      var pol = (pr && pr.data && pr.data.rating_policy) || 'everyone';
+      if (pol === 'nobody') return 'Rating is turned off for this.';
+      if (pol === 'followers') {
+        var f = await DB.from('demos_follows').select('status').eq('follower_id', me.id).eq('following_id', owner).maybeSingle();
+        if (!(f && f.data && f.data.status === 'accepted')) return 'Only followers can rate this.';
+      }
+    } catch (e) {}
+    return '';
+  }
+  /* ===== /RATING POLICY ===== */
+  /* ===== HIDDEN WORDS ===== */
+  var HW = { list: [] };
+  async function hwLoad(){
+    try {
+      if (!me) { HW.list = []; return; }
+      var r = await DB.from('demos_hidden_words').select('id,word').eq('user_id', me.id).order('created_at', { ascending:false });
+      if (!r.error) HW.list = r.data || [];
+    } catch (e) {}
+  }
+  function hwHit(t){
+    try {
+      if (!HW.list.length || !t) return false;
+      var low = String(t).toLowerCase();
+      for (var i = 0; i < HW.list.length; i++) {
+        var w = String(HW.list[i].word || '').toLowerCase().trim();
+        if (w && low.indexOf(w) !== -1) return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+  function hwMask(t){
+    return hwHit(t) ? '<span class="dm-hw" data-hwr="' + esc(t) + '" style="opacity:.6;font-style:italic;cursor:pointer">Hidden word · tap to view</span>' : esc(t);
+  }
+  function hwInbox(t){
+    return hwHit(t) ? '<i style="opacity:.6">Message hidden</i>' : esc(t);
+  }
+  async function showHidden(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Hidden words';
+    if (!me) { goLogin(); return; }
+    await hwLoad();
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'hidden') return;
+    el.innerHTML =
+      '<div class="dm-ssec">Hide comments and messages containing</div>' +
+      '<div class="dm-sgrp" style="padding:12px;display:flex;gap:8px"><input id="hwIn" maxlength="40" placeholder="Add a word or phrase" autocomplete="off" style="flex:1;min-width:0;padding:10px 12px;border:1px solid rgba(0,0,0,.18);border-radius:10px;font-size:15px;background:transparent;color:inherit"><button class="dm-btn pri" data-hwadd="1">Add</button></div>' +
+      (HW.list.length
+        ? '<div class="dm-ssec">Your hidden words</div><div class="dm-sgrp">' + HW.list.map(function(x){
+            return '<div class="dm-brow"><div class="dm-bnm"><div class="dm-name">' + esc(x.word) + '</div></div><button class="dm-btn sec" data-hwdel="' + esc(x.id) + '">Remove</button></div>';
+          }).join('') + '</div>'
+        : '<div class="dm-empty">No hidden words yet.</div>') +
+      '<div class="dm-time" style="padding:8px 14px">Only you see this. Matching comments show as hidden (tap to view) and messages are hidden in your inbox. Case is ignored.</div>';
+  }
+  async function hwAdd(){
+    var inp = $('#hwIn');
+    if (!inp || !me) return;
+    var w = inp.value.trim().split(' ').filter(Boolean).join(' ');
+    if (!w) { toast('Type a word first'); return; }
+    if (w.length > 40) { toast('Up to 40 characters'); return; }
+    if (HW.list.length >= 50) { toast('You can hide up to 50 words'); return; }
+    var r = await DB.from('demos_hidden_words').insert({ user_id: me.id, word: w });
+    if (r.error) { toast(r.error.code === '23505' ? 'Already added' : 'Could not add'); return; }
+    toast('Added');
+    showHidden();
+  }
+  async function hwDel(id){
+    if (!me || !id) return;
+    var r = await DB.from('demos_hidden_words').delete().eq('id', id).eq('user_id', me.id);
+    if (r.error) { toast('Could not remove'); return; }
+    toast('Removed');
+    showHidden();
+  }
+  /* ===== /HIDDEN WORDS ===== */
+  /* ===== MUTED ACCOUNTS ===== */
+  var MU = {};
+  async function muLoad(){
+    try {
+      if (!me) { MU = {}; return; }
+      var r = await DB.from('demos_mutes').select('muted_id').eq('muter_id', me.id);
+      if (!r.error) { MU = {}; (r.data || []).forEach(function(x){ MU[x.muted_id] = true; }); }
+    } catch (e) {}
+  }
+  async function muToggle(uid){
+    if (!me) { goLogin(); return; }
+    if (!uid || uid === me.id) return;
+    var was = !!MU[uid];
+    var r = was
+      ? await DB.from('demos_mutes').delete().eq('muter_id', me.id).eq('muted_id', uid)
+      : await DB.from('demos_mutes').insert({ muter_id: me.id, muted_id: uid });
+    if (r.error && r.error.code !== '23505') { toast('Could not ' + (was ? 'unmute' : 'mute')); return; }
+    if (was) delete MU[uid]; else MU[uid] = true;
+    toast(was ? 'Unmuted' : 'Muted. They will not be told.');
+    feedDirty = true;
+    try {
+      var cv = stack[stack.length - 1];
+      if (cv && cv.v === 'muted') showMuted(); else refreshView();
+    } catch (e) {}
+  }
+  async function showMuted(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Muted accounts';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var r = await DB.from('demos_mutes').select('muted_id, created_at').eq('muter_id', me.id).order('created_at', { ascending:false });
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'muted') return;
+    if (r.error) { el.innerHTML = '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+    var ids = (r.data || []).map(function(x){ return x.muted_id; });
+    MU = {}; ids.forEach(function(i){ MU[i] = true; });
+    if (!ids.length) { el.innerHTML = '<div class="dm-empty">You have not muted anyone.<br>Use ⋮ on a post or the profile page to mute.</div>'; return; }
+    var pr = await DB.from('demos_profiles').select('*').in('user_id', ids);
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'muted') return;
+    var byId = {};
+    ((pr && pr.data) || []).forEach(function(q){ byId[q.user_id] = q; });
+    el.innerHTML = '<div class="dm-ssec">People you muted</div><div class="dm-sgrp">' + ids.map(function(id){
+      var q = byId[id] || {}, nm = q.display_name || q.username || 'User';
+      return '<div class="dm-brow"><div class="dm-av">' + avInner(q, nm) + '</div><div class="dm-bnm"><div class="dm-name">' + esc(nm) + '</div><div class="dm-time">' + (q.username ? '@' + esc(q.username) : '') + '</div></div><button class="dm-btn sec" data-unmute="' + esc(id) + '">Unmute</button></div>';
+    }).join('') + '</div><div class="dm-time" style="padding:8px 14px">Their posts are hidden from your feed. They are not told. You can still visit their profile.</div>';
+  }
+  /* ===== /MUTED ACCOUNTS ===== */
+  /* ===== NOTIFICATIONS ===== */
+  function ntSetCount(n){
+    var b = $('#ntN');
+    if (!b) return;
+    n = Number(n) || 0;
+    b.textContent = n > 99 ? '99+' : String(n);
+    b.style.display = n > 0 ? '' : 'none';
+  }
+  async function ntRefresh(){
+    try {
+      if (!me) { ntSetCount(0); return; }
+      var r = await DB.from('demos_notifications').select('id', { count:'exact', head:true }).eq('receiver_id', me.id).is('read_at', null);
+      if (!r.error) ntSetCount(r.count || 0);
+    } catch (e) {}
+  }
+  function ntText(x){
+    var m = x.meta || {}, tt = x.target_type;
+    if (x.type === 'follow') return 'started following you';
+    if (x.type === 'follow_request') return 'requested to follow you';
+    if (x.type === 'follow_accepted') return 'accepted your follow request';
+    if (x.type === 'message') return 'sent you a message';
+    if (x.type === 'comment') return 'commented on your post' + (m.snippet ? ': “' + hwMask(m.snippet) + '”' : '');
+    if (x.type === 'rating') {
+      var st = Number(m.stars) || 0;
+      return 'rated ' + (tt === 'profile' ? 'you' : (tt === 'dlooks' ? 'your Dlook' : 'your post')) + ' ' + st + ' ★';
+    }
+    return 'sent you a notification';
+  }
+  function ntOpen(el){
+    var t = el.getAttribute('data-nty'), a = el.getAttribute('data-nta');
+    var tt = el.getAttribute('data-ntt'), ti = el.getAttribute('data-nti');
+    if (t === 'message') { openChat(a); return; }
+    if (t === 'comment' || t === 'rating') {
+      if (tt === 'dwall' || tt === 'dreels') { go({ v:'post', kind: tt, id: ti }); return; }
+      openProfile(me.id); return;
+    }
+    if (t === 'follow_request') { openProfile(me.id); return; }
+    openProfile(a);
+  }
+  async function showNotifs(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Notifications';
+    if (!me) { goLogin(); return; }
+    el.innerHTML = '<div class="dm-empty">Loading…</div>';
+    var r = await DB.from('demos_notifications').select('*').eq('receiver_id', me.id).order('created_at', { ascending:false }).limit(60);
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'notifs') return;
+    if (r.error) { el.innerHTML = '<div class="dm-empty">Could not load. Please try again.</div>'; return; }
+    var rows = r.data || [];
+    if (!rows.length) { el.innerHTML = '<div class="dm-empty">No notifications yet.</div>'; ntSetCount(0); return; }
+    var seen = {}, ids = [];
+    rows.forEach(function(x){ if (!seen[x.actor_id]) { seen[x.actor_id] = true; ids.push(x.actor_id); } });
+    var pr = await DB.from('demos_profiles').select('*').in('user_id', ids);
+    cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'notifs') return;
+    var byId = {};
+    ((pr && pr.data) || []).forEach(function(q){ byId[q.user_id] = q; });
+    el.innerHTML = '<div class="dm-sgrp">' + rows.map(function(x){
+      var q = byId[x.actor_id] || {}, nm = q.display_name || q.username || 'Someone';
+      return '<div class="dm-brow" data-nt="' + esc(x.id) + '" data-nty="' + esc(x.type) + '" data-nta="' + esc(x.actor_id) + '" data-ntt="' + esc(x.target_type || '') + '" data-nti="' + esc(x.target_id || '') + '" style="cursor:pointer' + (x.read_at ? '' : ';background:rgba(196,98,59,.08)') + '"><div class="dm-av">' + avInner(q, nm) + '</div><div class="dm-bnm"><div class="dm-name">' + esc(nm) + ' <span style="font-weight:400">' + ntText(x) + '</span></div><div class="dm-time">' + esc(ago(x.created_at)) + '</div></div></div>';
+    }).join('') + '</div><div style="padding:12px 14px"><button class="dm-btn sec" data-ntclear="1">Clear all</button></div>';
+    if (rows.some(function(x){ return !x.read_at; })) {
+      DB.from('demos_notifications').update({ read_at: new Date().toISOString() }).eq('receiver_id', me.id).is('read_at', null).then(function(){ ntSetCount(0); });
+    }
+  }
+  async function ntClear(){
+    if (!me) return;
+    if (!confirm('Clear all notifications?')) return;
+    var r = await DB.from('demos_notifications').delete().eq('receiver_id', me.id);
+    if (r.error) { toast('Could not clear'); return; }
+    ntSetCount(0);
+    showNotifs();
+  }
+  async function showNotifSet(){
+    var el = $('#vMsg');
+    $('#topTitle').textContent = 'Notifications';
+    if (!me) { goLogin(); return; }
+    var r = await DB.from('demos_profiles').select('notif_prefs').eq('user_id', me.id).maybeSingle();
+    var cv = stack[stack.length - 1];
+    if (!cv || cv.v !== 'notifset') return;
+    var pf = (r && r.data && r.data.notif_prefs) || {};
+    if (myProfile) myProfile.notif_prefs = pf;
+    function tg(key, ic, lb){
+      return '<label class="dm-srow"><span class="dm-sic">' + ic + '</span><span class="dm-slb">' + lb + '</span><input type="checkbox" data-ntp="' + key + '"' + (pf[key] !== false ? ' checked' : '') + ' style="width:22px;height:22px"></label>';
+    }
+    el.innerHTML = '<div class="dm-ssec">Notify me about</div><div class="dm-sgrp">' +
+      tg('follows', '👥', 'Follows and follow requests') +
+      tg('comments', '💬', 'Comments on my posts') +
+      tg('ratings', '⭐', 'Ratings') +
+      tg('messages', '✉️', 'New messages') +
+      '</div><div class="dm-time" style="padding:8px 14px">Applies to new activity. Blocked and muted accounts never notify you.</div>';
+  }
+  async function ntSetPref(key, on, el){
+    if (!me) return;
+    var pf = Object.assign({}, (myProfile && myProfile.notif_prefs) || {});
+    pf[key] = !!on;
+    var r = await DB.from('demos_profiles').update({ notif_prefs: pf }).eq('user_id', me.id);
+    if (r.error) { toast('Could not save'); try { el.checked = !on; } catch (e) {} return; }
+    if (myProfile) myProfile.notif_prefs = pf;
+    toast('Saved');
+  }
+  /* ===== /NOTIFICATIONS ===== */
+  /* ===== DELETE PROFILE ===== */
+  var DP = { busy:false };
+  function openDelProfile(){
+    if (!me) { goLogin(); return; }
+    $('#dpIn').value = '';
+    $('#dpGo').disabled = true;
+    $('#dpGo').style.opacity = '.5';
+    $('#dpBg').classList.add('show');
+  }
+  function dpCheck(){
+    var ok = (($('#dpIn').value || '').trim() === 'DELETE') && !DP.busy;
+    $('#dpGo').disabled = !ok;
+    $('#dpGo').style.opacity = ok ? '1' : '.5';
+  }
+  async function doDelProfile(){
+    if (DP.busy || !me) return;
+    if (($('#dpIn').value || '').trim() !== 'DELETE') { toast('Type DELETE to confirm'); return; }
+    DP.busy = true; dpCheck();
+    var uid = me.id;
+    var r = await DB.rpc('demos_delete_my_profile');
+    if (r.error) {
+      DP.busy = false; dpCheck();
+      var m = String(r.error.message || '');
+      if (m.indexOf('admin_cannot_delete') !== -1) toast('Admin accounts cannot be deleted here.');
+      else if (m.indexOf('suspended_cannot_delete') !== -1) toast('Your account is suspended, so it cannot be deleted right now.');
+      else toast('Could not delete. Please try again.');
+      return;
+    }
+    var left = 0, buckets = ['demos-media', 'demos-quarantine'];
+    for (var i = 0; i < buckets.length; i++) {
+      try {
+        var l = await DB.storage.from(buckets[i]).list(uid, { limit: 1000 });
+        var names = ((l && l.data) || []).filter(function(f){ return f && f.id && f.name; }).map(function(f){ return uid + '/' + f.name; });
+        if (names.length) { var d = await DB.storage.from(buckets[i]).remove(names); if (d.error) left++; }
+      } catch (e) { left++; }
+    }
+    try { $('#dpBg').classList.remove('show'); } catch (e) {}
+    toast(left ? 'Profile deleted. Some files could not be removed.' : 'Your Demos profile was deleted.');
+    setTimeout(function(){ try { location.reload(); } catch (e) {} }, 1400);
+  }
+  /* ===== /DELETE PROFILE ===== */
   function openRules(){ $('#ruBg').classList.add('show'); }
   async function acceptRules(){
     if (me && myProfile && !myProfile.terms_accepted_at) {
