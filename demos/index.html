@@ -2873,8 +2873,8 @@
       var L = 1000;
       var res = await Promise.all([
         get('profile', function(){ return DB.from('demos_profiles').select('*').eq('user_id', uid).maybeSingle(); }, null),
-        get('dwall', function(){ return DB.from('demos_dwall').select('id,body,media_url,status,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
-        get('dreels', function(){ return DB.from('demos_dreels').select('id,caption,video_url,thumbnail_url,status,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('dwall', function(){ return DB.from('demos_dwall').select('id,body,media_url,status,archived,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('dreels', function(){ return DB.from('demos_dreels').select('id,caption,video_url,thumbnail_url,status,archived,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
         get('dlooks', function(){ return DB.from('demos_dlooks').select('id,caption,media_url,media_type,status,created_at,expires_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
         get('comments', function(){ return DB.from('demos_comments').select('target_type,target_id,body,status,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
         get('ratings', function(){ return DB.from('demos_reviews').select('target_type,target_id,stars,created_at,updated_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
@@ -2883,7 +2883,10 @@
         get('blocked', function(){ return DB.from('demos_blocks').select('blocked_id,created_at').eq('blocker_id', uid).limit(L); }, []),
         get('muted', function(){ return DB.from('demos_mutes').select('muted_id,created_at').eq('muter_id', uid).limit(L); }, []),
         get('hidden_words', function(){ return DB.from('demos_hidden_words').select('word,created_at').eq('user_id', uid).limit(L); }, []),
-        get('messages_sent', function(){ return DB.from('demos_messages').select('recipient_id,body,status,created_at').eq('sender_id', uid).order('created_at', { ascending:false }).limit(L); }, [])
+        get('messages_sent', function(){ return DB.from('demos_messages').select('recipient_id,body,status,created_at').eq('sender_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('restricted', function(){ return DB.from('demos_restricts').select('restricted_id,created_at').eq('restrictor_id', uid).limit(L); }, []),
+        get('saved', function(){ return DB.from('demos_saves').select('target_type,target_id,created_at').eq('user_id', uid).order('created_at', { ascending:false }).limit(L); }, []),
+        get('favorites', function(){ return DB.from('demos_favorites').select('favorite_id,created_at').eq('user_id', uid).limit(L); }, [])
       ]);
       var ids = [];
       res[6].forEach(function(x){ ids.push(x.follower_id); });
@@ -2891,6 +2894,8 @@
       res[8].forEach(function(x){ ids.push(x.blocked_id); });
       res[9].forEach(function(x){ ids.push(x.muted_id); });
       res[11].forEach(function(x){ ids.push(x.recipient_id); });
+      res[12].forEach(function(x){ ids.push(x.restricted_id); });
+      res[14].forEach(function(x){ ids.push(x.favorite_id); });
       res[5].forEach(function(x){ if (x.target_type === 'profile') ids.push(x.target_id); });
       var nm = await dlNames(ids);
       function who(id){ return nm[id] ? { username: nm[id].username, name: nm[id].name } : { unavailable: true }; }
@@ -2909,6 +2914,9 @@
         muted: res[9].map(function(x){ return { user: who(x.muted_id), since: x.created_at }; }),
         hidden_words: res[10],
         messages_sent: res[11].map(function(x){ return { to: who(x.recipient_id), body: x.body, status: x.status, created_at: x.created_at }; }),
+        restricted: res[12].map(function(x){ return { user: who(x.restricted_id), since: x.created_at }; }),
+        saved: res[13].map(function(x){ return { target_type: x.target_type, target: { id: x.target_id }, saved_at: x.created_at }; }),
+        favorites: res[14].map(function(x){ return { user: who(x.favorite_id), since: x.created_at }; }),
         errors: errs
       };
       var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
