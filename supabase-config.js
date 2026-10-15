@@ -12,41 +12,23 @@ async function getProfile() {
   return data
 }
 
-async function addCoins(amount, type, description) {
-  const { data: { user } } = await db.auth.getUser()
-  if (!user) return
-  const profile = await getProfile()
-  await db.from('profiles').update({
-    emo_coins: (profile.emo_coins || 0) + amount,
-    earned_today: (profile.earned_today || 0) + amount
-  }).eq('id', user.id)
-  await db.from('emo_transactions').insert({
-    user_id: user.id,
-    amount,
-    type,
-    description
-  })
+async function earnCoins(kind, ref) {
+  const { data, error } = await db.rpc('earn_coins', { p_kind: kind, p_ref: ref || null })
+  if (error) { console.error('earnCoins error:', error); return { awarded: 0, error: error.message } }
+  return data
+}
+
+// Disabled: coins are now awarded only by the server (earn_coins)
+async function addCoins() {
+  console.warn('addCoins is disabled, use earnCoins(kind, ref)')
+  return { awarded: 0 }
 }
 
 async function claimDailyLogin() {
   const { data: { user } } = await db.auth.getUser()
   if (!user) return { error: 'Not logged in' }
-  const profile = await getProfile()
-  if (!profile) return { error: 'Profile not found' }
-  const today = new Date().toISOString().split('T')[0]
-  if (profile.last_login === today) return { error: 'Already claimed' }
-  const newStreak = (profile.streak_days || 0) + 1
-  const bonus = newStreak >= 7 ? 3 : 1
-  await db.from('profiles').update({
-    last_login: today,
-    streak_days: newStreak,
-    emo_coins: (profile.emo_coins || 0) + bonus
-  }).eq('id', user.id)
-  await db.from('emo_transactions').insert({
-    user_id: user.id,
-    amount: bonus,
-    type: 'daily_login',
-    description: `Day ${newStreak} streak bonus`
-  })
-  return { coins: bonus, streak: newStreak }
+  const res = await earnCoins('daily_login')
+  if (res.error) return { error: res.error }
+  if (!res.awarded) return { error: 'Already claimed' }
+  return { coins: res.awarded, streak: res.streak }
 }

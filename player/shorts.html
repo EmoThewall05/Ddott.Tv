@@ -170,7 +170,10 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 async function persistLikeCount(videoId, newCount) {
-    try { await sb.from('videos').update({ likes: newCount }).eq('id', videoId); }
+    // the server keeps the real count, the page only reports liked / not liked
+    const v = drottsData.find(x => x.id === videoId);
+    const base = v ? (v.likes || 0) : 0;
+    try { await sb.rpc('set_video_reaction', { p_video_id: videoId, p_reaction: newCount > base ? 1 : 0 }); }
     catch (e) { console.warn('Like persist failed:', e); }
 }
 
@@ -521,10 +524,12 @@ function triggerSuperLike(element, x, y, isSplit) {
         coinCountEl.textContent = emoCoins.toLocaleString();
         if (navigator.vibrate) navigator.vibrate([50,30,50,30,100]);
 
-        // Supabase sync
+        // Supabase sync (server decides the reward)
         if (currentUserId) {
-            sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({ data }) => {
-                if (data) sb.from('profiles').update({ emo_coins: (data.emo_coins||0) + 1 }).eq('id', currentUserId).then(()=>sb.from('profiles').select('emo_coins').eq('id', currentUserId).single().then(({data:d})=>{if(d){emoCoins=d.emo_coins;coinCountEl.textContent=emoCoins.toLocaleString();}}));
+            sb.rpc('earn_coins', { p_kind: 'super_like', p_ref: s.id }).then(({ data }) => {
+                if (data && data.balance != null) emoCoins = data.balance;
+                else emoCoins = Math.max(0, emoCoins - 1);
+                coinCountEl.textContent = emoCoins.toLocaleString();
             });
         }
     } else {

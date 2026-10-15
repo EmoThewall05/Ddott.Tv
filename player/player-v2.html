@@ -1034,14 +1034,12 @@
     async function incrementViewCount() {
         if (viewCounted || !currentVideoId) return;
         viewCounted = true;
+        if (!currentUser) return;
         try {
-            const { data, error } = await db.from('videos').select('views').eq('id', currentVideoId).single();
-            if (error || !data) return;
-            const newViews = (data.views || 0) + 1;
-            const { error: updErr } = await db.from('videos').update({ views: newViews }).eq('id', currentVideoId);
-            if (!updErr) document.getElementById('viewCount').textContent = newViews + ' views';
+            const { data, error } = await db.rpc('register_view', { p_video_id: currentVideoId });
+            if (!error && data != null) document.getElementById('viewCount').textContent = data + ' views';
         } catch (e) {
-            console.error('View increment failed:', e);
+            console.error('View register failed:', e);
         }
     }
 
@@ -1251,7 +1249,7 @@
         const pool = buildVideoQuestionPool();
         const quiz = pickUnaskedQuestion(pool, currentVideoId || 'unknown');
         renderQuiz(quiz, async () => {
-            await creditCoins(10, 'video watch');
+            return await creditCoins('video_watch', currentVideoId, 'video watch');
         });
     }
 
@@ -1273,11 +1271,11 @@
         const quiz = pool[Math.floor(Math.random() * pool.length)];
         renderQuiz(quiz, async () => {
             const tier = (activeAd.tier || 'normal').toLowerCase();
-            const reward = AD_TIER_REWARDS[tier] ?? AD_TIER_REWARDS.normal;
-            await creditCoins(reward, 'ad watch (' + tier + ')');
+            const ok = await creditCoins('ad_watch', activeAd.id, 'ad watch (' + tier + ')');
             if (tier === 'share') {
                 document.getElementById('shareAdBtn').classList.add('visible');
             }
+            return ok;
         }, () => {
             // after quiz closes (pass or fail), go on to the main content video
             loadVideo();
@@ -1358,26 +1356,18 @@
         }
     }
 
-    async function creditCoins(amount, reason) {
+    async function creditCoins(kind, ref, reason) {
         if (!currentUser) return false;
         try {
-            const { data: profile, error: fetchErr } = await db
-                .from('profiles')
-                .select('emo_coins')
-                .eq('id', currentUser.id)
-                .single();
-            if (fetchErr) throw fetchErr;
-
-            const newBalance = (profile?.emo_coins || 0) + amount;
-            const { error: updateErr } = await db
-                .from('profiles')
-                .update({ emo_coins: newBalance })
-                .eq('id', currentUser.id);
-            if (updateErr) throw updateErr;
-
-            window.__userCoins = newBalance;
-            console.log('🪙 +' + amount + ' coins credited for: ' + reason);
-            return true;
+            const { data, error } = await db.rpc('earn_coins', { p_kind: kind, p_ref: ref || null });
+            if (error) throw error;
+            if (data && data.awarded > 0) {
+                window.__userCoins = data.balance;
+                console.log('🪙 +' + data.awarded + ' coins credited for: ' + reason);
+                return true;
+            }
+            console.log('No coins for ' + reason + ':', data && data.reason);
+            return false;
         } catch (e) {
             console.error('Coin credit failed (' + reason + '):', e);
             return false;
@@ -1406,10 +1396,10 @@
         }
 
         try {
-            if (quizOnClaim) await quizOnClaim();
+            const awarded = quizOnClaim ? await quizOnClaim() : true;
             localStorage.setItem(claimKey, '1');
             quizCoinsClaimed = true;
-            document.getElementById('quizResult').textContent = '🎉 Emo Coins added to your wallet!';
+            document.getElementById('quizResult').textContent = awarded === false ? 'ℹ️ No coins this time (already claimed or daily limit reached).' : '🎉 Emo Coins added to your wallet!';
             earnBtn.classList.remove('visible');
             if (!(playerMode === 'ad' && (activeAd?.tier || '').toLowerCase() === 'share')) {
                 setTimeout(closeQuiz, 1500);
@@ -1433,8 +1423,7 @@
                 await navigator.clipboard.writeText(window.location.href);
                 showToast('Link copied — share it anywhere!');
             }
-            await creditCoins(AD_SHARE_BONUS, 'ad share bonus');
-            document.getElementById('quizResult').textContent = '🎉 Ad shared! Bonus coins added.';
+            document.getElementById('quizResult').textContent = '🎉 Ad shared! Thanks for spreading the word.';
             document.getElementById('shareAdBtn').classList.remove('visible');
             setTimeout(closeQuiz, 1200);
         } catch (e) {
@@ -1740,6 +1729,7 @@
     let dislikeCountVal = 0;
 
     async function toggleLike() {
+        if (!currentUser) { showToast('⚠️ Login to like'); return; }
         const btn = document.getElementById('likeBtn');
         const disBtn = document.getElementById('dislikeBtn');
 
@@ -1764,12 +1754,20 @@
         if (currentVideoId) {
             localStorage.setItem('liked_' + currentVideoId, liked ? '1' : '0');
             localStorage.setItem('disliked_' + currentVideoId, disliked ? '1' : '0');
-            db.rpc('update_video_reaction', { p_video_id: currentVideoId, p_likes: likeCountVal, p_dislikes: dislikeCountVal })
-                .then(({ error }) => { if (error) console.error('Like update failed:', error); });
+            db.rpc('set_video_reaction', { p_video_id: currentVideoId, p_reaction: liked ? 1 : (disliked ? -1 : 0) })
+                .then(({ data, error }) => {
+                    if (error) { console.error('Reaction update failed:', error); return; }
+                    if (data) {
+                        likeCountVal = data.likes; dislikeCountVal = data.dislikes;
+                        document.getElementById('likeCount').textContent = likeCountVal;
+                        document.getElementById('dislikeCount').textContent = dislikeCountVal;
+                    }
+                });
         }
     }
 
     async function toggleDislike() {
+        if (!currentUser) { showToast('⚠️ Login to react'); return; }
         const btn = document.getElementById('dislikeBtn');
         const likeBtn = document.getElementById('likeBtn');
 
@@ -1794,8 +1792,15 @@
         if (currentVideoId) {
             localStorage.setItem('liked_' + currentVideoId, liked ? '1' : '0');
             localStorage.setItem('disliked_' + currentVideoId, disliked ? '1' : '0');
-            db.rpc('update_video_reaction', { p_video_id: currentVideoId, p_likes: likeCountVal, p_dislikes: dislikeCountVal })
-                .then(({ error }) => { if (error) console.error('Dislike update failed:', error); });
+            db.rpc('set_video_reaction', { p_video_id: currentVideoId, p_reaction: liked ? 1 : (disliked ? -1 : 0) })
+                .then(({ data, error }) => {
+                    if (error) { console.error('Reaction update failed:', error); return; }
+                    if (data) {
+                        likeCountVal = data.likes; dislikeCountVal = data.dislikes;
+                        document.getElementById('likeCount').textContent = likeCountVal;
+                        document.getElementById('dislikeCount').textContent = dislikeCountVal;
+                    }
+                });
         }
     }
 

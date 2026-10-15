@@ -537,7 +537,7 @@ async function publishVideo() {
     const { data: { user } } = await db.auth.getUser();
     if (!user) throw new Error('Not logged in');
 
-    const { error } = await db.from('videos').insert({
+    const { data: newVideo, error } = await db.from('videos').insert({
       user_id: user.id,
       creator_id: user.id,
       title: title,
@@ -551,12 +551,12 @@ async function publishVideo() {
       is_short: isShort,
       short_coins_multiplier: isShort ? 3 : 1,
       tags: tags
-    });
+    }).select('id').single();
 
     if (error) throw error;
 
-    // Award upload coins
-    await addCoins(50, 'upload_reward', 'Video uploaded: ' + title);
+    // Award upload coins (server decides the amount)
+    await earnCoins('upload', newVideo.id);
 
     statusMsg.style.color = '#00ff88';
     statusMsg.textContent = isShort ? '✅ Short published! 1x Emo Coins active 🔥' : '✅ Video published!';
