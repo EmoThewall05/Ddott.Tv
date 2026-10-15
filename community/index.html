@@ -169,6 +169,43 @@
   .neon-div { height:1px; background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent); margin:14px 0; opacity:0.2; }
   ::-webkit-scrollbar { width:3px; }
   ::-webkit-scrollbar-thumb { background:var(--purple); border-radius:4px; }
+
+  /* ===== WEEKLY COMPETITIONS ===== */
+  .cp-card { border-radius:14px; padding:14px; margin-bottom:12px; background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(180,0,255,0.08)); border:1px solid rgba(255,215,0,0.2); animation:fadeUp 0.4s ease both; }
+  .cp-head { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px; }
+  .cp-title { font-family:'Orbitron',monospace; font-size:12px; font-weight:700; color:#fff; letter-spacing:0.5px; }
+  .cp-timer { font-family:'Orbitron',monospace; font-size:9px; color:var(--gold); white-space:nowrap; padding:3px 8px; border-radius:10px; background:rgba(0,0,0,0.4); }
+  .cp-desc { font-size:12px; color:var(--muted); line-height:1.4; margin-bottom:10px; }
+  .cp-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:10px; }
+  .cp-stat { text-align:center; padding:8px 4px; border-radius:10px; background:rgba(0,0,0,0.35); }
+  .cp-stat b { display:block; font-family:'Orbitron',monospace; font-size:14px; color:var(--gold); }
+  .cp-stat span { font-size:9px; color:var(--muted); letter-spacing:1px; }
+  .cp-prizes { text-align:center; font-size:12px; color:var(--text); margin-bottom:10px; }
+  .cp-actions { display:flex; gap:8px; }
+  .cp-btn { flex:1; padding:11px 8px; border-radius:10px; border:none; font-family:'Orbitron',monospace; font-size:10px; font-weight:900; letter-spacing:1px; cursor:pointer; }
+  .cp-btn.primary { background:linear-gradient(135deg,var(--gold),var(--orange)); color:#1a0f00; }
+  .cp-btn.ghost { background:rgba(0,245,255,0.08); border:1px solid rgba(0,245,255,0.3); color:var(--cyan); }
+  .cp-btn:disabled { opacity:0.5; }
+  .cp-note { font-size:10px; color:var(--muted); margin-top:8px; line-height:1.4; text-align:center; }
+  .cp-winners { border-radius:14px; padding:12px; margin-bottom:12px; background:var(--surface); border:1px solid rgba(0,245,255,0.08); }
+  .cp-winners-title { font-family:'Orbitron',monospace; font-size:10px; color:var(--cyan); letter-spacing:1px; margin-bottom:8px; }
+  .cp-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+  .cp-row:last-child { border-bottom:none; }
+  .cp-rank { width:26px; text-align:center; font-family:'Orbitron',monospace; font-size:13px; flex-shrink:0; }
+  .cp-ava { width:32px; height:32px; border-radius:50%; background:var(--surface3); object-fit:cover; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .cp-who { flex:1; min-width:0; }
+  .cp-name { font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cp-sub { font-size:10px; color:var(--muted); }
+  .cp-score { font-family:'Orbitron',monospace; font-size:11px; color:var(--gold); text-align:right; flex-shrink:0; }
+  .cp-watch { font-size:10px; color:var(--cyan); cursor:pointer; margin-right:2px; }
+  .cp-stars { display:flex; gap:2px; margin-top:3px; }
+  .cp-star { font-size:18px; color:#4a3a66; cursor:pointer; line-height:1; }
+  .cp-star.on { color:var(--gold); }
+  .cp-sheet { max-height:85vh; overflow-y:auto; }
+  .cp-vid { display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); margin-bottom:8px; cursor:pointer; }
+  .cp-vid.sel { border-color:var(--gold); background:rgba(255,215,0,0.08); }
+  .cp-vid img { width:56px; height:36px; object-fit:cover; border-radius:6px; background:var(--surface3); flex-shrink:0; }
+  .cp-vid div { font-size:12px; color:#fff; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 </style>
 <base target="_blank">
 </head>
@@ -224,10 +261,29 @@
     <a href="https://drive.google.com/file/d/1Nkdv8dnPeo8ThOoEOKcViqdBGfh3m1U_/view?usp=drivesdk" style="flex-shrink:0;padding:9px 12px;border-radius:10px;background:rgba(255,140,0,0.15);border:1px solid rgba(255,140,0,0.4);color:#ffffff;font-family:'Orbitron',monospace;font-size:9px;font-weight:900;letter-spacing:0.5px;text-decoration:none;">⬇ APK</a>
   </div>
 
-  <div class="community-grid" id="communityGrid">
+  <!-- WEEKLY COMPETITIONS -->
+  <div class="sec-title">🏆 WEEKLY COMPETITIONS</div>
+  <div id="compBody">
     <div class="loading-state">
       <div class="loading-spinner"></div>
-      <div>Loading communities...</div>
+      <div>Loading competitions...</div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="compJoinModal" onclick="compCloseJoin(event)">
+    <div class="modal-sheet cp-sheet">
+      <div class="modal-title">🏆 CHOOSE YOUR VIDEO</div>
+      <div id="compJoinBody"></div>
+      <button class="modal-create-btn" id="compJoinBtn" onclick="compConfirmJoin()">JOIN</button>
+      <div class="modal-close" onclick="compCloseJoin()">Cancel</div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="compLbModal" onclick="compCloseLb(event)">
+    <div class="modal-sheet cp-sheet">
+      <div class="modal-title" id="compLbTitle">LEADERBOARD</div>
+      <div id="compLbBody"></div>
+      <div class="modal-close" onclick="compCloseLb()">Close</div>
     </div>
   </div>
 
@@ -281,7 +337,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+<script src="../supabase-config.js"></script>
 <script>
 // ============================================
 // COMMUNITY CENTER - NO MOCK DATA
@@ -306,7 +362,7 @@ async function initSupabase() {
 
     // Load all data
     loadStats();
-    loadCommunities();
+    loadCompetitions();
     loadAIFeatures();
     loadCollabs();
 
@@ -551,9 +607,9 @@ async function loadCollabs() {
 // ============================================
 function showEmptyStates() {
   document.getElementById('heroStats').innerHTML = '<div class="hs" style="color:var(--muted)">Database offline</div>';
-  document.getElementById('communityGrid').innerHTML = `
-    <div class="empty-state" style="grid-column:1/-1">
-      <div class="empty-state-icon">🌐</div>
+  document.getElementById('compBody').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-state-icon">🏆</div>
       <div class="empty-state-text">Connect to database</div>
     </div>
   `;
@@ -659,6 +715,266 @@ function showToast(msg) {
 // ============================================
 // INIT
 // ============================================
+// ============================================
+// WEEKLY COMPETITIONS
+// ============================================
+const COMP_ICONS = { singing: '🎤', dancing: '💃', short_film: '🎬', talent: '⭐' };
+let compState = { cats: [], comps: [], counts: {}, mine: {}, active: null, joinComp: null, joinVideo: null, lbComp: null, lbOpen: false };
+let compTimerId = null;
+
+function compEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+function compEmpty(icon, text, sub) {
+  return '<div class="empty-state"><div class="empty-state-icon">' + icon + '</div><div class="empty-state-text">' + text + '</div>' +
+    (sub ? '<div style="color:var(--muted);font-size:12px;">' + sub + '</div>' : '') + '</div>';
+}
+
+function compErr(e) {
+  const m = String((e && e.message) || e || '');
+  const map = [
+    ['not enough coins', 'Not enough Emo Coins'],
+    ['already entered', 'You already entered this competition'],
+    ['not open yet', 'Competitions are not open yet'],
+    ['not open for entries', 'This competition is closed'],
+    ['not yours', 'Choose one of your own videos'],
+    ['login required', 'Please login first'],
+    ['account too new', 'New accounts can rate after 24 hours'],
+    ['your own entry', 'You cannot rate your own entry'],
+    ['rating is closed', 'Rating is closed']
+  ];
+  for (const [k, v] of map) if (m.includes(k)) return v;
+  return 'Something went wrong, try again';
+}
+
+function compTimeLeft(c) {
+  const now = Date.now(), s = new Date(c.start_at).getTime(), e = new Date(c.end_at).getTime();
+  const target = now < s ? s : e;
+  let ms = Math.max(0, target - now);
+  const d = Math.floor(ms / 86400000); ms -= d * 86400000;
+  const h = Math.floor(ms / 3600000); ms -= h * 3600000;
+  const m = Math.floor(ms / 60000);
+  const txt = (d ? d + 'd ' : '') + h + 'h ' + m + 'm';
+  return (now < s ? 'STARTS IN ' : 'ENDS IN ') + txt;
+}
+
+async function loadCompetitions() {
+  const box = document.getElementById('compBody');
+  if (!supa) { box.innerHTML = compEmpty('🏆', 'Connect to database'); return; }
+  try {
+    const [catRes, compRes] = await Promise.all([
+      supa.from('competition_categories').select('slug,name,default_fee').eq('active', true),
+      supa.from('competitions').select('*').order('end_at', { ascending: false }).limit(40)
+    ]);
+    if (catRes.error) throw catRes.error;
+    if (compRes.error) throw compRes.error;
+    compState.cats = catRes.data || [];
+    compState.comps = compRes.data || [];
+    compState.counts = {};
+    compState.mine = {};
+    const openIds = compState.comps.filter(c => c.status === 'open').map(c => c.id);
+    if (openIds.length) {
+      const en = await supa.from('competition_entries').select('id,competition_id,user_id').in('competition_id', openIds);
+      (en.data || []).forEach(r => {
+        compState.counts[r.competition_id] = (compState.counts[r.competition_id] || 0) + 1;
+        if (currentUser && r.user_id === currentUser.id) compState.mine[r.competition_id] = r.id;
+      });
+    }
+    if (!compState.active || !compState.cats.find(x => x.slug === compState.active)) {
+      compState.active = compState.cats.length ? compState.cats[0].slug : null;
+    }
+    renderCompetitions();
+  } catch (e) {
+    console.error('Competitions load failed:', e);
+    box.innerHTML = compEmpty('⚠️', 'Failed to load competitions');
+  }
+}
+
+function compOpenFor(slug) {
+  const now = Date.now();
+  return compState.comps.filter(c => c.category === slug && c.status === 'open' && new Date(c.end_at).getTime() > now)
+    .sort((a, b) => new Date(a.end_at) - new Date(b.end_at))[0] || null;
+}
+
+function compSetCat(slug) {
+  compState.active = slug;
+  renderCompetitions();
+}
+
+function renderCompetitions() {
+  const box = document.getElementById('compBody');
+  if (!compState.cats.length) { box.innerHTML = compEmpty('🏆', 'Competitions coming soon'); return; }
+  const chips = compState.cats.map(cat =>
+    '<div class="cat-chip ' + (cat.slug === compState.active ? 'active' : '') + '" onclick="compSetCat(\'' + compEsc(cat.slug) + '\')">' +
+    (COMP_ICONS[cat.slug] || '🏆') + ' ' + compEsc(cat.name) + '</div>').join('');
+  const c = compOpenFor(compState.active);
+  let card;
+  if (!c) {
+    card = compEmpty('⏳', 'No active competition right now', 'A new weekly competition starts soon. Check back!');
+  } else {
+    const n = compState.counts[c.id] || 0;
+    const pool = Math.floor(n * c.entry_fee * c.pool_percent / 100);
+    const joined = !!compState.mine[c.id];
+    const started = Date.now() >= new Date(c.start_at).getTime();
+    card = '<div class="cp-card">' +
+      '<div class="cp-head"><div class="cp-title">' + compEsc(c.title) + '</div><div class="cp-timer" id="cpTimer">' + compTimeLeft(c) + '</div></div>' +
+      '<div class="cp-desc">' + compEsc(c.description || '') + '</div>' +
+      '<div class="cp-stats">' +
+        '<div class="cp-stat"><b>' + c.entry_fee + '</b><span>ENTRY FEE 🪙</span></div>' +
+        '<div class="cp-stat"><b>' + pool + '</b><span>PRIZE POOL 🪙</span></div>' +
+        '<div class="cp-stat"><b>' + n + '</b><span>ENTRIES</span></div>' +
+      '</div>' +
+      '<div class="cp-prizes">🥇 50% &nbsp; 🥈 30% &nbsp; 🥉 20% of the prize pool</div>' +
+      '<div class="cp-actions">' +
+        '<button class="cp-btn primary" ' + (joined || !started ? 'disabled' : '') + ' onclick="compOpenJoin(\'' + c.id + '\')">' + (joined ? '✅ ENTERED' : 'JOIN · ' + c.entry_fee + ' 🪙') + '</button>' +
+        '<button class="cp-btn ghost" onclick="compOpenLb(\'' + c.id + '\', true)">LEADERBOARD</button>' +
+      '</div>' +
+      '<div class="cp-note">One entry per user. Score = unique views + 5 × rating points. If fewer than ' + c.min_entries + ' people join, every fee is refunded.</div>' +
+    '</div>';
+  }
+  box.innerHTML = '<div class="cat-scroll" style="padding:0 0 10px">' + chips + '</div>' + card + '<div id="compWinners"></div>';
+  if (compTimerId) clearInterval(compTimerId);
+  if (c) compTimerId = setInterval(() => { const t = document.getElementById('cpTimer'); if (t) t.textContent = compTimeLeft(c); }, 30000);
+  compLoadWinners(compState.active);
+}
+
+async function compLoadWinners(slug) {
+  const holder = document.getElementById('compWinners');
+  const done = compState.comps.filter(c => c.category === slug && c.status === 'finished')
+    .sort((a, b) => new Date(b.end_at) - new Date(a.end_at))[0];
+  if (!done || !holder) return;
+  try {
+    const [resRes, lbRes] = await Promise.all([
+      supa.from('competition_results').select('place,entry_id,prize_coins,score').eq('competition_id', done.id).order('place'),
+      supa.rpc('competition_leaderboard', { p_competition_id: done.id })
+    ]);
+    if (resRes.error || !resRes.data || !resRes.data.length) return;
+    const names = {};
+    (lbRes.data || []).forEach(r => { names[r.entry_id] = r.display_name || r.username || 'Creator'; });
+    const medals = ['🥇', '🥈', '🥉'];
+    if (compState.active !== slug) return;
+    holder.innerHTML = '<div class="cp-winners"><div class="cp-winners-title">🏅 LAST WINNERS · ' + compEsc(done.title) + '</div>' +
+      resRes.data.map(r => '<div class="cp-row"><div class="cp-rank">' + (medals[r.place - 1] || r.place) + '</div>' +
+        '<div class="cp-who"><div class="cp-name">' + compEsc(names[r.entry_id] || 'Creator') + '</div><div class="cp-sub">Score ' + r.score + '</div></div>' +
+        '<div class="cp-score">+' + r.prize_coins + ' 🪙</div></div>').join('') + '</div>';
+  } catch (e) { console.error('Winners load failed:', e); }
+}
+
+// ---------- JOIN ----------
+async function compOpenJoin(compId) {
+  if (!currentUser) { window.location = '/auth/login.html'; return; }
+  compState.joinComp = compId;
+  compState.joinVideo = null;
+  const c = compState.comps.find(x => x.id === compId);
+  const body = document.getElementById('compJoinBody');
+  const btn = document.getElementById('compJoinBtn');
+  body.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div></div>';
+  btn.disabled = true;
+  btn.textContent = 'JOIN · ' + (c ? c.entry_fee : '') + ' 🪙';
+  document.getElementById('compJoinModal').classList.add('show');
+  try {
+    const uid = currentUser.id;
+    const { data, error } = await supa.from('videos').select('id,title,thumbnail_url')
+      .or('user_id.eq.' + uid + ',creator_id.eq.' + uid).order('created_at', { ascending: false }).limit(30);
+    if (error) throw error;
+    if (!data || !data.length) {
+      body.innerHTML = compEmpty('🎬', 'You have no videos yet', '<a href="/creator/studio.html" style="color:var(--cyan)">Upload a video first</a>');
+      return;
+    }
+    body.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-align:center">The entry fee is taken from your Emo Coins. You cannot change the video later.</div>' +
+      data.map(v => '<div class="cp-vid" data-id="' + v.id + '" onclick="compPickVideo(this)">' +
+        (v.thumbnail_url ? '<img src="' + compEsc(v.thumbnail_url) + '" alt="">' : '<img alt="">') +
+        '<div>' + compEsc(v.title || 'Untitled') + '</div></div>').join('');
+  } catch (e) {
+    console.error('Videos load failed:', e);
+    body.innerHTML = compEmpty('⚠️', 'Could not load your videos');
+  }
+}
+
+function compPickVideo(el) {
+  document.querySelectorAll('#compJoinBody .cp-vid').forEach(x => x.classList.remove('sel'));
+  el.classList.add('sel');
+  compState.joinVideo = el.getAttribute('data-id');
+  document.getElementById('compJoinBtn').disabled = false;
+}
+
+function compCloseJoin(e) {
+  if (!e || e.target === document.getElementById('compJoinModal'))
+    document.getElementById('compJoinModal').classList.remove('show');
+}
+
+async function compConfirmJoin() {
+  if (!compState.joinComp || !compState.joinVideo) return;
+  const btn = document.getElementById('compJoinBtn');
+  btn.disabled = true;
+  btn.textContent = 'JOINING...';
+  try {
+    const { data, error } = await supa.rpc('join_competition', { p_competition_id: compState.joinComp, p_video_id: compState.joinVideo });
+    if (error) throw error;
+    if (data && data.balance != null) document.getElementById('navCoin').textContent = '🪙 ' + data.balance;
+    document.getElementById('compJoinModal').classList.remove('show');
+    showToast('🏆 You are in! Good luck');
+    loadCompetitions();
+  } catch (e) {
+    console.error('Join failed:', e);
+    showToast('⚠️ ' + compErr(e));
+    btn.disabled = false;
+    btn.textContent = 'TRY AGAIN';
+  }
+}
+
+// ---------- LEADERBOARD + RATING ----------
+async function compOpenLb(compId, isOpen) {
+  compState.lbComp = compId;
+  compState.lbOpen = !!isOpen;
+  const c = compState.comps.find(x => x.id === compId);
+  document.getElementById('compLbTitle').textContent = '🏆 ' + (c ? c.title : 'LEADERBOARD');
+  const body = document.getElementById('compLbBody');
+  body.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div></div>';
+  document.getElementById('compLbModal').classList.add('show');
+  try {
+    const { data, error } = await supa.rpc('competition_leaderboard', { p_competition_id: compId });
+    if (error) throw error;
+    if (!data || !data.length) { body.innerHTML = compEmpty('🎬', 'No entries yet', 'Be the first to join!'); return; }
+    const medals = ['🥇', '🥈', '🥉'];
+    body.innerHTML = data.map(r => {
+      const avg = r.rating_count ? (r.rating_sum / r.rating_count).toFixed(1) : '–';
+      const canRate = compState.lbOpen && currentUser && r.user_id !== currentUser.id;
+      const stars = canRate ? '<div class="cp-stars">' + [1, 2, 3, 4, 5].map(n =>
+        '<span class="cp-star" onclick="compRate(\'' + r.entry_id + '\',' + n + ')">★</span>').join('') + '</div>' : '';
+      const name = compEsc(r.display_name || r.username || 'Creator');
+      const ava = r.avatar_url ? '<img class="cp-ava" src="' + compEsc(r.avatar_url) + '" alt="">' : '<div class="cp-ava">' + name.charAt(0).toUpperCase() + '</div>';
+      return '<div class="cp-row"><div class="cp-rank">' + (medals[r.place - 1] || r.place) + '</div>' + ava +
+        '<div class="cp-who"><div class="cp-name">' + name + '</div>' +
+        '<div class="cp-sub">👁 ' + r.unique_views + ' · ⭐ ' + avg + ' (' + r.rating_count + ')</div>' + stars + '</div>' +
+        '<div style="text-align:right"><div class="cp-watch" onclick="window.location=\'/player/player-v2.html?id=' + r.video_id + '\'">▶ WATCH</div>' +
+        '<div class="cp-score">' + r.score + ' pts</div></div></div>';
+    }).join('');
+  } catch (e) {
+    console.error('Leaderboard failed:', e);
+    body.innerHTML = compEmpty('⚠️', 'Could not load leaderboard');
+  }
+}
+
+function compCloseLb(e) {
+  if (!e || e.target === document.getElementById('compLbModal'))
+    document.getElementById('compLbModal').classList.remove('show');
+}
+
+async function compRate(entryId, n) {
+  if (!currentUser) { window.location = '/auth/login.html'; return; }
+  try {
+    const { error } = await supa.rpc('rate_entry', { p_entry_id: entryId, p_rating: n });
+    if (error) throw error;
+    showToast('⭐ Rated ' + n + '/5');
+    compOpenLb(compState.lbComp, compState.lbOpen);
+  } catch (e) {
+    console.error('Rate failed:', e);
+    showToast('⚠️ ' + compErr(e));
+  }
+}
+
 document.addEventListener('DOMContentLoaded', initSupabase);
 </script>
 
