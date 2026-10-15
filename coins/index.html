@@ -178,6 +178,7 @@ async function loadProfile() {
   document.getElementById('progressText').textContent = `${coins} / ${level.max}`
   document.getElementById('streakBadge').textContent = `● DAY ${profile.streak_days || 1} STREAK`
   document.getElementById('earnedToday').textContent = '+' + (profile.earned_today || 0)
+  loadEarnedStats(profile.id)
 
   const today = new Date().toISOString().split('T')[0]
   if (profile.last_login === today) {
@@ -187,6 +188,27 @@ async function loadProfile() {
   }
 
   loadHistory()
+}
+
+async function loadEarnedStats(uid) {
+  try {
+    const { data, error } = await db.from('emo_transactions')
+      .select('amount,type,created_at')
+      .eq('user_id', uid)
+      .gt('amount', 0)
+    if (error) throw error
+    const today = new Date().toISOString().split('T')[0]
+    let all = 0, td = 0
+    ;(data || []).forEach(t => {
+      if (t.type === 'competition_refund') return
+      all += t.amount
+      if (String(t.created_at).slice(0, 10) === today) td += t.amount
+    })
+    document.getElementById('allTimeEarned').textContent = all.toLocaleString()
+    document.getElementById('earnedToday').textContent = '+' + td.toLocaleString()
+  } catch (e) {
+    console.error('Earned stats failed:', e)
+  }
 }
 
 async function handleDailyLogin() {

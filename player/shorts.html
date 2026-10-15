@@ -374,6 +374,12 @@ function playSplit(index) {
 
 // ===== GESTURES =====
 function attachGestures(element, isSplit = false) {
+    // stop the browser long-press menu (text select / Search with Google) while holding for super-like
+    element.style.userSelect = 'none';
+    element.style.webkitUserSelect = 'none';
+    element.style.setProperty('-webkit-touch-callout', 'none');
+    element.addEventListener('contextmenu', e => e.preventDefault());
+    element.addEventListener('selectstart', e => e.preventDefault());
     element.addEventListener('touchstart', e => {
         if (e.target.closest('.action-btn')) return;
         const t = e.touches[0];
