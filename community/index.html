@@ -593,7 +593,7 @@ async function loadCollabs() {
   try {
     const { data, error } = await supa.from('collabs')
       .select('*')
-      .eq('status', 'open')
+      .in('status', ['open', 'full'])
       .order('created_at', { ascending: false })
       .limit(10);
 
@@ -612,11 +612,11 @@ async function loadCollabs() {
     const colors = { music: 'rgba(180,0,255,0.1)', film: 'rgba(0,245,255,0.1)', comedy: 'rgba(255,215,0,0.1)', news: 'rgba(0,255,136,0.1)', education: 'rgba(255,215,0,0.1)', podcast: 'rgba(255,0,200,0.1)' };
 
     list.innerHTML = data.map(c => `
-      <div class="collab-item" onclick="joinCollab('${c.id}')">
+      <div class="collab-item" onclick="${currentUser && c.user_id === currentUser.id ? 'manageCollab' : 'joinCollab'}('${c.id}')">
         <div class="ci-icon" style="background:${colors[c.type] || 'rgba(180,0,255,0.1)'}">${icons[c.type] || '🎭'}</div>
         <div class="ci-info">
-          <div class="ci-title">${c.title || 'Untitled Collab'}</div>
-          <div class="ci-meta">${c.roles_needed || 'No roles specified'} · ${c.members_count || 0}/${c.max_members || 5} members</div>
+          <div class="ci-title">${escHtml(c.title || 'Untitled Collab')}</div>
+          <div class="ci-meta">${escHtml(c.roles_needed || 'No roles specified')} · ${c.members_count || 0}/${c.max_members || 5} members${c.status === 'full' ? ' · FULL' : ''}${currentUser && c.user_id === currentUser.id ? ' · YOURS (tap to manage)' : ''}</div>
         </div>
         <div class="ci-coins">+${c.coins_reward || 0} 🪙</div>
       </div>
@@ -696,16 +696,15 @@ async function createCollab() {
   if (!title) { alert('Add a title!'); return; }
 
   try {
-    const { error } = await supa.from('collabs').insert({
-      user_id: currentUser.id,
-      title: title,
-      type: type,
-      roles_needed: roles,
-      coins_reward: coins,
-      members_count: 1,
-      max_members: 5,
-      status: 'open',
-      created_at: new Date().toISOString()
+    const maxMembers = 5;
+    const escrow = coins * (maxMembers - 1);
+    if (escrow > 0 && !confirm('Reward ' + coins + ' x ' + (maxMembers - 1) + ' members = ' + escrow + ' Emo Coins will be held in escrow. Unused coins are refunded. Continue?')) return;
+    const { error } = await supa.rpc('create_collab', {
+      p_title: title,
+      p_type: type,
+      p_roles: roles,
+      p_reward: coins,
+      p_max_members: maxMembers
     });
 
     if (error) throw error;
@@ -724,10 +723,87 @@ async function createCollab() {
   }
 }
 
-function joinCollab(id) {
+/* ===== COLLAB JOIN + MANAGE ===== */
+function escHtml(t) {
+  return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function joinCollab(id) {
   if (!currentUser) { window.location = '/auth/login.html'; return; }
-  showToast('🎵 JOINED COLLAB!');
-  // Implement actual join logic
+  const role = prompt('Which role do you want? (e.g. Singer)') || '';
+  try {
+    const { error } = await supa.rpc('request_join_collab', { p_collab_id: id, p_role: role.trim() });
+    if (error) throw error;
+    showToast('📨 JOIN REQUEST SENT!');
+  } catch (err) {
+    alert('Could not join: ' + err.message);
+  }
+}
+
+async function manageCollab(id) {
+  if (!supa || !currentUser) return;
+  const { data: reqs, error } = await supa.from('collab_members')
+    .select('id,user_id,role,status').eq('collab_id', id).order('joined_at', { ascending: true });
+  if (error) { alert('Failed to load: ' + error.message); return; }
+  const list = reqs || [];
+  const ids = [...new Set(list.map(r => r.user_id))];
+  const names = {};
+  if (ids.length) {
+    const { data: ps } = await supa.from('profiles').select('id,display_name,username').in('id', ids);
+    (ps || []).forEach(p => { names[p.id] = p.display_name || p.username || 'User'; });
+  }
+  const pending = list.filter(r => r.status === 'pending');
+  const accepted = list.filter(r => r.status === 'accepted' && r.role !== 'owner');
+  const old = document.getElementById('collabManage');
+  if (old) old.remove();
+  const box = document.createElement('div');
+  box.id = 'collabManage';
+  box.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:flex;align-items:flex-end;justify-content:center;';
+  const row = (r, btns) => '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;"><span>' + escHtml(names[r.user_id] || 'User') + ' · ' + escHtml(r.role || 'no role') + '</span><span>' + btns + '</span></div>';
+  const btn = 'style="padding:6px 10px;border-radius:10px;border:0;font-weight:700;cursor:pointer;"';
+  box.innerHTML = '<div style="width:100%;max-width:480px;background:#0a0020;border:1px solid rgba(0,245,255,.3);border-radius:20px 20px 0 0;padding:18px;color:#fff;max-height:80vh;overflow:auto;">'
+    + '<div style="font-weight:700;margin-bottom:10px;">MANAGE COLLAB</div>'
+    + '<div style="color:#00f5ff;font-size:12px;margin:8px 0 4px;">JOIN REQUESTS (' + pending.length + ')</div>'
+    + (pending.length ? pending.map(r => row(r, '<button ' + btn + ' onclick="cmRespond(\'' + r.id + '\',true,\'' + id + '\')">Accept</button> <button ' + btn + ' onclick="cmRespond(\'' + r.id + '\',false,\'' + id + '\')">Reject</button>')).join('') : '<div style="color:#888;font-size:12px;">No pending requests</div>')
+    + '<div style="color:#00ff88;font-size:12px;margin:12px 0 4px;">MEMBERS (' + accepted.length + ')</div>'
+    + (accepted.length ? accepted.map(r => row(r, '')).join('') : '<div style="color:#888;font-size:12px;">No members yet</div>')
+    + '<div style="display:flex;gap:8px;margin-top:16px;">'
+    + '<button ' + btn + ' onclick="cmComplete(\'' + id + '\')">✅ Complete &amp; pay</button>'
+    + '<button ' + btn + ' onclick="cmCancel(\'' + id + '\')">🛑 Cancel</button>'
+    + '<button ' + btn + ' onclick="document.getElementById(\'collabManage\').remove()">Close</button></div></div>';
+  document.body.appendChild(box);
+}
+
+async function cmRespond(memberId, accept, collabId) {
+  try {
+    const { error } = await supa.rpc('respond_join_request', { p_member_id: memberId, p_accept: accept });
+    if (error) throw error;
+    showToast(accept ? '✅ ACCEPTED' : '❌ REJECTED');
+    await manageCollab(collabId);
+    loadCollabs();
+  } catch (err) { alert(err.message); }
+}
+
+async function cmComplete(id) {
+  if (!confirm('Complete this collab? Members get their reward, unused escrow is refunded to you.')) return;
+  try {
+    const { data, error } = await supa.rpc('complete_collab', { p_collab_id: id });
+    if (error) throw error;
+    document.getElementById('collabManage').remove();
+    showToast('🏁 COMPLETED · PAID ' + ((data && data.paid) || 0) + ' 🪙');
+    loadCollabs();
+  } catch (err) { alert(err.message); }
+}
+
+async function cmCancel(id) {
+  if (!confirm('Cancel this collab and refund the escrow?')) return;
+  try {
+    const { error } = await supa.rpc('cancel_collab', { p_collab_id: id });
+    if (error) throw error;
+    document.getElementById('collabManage').remove();
+    showToast('🛑 CANCELLED · REFUNDED');
+    loadCollabs();
+  } catch (err) { alert(err.message); }
 }
 
 function openComm(id) {
