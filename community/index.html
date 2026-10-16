@@ -219,6 +219,9 @@
   .cp-msg.bot { align-self:flex-start; background:var(--surface3); color:#fff; border:1px solid rgba(0,245,255,0.15); }
   .cp-chat-row { display:flex; gap:8px; margin-top:8px; }
   .cp-chat-input { flex:1; min-width:0; padding:11px 12px; border-radius:10px; border:1px solid rgba(0,245,255,0.3); background:rgba(0,0,0,0.4); color:#fff; font-size:14px; outline:none; }
+  /* chat window sits above the floating + button */
+  #compChatModal .modal-sheet { margin-bottom:76px; border-radius:20px; max-height:calc(100vh - 170px); }
+  #compChatModal .cp-chat { max-height:36vh; }
 </style>
 <base target="_blank">
 </head>
