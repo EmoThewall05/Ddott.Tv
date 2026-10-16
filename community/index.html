@@ -211,6 +211,14 @@
   .cp-vid.sel { border-color:var(--gold); background:rgba(255,215,0,0.08); }
   .cp-vid img { width:56px; height:36px; object-fit:cover; border-radius:6px; background:var(--surface3); flex-shrink:0; }
   .cp-vid div { font-size:12px; color:#fff; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* ===== COMPETITION AI CHAT ===== */
+  .cp-chat { max-height:45vh; overflow-y:auto; padding:4px 0 8px; display:flex; flex-direction:column; gap:8px; }
+  .cp-msg { max-width:86%; padding:9px 12px; border-radius:12px; font-size:13px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+  .cp-msg.me { align-self:flex-end; background:linear-gradient(135deg,var(--gold),var(--orange)); color:#1a0f00; }
+  .cp-msg.bot { align-self:flex-start; background:var(--surface3); color:#fff; border:1px solid rgba(0,245,255,0.15); }
+  .cp-chat-row { display:flex; gap:8px; margin-top:8px; }
+  .cp-chat-input { flex:1; min-width:0; padding:11px 12px; border-radius:10px; border:1px solid rgba(0,245,255,0.3); background:rgba(0,0,0,0.4); color:#fff; font-size:14px; outline:none; }
 </style>
 <base target="_blank">
 </head>
@@ -283,6 +291,19 @@
       <div id="compJoinBody"></div>
       <button class="modal-create-btn" id="compJoinBtn" onclick="compConfirmJoin()">JOIN</button>
       <div class="modal-close" onclick="compCloseJoin()">Cancel</div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="compChatModal" onclick="compCloseChat(event)">
+    <div class="modal-sheet cp-sheet">
+      <div class="modal-title">🤖 COMPETITION ASSISTANT</div>
+      <div class="cp-chat" id="compChatLog"></div>
+      <div class="cp-chat-row">
+        <input id="compChatInput" class="cp-chat-input" maxlength="500" placeholder="Ask about fees, prizes, rules..." onkeydown="if(event.key==='Enter')compSendChat()">
+        <button class="cp-btn primary" id="compChatSend" style="flex:0 0 auto;padding:11px 16px" onclick="compSendChat()">SEND</button>
+      </div>
+      <div class="cp-note">AI can make mistakes. Check the numbers on the competition card.</div>
+      <div class="modal-close" onclick="compCloseChat()">Close</div>
     </div>
   </div>
 
@@ -749,7 +770,12 @@ function compErr(e) {
     ['login required', 'Please login first'],
     ['account too new', 'New accounts can rate after 24 hours'],
     ['your own entry', 'You cannot rate your own entry'],
-    ['rating is closed', 'Rating is closed']
+    ['rating is closed', 'Rating is closed'],
+    ['device_already_entered', 'Another account on this device already entered this competition'],
+    ['device_already_rated', 'Another account on this device already rated this entry'],
+    ['same_device_as_owner', 'You cannot rate an entry from the same device as its owner'],
+    ['daily_limit', 'Daily AI question limit reached, try again tomorrow'],
+    ['ai_unavailable', 'The assistant is busy, try again in a moment']
   ];
   for (const [k, v] of map) if (m.includes(k)) return v;
   return 'Something went wrong, try again';
@@ -840,7 +866,7 @@ function renderCompetitions() {
       '<div class="cp-note">One entry per user. Score = unique views + 5 × rating points. If fewer than ' + c.min_entries + ' people join, every fee is refunded.</div>' +
     '</div>';
   }
-  box.innerHTML = '<div class="cat-scroll" style="padding:0 0 10px">' + chips + '</div>' + card + '<div id="compWinners"></div>';
+  box.innerHTML = '<div class="cat-scroll" style="padding:0 0 10px">' + chips + '</div>' + card + '<div id="compWinners"></div><button class="cp-btn ghost" style="width:100%;margin-top:12px" onclick="compOpenChat()">🤖 ASK AI · RULES &amp; PRIZES</button>';
   if (compTimerId) clearInterval(compTimerId);
   if (c) compTimerId = setInterval(() => { const t = document.getElementById('cpTimer'); if (t) t.textContent = compTimeLeft(c); }, 30000);
   compLoadWinners(compState.active);
@@ -917,7 +943,8 @@ async function compConfirmJoin() {
   btn.disabled = true;
   btn.textContent = 'JOINING...';
   try {
-    const { data, error } = await supa.rpc('join_competition', { p_competition_id: compState.joinComp, p_video_id: compState.joinVideo });
+    const out = await compCall('/join', { competition_id: compState.joinComp, video_id: compState.joinVideo });
+    const data = out.data; const error = null;
     if (error) throw error;
     if (data && data.balance != null) document.getElementById('navCoin').textContent = '🪙 ' + data.balance;
     document.getElementById('compJoinModal').classList.remove('show');
@@ -972,7 +999,8 @@ function compCloseLb(e) {
 async function compRate(entryId, n) {
   if (!currentUser) { window.location = '/auth/login.html'; return; }
   try {
-    const { error } = await supa.rpc('rate_entry', { p_entry_id: entryId, p_rating: n });
+    await compCall('/rate', { entry_id: entryId, rating: n });
+    const error = null;
     if (error) throw error;
     showToast('⭐ Rated ' + n + '/5');
     compOpenLb(compState.lbComp, compState.lbOpen);
@@ -980,6 +1008,115 @@ async function compRate(entryId, n) {
     console.error('Rate failed:', e);
     showToast('⚠️ ' + compErr(e));
   }
+}
+
+// ============================================
+// COMPETITION WORKER (join, rate, AI chat)
+// ============================================
+const COMP_API = 'https://competition-ai-chat.meradivin.workers.dev';
+let compChatHist = [];
+let compChatBusy = false;
+let compDevCache = null;
+
+async function compSha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join("");
+}
+
+function compGpu() {
+  try {
+    const cv = document.createElement('canvas');
+    const gl = cv.getContext('webgl') || cv.getContext('experimental-webgl');
+    if (!gl) return 'nogl';
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    return ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : 'noext';
+  } catch (e) { return 'glerr'; }
+}
+
+async function compDeviceInfo() {
+  if (compDevCache) return compDevCache;
+  let dt = null;
+  try {
+    dt = localStorage.getItem('ddott_dt');
+    if (!dt || dt.length < 16) {
+      dt = crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+      localStorage.setItem('ddott_dt', dt);
+    }
+  } catch (e) { dt = 'no-storage-device-token'; }
+  const parts = [navigator.platform, navigator.hardwareConcurrency, navigator.deviceMemory,
+    screen.width + 'x' + screen.height, screen.colorDepth, window.devicePixelRatio,
+    (Intl.DateTimeFormat().resolvedOptions().timeZone || 'tz'), navigator.language, compGpu()];
+  const fp = await compSha256(parts.join('|'));
+  compDevCache = { fp: fp, dt: dt };
+  return compDevCache;
+}
+
+async function compCall(path, payload) {
+  const sess = await supa.auth.getSession();
+  const session = sess && sess.data && sess.data.session;
+  if (!session) { window.location = '/auth/login.html'; throw new Error('login required'); }
+  const dev = await compDeviceInfo();
+  const res = await fetch(COMP_API + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+    body: JSON.stringify(Object.assign({}, payload, { fp: dev.fp, dt: dev.dt }))
+  });
+  let out = null;
+  try { out = await res.json(); } catch (e) {}
+  if (!res.ok || !out || !out.ok) {
+    throw new Error((out && (out.reason || out.error)) || 'request failed');
+  }
+  return out;
+}
+
+// ---------- AI chat ----------
+function compOpenChat() {
+  if (!currentUser) { window.location = '/auth/login.html'; return; }
+  document.getElementById('compChatModal').classList.add('show');
+  const log = document.getElementById('compChatLog');
+  if (!log.children.length) {
+    compChatAdd('bot', 'Hi! Ask me about entry fees, prize money, scoring or rules. You can write in Malayalam, English, Hindi or Arabic. 🏆');
+  }
+}
+
+function compCloseChat(e) {
+  if (!e || e.target === document.getElementById('compChatModal'))
+    document.getElementById('compChatModal').classList.remove('show');
+}
+
+function compChatAdd(who, text) {
+  const log = document.getElementById('compChatLog');
+  const d = document.createElement('div');
+  d.className = 'cp-msg ' + who;
+  d.textContent = text;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+  return d;
+}
+
+async function compSendChat() {
+  if (compChatBusy) return;
+  const input = document.getElementById('compChatInput');
+  const btn = document.getElementById('compChatSend');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  compChatAdd('me', text);
+  compChatBusy = true;
+  btn.disabled = true;
+  const wait = compChatAdd('bot', '...');
+  try {
+    const out = await compCall('/chat', { message: text, history: compChatHist.slice(-6) });
+    wait.textContent = out.reply;
+    compChatHist.push({ role: 'user', text: text }, { role: 'model', text: out.reply });
+    compChatHist = compChatHist.slice(-6);
+  } catch (e) {
+    console.error('Chat failed:', e);
+    wait.textContent = '⚠️ ' + compErr(e);
+  }
+  compChatBusy = false;
+  btn.disabled = false;
+  input.focus();
 }
 
 document.addEventListener('DOMContentLoaded', initSupabase);
