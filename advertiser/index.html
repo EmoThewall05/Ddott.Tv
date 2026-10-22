@@ -119,6 +119,7 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
 .nav-icon{font-size:20px;}
 </style>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -150,6 +151,33 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
     </div>
     <input type="file" id="videoFile" accept="video/*" style="display:none" onchange="handleVideoSelect(this)">
     <video class="video-preview" id="videoPreview" controls></video>
+  </div>
+
+  <!-- ADVERTISER PROFILE -->
+  <div class="card" id="profileCard">
+    <div class="card-title">ADVERTISER PROFILE</div>
+    <div class="form-group">
+      <label class="form-label">BRAND NAME *</label>
+      <input class="form-input" id="profBrand" placeholder="Your brand / company" maxlength="60">
+    </div>
+    <div class="form-group">
+      <label class="form-label">CONTACT EMAIL</label>
+      <input class="form-input" id="profEmail" type="email" placeholder="contact@brand.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">CONTACT PHONE</label>
+      <input class="form-input" id="profPhone" placeholder="+971...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">WEBSITE</label>
+      <input class="form-input" id="profWebsite" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">LOGO URL (optional)</label>
+      <input class="form-input" id="profLogo" placeholder="https://...logo.png">
+    </div>
+    <button class="submit-btn" onclick="saveProfile()">💾 SAVE PROFILE</button>
+    <div id="profStatus" style="font-size:11px;opacity:0.6;margin-top:8px;text-align:center;"></div>
   </div>
 
   <div class="card">
@@ -224,10 +252,10 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
     <div class="form-group">
       <label class="form-label">AD PRICING TIER</label>
       <div class="rules-wrap" id="tierButtons">
-        <div class="rule-tag" data-tier="normal" onclick="selectTier(this)">Normal (0-5K views)</div>
-        <div class="rule-tag" data-tier="mid" onclick="selectTier(this)">Mid (5K-10K views)</div>
-        <div class="rule-tag" data-tier="viral" onclick="selectTier(this)">Viral (10K+ views)</div>
-        <div class="rule-tag" data-tier="share" onclick="selectTier(this)">Share (min 3 ads)</div>
+        <div class="rule-tag" data-tier="normal" onclick="selectTier(this)">Normal (min 500 views)</div>
+        <div class="rule-tag" data-tier="mid" onclick="selectTier(this)">Mid (min 500 views)</div>
+        <div class="rule-tag" data-tier="viral" onclick="selectTier(this)">Viral (min 500 views)</div>
+        <div class="rule-tag" data-tier="share" onclick="selectTier(this)">Share (min 1000 views)</div>
       </div>
     </div>
   </div>
@@ -297,6 +325,14 @@ html,body{min-height:100%;background:#000;color:#fff;font-family:'Rajdhani',sans
     </div>
   </div>
 
+  <!-- WALLET HISTORY -->
+  <div class="card">
+    <div class="card-title">WALLET HISTORY</div>
+    <div id="walletHistory">
+      <div style="text-align:center;opacity:0.4;padding:20px;font-size:13px;">No transactions yet</div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">MY CAMPAIGNS</div>
     <div id="campaignsList">
@@ -311,8 +347,11 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const CF_AI_WORKER = 'https://ddott-add-ai-chat.meradivin.workers.dev';
 const CLOUDINARY_CLOUD = 'dggip9tpp';
 const CLOUDINARY_PRESET = 'ddott-tv-upload';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let uploadedVideoUrl = '';
+let uploadedDuration = 0;
+let advProfile = null;
 let aiSuggestions = {};
 let currentUser = null;
 let chatHistory = [];
@@ -321,12 +360,14 @@ let chatHistory = [];
 window.onload = async () => {
   await loadTiers();
   loadStats();
+  loadProfile();
+  loadHistory();
 };
 
 // TAB SWITCH
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i) => {
-    t.classList.toggle('active', ['upload','ai','rules','stats'][i] === tab);
+    t.classList.toggle('active', ['upload','ai','rules','stats','buy'][i] === tab);
   });
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
@@ -361,6 +402,7 @@ async function uploadToCloudinary(file) {
   xhr.onload = () => {
     const res = JSON.parse(xhr.responseText);
     uploadedVideoUrl = res.secure_url;
+    uploadedDuration = Math.round(Number(res.duration) || 0);
     fill.style.width = '100%';
     document.getElementById('uploadZone').innerHTML = '✅ <div style="margin-top:6px;font-size:12px;color:#00ff64;">Video uploaded successfully!</div>';
   };
@@ -483,9 +525,9 @@ async function loadTiers() {
     });
     tierData = await res.json();
     if(Array.isArray(tierData) && tierData.length) {
-      const defaultTier = tierData.find(t => t.tier_name === 'normal') || tierData[0];
+      const defaultTier = tierData.find(t => String(t.tier_name).toLowerCase() === 'normal') || tierData[0];
       selectedTier = defaultTier;
-      const defaultBtn = document.querySelector(`#tierButtons [data-tier="${defaultTier.tier_name}"]`);
+      const defaultBtn = document.querySelector(`#tierButtons [data-tier="${String(defaultTier.tier_name).toLowerCase()}"]`);
       if(defaultBtn) defaultBtn.classList.add('active');
     }
   } catch(e) {}
@@ -496,7 +538,7 @@ function selectTier(el) {
   document.querySelectorAll('#tierButtons .rule-tag').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   const tierName = el.getAttribute('data-tier');
-  selectedTier = tierData.find(t => t.tier_name === tierName);
+  selectedTier = tierData.find(t => String(t.tier_name).toLowerCase() === tierName);
   if(selectedTier && selectedTier.min_views) {
     const viewsInput = document.getElementById('viewsRange');
     viewsInput.min = selectedTier.min_views;
@@ -524,14 +566,13 @@ function updateCost() {
   const userCoin = parseFloat(selectedTier.user_watch_coin);
   const rate = parseFloat(selectedTier.rate_per_view);
   const minAds = selectedTier.min_ads_required;
-  const base = views * rate;
-  const fee = base * 0.1;
-  const total = base + fee;
+  const total = Math.ceil(Math.round(views * rate * 11 * 1e6) / 1e6) / 100;
+  const fee = total - (views * rate / 10);
 
   document.getElementById('costWatch').textContent = userCoin + ' 🪙 (per genuine watch)';
   document.getElementById('costShare').textContent = minAds > 1 ? ('Min ' + minAds + ' ads required') : '1 ad';
-  document.getElementById('costFee').textContent = '₹' + fee.toFixed(2);
-  document.getElementById('costTotal').textContent = '₹' + total.toFixed(2);
+  document.getElementById('costFee').textContent = fee.toFixed(2) + ' 🪙';
+  document.getElementById('costTotal').textContent = total.toFixed(2) + ' 🪙';
 }
 
 // RULES TOGGLE
@@ -540,7 +581,144 @@ function toggleRule(el) {
 }
 
 // PUBLISH
+/* ===== PROFILE / HISTORY / PUBLISH (server-side) ===== */
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+async function loadProfile() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return null;
+    const { data } = await db.from('advertiser_profiles').select('*').eq('user_id', user.id).maybeSingle();
+    advProfile = data || null;
+    if (data) {
+      document.getElementById('profBrand').value = data.brand_name || '';
+      document.getElementById('profEmail').value = data.contact_email || '';
+      document.getElementById('profPhone').value = data.contact_phone || '';
+      document.getElementById('profWebsite').value = data.website || '';
+      document.getElementById('profLogo').value = data.logo_url || '';
+      document.getElementById('profStatus').textContent = '✅ Profile saved · ' + (data.brand_name || '');
+    }
+    return advProfile;
+  } catch (e) { return null; }
+}
+
+async function saveProfile() {
+  const brand = document.getElementById('profBrand').value.trim();
+  if (!brand) { alert('Brand name is required'); return; }
+  const g = function(id) { const v = document.getElementById(id).value.trim(); return v ? v : null; };
+  const st = document.getElementById('profStatus');
+  st.textContent = 'Saving...';
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { st.textContent = ''; alert('Please login on ddott.live first'); return; }
+    const { error } = await db.rpc('advertiser_save_profile', {
+      p_brand: brand, p_email: g('profEmail'), p_phone: g('profPhone'),
+      p_website: g('profWebsite'), p_logo: g('profLogo')
+    });
+    if (error) { st.textContent = '❌ ' + error.message; return; }
+    await loadProfile();
+  } catch (e) { st.textContent = '❌ Could not save profile'; }
+}
+
+async function loadHistory() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    const { data } = await db.from('ad_wallet_ledger').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20);
+    const box = document.getElementById('walletHistory');
+    if (!data || !data.length) {
+      box.innerHTML = '<div style="text-align:center;opacity:0.4;padding:20px;font-size:13px;">No transactions yet</div>';
+      return;
+    }
+    box.innerHTML = data.map(function(r) {
+      const amt = Number(r.amount);
+      const col = amt >= 0 ? '#00ff64' : '#ff6680';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12px;">'
+        + '<div><div style="font-weight:700;">' + esc(r.note || r.kind) + '</div>'
+        + '<div style="opacity:0.4;font-size:10px;">' + esc(new Date(r.created_at).toLocaleString()) + '</div></div>'
+        + '<div style="text-align:right;"><div style="color:' + col + ';font-weight:700;">' + (amt >= 0 ? '+' : '') + amt.toFixed(2) + ' 🪙</div>'
+        + '<div style="opacity:0.4;font-size:10px;">bal ' + Number(r.balance_after).toFixed(2) + '</div></div></div>';
+    }).join('');
+  } catch (e) {}
+}
+
 async function publishAd() {
+  const btn = document.getElementById('publishBtn');
+  const reset = function() { btn.disabled = false; btn.textContent = '🚀 PUBLISH AD CAMPAIGN'; };
+  if (!uploadedVideoUrl) { alert('Please upload a video first!'); switchTab('upload'); return; }
+  const title = document.getElementById('adTitle').value.trim();
+  if (!title) { alert('Please add an ad title!'); switchTab('upload'); return; }
+  const category = document.getElementById('adCategory').value;
+  if (!category) { alert('Please select a category!'); switchTab('upload'); return; }
+  if (!selectedTier) { alert('Please select a pricing tier!'); return; }
+  const views = parseInt(document.getElementById('viewsRange').value);
+  if (views < selectedTier.min_views) {
+    alert('Minimum ' + selectedTier.min_views + ' views required for ' + selectedTier.tier_name + ' tier!');
+    return;
+  }
+  let dur = uploadedDuration;
+  if (!dur) {
+    const pv = document.getElementById('videoPreview');
+    dur = Math.round((pv && pv.duration) || 0);
+  }
+  if (!dur || dur <= 0) { alert('Could not read the video length. Please upload the video again.'); switchTab('upload'); return; }
+  if (dur > 120) { alert('Ad video must be 2 minutes or less.'); switchTab('upload'); return; }
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { alert('Please login on ddott.live first'); return; }
+  if (!advProfile) await loadProfile();
+  if (!advProfile) { alert('Please save your advertiser profile first'); switchTab('upload'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'PUBLISHING...';
+
+  const langs = [...document.querySelectorAll('#langRules .rule-tag.active')].map(t => t.textContent);
+  const afterCats = [...document.querySelectorAll('#afterRules .rule-tag.active')].map(t => t.textContent);
+  const skipAfter = parseInt(document.getElementById('skipAfter').value);
+
+  try {
+    const { data, error } = await db.rpc('ad_create', {
+      p_title: title,
+      p_description: document.getElementById('adDesc').value,
+      p_category: category,
+      p_video_url: uploadedVideoUrl,
+      p_duration: dur,
+      p_tier: selectedTier.tier_name,
+      p_views: views,
+      p_languages: langs,
+      p_show_after: afterCats,
+      p_skip_after: skipAfter
+    });
+    if (error) { reset(); alert('Failed: ' + error.message); return; }
+    if (data && data.created) {
+      btn.textContent = '✅ SUBMITTED FOR REVIEW!';
+      btn.style.background = 'rgba(0,255,100,0.2)';
+      loadWallet(); loadStats(); loadHistory();
+      setTimeout(function() { switchTab('stats'); reset(); btn.style.background = ''; }, 1500);
+    } else if (data && data.reason === 'insufficient_balance') {
+      reset();
+      alert('Not enough EMO coins.\nNeeded: ' + Number(data.needed).toFixed(2) + '\nYour balance: ' + Number(data.balance).toFixed(2) + '\n\nBuy coins in the BUY tab.');
+      switchTab('buy');
+    } else if (data && data.reason === 'profile_required') {
+      reset();
+      alert('Please save your advertiser profile first');
+      switchTab('upload');
+    } else {
+      reset();
+      alert('Could not publish. Please try again.');
+    }
+  } catch (e) {
+    reset();
+    alert('Failed to publish. Check your connection.');
+  }
+}
+/* ===== END PROFILE / HISTORY / PUBLISH ===== */
+
+async function publishAdOld_unused() {
   if(!uploadedVideoUrl) {
     alert('Please upload a video first!');
     switchTab('upload');
@@ -625,6 +803,42 @@ async function publishAd() {
 // LOAD STATS
 async function loadStats() {
   try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    const { data: ads, error } = await db.from('ads').select('*').eq('advertiser_id', user.id).order('created_at', { ascending: false });
+    if (error || !Array.isArray(ads)) return;
+
+    const totalViews = ads.reduce((a, b) => a + (b.views_delivered || 0), 0);
+    const totalCoins = ads.reduce((a, b) => a + Number(b.budget_coins || 0), 0);
+    document.getElementById('statViews').textContent = totalViews;
+    document.getElementById('statCoinsSpent').textContent = totalCoins.toFixed(2).replace(/\.00$/, '');
+
+    const list = document.getElementById('campaignsList');
+    if (ads.length === 0) {
+      list.innerHTML = '<div style="text-align:center;opacity:0.4;padding:20px;font-size:13px;">No campaigns yet</div>';
+      return;
+    }
+    list.innerHTML = ads.map(function(ad) {
+      const st = ad.status || 'pending';
+      const cls = st === 'active' ? 'status-active' : 'status-pending';
+      const extra = st === 'rejected' ? ' style="color:#ff6680;"' : '';
+      const reason = (st === 'rejected' && ad.reject_reason)
+        ? '<div style="font-size:11px;color:#ff6680;margin-top:6px;">❌ ' + esc(ad.reject_reason) + ' (coins refunded)</div>' : '';
+      const pct = Math.min(100, ((ad.views_delivered || 0) / (ad.views_purchased || 1)) * 100);
+      return '<div class="ad-campaign-card">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+        + '<div style="font-weight:700;font-size:13px;">' + esc(ad.title) + '</div>'
+        + '<span class="campaign-status ' + cls + '"' + extra + '>' + esc(st.toUpperCase()) + '</span></div>'
+        + '<div style="font-size:11px;opacity:0.5;">' + (ad.views_delivered || 0) + ' / ' + (ad.views_purchased || 0) + ' views · ' + esc(ad.tier_name || '') + '</div>'
+        + '<div class="progress-bar"><div class="progress-bar-fill" style="width:' + pct + '%"></div></div>'
+        + '<div style="margin-top:8px;font-size:11px;opacity:0.6;">🪙 ' + Number(ad.budget_coins || 0).toFixed(2) + ' budget</div>'
+        + reason + '</div>';
+    }).join('');
+  } catch (e) {}
+}
+
+async function loadStatsOld_unused() {
+  try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/ads?select=*&order=created_at.desc`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
@@ -669,7 +883,7 @@ async function loadStats() {
   <div class="balance-box">
     <div class="balance-label">YOUR BALANCE</div>
     <div class="balance-amount" id="buyTabBalance">0</div>
-    <div class="balance-usd">GET VIEWS · ₹0.20 per view</div>
+    <div class="balance-usd">1 EMO COIN = ₹10 · USE COINS FOR AD CAMPAIGNS</div>
   </div>
   <div class="packages-title">SELECT PACKAGE</div>
   <div class="packages-grid">
@@ -733,11 +947,17 @@ async function buyCoins() {
     return;
   }
 
+  const hdrs = await authHeaders();
+  if (!hdrs) {
+    alert('Please login first to buy EMO coins');
+    return;
+  }
+
   let order;
   try {
     const orderRes = await fetch(PAYMENT_WORKER_URL + '/create-order', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: hdrs,
       body: JSON.stringify({ amount: selectedPkg.price, coins: selectedPkg.coins })
     });
     const orderData = await orderRes.json();
@@ -763,7 +983,7 @@ async function buyCoins() {
       try {
         const verifyRes = await fetch(PAYMENT_WORKER_URL + '/verify-payment', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: (await authHeaders()) || hdrs,
           body: JSON.stringify({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
@@ -772,7 +992,7 @@ async function buyCoins() {
         });
         const verifyData = await verifyRes.json();
         if (verifyData.verified) {
-          await creditCoins(response.razorpay_payment_id, selectedPkg.coins, selectedPkg.price);
+          await afterPayment(verifyData, response.razorpay_payment_id);
         } else {
           alert('❌ Payment verification failed. Contact support with payment ID: ' + response.razorpay_payment_id);
         }
@@ -787,28 +1007,46 @@ async function buyCoins() {
   rzp.open();
 }
 
-async function creditCoins(paymentId, coins, price) {
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
-  await db.from('emo_transactions').insert({
-    user_id: user.id,
-    amount: coins,
-    type: 'purchase',
-    description: 'Bought ' + coins + ' EMO Coins · Payment: ' + paymentId
-  });
-  await db.rpc('increment_coins', { uid: user.id, amt: coins });
-  document.getElementById('buyTabBalance').textContent = parseInt(document.getElementById('buyTabBalance').textContent || 0) + coins;
-  document.getElementById('coinBalance').textContent = parseInt(document.getElementById('coinBalance').textContent || 0) + coins;
-  alert('✅ ' + coins + ' EMO Coins credited!');
+/* ===== AD WALLET (server-credited, read-only on client) ===== */
+async function authHeaders() {
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) return null;
+    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token };
+  } catch (e) { return null; }
 }
 
-// Load balance in buy tab
-async function loadBuyBalance() {
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
-  const { data } = await db.from('profiles').select('emo_coins').eq('id', user.id).single();
-  if (data) document.getElementById('buyTabBalance').textContent = data.emo_coins || 0;
+async function loadWallet() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return null;
+    const { data } = await db.from('ad_wallets').select('balance').eq('user_id', user.id).maybeSingle();
+    const bal = data ? Number(data.balance) : 0;
+    const txt = bal.toFixed(2).replace(/\.00$/, '');
+    ['buyTabBalance', 'coinBalance'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    });
+    return bal;
+  } catch (e) { return null; }
 }
+
+async function loadBuyBalance() { return loadWallet(); }
+
+async function afterPayment(v, paymentId) {
+  const before = parseFloat(document.getElementById('buyTabBalance').textContent) || 0;
+  let bal = await loadWallet();
+  for (let i = 0; i < 3 && (bal === null || bal <= before); i++) {
+    await new Promise(function(r) { setTimeout(r, 1500); });
+    bal = await loadWallet();
+  }
+  if (bal !== null && bal > before) {
+    alert('✅ ' + (bal - before).toFixed(2).replace(/\.00$/, '') + ' EMO Coins added to your wallet!');
+  } else {
+    alert('⏳ Payment received. Coins will appear shortly. Payment ID: ' + paymentId);
+  }
+}
+/* ===== END AD WALLET ===== */
 
 // Patch switchTab to load balance
 const _origSwitch = window.switchTab;
@@ -816,6 +1054,7 @@ window.switchTab = function(tab) {
   if (_origSwitch) _origSwitch(tab);
   if (tab === 'buy') loadBuyBalance();
 };
+setTimeout(loadWallet, 800);
 </script>
 </body>
 </html>

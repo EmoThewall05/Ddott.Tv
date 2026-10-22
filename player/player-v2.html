@@ -1261,7 +1261,127 @@
         ];
     }
 
+    /* ===== AD QUIZ V2: answer = ad length in seconds, verified by the server ===== */
     function showAdQuiz() {
+        adBadge.classList.remove('visible');
+        quizCoinsClaimed = false;
+        document.getElementById('quizTitle').textContent = '📢 Ad Proof of Watch';
+        document.getElementById('quizSubtitle').textContent = 'Answer correctly to earn your ad reward 🪙';
+        document.getElementById('quizQuestion').textContent = 'How many seconds long was this ad?';
+        const resEl = document.getElementById('quizResult');
+        resEl.textContent = '';
+        resEl.style.color = '#00e676';
+        document.getElementById('quizEarnBtn').classList.remove('visible');
+        document.getElementById('shareAdBtn').classList.remove('visible');
+
+        const optDiv = document.getElementById('quizOptions');
+        optDiv.innerHTML = '';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.inputMode = 'numeric';
+        input.min = '1';
+        input.max = '600';
+        input.placeholder = 'Seconds';
+        input.style.cssText = 'width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:16px;text-align:center;margin-bottom:10px;box-sizing:border-box;';
+        const sub = document.createElement('button');
+        sub.className = 'quiz-option';
+        sub.textContent = 'SUBMIT ANSWER';
+        const rep = document.createElement('button');
+        rep.textContent = '🚩 Report this ad';
+        rep.style.cssText = 'background:none;border:none;color:rgba(255,255,255,0.5);font-size:12px;margin-top:12px;cursor:pointer;';
+        optDiv.appendChild(input);
+        optDiv.appendChild(sub);
+        optDiv.appendChild(rep);
+
+        quizOnClaim = null;
+        quizOnClose = () => { loadVideo(); };
+
+        rep.onclick = async () => {
+            const reason = prompt('Why are you reporting this ad? (optional)');
+            if (reason === null) return;
+            try {
+                const { error } = await db.rpc('ad_report', { p_ad: activeAd.id, p_reason: reason || null });
+                if (error) throw error;
+                rep.disabled = true;
+                showToast('🚩 Report sent. Thank you!');
+            } catch (e) {
+                showToast('⚠️ Could not send report');
+            }
+        };
+
+        sub.onclick = async () => {
+            const val = parseFloat(input.value);
+            if (!isFinite(val) || val <= 0) { resEl.textContent = '⚠️ Enter the ad length in seconds'; return; }
+            sub.disabled = true;
+            input.disabled = true;
+            clearInterval(quizTimerInterval);
+            if (cheatDetected) {
+                resEl.style.color = '#ff5500';
+                resEl.textContent = '❌ Skipping/leaving the screen was detected — no coins this time.';
+                setTimeout(closeQuiz, 2500);
+                return;
+            }
+            if (!currentUser) {
+                resEl.style.color = '#ff5500';
+                resEl.textContent = '⚠️ Please log in to earn Emo Coins.';
+                setTimeout(closeQuiz, 2000);
+                return;
+            }
+            try {
+                const { data, error } = await db.rpc('ad_complete', { p_ad: activeAd.id, p_answer: val });
+                if (error) throw error;
+                if (data && data.passed && data.awarded > 0) {
+                    window.__userCoins = data.balance;
+                    resEl.style.color = '#00e676';
+                    resEl.textContent = '🎉 +' + data.awarded + ' Emo Coins added to your wallet!';
+                    if ((activeAd.tier || '').toLowerCase() === 'share') {
+                        await showAdShareUi(optDiv, resEl);
+                        return;
+                    }
+                } else if (data && data.passed === false) {
+                    resEl.style.color = '#ff5500';
+                    resEl.textContent = '❌ Wrong answer — no coins for this ad.';
+                } else if (data && data.reason === 'budget_exhausted') {
+                    resEl.style.color = '#ff5500';
+                    resEl.textContent = 'ℹ️ This campaign just ended — no coins this time.';
+                } else {
+                    resEl.style.color = '#ff5500';
+                    resEl.textContent = 'ℹ️ Already attempted — no coins this time.';
+                }
+            } catch (e) {
+                resEl.style.color = '#ff5500';
+                resEl.textContent = '⚠️ ' + ((e && e.message) ? e.message : 'Could not verify. Try again later.');
+            }
+            setTimeout(closeQuiz, 2500);
+        };
+
+        document.getElementById('quizOverlay').classList.add('active');
+        startQuizTimer();
+    }
+
+    async function showAdShareUi(optDiv, resEl) {
+        let stt = null;
+        try {
+            const { data } = await db.rpc('ad_share_status');
+            stt = data;
+        } catch (e) {}
+        if (stt && stt.shares_available >= 1) {
+            document.getElementById('shareAdBtn').classList.add('visible');
+            resEl.textContent += ' Share unlocked! 🔓';
+        } else if (stt) {
+            resEl.textContent += ' ' + stt.next_unlock_in + ' more Share ad(s) to unlock sharing.';
+            setTimeout(closeQuiz, 3000);
+            return;
+        }
+        const cont = document.createElement('button');
+        cont.className = 'quiz-option';
+        cont.textContent = 'CONTINUE ▶';
+        cont.onclick = () => closeQuiz();
+        optDiv.appendChild(cont);
+    }
+    /* ===== END AD QUIZ V2 ===== */
+
+    function showAdQuizOld_unused() {
         adBadge.classList.remove('visible');
         quizCoinsClaimed = false;
         document.getElementById('quizTitle').textContent = '📢 Ad Proof of Watch';
@@ -1412,6 +1532,25 @@
     }
 
     async function shareAd() {
+        const resEl = document.getElementById('quizResult');
+        try {
+            const { data, error } = await db.rpc('ad_share', { p_ad: activeAd.id });
+            if (error) throw error;
+            if (data && data.shared) {
+                resEl.style.color = '#00e676';
+                resEl.textContent = '🎉 Ad shared! It was placed on another video.';
+                document.getElementById('shareAdBtn').classList.remove('visible');
+                setTimeout(closeQuiz, 1800);
+            } else {
+                const why = { not_unlocked: 'Watch 3 Share ads to unlock a share.', budget_exhausted: 'This campaign has ended.', no_video_available: 'No video available right now.' }[data && data.reason] || 'Could not share right now.';
+                resEl.textContent = 'ℹ️ ' + why;
+            }
+        } catch (e) {
+            resEl.textContent = '⚠️ ' + ((e && e.message) ? e.message : 'Share failed');
+        }
+    }
+
+    async function shareAdOld_unused() {
         try {
             if (navigator.share) {
                 await navigator.share({
@@ -1445,11 +1584,9 @@
     // ===== PRE-ROLL AD FLOW =====
     async function maybeShowAdPrompt() {
         try {
-            const { data, error } = await db
-                .from('ads')
-                .select('id,title,brand_name,video_url,tier')
-                .eq('status', 'active')
-                .limit(10);
+            const vid = currentVideoId || new URLSearchParams(window.location.search).get('id') || null;
+            const { data: adRow, error } = await db.rpc('ad_for_video', { p_video: vid });
+            const data = adRow ? [{ id: adRow.id, title: adRow.title, video_url: adRow.video_url, tier: adRow.tier_name }] : [];
 
             if (error || !data || data.length === 0) {
                 loadVideo();
@@ -1475,9 +1612,14 @@
         loadVideo();
     }
 
-    function startAdPlayback() {
+    async function startAdPlayback() {
         document.getElementById('adPromptOverlay').classList.remove('active');
         if (!activeAd || !activeAd.video_url) { loadVideo(); return; }
+        try {
+            const vid = currentVideoId || new URLSearchParams(window.location.search).get('id') || null;
+            const { data: st, error: stErr } = await db.rpc('ad_start', { p_ad: activeAd.id, p_video: vid });
+            if (stErr || !st || !st.started) { activeAd = null; loadVideo(); return; }
+        } catch (e) { activeAd = null; loadVideo(); return; }
 
         playerMode = 'ad';
         adBadge.classList.add('visible');
