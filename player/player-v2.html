@@ -796,7 +796,7 @@
             <div id="quizOptions"></div>
             <div class="quiz-result" id="quizResult"></div>
             <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
-            <button class="share-ad-btn" id="shareAdBtn" onclick="shareAd()">↗ Share This Ad &amp; Earn More</button>
+            <button class="share-ad-btn" id="shareAdBtn" onclick="shareAd()">↗ Share This Ad</button>
             <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
         </div>
     </div>
@@ -847,6 +847,11 @@
     // playerMode: 'content' (main video) or 'ad' (pre-roll ad)
     let playerMode = 'content';
     let activeAd = null;
+    let resumeState = null;   // set while a mid-roll/end ad interrupts the content video
+    let adQueue = [];         // extra Share ads still to play inside this video
+    let adInProgress = false;
+    let shareRun = false;     // true when the pre-roll was a Share-tier ad
+    let queueBuilt = false;
     let cheatDetected = false;
     let lastSafeTime = 0;
 
@@ -1122,11 +1127,12 @@
         errorState.classList.remove('visible');
         if (playerMode === 'content') {
             document.getElementById('videoDuration').textContent = formatTime(video.duration || 0);
-            incrementViewCount();
+            if (!resumeState) incrementViewCount();
         }
         updateTimeDisplay();
         cheatDetected = false;
         lastSafeTime = 0;
+        onContentLoaded();
     });
 
     video.addEventListener('canplaythrough', () => {
@@ -1148,7 +1154,7 @@
         if (playerMode === 'ad') {
             // If an ad fails to load, just fall through to the main video instead of blocking the user.
             console.warn('Ad failed to load, skipping straight to content.');
-            loadVideo();
+            afterAdFlow();
             return;
         }
 
@@ -1294,7 +1300,7 @@
         optDiv.appendChild(rep);
 
         quizOnClaim = null;
-        quizOnClose = () => { loadVideo(); };
+        quizOnClose = () => { afterAdFlow(); };
 
         rep.onclick = async () => {
             const reason = prompt('Why are you reporting this ad? (optional)');
@@ -1360,19 +1366,8 @@
     }
 
     async function showAdShareUi(optDiv, resEl) {
-        let stt = null;
-        try {
-            const { data } = await db.rpc('ad_share_status');
-            stt = data;
-        } catch (e) {}
-        if (stt && stt.shares_available >= 1) {
-            document.getElementById('shareAdBtn').classList.add('visible');
-            resEl.textContent += ' Share unlocked! 🔓';
-        } else if (stt) {
-            resEl.textContent += ' ' + stt.next_unlock_in + ' more Share ad(s) to unlock sharing.';
-            setTimeout(closeQuiz, 3000);
-            return;
-        }
+        document.getElementById('shareAdBtn').classList.add('visible');
+        resEl.textContent += ' You can share this ad now! 🔓';
         const cont = document.createElement('button');
         cont.className = 'quiz-option';
         cont.textContent = 'CONTINUE ▶';
@@ -1542,7 +1537,7 @@
                 document.getElementById('shareAdBtn').classList.remove('visible');
                 setTimeout(closeQuiz, 1800);
             } else {
-                const why = { not_unlocked: 'Watch 3 Share ads to unlock a share.', budget_exhausted: 'This campaign has ended.', no_video_available: 'No video available right now.' }[data && data.reason] || 'Could not share right now.';
+                const why = { already_shared: 'You already shared this ad.', budget_exhausted: 'This campaign has ended.', no_video_available: 'No video available right now.' }[data && data.reason] || 'Could not share right now.';
                 resEl.textContent = 'ℹ️ ' + why;
             }
         } catch (e) {
@@ -1581,12 +1576,95 @@
         if (quizOnClose) { const fn = quizOnClose; quizOnClose = null; fn(); }
     }
 
+    /* ===== MULTI-AD (SHARE TIER): start / middle / before end ===== */
+    function getVidId() {
+        return currentVideoId || new URLSearchParams(window.location.search).get('id') || null;
+    }
+
+    function afterAdFlow() {
+        if (resumeState) { resumeContent(); } else { loadVideo(); }
+    }
+
+    function resumeContent() {
+        adInProgress = false;
+        playerMode = 'content';
+        adBadge.classList.remove('visible');
+        errorState.classList.remove('visible');
+        loadingOverlay.classList.remove('hidden');
+        video.pause();
+        video.src = currentVideoUrl;
+        video.load();
+        attemptPlay();
+    }
+
+    function onContentLoaded() {
+        if (playerMode !== 'content') return;
+        if (resumeState) {
+            const t = resumeState.time;
+            resumeState = null;
+            adInProgress = false;
+            lastSafeTime = t;
+            try { video.currentTime = t; } catch (e) {}
+            return;
+        }
+        adInProgress = false;
+        const vid = getVidId();
+        if (currentUser && vid && video.duration && isFinite(video.duration)) {
+            db.rpc('video_report_duration', { p_video: vid, p_seconds: Math.round(video.duration) }).then(function() {}, function() {});
+        }
+        if (shareRun && !queueBuilt) {
+            queueBuilt = true;
+            fetchMoreShareAds();
+        }
+    }
+
+    async function fetchMoreShareAds() {
+        try {
+            const vid = getVidId();
+            const dur = Math.round(video.duration || 0);
+            if (!vid || !dur) return;
+            const { data, error } = await db.rpc('ad_more_share_ads', { p_video: vid, p_duration: dur });
+            if (error || !Array.isArray(data) || !data.length) return;
+            const times = data.length >= 2
+                ? [dur * 0.5, Math.max(dur - 10, dur * 0.5 + 5)]
+                : [Math.max(dur - 10, 5)];
+            adQueue = data.map(function(a, i) {
+                return {
+                    ad: { id: a.id, title: a.title, video_url: a.video_url, tier: a.tier_name, reward: a.reward },
+                    at: times[i],
+                    n: i + 2,
+                    total: data.length + 1
+                };
+            });
+        } catch (e) { console.warn('more share ads failed', e); }
+    }
+
+    video.addEventListener('timeupdate', function() {
+        if (playerMode !== 'content' || !adQueue.length || adInProgress || video.seeking) return;
+        if (video.currentTime >= adQueue[0].at) triggerQueuedAd();
+    });
+
+    function triggerQueuedAd() {
+        const item = adQueue.shift();
+        adInProgress = true;
+        resumeState = { time: video.currentTime };
+        video.pause();
+        isPlaying = false;
+        playBtn.textContent = '▶';
+        activeAd = item.ad;
+        document.getElementById('adRewardLabel').textContent = (item.ad.reward != null) ? item.ad.reward : '';
+        document.getElementById('adPromptSub').textContent =
+            (item.ad.title || 'A sponsor') + ' — sponsored ad ' + item.n + ' of ' + item.total + '.';
+        document.getElementById('adPromptOverlay').classList.add('active');
+    }
+    /* ===== END MULTI-AD ===== */
+
     // ===== PRE-ROLL AD FLOW =====
     async function maybeShowAdPrompt() {
         try {
             const vid = currentVideoId || new URLSearchParams(window.location.search).get('id') || null;
             const { data: adRow, error } = await db.rpc('ad_for_video', { p_video: vid });
-            const data = adRow ? [{ id: adRow.id, title: adRow.title, video_url: adRow.video_url, tier: adRow.tier_name }] : [];
+            const data = adRow ? [{ id: adRow.id, title: adRow.title, video_url: adRow.video_url, tier: adRow.tier_name, reward: adRow.reward }] : [];
 
             if (error || !data || data.length === 0) {
                 loadVideo();
@@ -1595,7 +1673,7 @@
 
             activeAd = data[Math.floor(Math.random() * data.length)];
             const tier = (activeAd.tier || 'normal').toLowerCase();
-            const reward = AD_TIER_REWARDS[tier] ?? AD_TIER_REWARDS.normal;
+            const reward = (activeAd.reward != null) ? activeAd.reward : (AD_TIER_REWARDS[tier] ?? AD_TIER_REWARDS.normal);
             document.getElementById('adRewardLabel').textContent = reward;
             document.getElementById('adPromptSub').textContent =
                 (activeAd.brand_name || activeAd.title || 'A sponsor') + ' wants to show you a quick ad.';
@@ -1609,17 +1687,18 @@
     function skipAd() {
         document.getElementById('adPromptOverlay').classList.remove('active');
         activeAd = null;
-        loadVideo();
+        afterAdFlow();
     }
 
     async function startAdPlayback() {
         document.getElementById('adPromptOverlay').classList.remove('active');
-        if (!activeAd || !activeAd.video_url) { loadVideo(); return; }
+        if (!activeAd || !activeAd.video_url) { afterAdFlow(); return; }
         try {
             const vid = currentVideoId || new URLSearchParams(window.location.search).get('id') || null;
             const { data: st, error: stErr } = await db.rpc('ad_start', { p_ad: activeAd.id, p_video: vid });
-            if (stErr || !st || !st.started) { activeAd = null; loadVideo(); return; }
-        } catch (e) { activeAd = null; loadVideo(); return; }
+            if (stErr || !st || !st.started) { activeAd = null; afterAdFlow(); return; }
+        } catch (e) { activeAd = null; afterAdFlow(); return; }
+        if (!resumeState && (activeAd.tier || '').toLowerCase() === 'share') shareRun = true;
 
         playerMode = 'ad';
         adBadge.classList.add('visible');
