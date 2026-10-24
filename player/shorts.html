@@ -228,11 +228,98 @@ async function init() {
     setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 1000);
 }
 
+/* ===== DROTTS VIEWS + FOLLOW ===== */
+const _viewDone = new Set();
+let _followed = new Set();
+
+(function() {
+    const st = document.createElement('style');
+    st.textContent = '.follow-btn{margin-left:8px;padding:4px 12px;border-radius:14px;border:1px solid #fff;background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;position:relative;z-index:6;pointer-events:auto}.follow-btn.on{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5)}';
+    document.head.appendChild(st);
+})();
+
+function registerView(id) {
+    if (!id || !currentUserId || _viewDone.has(id)) return;
+    _viewDone.add(id);
+    sb.rpc('register_view', { p_video_id: id }).then(function(res) {
+        if (!res || res.error || res.data == null) return;
+        const d = drottsData.find(function(x) { return x.id === id; });
+        if (d) d.views = res.data;
+        const el = document.querySelector('.short-item[data-id="' + id + '"] .video-stats');
+        if (el) el.textContent = res.data + ' views';
+        const cur = drottsData[currentIndex];
+        const sp = document.getElementById('spStats');
+        if (cur && cur.id === id && sp) sp.textContent = res.data + ' views';
+    }, function() {});
+}
+
+async function refreshFollows() {
+    if (currentUserId) {
+        try {
+            const { data } = await sb.from('follows').select('creator_id').eq('follower_id', currentUserId);
+            _followed = new Set((data || []).map(function(r) { return r.creator_id; }));
+        } catch (e) {}
+    }
+    applyFollowState();
+}
+
+function applyFollowState() {
+    document.querySelectorAll('.follow-btn').forEach(function(b) {
+        const c = b.dataset.creator;
+        if (!c || c === currentUserId) { b.style.display = 'none'; return; }
+        b.style.display = '';
+        const on = _followed.has(c);
+        b.textContent = on ? 'Following' : 'Follow';
+        b.classList.toggle('on', on);
+    });
+}
+
+async function toggleFollow(e, creatorId) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (!creatorId) return;
+    if (!currentUserId) { alert('Please log in to follow.'); return; }
+    if (creatorId === currentUserId) return;
+    const was = _followed.has(creatorId);
+    if (was) _followed.delete(creatorId); else _followed.add(creatorId);
+    applyFollowState();
+    try {
+        let res;
+        if (was) {
+            res = await sb.from('follows').delete().eq('follower_id', currentUserId).eq('creator_id', creatorId);
+        } else {
+            res = await sb.from('follows').insert({ follower_id: currentUserId, creator_id: creatorId });
+        }
+        if (res.error && res.error.code !== '23505') throw res.error;
+    } catch (err) {
+        if (was) _followed.add(creatorId); else _followed.delete(creatorId);
+        applyFollowState();
+        alert('Could not update follow. Please try again.');
+    }
+}
+
+function ensureSplitFollow(s) {
+    const au = document.getElementById('spAuthor');
+    if (!au) return;
+    let b = document.getElementById('spFollowBtn');
+    if (!b) {
+        b = document.createElement('button');
+        b.id = 'spFollowBtn';
+        b.className = 'follow-btn';
+        b.addEventListener('touchstart', function(ev) { ev.stopPropagation(); });
+        b.addEventListener('touchend', function(ev) { ev.stopPropagation(); });
+        au.insertAdjacentElement('afterend', b);
+    }
+    b.dataset.creator = s.creator_id || '';
+    b.onclick = function(ev) { toggleFollow(ev, s.creator_id || ''); };
+    applyFollowState();
+}
+/* ===== END DROTTS VIEWS + FOLLOW ===== */
+
 // ===== FETCH SHORTS =====
 async function fetchShorts() {
     try {
         const { data, error } = await sb.from('videos')
-            .select('id, title, video_url, thumbnail_url, creator_name, views, likes')
+            .select('id, title, video_url, thumbnail_url, creator_name, creator_id, views, likes, comments')
             .eq('is_short', true)
             .order('created_at', { ascending: false })
             .limit(20);
@@ -266,6 +353,7 @@ function renderFullScroll() {
                 <div class="video-author">
                     <div class="author-avatar">${(s.creator_name||'?')[0].toUpperCase()}</div>
                     <span class="author-name">@${s.creator_name||'creator'}</span>
+                    <button class="follow-btn" data-creator="${s.creator_id||''}" onclick="toggleFollow(event,'${s.creator_id||''}')" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">Follow</button>
                 </div>
                 <div class="video-title">${s.title||''}</div>
                 <div class="video-stats">${s.views||0} views</div>
@@ -290,6 +378,11 @@ function renderFullScroll() {
     `).join('');
 
     document.querySelectorAll('.short-item').forEach(el => attachGestures(el));
+    document.querySelectorAll('.short-item').forEach(function(el) {
+        const vEl = el.querySelector('video');
+        if (vEl) vEl.addEventListener('playing', function() { registerView(el.dataset.id); });
+    });
+    refreshFollows();
 }
 
 // ===== RENDER STRIP =====
@@ -361,6 +454,8 @@ function playSplit(index) {
     document.getElementById('spAuthor').textContent = '@' + (s.creator_name||'creator');
     document.getElementById('spTitle').textContent = s.title||'';
     document.getElementById('spStats').textContent = (s.views||0) + ' views';
+    registerView(s.id);
+    ensureSplitFollow(s);
     document.getElementById('spComments').textContent = s.comments||0;
     updateSplitLikeUI();
     document.querySelectorAll('.strip-item').forEach((el,i) => el.classList.toggle('active', i===index));
