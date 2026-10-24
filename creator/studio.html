@@ -179,6 +179,12 @@ select option { background: #0d0d0d; }
     </div>
   </div>
 
+  <!-- RIGHTS CONFIRMATION -->
+  <label id="rightsBox" style="display:flex;gap:10px;align-items:flex-start;margin:14px 0;padding:12px;border:1px solid rgba(255,255,255,.18);border-radius:12px;font-size:.82rem;line-height:1.4;cursor:pointer;">
+    <input type="checkbox" id="rightsConfirm" style="margin-top:3px;width:18px;height:18px;flex:none;">
+    <span>I confirm this video is mine, or I have the owner's permission (or a valid licence) to upload it. Uploading other people's videos (for example from YouTube) without permission is not allowed and can lead to removal of the video and my account.</span>
+  </label>
+  <!-- END RIGHTS CONFIRMATION -->
   <button class="publish-btn" id="publishBtn" onclick="publishVideo()">🚀 PUBLISH VIDEO</button>
 </div>
 
@@ -471,6 +477,11 @@ async function publishVideo() {
   if (!selectedFile) { alert('Please select a video first!'); return; }
   const title = document.getElementById('videoTitle').value.trim();
   if (!title) { alert('Please add a title!'); return; }
+  if (!document.getElementById('rightsConfirm').checked) {
+    alert('Please confirm that you own this video or have permission to upload it.');
+    document.getElementById('rightsBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   const btn = document.getElementById('publishBtn');
   const statusMsg = document.getElementById('statusMsg');
@@ -544,6 +555,7 @@ async function publishVideo() {
       description: document.getElementById('videoDesc').value,
       category: document.getElementById('videoCategory').value,
       licence: document.getElementById('videoLicence').value,
+      rights_confirmed_at: new Date().toISOString(),
       video_url: h264Url,
       thumbnail_url: streamThumbnailUrl,
       views: 0,
