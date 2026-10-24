@@ -335,6 +335,7 @@ async function fetchShorts() {
         renderStrip();
         setupIntersectionObserver();
 
+        loadMyReactions();
         // Default full mode
         fullContainer.style.display = 'block';
     } catch(e) {
@@ -539,7 +540,7 @@ document.getElementById('spLikeBtn').addEventListener('click', e => {
 });
 
 // ===== SINGLE LIKE =====
-function triggerSingleLike(element, isSplit) {
+function triggerSingleLike_old(element, isSplit) {
     const s = drottsData[currentIndex];
     if (!s) return;
     const base = s.likes || 0;
@@ -562,7 +563,7 @@ function triggerSingleLike(element, isSplit) {
 }
 
 // ===== HEART BURST =====
-function triggerHeartBurst(element, x, y, isSplit) {
+function triggerHeartBurst_old(element, x, y, isSplit) {
     const s = drottsData[currentIndex];
     if (!s) return;
     const base = s.likes || 0;
@@ -579,7 +580,7 @@ function triggerHeartBurst(element, x, y, isSplit) {
 }
 
 // ===== SUPER LIKE =====
-function triggerSuperLike(element, x, y, isSplit) {
+function triggerSuperLike_old(element, x, y, isSplit) {
     const s = drottsData[currentIndex];
     if (!s) return;
     const base = s.likes || 0;
@@ -637,6 +638,148 @@ function triggerSuperLike(element, x, y, isSplit) {
         if (navigator.vibrate) navigator.vibrate(50);
     }
 }
+
+/* ===== LIKE KINDS v2: purple single, red double, yellow super (locked) ===== */
+function _likeToast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:8px 14px;border-radius:16px;font-size:13px;z-index:9999;max-width:80%;text-align:center';
+    document.body.appendChild(t);
+    setTimeout(function() { t.remove(); }, 1800);
+}
+
+function _likeBase(s) {
+    const st = likeStates.get(s.id);
+    return (st && st.base != null) ? st.base : (s.likes || 0);
+}
+
+function _applyLike(s, newState, element, isSplit) {
+    const base = _likeBase(s);
+    const st = { base: base, count: base + (newState === 'none' ? 0 : 1), state: newState };
+    likeStates.set(s.id, st);
+    updateLikeUI(s.id, st, element, isSplit);
+    const item = document.querySelector('.short-item[data-id="' + s.id + '"]');
+    if (item && item !== element) updateLikeUI(s.id, st, item, false);
+    if (!isSplit) updateSplitLikeUI();
+    return st;
+}
+
+function _persistKind(s, kind, prev, element, isSplit) {
+    sb.rpc('set_video_like', { p_video: s.id, p_kind: kind }).then(function(res) {
+        if (res.error) {
+            _applyLike(s, prev, element, isSplit);
+            _likeToast('Could not save like');
+            return;
+        }
+        if (res.data && res.data.changed === false && res.data.reason === 'super_locked') {
+            _applyLike(s, 'super', element, isSplit);
+            _likeToast("Super like can't be removed");
+        }
+    }, function() {
+        _applyLike(s, prev, element, isSplit);
+    });
+}
+
+function triggerSingleLike(element, isSplit) {
+    const s = drottsData[currentIndex];
+    if (!s) return;
+    const cur = likeStates.get(s.id) || { state: 'none' };
+    if (cur.state === 'super') { _likeToast("Super like can't be removed"); return; }
+    if (!currentUserId) { _likeToast('Please log in to like'); return; }
+    const prev = cur.state;
+    const newState = (prev === 'liked') ? 'none' : 'liked';
+    if (newState === 'liked' && element) createFloatingHeart(element, '💜', element.clientWidth / 2, element.clientHeight / 2);
+    _applyLike(s, newState, element, isSplit);
+    _persistKind(s, newState === 'none' ? 0 : 1, prev, element, isSplit);
+}
+
+function triggerHeartBurst(element, x, y, isSplit) {
+    const s = drottsData[currentIndex];
+    if (!s) return;
+    const cur = likeStates.get(s.id) || { state: 'none' };
+    if (cur.state === 'super') { _likeToast("Super like can't be removed"); return; }
+    if (!currentUserId) { _likeToast('Please log in to like'); return; }
+    const prev = cur.state;
+    if (prev !== 'heart') {
+        _applyLike(s, 'heart', element, isSplit);
+        _persistKind(s, 2, prev, element, isSplit);
+    }
+    const rect = element.getBoundingClientRect();
+    for (let i = 0; i < 5; i++) {
+        setTimeout(function() { createFloatingHeart(element, '❤️', x - rect.left + (Math.random() - 0.5) * 60, y - rect.top + (Math.random() - 0.5) * 40); }, i * 70);
+    }
+}
+
+function triggerSuperLike(element, x, y, isSplit) {
+    const s = drottsData[currentIndex];
+    if (!s) return;
+    const cur = likeStates.get(s.id) || { state: 'none' };
+    if (cur.state === 'super') { _likeToast("Super like can't be removed"); return; }
+    if (!currentUserId) { _likeToast('Please log in to super like'); return; }
+    const prev = cur.state;
+    _applyLike(s, 'super', element, isSplit);
+
+    const rect = element.getBoundingClientRect();
+    const lx = x - rect.left, ly = y - rect.top;
+    const ring = document.createElement('div');
+    ring.className = 'haptic-ring';
+    ring.style.cssText = 'left:' + lx + 'px;top:' + ly + 'px';
+    element.appendChild(ring);
+    setTimeout(function() { ring.remove(); }, 800);
+    const txt = document.createElement('div');
+    txt.className = 'super-like-text';
+    txt.textContent = '⭐ SUPER LIKE!';
+    txt.style.cssText = 'left:' + Math.max(10, lx - 60) + 'px;top:' + (ly - 40) + 'px';
+    element.appendChild(txt);
+    setTimeout(function() { txt.remove(); }, 1200);
+    for (let i = 0; i < 6; i++) {
+        setTimeout(function() { createFloatingHeart(element, '💛', lx + (Math.random() - 0.5) * 80, ly + (Math.random() - 0.5) * 60); }, i * 60);
+    }
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
+
+    sb.rpc('super_like_video', { p_video: s.id }).then(function(res) {
+        if (res.error || !res.data) {
+            _applyLike(s, prev, element, isSplit);
+            _likeToast('Could not save super like');
+            return;
+        }
+        const d = res.data;
+        if (d.awarded > 0) {
+            const coin = document.createElement('div');
+            coin.className = 'coin-pop';
+            coin.innerHTML = '🪙 +' + d.awarded + ' Emo Coin';
+            coin.style.cssText = 'left:' + Math.max(10, lx - 40) + 'px;top:' + (ly + 10) + 'px';
+            element.appendChild(coin);
+            setTimeout(function() { coin.remove(); }, 1000);
+            if (d.balance != null) emoCoins = Number(d.balance); else emoCoins += Number(d.awarded);
+            coinCountEl.textContent = emoCoins.toLocaleString();
+        } else if (d.reason === 'daily_limit') {
+            _likeToast('Daily super-like coin limit reached');
+        }
+    }, function() {
+        _applyLike(s, prev, element, isSplit);
+    });
+}
+
+async function loadMyReactions() {
+    if (!currentUserId || !drottsData.length) return;
+    try {
+        const { data } = await sb.rpc('video_my_reactions', { p_ids: drottsData.map(function(x) { return x.id; }) });
+        (data || []).forEach(function(r) {
+            if (r.reaction !== 1) return;
+            const s = drottsData.find(function(x) { return x.id === r.video_id; });
+            if (!s) return;
+            const state = r.kind === 3 ? 'super' : (r.kind === 2 ? 'heart' : 'liked');
+            const base = Math.max(0, (s.likes || 0) - 1);
+            const st = { base: base, count: base + 1, state: state };
+            likeStates.set(s.id, st);
+            const item = document.querySelector('.short-item[data-id="' + r.video_id + '"]');
+            updateLikeUI(r.video_id, st, item, false);
+        });
+        updateSplitLikeUI();
+    } catch (e) {}
+}
+/* ===== END LIKE KINDS v2 ===== */
 
 // ===== UPDATE LIKE UI =====
 function updateLikeUI(id, st, element, isSplit) {
