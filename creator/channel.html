@@ -913,11 +913,18 @@ async function toggleSub() {
       document.getElementById('statSubs').textContent = fmtNum(subCount);
       document.getElementById('statSubs').dataset.raw = subCount;
       let totalViews = profile.total_views || 0;
+      let totalLikes = 0, totalDislikes = 0;
       try {
-        const { data: vrows } = await db.from('videos').select('views').or('user_id.eq.' + creatorId + ',creator_id.eq.' + creatorId);
-        if (vrows) totalViews = vrows.reduce(function(a, r) { return a + (r.views || 0); }, 0);
+        const { data: vrows } = await db.from('videos').select('views, likes, dislikes').or('user_id.eq.' + creatorId + ',creator_id.eq.' + creatorId);
+        if (vrows) {
+          totalViews = vrows.reduce(function(a, r) { return a + (r.views || 0); }, 0);
+          totalLikes = vrows.reduce(function(a, r) { return a + (r.likes || 0); }, 0);
+          totalDislikes = vrows.reduce(function(a, r) { return a + (r.dislikes || 0); }, 0);
+        }
       } catch (e) {}
       document.getElementById('statViews').textContent = fmtNum(totalViews);
+      const likeDen = totalLikes + totalDislikes;
+      document.getElementById('statLikes').textContent = (likeDen > 0 ? Math.round(totalLikes * 100 / likeDen) : 0) + '%';
       document.getElementById('emoCoins').textContent = fmtNum(profile.emo_coins || 0);
       if (profile.is_verified) document.getElementById('verifiedBadge').style.display = 'flex';
       if (profile.avatar_url) {
@@ -930,7 +937,7 @@ async function toggleSub() {
         banner.style.backgroundPosition = 'center';
       }
       document.getElementById('bannerText').textContent = profile.username || '';
-      window.channelStats = { videos: 0, views: totalViews, likes: 0, emo_coins: profile.emo_coins || 0, subscribers: subCount };
+      window.channelStats = { videos: 0, views: totalViews, likes: totalLikes, emo_coins: profile.emo_coins || 0, subscribers: subCount };
       renderAbout({
         bio: profile.bio,
         location: profile.location,
