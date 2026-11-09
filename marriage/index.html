@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Marriage Studio</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/messaging/supabase-config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#F1F8F4;color:#12332A;--accent:#F0D58C;padding-bottom:40px}
+body.fem{--accent:#C2336B}
+.th-def,.th-muslim,.th-mixed,.th-other{--brand:#0B5D46;--soft:#DDF3E8}
+.th-hindu{--brand:#B45309;--soft:#FDEBD0}
+.th-christian{--brand:#1E3A8A;--soft:#E3EBFF}
+.head{background:#0B5D46;color:#fff;padding:14px 16px 12px;border-bottom:4px solid var(--accent);display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.head h1{margin:0;font-size:19px;font-weight:700}
+.head p{margin:2px 0 0;font-size:12px;color:#CFE8DD}
+.back{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:22px;border-radius:12px}
+.sec{margin:16px 16px 8px;font-size:15px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px 4px}
+.chip{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid #CFE3D9;background:#fff;color:#12332A;font:600 13px inherit;cursor:pointer}
+.chip.on{background:#0B5D46;border-color:#0B5D46;color:#fff}
+body.fem .chip.on{background:#C2336B;border-color:#C2336B}
+.card{background:#fff;border:1px solid #DCEBE3;border-top:4px solid var(--brand,#0B5D46);border-radius:16px;padding:14px;margin:0 16px 12px}
+.row{display:flex;align-items:center;gap:12px}
+.av{width:44px;height:44px;flex:none;border-radius:50%;background:var(--brand,#0B5D46);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+.grow{flex:1;min-width:0}
+.name{font-size:15px;font-weight:700;overflow-wrap:anywhere}
+.sub{font-size:12px;color:#4C6A60;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{background:var(--soft,#DDF3E8);color:#12332A;font-size:12px;padding:4px 10px;border-radius:8px}
+.pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--soft,#DDF3E8);color:#12332A}
+.pill.off{background:#ECEFED;color:#4C6A60}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;border:0;border-radius:12px;background:var(--brand,#0B5D46);color:#fff;font:600 14px inherit;cursor:pointer;padding:0 16px}
+.btn.gold{background:#E3C268;color:#3A2A00}
+.btn.ghost{background:#fff;color:var(--brand,#0B5D46);border:1px solid var(--brand,#0B5D46)}
+.btn.sm{width:auto;min-height:44px}
+.btn:disabled{opacity:.5}
+.note{margin:0 16px 12px;font-size:12px;line-height:1.5;color:#4C6A60}
+.msg{font-size:13px;line-height:1.5;padding:10px 12px;border-radius:12px;background:var(--soft,#DDF3E8);margin-top:10px}
+.top{padding:14px 16px 0}
+.ov{position:fixed;inset:0;background:rgba(10,30,24,.55);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px 24px}
+.sheet h2{margin:0 0 10px;font-size:17px}
+label.f{display:block;font-size:12px;font-weight:600;margin:12px 0 4px;color:#4C6A60}
+input[type=text],input[type=number],select,textarea{width:100%;min-height:44px;border:1px solid #CFE3D9;border-radius:12px;padding:10px 12px;font:14px inherit;background:#fff;color:#12332A}
+textarea{min-height:80px}
+.chk{display:flex;align-items:center;gap:12px;min-height:44px;font-size:13px;font-weight:600}
+.chk input{width:22px;height:22px;accent-color:var(--brand,#0B5D46)}
+.rule{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #E6F0EA;font-size:13px;line-height:1.45}
+.rule b{flex:none;width:22px;height:22px;border-radius:50%;background:var(--soft,#DDF3E8);display:flex;align-items:center;justify-content:center;font-size:12px}
+.toast{position:fixed;left:16px;right:16px;bottom:24px;background:#12332A;color:#fff;padding:12px 14px;border-radius:12px;font-size:13px;z-index:30;display:none}
+.req{padding:10px 0;border-top:1px solid #E6F0EA;font-size:13px}
+.req .who{font-weight:700}
+.req .meta{color:#4C6A60;font-size:12px;margin:2px 0 4px;line-height:1.45}
+.req .acts{display:flex;gap:8px;margin-top:8px}
+.center{text-align:center;padding:40px 24px;color:#4C6A60}
+</style>
+</head>
+<body>
+<div class="head">
+  <a class="back" href="/" aria-label="Back to Home">&#8592;</a>
+  <div><h1>Marriage Studio</h1><p>Find your match, guided by a Coordinator</p></div>
+</div>
+<div id="app"><div class="center">Loading...</div></div>
+<div id="sheetHost"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const RELIGIONS = { hindu:'Hindu', muslim:'Muslim', christian:'Christian', other:'Other', mixed:'Mixed religion' };
+const REJECT_MSG = 'Verification coordinator busy or unavailable this moment, please try another community.';
+let me = null, comms = [], myReqs = {}, myProfiles = {}, pending = [], filter = 'all', cur = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m) { const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.display = 'none', 3500); }
+function errText(e) { if (!e) return ''; if (e.code === '23505') return 'This is already done.'; return e.message || 'Something went wrong, please try again.'; }
+function theme(c) { return 'th-' + (c && c.religion ? c.religion : 'def'); }
+
+async function init() {
+  if (typeof db === 'undefined') { $('app').innerHTML = '<div class="center">App connection not found. Please open Ddott.TV and try again.</div>'; return; }
+  const { data } = await db.auth.getUser();
+  if (!data || !data.user) { $('app').innerHTML = '<div class="center">Please log in to Ddott.TV to use Marriage Studio.<br><br><a class="btn sm" style="display:inline-flex" href="/">Go to Home</a></div>'; return; }
+  me = data.user;
+  await loadAll();
+  render();
+}
+
+async function loadAll() {
+  const [c, r, p] = await Promise.all([
+    db.from('marriage_communities').select('*').order('created_at', { ascending: false }),
+    db.from('marriage_join_requests').select('*').eq('user_id', me.id),
+    db.from('marriage_profiles').select('community_id,gender').eq('user_id', me.id)
+  ]);
+  comms = c.data || [];
+  myReqs = {}; (r.data || []).forEach(x => myReqs[x.community_id] = x);
+  myProfiles = {}; (p.data || []).forEach(x => myProfiles[x.community_id] = x);
+  const g = (p.data || [])[0] || (r.data || [])[0];
+  const gender = g ? (g.gender || g.req_gender) : null;
+  document.body.classList.toggle('fem', gender === 'female');
+  const mine = comms.filter(x => x.coordinator_id === me.id).map(x => x.id);
+  pending = [];
+  if (mine.length) {
+    const q = await db.from('marriage_join_requests').select('*').in('community_id', mine).eq('status', 'pending').order('created_at');
+    pending = q.data || [];
+  }
+}
+
+function render() {
+  const mine = comms.filter(c => c.coordinator_id === me.id);
+  const list = comms.filter(c => c.coordinator_id !== me.id && (filter === 'all' || c.religion === filter));
+  let h = '<div class="chips">';
+  [['all','All'],['hindu','Hindu'],['muslim','Muslim'],['christian','Christian'],['mixed','Mixed']].forEach(f => {
+    h += '<button class="chip' + (filter === f[0] ? ' on' : '') + '" data-act="filter" data-v="' + f[0] + '">' + f[1] + '</button>';
+  });
+  h += '</div><div class="top"><button class="btn gold" data-act="newcomm">Become a Coordinator</button></div>';
+
+  if (mine.length) {
+    h += '<div class="sec">Your communities</div>';
+    mine.forEach(c => {
+      const reqs = pending.filter(x => x.community_id === c.id);
+      h += '<div class="card ' + theme(c) + '"><div class="row"><div class="av">' + esc(c.name.charAt(0).toUpperCase()) + '</div><div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) : '') + '</div></div>';
+      h += '<span class="pill' + (c.accepting ? '' : ' off') + '">' + (c.accepting ? 'Accepting' : 'Paused') + '</span></div>';
+      h += '<div class="row" style="margin-top:12px"><button class="btn ghost sm" data-act="toggle" data-id="' + c.id + '">' + (c.accepting ? 'Pause' : 'Start') + '</button>';
+      h += '<div class="grow"><label class="f" style="margin:0" for="lim' + c.id + '">User limit</label></div><input type="number" min="1" max="500" id="lim' + c.id + '" value="' + c.max_users + '" style="width:80px"><button class="btn sm" data-act="limit" data-id="' + c.id + '">Save</button></div>';
+      h += '<div class="sub" style="margin-top:12px">Join requests waiting: ' + reqs.length + '</div>';
+      reqs.forEach(q => {
+        h += '<div class="req"><div class="who">' + esc(q.req_name) + ' · ' + esc(q.req_age) + ' · ' + (q.req_gender === 'female' ? 'Female' : 'Male') + '</div>';
+        h += '<div class="meta">' + esc(RELIGIONS[q.req_religion]) + (q.req_caste ? ' · ' + esc(q.req_caste) : '') + (q.req_second_marriage ? ' · Second marriage' : '') + ' · ' + esc(new Date(q.created_at).toLocaleDateString()) + '</div>';
+        if (q.req_intro) h += '<div>' + esc(q.req_intro) + '</div>';
+        h += '<div class="acts"><button class="btn sm" data-act="accept" data-id="' + q.id + '">Accept</button><button class="btn ghost sm" data-act="reject" data-id="' + q.id + '">Reject</button></div></div>';
+      });
+      h += '</div>';
+    });
+  }
+
+  h += '<div class="sec">Communities</div>';
+  if (!list.length) h += '<div class="center">No communities here yet.</div>';
+  list.forEach(c => {
+    const rq = myReqs[c.id], hasProfile = !!myProfiles[c.id];
+    h += '<div class="card ' + theme(c) + '"><div class="row"><div class="av">' + esc(c.name.charAt(0).toUpperCase()) + '</div><div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">Coordinator community</div></div>';
+    h += '<span class="pill' + (c.accepting ? '' : ' off') + '">' + (c.accepting ? 'Accepting' : 'Paused') + '</span></div>';
+    h += '<div class="tags"><span class="tag">' + esc(RELIGIONS[c.religion]) + '</span><span class="tag">' + (c.caste_mode === 'fixed' ? esc(c.caste) + ' only' : 'Mixed caste') + '</span><span class="tag">Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</span></div>';
+    if (!rq) {
+      h += c.accepting ? '<button class="btn" data-act="join" data-id="' + c.id + '">Request to join</button>' : '<button class="btn" disabled>Not accepting right now</button>';
+    } else if (rq.status === 'pending') {
+      h += '<div class="msg">Request sent. Waiting for the Coordinator.</div>';
+    } else if (rq.status === 'accepted') {
+      h += hasProfile ? '<div class="msg">Your profile is created. Verification (ID and face) is the next step and will be added soon.</div>' : '<button class="btn" data-act="mkprofile" data-id="' + c.id + '">Create your profile</button>';
+    } else {
+      h += '<div class="msg">' + esc(REJECT_MSG) + '</div>';
+    }
+    h += '</div>';
+  });
+  h += '<p class="note">We never show or sell your details to anyone.</p>';
+  $('app').innerHTML = h;
+}
+
+function openSheet(html, c) { $('sheetHost').innerHTML = '<div class="ov" data-act="closebg"><div class="sheet ' + theme(c) + '">' + html + '</div></div>'; }
+function closeSheet() { $('sheetHost').innerHTML = ''; }
+
+function relOptions(sel) { return ['hindu','muslim','christian','other'].map(k => '<option value="' + k + '"' + (k === sel ? ' selected' : '') + '>' + RELIGIONS[k] + '</option>').join(''); }
+
+function rulesSheet(c) {
+  const rules = [
+    'Check that this community\'s religion and caste match your details. This is your responsibility.',
+    'Your profile details must be true and match your ID.',
+    'Once the verification payment is completed there is no refund for your own mistakes. Any error on our side is refunded in full.',
+    'Chat unrelated to marriage or flirting: first a warning, then a block.',
+    '18+ only. Photos are shown to both sides only after the unlock payment.',
+    'We never show or sell your details to anyone. They are used only for verification and matching.'
+  ];
+  let h = '<h2>' + esc(c.name) + '</h2><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) + ' only' : ' · Mixed caste') + ' · Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</div>';
+  h += '<div class="sec" style="margin:14px 0 0">About you</div><div class="sub">Only this community\'s Coordinator will see this.</div>';
+  h += '<label class="f" for="rn">Name</label><input type="text" id="rn" maxlength="60">';
+  h += '<label class="f" for="rg">Gender</label><select id="rg"><option value="male">Male</option><option value="female">Female</option></select>';
+  h += '<label class="f" for="ra">Age (18 or above)</label><input type="number" id="ra" min="18" max="90">';
+  h += '<label class="f" for="rr">Your religion</label><select id="rr">' + relOptions(c.religion !== 'mixed' ? c.religion : 'hindu') + '</select>';
+  h += '<label class="f" for="rc">Your caste</label><input type="text" id="rc" maxlength="40">';
+  h += '<label class="chk"><input type="checkbox" id="rs"> This is my second marriage</label>';
+  h += '<label class="f" for="ri">One line about you</label><textarea id="ri" maxlength="300"></textarea>';
+  h += '<div class="sec" style="margin:16px 0 4px">Community rules</div>';
+  rules.forEach((r, i) => h += '<div class="rule"><b>' + (i + 1) + '</b><div>' + esc(r) + '</div></div>');
+  h += '<label class="chk" style="margin-top:8px"><input type="checkbox" id="acc"> I have read and accept these rules</label>';
+  h += '<button class="btn" style="margin-top:8px" data-act="sendreq">Send join request</button>';
+  h += '<p class="note" style="margin:10px 0 0">You create your full profile and complete verification only after the Coordinator accepts your request.</p>';
+  openSheet(h, c);
+}
+
+function newCommSheet() {
+  let h = '<h2>Become a Coordinator</h2>';
+  h += '<label class="f" for="cn">Community name</label><input type="text" id="cn" maxlength="60" placeholder="e.g. Nair Matrimony Circle">';
+  h += '<label class="f" for="cr">Religion</label><select id="cr">' + Object.keys(RELIGIONS).map(k => '<option value="' + k + '">' + RELIGIONS[k] + '</option>').join('') + '</select>';
+  h += '<label class="f" for="cm">Caste</label><select id="cm"><option value="mixed">Mixed caste</option><option value="fixed">One fixed caste</option></select>';
+  h += '<div id="ccw" style="display:none"><label class="f" for="cc">Caste name</label><input type="text" id="cc" maxlength="40"></div>';
+  h += '<label class="chk" style="margin-top:8px"><input type="checkbox" id="cs"> Second marriage allowed</label>';
+  h += '<label class="f" for="cl">How many users can you take?</label><input type="number" id="cl" min="1" max="500" value="25">';
+  h += '<button class="btn" style="margin-top:14px" data-act="savecomm">Create community</button>';
+  openSheet(h, null);
+  $('cm').addEventListener('change', () => { $('ccw').style.display = $('cm').value === 'fixed' ? 'block' : 'none'; });
+}
+
+function profileSheet(c) {
+  const rq = myReqs[c.id] || {};
+  let h = '<h2>Create your profile</h2><div class="sub">' + esc(c.name) + '</div>';
+  h += '<label class="f" for="pn">Name</label><input type="text" id="pn" maxlength="60">';
+  h += '<label class="f" for="pg">Gender</label><select id="pg"><option value="male">Male</option><option value="female">Female</option></select>';
+  h += '<label class="f" for="pa">Age (18 or above)</label><input type="number" id="pa" min="18" max="90">';
+  h += '<label class="f" for="pr">Your religion</label><select id="pr">' + relOptions(rq.req_religion || (c.religion !== 'mixed' ? c.religion : 'hindu')) + '</select>';
+  h += '<label class="f" for="pc">Your caste</label><input type="text" id="pc" maxlength="40">';
+  h += '<label class="chk"><input type="checkbox" id="ps"> This is my second marriage</label>';
+  h += '<label class="f" for="pi">About you (one or two lines)</label><textarea id="pi" maxlength="300"></textarea>';
+  h += '<button class="btn" style="margin-top:14px" data-act="saveprofile">Save profile</button>';
+  h += '<p class="note" style="margin:10px 0 0">The community rules are checked automatically. Wrong religion or caste is not accepted.</p>';
+  openSheet(h, c);
+  $('pn').value = rq.req_name || '';
+  $('pg').value = rq.req_gender || 'male';
+  $('pa').value = rq.req_age || '';
+  $('pc').value = rq.req_caste || '';
+  $('ps').checked = !!rq.req_second_marriage;
+  $('pi').value = rq.req_intro || '';
+}
+
+async function act(a, el, ev) {
+  const id = el && el.dataset ? el.dataset.id : null;
+  if (a === 'filter') { filter = el.dataset.v; render(); }
+  else if (a === 'newcomm') newCommSheet();
+  else if (a === 'closebg') { if (ev.target === el) closeSheet(); }
+  else if (a === 'join') { cur = comms.find(x => x.id === id); rulesSheet(cur); }
+  else if (a === 'mkprofile') { cur = comms.find(x => x.id === id); profileSheet(cur); }
+  else if (a === 'sendreq') {
+    const name = $('rn').value.trim(), age = parseInt($('ra').value, 10), rel = $('rr').value, caste = $('rc').value.trim(), second = $('rs').checked;
+    if (name.length < 2) { toast('Please enter your name.'); return; }
+    if (!age || age < 18 || age > 90) { toast('You must be 18 or above.'); return; }
+    if (cur.religion !== 'mixed' && rel !== cur.religion) { toast('This community is only for ' + RELIGIONS[cur.religion] + '. Please choose another community.'); return; }
+    if (cur.caste_mode === 'fixed' && caste.toLowerCase() !== String(cur.caste).trim().toLowerCase()) { toast('This community is only for ' + cur.caste + '. Please choose another community.'); return; }
+    if (second && !cur.second_marriage_allowed) { toast('Second marriage is not allowed in this community.'); return; }
+    if (!$('acc').checked) { toast('Please accept the rules first.'); return; }
+    const r = await db.from('marriage_join_requests').insert({ community_id: cur.id, rules_accepted_at: new Date().toISOString(), req_name: name, req_gender: $('rg').value, req_age: age, req_religion: rel, req_caste: caste || null, req_second_marriage: second, req_intro: $('ri').value.trim() || null });
+    if (r.error) { toast(errText(r.error)); return; }
+    closeSheet(); await loadAll(); render(); toast('Request sent.');
+  }
+  else if (a === 'savecomm') {
+    const name = $('cn').value.trim(), fixed = $('cm').value === 'fixed', caste = $('cc').value.trim();
+    if (name.length < 3) { toast('Please enter a community name.'); return; }
+    if (fixed && !caste) { toast('Please enter the caste name.'); return; }
+    const r = await db.from('marriage_communities').insert({ name: name, religion: $('cr').value, caste_mode: fixed ? 'fixed' : 'mixed', caste: fixed ? caste : null, second_marriage_allowed: $('cs').checked, max_users: Math.max(1, parseInt($('cl').value, 10) || 25) });
+    if (r.error) { toast(errText(r.error)); return; }
+    closeSheet(); await loadAll(); render(); toast('Community created.');
+  }
+  else if (a === 'toggle') {
+    const c = comms.find(x => x.id === id);
+    const r = await db.from('marriage_communities').update({ accepting: !c.accepting }).eq('id', id);
+    if (r.error) { toast(errText(r.error)); return; }
+    await loadAll(); render();
+  }
+  else if (a === 'limit') {
+    const v = Math.max(1, parseInt($('lim' + id).value, 10) || 1);
+    const r = await db.from('marriage_communities').update({ max_users: v }).eq('id', id);
+    if (r.error) { toast(errText(r.error)); return; }
+    await loadAll(); render(); toast('Saved.');
+  }
+  else if (a === 'accept' || a === 'reject') {
+    const r = await db.from('marriage_join_requests').update({ status: a === 'accept' ? 'accepted' : 'rejected' }).eq('id', id);
+    if (r.error) { toast(errText(r.error)); return; }
+    await loadAll(); render(); toast(a === 'accept' ? 'Accepted.' : 'Rejected.');
+  }
+  else if (a === 'saveprofile') {
+    const name = $('pn').value.trim(), age = parseInt($('pa').value, 10);
+    if (name.length < 2) { toast('Please enter your name.'); return; }
+    if (!age || age < 18) { toast('You must be 18 or above.'); return; }
+    const r = await db.from('marriage_profiles').insert({ community_id: cur.id, display_name: name, gender: $('pg').value, age: age, religion: $('pr').value, caste: $('pc').value.trim() || null, is_second_marriage: $('ps').checked, intro: $('pi').value.trim() || null });
+    if (r.error) { toast(errText(r.error)); return; }
+    closeSheet(); await loadAll(); render(); toast('Profile saved.');
+  }
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  act(el.dataset.act, el, e);
+});
+init();
+</script>
+</body>
+</html>
