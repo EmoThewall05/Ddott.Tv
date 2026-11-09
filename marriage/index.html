@@ -56,6 +56,13 @@ textarea{min-height:80px}
 .req .meta{color:#4C6A60;font-size:12px;margin:2px 0 4px;line-height:1.45}
 .req .acts{display:flex;gap:8px;margin-top:8px}
 .center{text-align:center;padding:40px 24px;color:#4C6A60}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.bn{margin:-14px -14px 12px;height:110px;border-radius:12px 12px 0 0;background:var(--soft,#DDF3E8) center/cover no-repeat}
+.bnp{height:90px;border-radius:12px;background:var(--soft,#DDF3E8) center/cover no-repeat;margin-top:4px}
+.avp{width:64px;height:64px;border-radius:50%;background:var(--soft,#DDF3E8) center/cover no-repeat;margin-top:4px}
+.exp{font-size:13px;line-height:1.5;margin:8px 0 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.pickrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+input[type=file]{font-size:13px;max-width:100%}
 </style>
 </head>
 <body>
@@ -71,12 +78,46 @@ textarea{min-height:80px}
 const RELIGIONS = { hindu:'Hindu', muslim:'Muslim', christian:'Christian', other:'Other', mixed:'Mixed religion' };
 const REJECT_MSG = 'Verification coordinator busy or unavailable this moment, please try another community.';
 let me = null, comms = [], myReqs = {}, myProfiles = {}, pending = [], filter = 'all', cur = null;
+let pickAv = null, pickBn = null, rmAv = false, rmBn = false, busy = false;
+const BUCKET = 'marriage-community-media';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(m) { const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.display = 'none', 3500); }
 function errText(e) { if (!e) return ''; if (e.code === '23505') return 'This is already done.'; return e.message || 'Something went wrong, please try again.'; }
 function theme(c) { return 'th-' + (c && c.religion ? c.religion : 'def'); }
+function avHtml(c) { return '<div class="av">' + (c.avatar_url ? '<img src="' + esc(c.avatar_url) + '" alt="">' : esc(c.name.charAt(0).toUpperCase())) + '</div>'; }
+function bnHtml(c) { return c.banner_url ? '<div class="bn" style="background-image:url(\'' + esc(c.banner_url) + '\')"></div>' : ''; }
+function coordLine(c) {
+  let t = 'Coordinator' + (c.coord_name ? ' \u00b7 ' + c.coord_name : '');
+  if (c.exp_years != null) t += ' \u00b7 ' + c.exp_years + (c.exp_years === 1 ? ' year' : ' years') + ' experience';
+  return t;
+}
+function resizeImg(file, max) {
+  return new Promise((res, rej) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const s = Math.min(1, max / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * s)), h = Math.max(1, Math.round(img.height * s));
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(u);
+      cv.toBlob(b => b ? res(b) : rej(new Error('Could not process this image.')), 'image/jpeg', 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('Could not read this image.')); };
+    img.src = u;
+  });
+}
+async function uploadImg(file, kind, max) {
+  const blob = await resizeImg(file, max);
+  const path = me.id + '/' + kind + '-' + Date.now() + '.jpg';
+  const r = await db.storage.from(BUCKET).upload(path, blob, { contentType: 'image/jpeg' });
+  if (r.error) throw r.error;
+  return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+function dropOld(url) {
+  try { const i = url ? url.indexOf('/' + BUCKET + '/') : -1; if (i > -1) db.storage.from(BUCKET).remove([url.slice(i + BUCKET.length + 2)]); } catch (e) {}
+}
 
 async function init() {
   if (typeof db === 'undefined') { $('app').innerHTML = '<div class="center">App connection not found. Please open Ddott.TV and try again.</div>'; return; }
@@ -120,8 +161,11 @@ function render() {
     h += '<div class="sec">Your communities</div>';
     mine.forEach(c => {
       const reqs = pending.filter(x => x.community_id === c.id);
-      h += '<div class="card ' + theme(c) + '"><div class="row"><div class="av">' + esc(c.name.charAt(0).toUpperCase()) + '</div><div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) : '') + '</div></div>';
+      h += '<div class="card ' + theme(c) + '">' + bnHtml(c) + '<div class="row">' + avHtml(c) + '<div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) : '') + '</div></div>';
       h += '<span class="pill' + (c.accepting ? '' : ' off') + '">' + (c.accepting ? 'Accepting' : 'Paused') + '</span></div>';
+      h += '<div class="sub" style="margin-top:8px">' + esc(coordLine(c)) + '</div>';
+      if (c.exp_desc) h += '<div class="exp">' + esc(c.exp_desc) + '</div>';
+      h += '<div style="margin-top:10px"><button class="btn ghost sm" data-act="editcomm" data-id="' + c.id + '">Edit Coordinator profile</button></div>';
       h += '<div class="row" style="margin-top:12px"><button class="btn ghost sm" data-act="toggle" data-id="' + c.id + '">' + (c.accepting ? 'Pause' : 'Start') + '</button>';
       h += '<div class="grow"><label class="f" style="margin:0" for="lim' + c.id + '">User limit</label></div><input type="number" min="1" max="500" id="lim' + c.id + '" value="' + c.max_users + '" style="width:80px"><button class="btn sm" data-act="limit" data-id="' + c.id + '">Save</button></div>';
       h += '<div class="sub" style="margin-top:12px">Join requests waiting: ' + reqs.length + '</div>';
@@ -139,8 +183,9 @@ function render() {
   if (!list.length) h += '<div class="center">No communities here yet.</div>';
   list.forEach(c => {
     const rq = myReqs[c.id], hasProfile = !!myProfiles[c.id];
-    h += '<div class="card ' + theme(c) + '"><div class="row"><div class="av">' + esc(c.name.charAt(0).toUpperCase()) + '</div><div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">Coordinator community</div></div>';
+    h += '<div class="card ' + theme(c) + '">' + bnHtml(c) + '<div class="row">' + avHtml(c) + '<div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(coordLine(c)) + '</div></div>';
     h += '<span class="pill' + (c.accepting ? '' : ' off') + '">' + (c.accepting ? 'Accepting' : 'Paused') + '</span></div>';
+    if (c.exp_desc) h += '<div class="exp">' + esc(c.exp_desc) + '</div>';
     h += '<div class="tags"><span class="tag">' + esc(RELIGIONS[c.religion]) + '</span><span class="tag">' + (c.caste_mode === 'fixed' ? esc(c.caste) + ' only' : 'Mixed caste') + '</span><span class="tag">Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</span></div>';
     if (!rq) {
       h += c.accepting ? '<button class="btn" data-act="join" data-id="' + c.id + '">Request to join</button>' : '<button class="btn" disabled>Not accepting right now</button>';
@@ -171,7 +216,9 @@ function rulesSheet(c) {
     '18+ only. Photos are shown to both sides only after the unlock payment.',
     'We never show or sell your details to anyone. They are used only for verification and matching.'
   ];
-  let h = '<h2>' + esc(c.name) + '</h2><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) + ' only' : ' · Mixed caste') + ' · Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</div>';
+  let h = (c.banner_url ? '<div class="bnp" style="background-image:url(\'' + esc(c.banner_url) + '\');margin:0 0 10px"></div>' : '') + '<h2>' + esc(c.name) + '</h2><div class="sub">' + esc(coordLine(c)) + '</div>';
+  if (c.exp_desc) h += '<div class="exp">' + esc(c.exp_desc) + '</div>';
+  h += '<div class="sub" style="margin-top:8px">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) + ' only' : ' · Mixed caste') + ' · Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</div>';
   h += '<div class="sec" style="margin:14px 0 0">About you</div><div class="sub">Only this community\'s Coordinator will see this.</div>';
   h += '<label class="f" for="rn">Name</label><input type="text" id="rn" maxlength="60">';
   h += '<label class="f" for="rg">Gender</label><select id="rg"><option value="male">Male</option><option value="female">Female</option></select>';
@@ -188,6 +235,34 @@ function rulesSheet(c) {
   openSheet(h, c);
 }
 
+function mediaFields(c) {
+  let h = '<div class="sec" style="margin:16px 0 0">About you, the Coordinator</div><div class="sub">Everyone can see this. Write only what you want to show.</div>';
+  h += '<label class="f" for="kn">Display name (username or real name)</label><input type="text" id="kn" maxlength="40" placeholder="e.g. Anil K">';
+  h += '<label class="f" for="ky">Experience (years)</label><input type="number" id="ky" min="0" max="60" placeholder="e.g. 5">';
+  h += '<label class="f" for="kd">Experience details</label><textarea id="kd" maxlength="600" placeholder="Tell people about your experience as a Coordinator"></textarea>';
+  h += '<label class="f" for="avf">Profile picture (optional, any picture you like)</label><div class="avp" id="avp"></div>';
+  h += '<div class="pickrow"><input type="file" id="avf" accept="image/*"><button type="button" class="btn ghost sm" data-act="rmav">Remove</button></div>';
+  h += '<label class="f" for="bnf">Background banner (optional, any picture you like)</label><div class="bnp" id="bnp"></div>';
+  h += '<div class="pickrow"><input type="file" id="bnf" accept="image/*"><button type="button" class="btn ghost sm" data-act="rmbn">Remove</button></div>';
+  return h;
+}
+function bindMedia(c) {
+  pickAv = null; pickBn = null; rmAv = false; rmBn = false;
+  if (c) {
+    $('kn').value = c.coord_name || ''; $('ky').value = c.exp_years != null ? c.exp_years : ''; $('kd').value = c.exp_desc || '';
+    if (c.avatar_url) $('avp').style.backgroundImage = 'url(\'' + c.avatar_url + '\')';
+    if (c.banner_url) $('bnp').style.backgroundImage = 'url(\'' + c.banner_url + '\')';
+  }
+  $('avf').addEventListener('change', () => { const f = $('avf').files[0]; if (!f) return; pickAv = f; rmAv = false; $('avp').style.backgroundImage = 'url(\'' + URL.createObjectURL(f) + '\')'; });
+  $('bnf').addEventListener('change', () => { const f = $('bnf').files[0]; if (!f) return; pickBn = f; rmBn = false; $('bnp').style.backgroundImage = 'url(\'' + URL.createObjectURL(f) + '\')'; });
+}
+function readCoord() {
+  const name = $('kn').value.trim(), yv = $('ky').value.trim(), years = yv === '' ? null : parseInt(yv, 10), desc = $('kd').value.trim();
+  if (name.length < 2) { toast('Please enter your display name.'); return null; }
+  if (years !== null && (isNaN(years) || years < 0 || years > 60)) { toast('Experience should be between 0 and 60 years.'); return null; }
+  return { coord_name: name, exp_years: years, exp_desc: desc || null };
+}
+
 function newCommSheet() {
   let h = '<h2>Become a Coordinator</h2>';
   h += '<label class="f" for="cn">Community name</label><input type="text" id="cn" maxlength="60" placeholder="e.g. Nair Matrimony Circle">';
@@ -196,9 +271,19 @@ function newCommSheet() {
   h += '<div id="ccw" style="display:none"><label class="f" for="cc">Caste name</label><input type="text" id="cc" maxlength="40"></div>';
   h += '<label class="chk" style="margin-top:8px"><input type="checkbox" id="cs"> Second marriage allowed</label>';
   h += '<label class="f" for="cl">How many users can you take?</label><input type="number" id="cl" min="1" max="500" value="25">';
-  h += '<button class="btn" style="margin-top:14px" data-act="savecomm">Create community</button>';
+  h += mediaFields(null);
+  h += '<button class="btn" id="savebtn" style="margin-top:14px" data-act="savecomm">Create community</button>';
   openSheet(h, null);
+  bindMedia(null);
   $('cm').addEventListener('change', () => { $('ccw').style.display = $('cm').value === 'fixed' ? 'block' : 'none'; });
+}
+
+function editCommSheet(c) {
+  let h = '<h2>Edit Coordinator profile</h2><div class="sub">' + esc(c.name) + '</div>';
+  h += mediaFields(c);
+  h += '<button class="btn" id="savebtn" style="margin-top:14px" data-act="saveedit" data-id="' + c.id + '">Save</button>';
+  openSheet(h, c);
+  bindMedia(c);
 }
 
 function profileSheet(c) {
@@ -226,6 +311,9 @@ async function act(a, el, ev) {
   const id = el && el.dataset ? el.dataset.id : null;
   if (a === 'filter') { filter = el.dataset.v; render(); }
   else if (a === 'newcomm') newCommSheet();
+  else if (a === 'editcomm') { cur = comms.find(x => x.id === id); editCommSheet(cur); }
+  else if (a === 'rmav') { pickAv = null; rmAv = true; $('avf').value = ''; $('avp').style.backgroundImage = ''; }
+  else if (a === 'rmbn') { pickBn = null; rmBn = true; $('bnf').value = ''; $('bnp').style.backgroundImage = ''; }
   else if (a === 'closebg') { if (ev.target === el) closeSheet(); }
   else if (a === 'join') { cur = comms.find(x => x.id === id); rulesSheet(cur); }
   else if (a === 'mkprofile') { cur = comms.find(x => x.id === id); profileSheet(cur); }
@@ -242,12 +330,39 @@ async function act(a, el, ev) {
     closeSheet(); await loadAll(); render(); toast('Request sent.');
   }
   else if (a === 'savecomm') {
+    if (busy) return;
     const name = $('cn').value.trim(), fixed = $('cm').value === 'fixed', caste = $('cc').value.trim();
     if (name.length < 3) { toast('Please enter a community name.'); return; }
     if (fixed && !caste) { toast('Please enter the caste name.'); return; }
-    const r = await db.from('marriage_communities').insert({ name: name, religion: $('cr').value, caste_mode: fixed ? 'fixed' : 'mixed', caste: fixed ? caste : null, second_marriage_allowed: $('cs').checked, max_users: Math.max(1, parseInt($('cl').value, 10) || 25) });
-    if (r.error) { toast(errText(r.error)); return; }
-    closeSheet(); await loadAll(); render(); toast('Community created.');
+    const co = readCoord(); if (!co) return;
+    busy = true; $('savebtn').disabled = true; $('savebtn').textContent = 'Saving...';
+    try {
+      const row = { name: name, religion: $('cr').value, caste_mode: fixed ? 'fixed' : 'mixed', caste: fixed ? caste : null, second_marriage_allowed: $('cs').checked, max_users: Math.max(1, parseInt($('cl').value, 10) || 25), coord_name: co.coord_name, exp_years: co.exp_years, exp_desc: co.exp_desc };
+      if (pickAv) row.avatar_url = await uploadImg(pickAv, 'avatar', 400);
+      if (pickBn) row.banner_url = await uploadImg(pickBn, 'banner', 1200);
+      const r = await db.from('marriage_communities').insert(row);
+      if (r.error) throw r.error;
+      closeSheet(); await loadAll(); render(); toast('Community created.');
+    } catch (e) { toast(errText(e)); if ($('savebtn')) { $('savebtn').disabled = false; $('savebtn').textContent = 'Create community'; } }
+    busy = false;
+  }
+  else if (a === 'saveedit') {
+    if (busy) return;
+    const co = readCoord(); if (!co) return;
+    const c = comms.find(x => x.id === id);
+    busy = true; $('savebtn').disabled = true; $('savebtn').textContent = 'Saving...';
+    try {
+      const upd = { coord_name: co.coord_name, exp_years: co.exp_years, exp_desc: co.exp_desc };
+      const oldAv = c.avatar_url, oldBn = c.banner_url;
+      if (pickAv) upd.avatar_url = await uploadImg(pickAv, 'avatar', 400); else if (rmAv) upd.avatar_url = null;
+      if (pickBn) upd.banner_url = await uploadImg(pickBn, 'banner', 1200); else if (rmBn) upd.banner_url = null;
+      const r = await db.from('marriage_communities').update(upd).eq('id', id);
+      if (r.error) throw r.error;
+      if ('avatar_url' in upd) dropOld(oldAv);
+      if ('banner_url' in upd) dropOld(oldBn);
+      closeSheet(); await loadAll(); render(); toast('Saved.');
+    } catch (e) { toast(errText(e)); if ($('savebtn')) { $('savebtn').disabled = false; $('savebtn').textContent = 'Save'; } }
+    busy = false;
   }
   else if (a === 'toggle') {
     const c = comms.find(x => x.id === id);
