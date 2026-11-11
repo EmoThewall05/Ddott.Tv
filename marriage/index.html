@@ -70,6 +70,20 @@ input[type=file]{font-size:13px;max-width:100%}
 .mrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .mem{padding:12px 0;border-top:1px solid #E6F0EA;font-size:13px}
 .mem .who{font-weight:700;font-size:14px}
+.pgban{height:150px;background:linear-gradient(135deg,var(--brand,#0B5D46),var(--soft,#DDF3E8)) center/cover no-repeat}
+.pghead{padding:0 16px;margin-top:-46px;position:relative}
+.pgav{width:92px;height:92px;border-radius:50%;border:4px solid #F1F8F4;background:var(--brand,#0B5D46) center/cover no-repeat;color:#fff;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700}
+.pgname{margin:10px 0 0;font-size:22px;font-weight:800;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 16px 0}
+.stat{background:#fff;border:1px solid #DCEBE3;border-radius:14px;padding:12px 6px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--brand,#0B5D46)}
+.stat span{font-size:11px;color:#4C6A60}
+.tabs{display:flex;gap:6px;margin:16px 16px 0;border-bottom:1px solid #DCEBE3}
+.tab{flex:1;min-height:44px;border:0;background:none;font:600 14px inherit;color:#4C6A60;cursor:pointer;border-bottom:3px solid transparent}
+.tab.on{color:var(--brand,#0B5D46);border-bottom-color:var(--brand,#0B5D46)}
+.pgbody{margin:12px 16px 0}
+.pgact{margin:14px 16px 0;display:flex;flex-direction:column;gap:10px}
+.backb{margin:8px 8px 0;min-height:44px;border:0;background:none;color:var(--brand,#0B5D46);font:600 14px inherit;cursor:pointer}
 </style>
 </head>
 <body>
@@ -87,6 +101,15 @@ const REJECT_MSG = 'Verification coordinator busy or unavailable this moment, pl
 let me = null, comms = [], myReqs = {}, myProfiles = {}, pending = [], filter = 'all', cur = null;
 let pickAv = null, pickBn = null, rmAv = false, rmBn = false, busy = false;
 let matches = [], profs = {}, chatTimer = null, chatCtx = null, chatCount = -1;
+let viewing = null, ptab = 'about', stats = {};
+const RULES = [
+  'Check that this community\'s religion and caste match your details. This is your responsibility.',
+  'Your profile details must be true and match your ID.',
+  'Once the verification payment is completed there is no refund for your own mistakes. Any error on our side is refunded in full.',
+  'Chat unrelated to marriage or flirting: first a warning, then a block.',
+  '18+ only. Photos are shown to both sides only after the unlock payment.',
+  'We never show or sell your details to anyone. They are used only for verification and matching.'
+];
 const BUCKET = 'marriage-community-media';
 
 const $ = id => document.getElementById(id);
@@ -168,7 +191,67 @@ async function init() {
   if (!data || !data.user) { $('app').innerHTML = '<div class="center">Please log in to Ddott.TV to use Marriage Studio.<br><br><a class="btn sm" style="display:inline-flex" href="/">Go to Home</a></div>'; return; }
   me = data.user;
   await loadAll();
+  const qc = new URLSearchParams(location.search).get('c');
+  if (qc && comms.some(x => x.id === qc)) { viewing = qc; ptab = 'about'; loadStats(qc); }
   render();
+}
+window.addEventListener('popstate', () => {
+  const qc = new URLSearchParams(location.search).get('c');
+  viewing = qc && comms.some(x => x.id === qc) ? qc : null;
+  if (viewing) { ptab = 'about'; loadStats(viewing); }
+  if (me) render();
+});
+async function loadStats(id) {
+  try {
+    const r = await db.rpc('marriage_community_stats', { p_id: id });
+    if (r && r.data) { stats[id] = r.data; if (viewing === id) render(); }
+  } catch (e) {}
+}
+function openPage(id) {
+  viewing = id; ptab = 'about';
+  try { history.pushState({ c: id }, '', '?c=' + id); } catch (e) {}
+  loadStats(id); render(); window.scrollTo(0, 0);
+}
+function backList() {
+  if (history.state && history.state.c) { history.back(); return; }
+  viewing = null;
+  try { history.replaceState({}, '', location.pathname); } catch (e) {}
+  render(); window.scrollTo(0, 0);
+}
+async function shareLink(id) {
+  const url = location.origin + '/marriage/?c=' + id;
+  try { if (navigator.share) { await navigator.share({ title: 'Marriage Studio', url: url }); return; } } catch (e) { return; }
+  try { await navigator.clipboard.writeText(url); toast('Link copied.'); } catch (e) { toast(url); }
+}
+
+function actionHtml(c) {
+  const rq = myReqs[c.id], hasProfile = !!myProfiles[c.id];
+  if (!rq) return c.accepting ? '<button class="btn" data-act="join" data-id="' + c.id + '">Request to join</button>' : '<button class="btn" disabled>Not accepting right now</button>';
+  if (rq.status === 'pending') return '<div class="msg">Request sent. Waiting for the Coordinator.</div>';
+  if (rq.status === 'accepted') {
+    if (!hasProfile) return '<button class="btn" data-act="mkprofile" data-id="' + c.id + '">Create your profile</button>';
+    if (myProfiles[c.id].kyc_verified) return '<button class="btn" data-act="browse" data-id="' + c.id + '">Browse members</button>';
+    return '<div class="msg">Your profile is created. Browsing members opens after your verification (ID and face), which will be added soon.</div>';
+  }
+  return '<div class="msg">' + esc(REJECT_MSG) + '</div>';
+}
+
+function pageHtml(c) {
+  const st = stats[c.id], own = c.coordinator_id === me.id;
+  let h = '<div class="' + theme(c) + '"><button class="backb" data-act="backlist">&#8592; Back</button>';
+  h += '<div class="pgban"' + (c.banner_url ? ' style="background-image:url(\'' + esc(c.banner_url) + '\')"' : '') + '></div>';
+  h += '<div class="pghead"><div class="pgav"' + (c.avatar_url ? ' style="background-image:url(\'' + esc(c.avatar_url) + '\')"' : '') + '>' + (c.avatar_url ? '' : esc(c.name.charAt(0).toUpperCase())) + '</div>';
+  h += '<h1 class="pgname">' + esc(c.name) + '</h1><div class="sub">' + esc(coordLine(c)) + '</div>';
+  h += '<div class="tags"><span class="pill' + (c.accepting ? '' : ' off') + '">' + (c.accepting ? 'Accepting' : 'Paused') + '</span><span class="tag">' + esc(RELIGIONS[c.religion]) + '</span><span class="tag">' + (c.caste_mode === 'fixed' ? esc(c.caste) + ' only' : 'Mixed caste') + '</span><span class="tag">Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</span></div></div>';
+  h += '<div class="stats"><div class="stat"><b>' + (c.exp_years != null ? esc(c.exp_years) : '-') + '</b><span>Years experience</span></div>';
+  h += '<div class="stat"><b>' + (st ? esc(st.members) : '-') + '</b><span>Members</span></div>';
+  h += '<div class="stat"><b>' + (st ? esc(st.matches) : '-') + '</b><span>Matches</span></div></div>';
+  h += '<div class="pgact">' + (own ? '<button class="btn ghost" data-act="editcomm" data-id="' + c.id + '">Edit Coordinator profile</button>' : actionHtml(c));
+  h += '<button class="btn ghost" data-act="share" data-id="' + c.id + '">Share this page</button></div>';
+  h += '<div class="tabs"><button class="tab' + (ptab === 'about' ? ' on' : '') + '" data-act="ptab" data-v="about">About</button><button class="tab' + (ptab === 'rules' ? ' on' : '') + '" data-act="ptab" data-v="rules">Rules</button></div><div class="pgbody">';
+  if (ptab === 'about') h += c.exp_desc ? '<div class="exp" style="margin:0">' + esc(c.exp_desc) + '</div>' : '<div class="sub">The Coordinator has not added a description yet.</div>';
+  else RULES.forEach((r, i) => h += '<div class="rule"><b>' + (i + 1) + '</b><div>' + esc(r) + '</div></div>');
+  return h + '</div></div>';
 }
 
 async function loadAll() {
@@ -200,6 +283,11 @@ async function loadAll() {
 }
 
 function render() {
+  if (viewing) {
+    const vc = comms.find(x => x.id === viewing);
+    if (vc) { $('app').innerHTML = pageHtml(vc); return; }
+    viewing = null;
+  }
   const mine = comms.filter(c => c.coordinator_id === me.id);
   const list = comms.filter(c => c.coordinator_id !== me.id && (filter === 'all' || c.religion === filter));
   let h = '<div class="chips">';
@@ -212,11 +300,11 @@ function render() {
     h += '<div class="sec">Your communities</div>';
     mine.forEach(c => {
       const reqs = pending.filter(x => x.community_id === c.id);
-      h += '<div class="card ' + theme(c) + '">' + bnHtml(c) + '<div class="row">' + avHtml(c) + '<div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) : '') + '</div></div>';
+      h += '<div class="card ' + theme(c) + '">' + bnHtml(c) + '<div class="row" data-act="viewc" data-id="' + c.id + '" style="cursor:pointer">' + avHtml(c) + '<div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) : '') + '</div></div>';
       h += '<span class="pill' + (c.accepting ? '' : ' off') + '">' + (c.accepting ? 'Accepting' : 'Paused') + '</span></div>';
       h += '<div class="sub" style="margin-top:8px">' + esc(coordLine(c)) + '</div>';
       if (c.exp_desc) h += '<div class="exp">' + esc(c.exp_desc) + '</div>';
-      h += '<div style="margin-top:10px"><button class="btn ghost sm" data-act="editcomm" data-id="' + c.id + '">Edit Coordinator profile</button></div>';
+      h += '<div class="mrow"><button class="btn ghost sm" data-act="viewc" data-id="' + c.id + '">View my page</button><button class="btn ghost sm" data-act="editcomm" data-id="' + c.id + '">Edit Coordinator profile</button><button class="btn ghost sm" data-act="share" data-id="' + c.id + '">Share</button></div>';
       h += '<div class="row" style="margin-top:12px"><button class="btn ghost sm" data-act="toggle" data-id="' + c.id + '">' + (c.accepting ? 'Pause' : 'Start') + '</button>';
       h += '<div class="grow"><label class="f" style="margin:0" for="lim' + c.id + '">User limit</label></div><input type="number" min="1" max="500" id="lim' + c.id + '" value="' + c.max_users + '" style="width:80px"><button class="btn sm" data-act="limit" data-id="' + c.id + '">Save</button></div>';
       h += '<div class="sub" style="margin-top:12px">Join requests waiting: ' + reqs.length + '</div>';
@@ -238,22 +326,11 @@ function render() {
   h += '<div class="sec">Communities</div>';
   if (!list.length) h += '<div class="center">No communities here yet.</div>';
   list.forEach(c => {
-    const rq = myReqs[c.id], hasProfile = !!myProfiles[c.id];
-    h += '<div class="card ' + theme(c) + '">' + bnHtml(c) + '<div class="row">' + avHtml(c) + '<div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(coordLine(c)) + '</div></div>';
+    h += '<div class="card ' + theme(c) + '">' + bnHtml(c) + '<div class="row" data-act="viewc" data-id="' + c.id + '" style="cursor:pointer">' + avHtml(c) + '<div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(coordLine(c)) + '</div></div>';
     h += '<span class="pill' + (c.accepting ? '' : ' off') + '">' + (c.accepting ? 'Accepting' : 'Paused') + '</span></div>';
     if (c.exp_desc) h += '<div class="exp">' + esc(c.exp_desc) + '</div>';
     h += '<div class="tags"><span class="tag">' + esc(RELIGIONS[c.religion]) + '</span><span class="tag">' + (c.caste_mode === 'fixed' ? esc(c.caste) + ' only' : 'Mixed caste') + '</span><span class="tag">Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</span></div>';
-    if (!rq) {
-      h += c.accepting ? '<button class="btn" data-act="join" data-id="' + c.id + '">Request to join</button>' : '<button class="btn" disabled>Not accepting right now</button>';
-    } else if (rq.status === 'pending') {
-      h += '<div class="msg">Request sent. Waiting for the Coordinator.</div>';
-    } else if (rq.status === 'accepted') {
-      if (!hasProfile) h += '<button class="btn" data-act="mkprofile" data-id="' + c.id + '">Create your profile</button>';
-      else if (myProfiles[c.id].kyc_verified) h += '<button class="btn" data-act="browse" data-id="' + c.id + '">Browse members</button>';
-      else h += '<div class="msg">Your profile is created. Browsing members opens after your verification (ID and face), which will be added soon.</div>';
-    } else {
-      h += '<div class="msg">' + esc(REJECT_MSG) + '</div>';
-    }
+    h += actionHtml(c);
     h += '</div>';
   });
   h += '<p class="note">We never show or sell your details to anyone.</p>';
@@ -313,14 +390,7 @@ async function loadChat() {
 function relOptions(sel) { return ['hindu','muslim','christian','other'].map(k => '<option value="' + k + '"' + (k === sel ? ' selected' : '') + '>' + RELIGIONS[k] + '</option>').join(''); }
 
 function rulesSheet(c) {
-  const rules = [
-    'Check that this community\'s religion and caste match your details. This is your responsibility.',
-    'Your profile details must be true and match your ID.',
-    'Once the verification payment is completed there is no refund for your own mistakes. Any error on our side is refunded in full.',
-    'Chat unrelated to marriage or flirting: first a warning, then a block.',
-    '18+ only. Photos are shown to both sides only after the unlock payment.',
-    'We never show or sell your details to anyone. They are used only for verification and matching.'
-  ];
+  const rules = RULES;
   let h = (c.banner_url ? '<div class="bnp" style="background-image:url(\'' + esc(c.banner_url) + '\');margin:0 0 10px"></div>' : '') + '<h2>' + esc(c.name) + '</h2><div class="sub">' + esc(coordLine(c)) + '</div>';
   if (c.exp_desc) h += '<div class="exp">' + esc(c.exp_desc) + '</div>';
   h += '<div class="sub" style="margin-top:8px">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) + ' only' : ' · Mixed caste') + ' · Second marriage: ' + (c.second_marriage_allowed ? 'Yes' : 'No') + '</div>';
@@ -329,7 +399,8 @@ function rulesSheet(c) {
   h += '<label class="f" for="rg">Gender</label><select id="rg"><option value="male">Male</option><option value="female">Female</option></select>';
   h += '<label class="f" for="ra">Age (18 or above)</label><input type="number" id="ra" min="18" max="90">';
   h += '<label class="f" for="rr">Your religion</label><select id="rr">' + relOptions(c.religion !== 'mixed' ? c.religion : 'hindu') + '</select>';
-  h += '<label class="f" for="rc">Your caste</label><input type="text" id="rc" maxlength="40">';
+  if (c.caste_mode === 'fixed') h += '<div class="msg">This community is for: <b>' + esc(c.caste) + '</b></div><label class="chk"><input type="checkbox" id="rcc"> I belong to this caste</label>';
+  else h += '<label class="f" for="rc">Your caste</label><input type="text" id="rc" maxlength="40">';
   h += '<label class="chk"><input type="checkbox" id="rs"> This is my second marriage</label>';
   h += '<label class="f" for="ri">One line about you</label><textarea id="ri" maxlength="300"></textarea>';
   h += '<div class="sec" style="margin:16px 0 4px">Community rules</div>';
@@ -421,6 +492,10 @@ async function act(a, el, ev) {
   else if (a === 'rmbn') { pickBn = null; rmBn = true; $('bnf').value = ''; $('bnp').style.backgroundImage = ''; }
   else if (a === 'closebg') { if (ev.target === el) closeSheet(); }
   else if (a === 'closesheet') closeSheet();
+  else if (a === 'viewc') openPage(id);
+  else if (a === 'backlist') backList();
+  else if (a === 'ptab') { ptab = el.dataset.v; render(); }
+  else if (a === 'share') shareLink(id);
   else if (a === 'browse') { browseSheet(comms.find(x => x.id === id)); }
   else if (a === 'interest') {
     const r = await db.from('marriage_matches').insert({ community_id: id, user_b: el.dataset.u });
@@ -455,11 +530,11 @@ async function act(a, el, ev) {
   else if (a === 'join') { cur = comms.find(x => x.id === id); rulesSheet(cur); }
   else if (a === 'mkprofile') { cur = comms.find(x => x.id === id); profileSheet(cur); }
   else if (a === 'sendreq') {
-    const name = $('rn').value.trim(), age = parseInt($('ra').value, 10), rel = $('rr').value, caste = $('rc').value.trim(), second = $('rs').checked;
+    const name = $('rn').value.trim(), age = parseInt($('ra').value, 10), rel = $('rr').value, caste = cur.caste_mode === 'fixed' ? String(cur.caste).trim() : $('rc').value.trim(), second = $('rs').checked;
     if (name.length < 2) { toast('Please enter your name.'); return; }
     if (!age || age < 18 || age > 90) { toast('You must be 18 or above.'); return; }
     if (cur.religion !== 'mixed' && rel !== cur.religion) { toast('This community is only for ' + RELIGIONS[cur.religion] + '. Please choose another community.'); return; }
-    if (cur.caste_mode === 'fixed' && caste.toLowerCase() !== String(cur.caste).trim().toLowerCase()) { toast('This community is only for ' + cur.caste + '. Please choose another community.'); return; }
+    if (cur.caste_mode === 'fixed' && !$('rcc').checked) { toast('Please confirm that you belong to ' + cur.caste + ', or choose another community.'); return; }
     if (second && !cur.second_marriage_allowed) { toast('Second marriage is not allowed in this community.'); return; }
     if (!$('acc').checked) { toast('Please accept the rules first.'); return; }
     const r = await db.from('marriage_join_requests').insert({ community_id: cur.id, rules_accepted_at: new Date().toISOString(), req_name: name, req_gender: $('rg').value, req_age: age, req_religion: rel, req_caste: caste || null, req_second_marriage: second, req_intro: $('ri').value.trim() || null });
