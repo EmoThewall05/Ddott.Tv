@@ -6,6 +6,7 @@
 <title>Marriage Studio</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/messaging/supabase-config.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#F1F8F4;color:#12332A;--accent:#F0D58C;padding-bottom:40px}
@@ -101,7 +102,9 @@ const REJECT_MSG = 'Verification coordinator busy or unavailable this moment, pl
 let me = null, comms = [], myReqs = {}, myProfiles = {}, pending = [], filter = 'all', cur = null;
 let pickAv = null, pickBn = null, rmAv = false, rmBn = false, busy = false;
 let matches = [], profs = {}, chatTimer = null, chatCtx = null, chatCount = -1;
-let viewing = null, ptab = 'about', stats = {};
+let viewing = null, ptab = 'about', stats = {}, wallet = 0, payBusy = false;
+const WORKER = 'https://ddott-add-ai-chat.meradivin.workers.dev', RZP_KEY = 'rzp_live_T7hoFzwN2P77Mf', UNLOCK = 50;
+const PACKS = [[500,50],[1000,100],[2000,200]];
 const RULES = [
   'Check that this community\'s religion and caste match your details. This is your responsibility.',
   'Your profile details must be true and match your ID.',
@@ -166,7 +169,7 @@ function userMatchHtml(m) {
     h += '<button class="btn ghost sm" data-act="mok" data-id="' + m.id + '">' + (myOk ? 'I am not ok now' : 'I am ok to go ahead') + '</button></div>';
     h += '<div class="sub" style="margin-top:8px">' + (m.a_ok && m.b_ok ? 'Both sides said ok. Waiting for the Coordinator to approve.' : (myOk ? 'You said ok. Waiting for the Coordinator.' : 'Talk to the Coordinator, then tell us if you are ok to go ahead.')) + '</div>';
   } else if (!m.unlocked_at) {
-    h += '<div class="msg">Approved by the Coordinator. Unlocking direct chat and photos (50 Emo) will open in the next update.</div>';
+    h += '<div class="msg">Approved by the Coordinator. Unlock direct chat and photos for ' + UNLOCK + ' Emo (\u20b9' + (UNLOCK * 10) + ').</div><div class="mrow"><button class="btn sm" data-act="unlock" data-id="' + m.id + '">Unlock with ' + UNLOCK + ' Emo</button></div>';
   } else {
     h += '<div class="mrow"><button class="btn sm" data-act="chat" data-id="' + m.id + '" data-t="direct" data-n="' + esc(name) + '">Chat with ' + esc(name) + '</button></div>';
   }
@@ -255,12 +258,14 @@ function pageHtml(c) {
 }
 
 async function loadAll() {
-  const [c, r, p, mt] = await Promise.all([
+  const [c, r, p, mt, wl] = await Promise.all([
     db.from('marriage_communities').select('*').order('created_at', { ascending: false }),
     db.from('marriage_join_requests').select('*').eq('user_id', me.id),
     db.from('marriage_profiles').select('community_id,gender,kyc_verified').eq('user_id', me.id),
-    db.from('marriage_matches').select('*').order('created_at', { ascending: false })
+    db.from('marriage_matches').select('*').order('created_at', { ascending: false }),
+    db.from('marriage_coin_wallets').select('balance').eq('user_id', me.id).maybeSingle()
   ]);
+  wallet = wl && wl.data ? Number(wl.data.balance) : 0;
   matches = mt.data || [];
   profs = {};
   const ids = Array.from(new Set(matches.reduce((a, m) => a.concat([m.user_a, m.user_b]), [])));
@@ -321,6 +326,9 @@ function render() {
   }
 
   const myM = matches.filter(m => m.user_a === me.id || m.user_b === me.id);
+  if (myM.length || Object.keys(myProfiles).length) {
+    h += '<div class="card"><div class="row"><div class="grow"><div class="name">Emo wallet: ' + wallet + ' Emo</div><div class="sub">1 Emo = \u20b910. Only bought Emo can be used here.</div></div><button class="btn gold sm" data-act="buy">Buy Emo</button></div></div>';
+  }
   if (myM.length) { h += '<div class="sec">My matches</div>'; myM.forEach(m => h += userMatchHtml(m)); }
 
   h += '<div class="sec">Communities</div>';
@@ -483,10 +491,80 @@ function profileSheet(c) {
   $('pi').value = rq.req_intro || '';
 }
 
+async function tok() { const r = await db.auth.getSession(); return r && r.data && r.data.session ? r.data.session.access_token : null; }
+async function wpost(path, body) {
+  const t = await tok(); if (!t) throw new Error('Please log in again.');
+  const res = await fetch(WORKER + path, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }, body: JSON.stringify(body) });
+  let d = {}; try { d = await res.json(); } catch (e) {}
+  return { ok: res.ok, d };
+}
+function buySheet(note) {
+  let h = '<h2>Buy Emo</h2><div class="sub">Your balance: ' + wallet + ' Emo. 1 Emo = ₹10. Unlock needs ' + UNLOCK + ' Emo.</div>';
+  if (note) h += '<div class="msg">' + esc(note) + '</div>';
+  h += '<div class="sub" style="margin-top:8px">Bought Emo is for Marriage Studio only. No refund for your own mistakes; any error from our side is refunded in full.</div>';
+  PACKS.forEach(k => { h += '<button class="btn" style="margin-top:10px" data-act="pay" data-amt="' + k[0] + '">' + k[1] + ' Emo for ₹' + k[0] + '</button>'; });
+  h += '<button class="btn ghost" style="margin-top:12px" data-act="closesheet">Close</button>';
+  openSheet(h);
+}
+async function payEmo(amount) {
+  if (payBusy) return; payBusy = true;
+  try {
+    if (typeof Razorpay === 'undefined') { toast('Payment window could not load. Check your internet and try again.'); return; }
+    const o = await wpost('/create-marriage-order', { amount: amount });
+    if (!o.ok || !o.d.order) { toast(o.d.error || 'Could not start payment.'); return; }
+    const order = o.d.order;
+    await new Promise(resolve => {
+      const rz = new Razorpay({
+        key: RZP_KEY, amount: order.amount, currency: 'INR', order_id: order.id,
+        name: 'Ddott TV Marriage Studio', description: 'Emo coins',
+        prefill: { email: me.email || '' },
+        theme: { color: '#0B5D46' },
+        handler: async resp => {
+          try {
+            const v = await wpost('/verify-marriage-payment', { razorpay_order_id: resp.razorpay_order_id, razorpay_payment_id: resp.razorpay_payment_id, razorpay_signature: resp.razorpay_signature });
+            if (v.ok && v.d.verified && v.d.credited) { toast('Payment done. ' + v.d.coins + ' Emo added.'); }
+            else if (v.d && v.d.verified && v.d.credited === false && !v.d.error) { toast('Payment received. Your Emo will show shortly. Use Report a problem if it does not.'); }
+            else toast((v.d && v.d.error) || 'Payment could not be verified. If money was cut, contact support with your payment ID: ' + resp.razorpay_payment_id);
+          } catch (e) { toast('Could not confirm payment. Payment ID: ' + resp.razorpay_payment_id); }
+          resolve();
+        },
+        modal: { ondismiss: () => resolve() }
+      });
+      rz.on('payment.failed', r => { toast((r && r.error && r.error.description) || 'Payment failed.'); });
+      rz.open();
+    });
+    await loadAll(); closeSheet(); render();
+  } catch (e) { toast(e.message || 'Payment error.'); }
+  finally { payBusy = false; }
+}
+function unlockSheet(m) {
+  const iA = m.user_a === me.id, name = pName(m, iA ? m.user_b : m.user_a);
+  let h = '<h2>Unlock with ' + esc(name) + '</h2><div class="sub">Direct chat and photos open for both sides.</div>';
+  h += '<div class="msg">Cost: ' + UNLOCK + ' Emo (₹' + (UNLOCK * 10) + ')<br>Your balance: ' + wallet + ' Emo</div>';
+  h += '<div class="sub" style="margin-top:8px">After payment there is no refund for your own mistakes. Any error from our side is refunded in full.</div>';
+  if (wallet >= UNLOCK) h += '<button class="btn" style="margin-top:12px" data-act="dounlock" data-id="' + m.id + '">Pay ' + UNLOCK + ' Emo and unlock</button>';
+  else h += '<div class="msg">You need ' + (UNLOCK - wallet) + ' more Emo.</div><button class="btn gold" style="margin-top:12px" data-act="buy">Buy Emo</button>';
+  h += '<button class="btn ghost" style="margin-top:10px" data-act="closesheet">Cancel</button>';
+  openSheet(h);
+}
+
 async function act(a, el, ev) {
   const id = el && el.dataset ? el.dataset.id : null;
   if (a === 'filter') { filter = el.dataset.v; render(); }
   else if (a === 'newcomm') newCommSheet();
+  else if (a === 'buy') buySheet();
+  else if (a === 'pay') payEmo(Number(el.dataset.amt));
+  else if (a === 'unlock') unlockSheet(matches.find(x => x.id === id));
+  else if (a === 'dounlock') {
+    if (payBusy) return; payBusy = true; el.disabled = true;
+    try {
+      const u = await wpost('/marriage-unlock', { match_id: id });
+      if (u.ok && u.d.unlocked) { await loadAll(); closeSheet(); render(); toast('Unlocked. You can chat directly now.'); }
+      else if (u.d && u.d.reason === 'insufficient_balance') { await loadAll(); buySheet('You need ' + UNLOCK + ' Emo to unlock.'); }
+      else { el.disabled = false; toast((u.d && (u.d.error || u.d.reason)) || 'Unlock failed.'); }
+    } catch (e) { el.disabled = false; toast(e.message || 'Unlock failed.'); }
+    finally { payBusy = false; }
+  }
   else if (a === 'editcomm') { cur = comms.find(x => x.id === id); editCommSheet(cur); }
   else if (a === 'rmav') { pickAv = null; rmAv = true; $('avf').value = ''; $('avp').style.backgroundImage = ''; }
   else if (a === 'rmbn') { pickBn = null; rmBn = true; $('bnf').value = ''; $('bnp').style.backgroundImage = ''; }
