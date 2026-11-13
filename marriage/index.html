@@ -86,11 +86,11 @@ input[type=file]{font-size:13px;max-width:100%}
 .pgact{margin:14px 16px 0;display:flex;flex-direction:column;gap:10px}
 .backb{margin:8px 8px 0;min-height:44px;border:0;background:none;color:var(--brand,#0B5D46);font:600 14px inherit;cursor:pointer}
 .phs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.phs img{width:96px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #DCEBE3;background:#EEF5F1}
 .phw{position:relative}
-.phw img{width:96px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #DCEBE3;background:#EEF5F1}
 .phw .x{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:16px;line-height:28px;padding:0;cursor:pointer}
-.pickrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
-input[type=file]{font-size:13px;max-width:100%}
+.sheet textarea{width:100%;min-height:90px}
+.lnk{background:none;border:0;color:var(--brand,#0B5D46);font:600 12px inherit;text-decoration:underline;padding:6px 0;cursor:pointer}
 </style>
 </head>
 <body>
@@ -109,7 +109,7 @@ let me = null, comms = [], myReqs = {}, myProfiles = {}, pending = [], filter = 
 let pickAv = null, pickBn = null, rmAv = false, rmBn = false, busy = false;
 let matches = [], profs = {}, chatTimer = null, chatCtx = null, chatCount = -1;
 let viewing = null, ptab = 'about', stats = {}, wallet = 0, payBusy = false;
-let ownPh = [];
+let cwal = 0, cled = [], cpay = [], members = [], ownPh = [], hmsgs = [], hrem = null, phCache = {};
 const WORKER = 'https://ddott-add-ai-chat.meradivin.workers.dev', RZP_KEY = 'rzp_live_T7hoFzwN2P77Mf', UNLOCK = 50;
 const PACKS = [[500,50],[1000,100],[2000,200]];
 const RULES = [
@@ -168,17 +168,18 @@ function userMatchHtml(m) {
   const c = comms.find(x => x.id === m.community_id) || {};
   let h = '<div class="card ' + theme(c) + '"><div class="name">' + esc(name) + '</div><div class="sub">' + esc(c.name || '') + '</div>';
   if (!m.b_accepted) {
-    if (iA) h += '<div class="msg">Interest sent. Waiting for ' + esc(name) + ' to accept.</div>';
-    else h += '<div class="msg">' + esc(name) + ' is interested in you. Accept to start talking with the Coordinator.</div><div class="mrow"><button class="btn sm" data-act="macc" data-id="' + m.id + '">Accept</button></div>';
+    if (iA) h += '<div class="msg">Interest sent. Waiting for ' + esc(name) + ' to accept.</div><div class="mrow"><button class="btn ghost sm" data-act="endm" data-id="' + m.id + '" data-w="withdraw">Withdraw</button></div>';
+    else h += '<div class="msg">' + esc(name) + ' is interested in you. Accept to start talking with the Coordinator.</div><div class="mrow"><button class="btn sm" data-act="macc" data-id="' + m.id + '">Accept</button><button class="btn ghost sm" data-act="endm" data-id="' + m.id + '" data-w="decline">Decline</button></div>';
   } else if (!m.coordinator_approved) {
     const myOk = iA ? m.a_ok : m.b_ok;
     h += '<div class="mrow"><button class="btn sm" data-act="chat" data-id="' + m.id + '" data-t="' + threadFor(m) + '" data-n="Coordinator">Chat with Coordinator</button>';
-    h += '<button class="btn ghost sm" data-act="mok" data-id="' + m.id + '">' + (myOk ? 'I am not ok now' : 'I am ok to go ahead') + '</button></div>';
+    h += '<button class="btn ghost sm" data-act="mok" data-id="' + m.id + '">' + (myOk ? 'I am not ok now' : 'I am ok to go ahead') + '</button><button class="btn ghost sm" data-act="endm" data-id="' + m.id + '" data-w="end">End match</button></div>';
     h += '<div class="sub" style="margin-top:8px">' + (m.a_ok && m.b_ok ? 'Both sides said ok. Waiting for the Coordinator to approve.' : (myOk ? 'You said ok. Waiting for the Coordinator.' : 'Talk to the Coordinator, then tell us if you are ok to go ahead.')) + '</div>';
   } else if (!m.unlocked_at) {
-    h += '<div class="msg">Approved by the Coordinator. Unlock direct chat and photos for ' + UNLOCK + ' Emo (\u20b9' + (UNLOCK * 10) + ').</div><div class="mrow"><button class="btn sm" data-act="unlock" data-id="' + m.id + '">Unlock with ' + UNLOCK + ' Emo</button></div>';
+    h += '<div class="msg">Approved by the Coordinator. Unlock direct chat and photos for ' + UNLOCK + ' Emo (\u20b9' + (UNLOCK * 10) + ').</div><div class="mrow"><button class="btn sm" data-act="unlock" data-id="' + m.id + '">Unlock with ' + UNLOCK + ' Emo</button><button class="btn ghost sm" data-act="endm" data-id="' + m.id + '" data-w="end">End match</button></div>';
   } else {
-    h += '<div class="mrow"><button class="btn sm" data-act="chat" data-id="' + m.id + '" data-t="direct" data-n="' + esc(name) + '">Chat with ' + esc(name) + '</button></div>';
+    h += '<div class="phs" data-phuser="' + other + '"></div>';
+    h += '<div class="mrow"><button class="btn sm" data-act="chat" data-id="' + m.id + '" data-t="direct" data-n="' + esc(name) + '">Chat with ' + esc(name) + '</button><button class="btn ghost sm" data-act="report" data-id="' + m.id + '">Report a problem</button><button class="btn ghost sm" data-act="endm" data-id="' + m.id + '" data-w="end">End match</button></div>';
   }
   return h + '</div>';
 }
@@ -192,6 +193,7 @@ function coordMatchHtml(m) {
   h += '<button class="btn ghost sm" data-act="chat" data-id="' + m.id + '" data-t="coord_b" data-n="' + esc(b) + '">Chat with ' + esc(b) + '</button></div>';
   if (m.coordinator_approved) h += '<div class="msg">Approved' + (m.unlocked_at ? ' and unlocked.' : '. Waiting for the unlock.') + '</div>';
   else if (m.a_ok && m.b_ok) h += '<div class="mrow"><button class="btn sm" data-act="mappr" data-id="' + m.id + '">Approve this match</button></div>';
+  h += '<div class="mrow"><button class="btn ghost sm" data-act="endm" data-id="' + m.id + '" data-w="coord">End this match</button></div>';
   return h + '</div>';
 }
 
@@ -268,14 +270,12 @@ async function loadAll() {
   const [c, r, p, mt, wl] = await Promise.all([
     db.from('marriage_communities').select('*').order('created_at', { ascending: false }),
     db.from('marriage_join_requests').select('*').eq('user_id', me.id),
-    db.from('marriage_profiles').select('community_id,gender,kyc_verified').eq('user_id', me.id),
+    db.from('marriage_profiles').select('community_id,gender,kyc_verified,display_name,age,intro').eq('user_id', me.id),
     db.from('marriage_matches').select('*').order('created_at', { ascending: false }),
     db.from('marriage_coin_wallets').select('balance').eq('user_id', me.id).maybeSingle()
   ]);
   wallet = wl && wl.data ? Number(wl.data.balance) : 0;
-  const ph = await db.from('marriage_photos').select('id,storage_path').eq('user_id', me.id);
-  ownPh = (ph && ph.data) || [];
-  matches = mt.data || [];
+  matches = (mt.data || []).filter(m => !m.ended_at);
   profs = {};
   const ids = Array.from(new Set(matches.reduce((a, m) => a.concat([m.user_a, m.user_b]), [])));
   if (ids.length) {
@@ -294,6 +294,18 @@ async function loadAll() {
     const q = await db.from('marriage_join_requests').select('*').in('community_id', mine).eq('status', 'pending').order('created_at');
     pending = q.data || [];
   }
+  const ex = await Promise.all([
+    db.from('marriage_photos').select('id,storage_path').eq('user_id', me.id),
+    mine.length ? db.from('marriage_wallets').select('balance_paise').eq('coordinator_id', me.id).maybeSingle() : Promise.resolve({}),
+    mine.length ? db.from('marriage_wallet_ledger').select('amount_paise,kind,created_at').eq('coordinator_id', me.id).order('created_at', { ascending: false }).limit(8) : Promise.resolve({}),
+    mine.length ? db.from('marriage_payouts').select('amount_paise,status,created_at').eq('coordinator_id', me.id).order('created_at', { ascending: false }).limit(5) : Promise.resolve({}),
+    mine.length ? db.from('marriage_profiles').select('user_id,community_id,display_name,kyc_verified').in('community_id', mine) : Promise.resolve({})
+  ]);
+  ownPh = (ex[0] && ex[0].data) || [];
+  cwal = ex[1] && ex[1].data ? Number(ex[1].data.balance_paise) : 0;
+  cled = (ex[2] && ex[2].data) || [];
+  cpay = (ex[3] && ex[3].data) || [];
+  members = (ex[4] && ex[4].data) || [];
 }
 
 function render() {
@@ -308,10 +320,14 @@ function render() {
   [['all','All'],['hindu','Hindu'],['muslim','Muslim'],['christian','Christian'],['mixed','Mixed']].forEach(f => {
     h += '<button class="chip' + (filter === f[0] ? ' on' : '') + '" data-act="filter" data-v="' + f[0] + '">' + f[1] + '</button>';
   });
-  h += '</div><div class="top"><button class="btn gold" data-act="newcomm">Become a Coordinator</button></div>';
+  h += '</div><div class="top"><div class="mrow" style="margin-top:0"><button class="btn gold sm" style="flex:1" data-act="newcomm">Become a Coordinator</button><button class="btn ghost sm" data-act="helper">Ask helper</button></div></div>';
 
   if (mine.length) {
     h += '<div class="sec">Your communities</div>';
+    h += '<div class="card"><div class="row"><div class="grow"><div class="name">Cash wallet: ' + rupee(cwal) + '</div><div class="sub">Your share (50%) of every unlock. Cash out any amount, no minimum.</div></div><button class="btn gold sm" data-act="cash"' + (cwal > 0 ? '' : ' disabled') + '>Cash out</button></div>';
+    cpay.forEach(x => h += '<div class="sub" style="margin-top:8px">Cash out ' + rupee(x.amount_paise) + ' \u00b7 ' + esc(x.status) + ' \u00b7 ' + esc(new Date(x.created_at).toLocaleDateString()) + '</div>');
+    cled.filter(x => x.kind === 'earning').slice(0, 5).forEach(x => h += '<div class="sub" style="margin-top:4px">Earned ' + rupee(x.amount_paise) + ' \u00b7 ' + esc(new Date(x.created_at).toLocaleDateString()) + '</div>');
+    h += '</div>';
     mine.forEach(c => {
       const reqs = pending.filter(x => x.community_id === c.id);
       h += '<div class="card ' + theme(c) + '">' + bnHtml(c) + '<div class="row" data-act="viewc" data-id="' + c.id + '" style="cursor:pointer">' + avHtml(c) + '<div class="grow"><div class="name">' + esc(c.name) + '</div><div class="sub">' + esc(RELIGIONS[c.religion]) + (c.caste_mode === 'fixed' ? ' · ' + esc(c.caste) : '') + '</div></div>';
@@ -330,6 +346,11 @@ function render() {
       });
       const cms = matches.filter(m => m.community_id === c.id);
       if (cms.length) { h += '<div class="sub" style="margin-top:12px">Matches: ' + cms.length + '</div>'; cms.forEach(m => h += coordMatchHtml(m)); }
+      const mem = members.filter(x => x.community_id === c.id);
+      if (mem.length) {
+        h += '<div class="sub" style="margin-top:12px">Members: ' + mem.length + '</div>';
+        mem.forEach(x => h += '<div class="mem"><div class="row"><div class="grow who">' + esc(x.display_name) + ' \u00b7 ' + (x.kyc_verified ? 'verified' : 'not verified') + '</div><button class="btn ghost sm" data-act="rmmem" data-c="' + c.id + '" data-u="' + x.user_id + '">Remove</button></div></div>');
+      }
       h += '</div>';
     });
   }
@@ -337,6 +358,15 @@ function render() {
   const myM = matches.filter(m => m.user_a === me.id || m.user_b === me.id);
   if (myM.length || Object.keys(myProfiles).length) {
     h += '<div class="card"><div class="row"><div class="grow"><div class="name">Emo wallet: ' + wallet + ' Emo</div><div class="sub">1 Emo = \u20b910. Only bought Emo can be used here.</div></div><button class="btn gold sm" data-act="buy">Buy Emo</button></div></div>';
+  }
+  const myPk = Object.keys(myProfiles);
+  if (myPk.length) {
+    h += '<div class="sec">My profile</div>';
+    myPk.forEach(cid => {
+      const pf = myProfiles[cid], cm = comms.find(x => x.id === cid) || {};
+      h += '<div class="card ' + theme(cm) + '"><div class="name">' + esc(pf.display_name || 'My profile') + (pf.age ? ' \u00b7 ' + esc(pf.age) : '') + '</div><div class="sub">' + esc(cm.name || '') + ' \u00b7 ' + (pf.kyc_verified ? 'Verified' : 'Verification pending') + '</div>';
+      h += '<div class="mrow"><button class="btn ghost sm" data-act="editprof" data-id="' + cid + '">Edit profile</button><button class="btn ghost sm" data-act="myphotos">My photos (' + ownPh.length + '/3)</button><button class="btn ghost sm" data-act="leave" data-id="' + cid + '">Leave</button></div></div>';
+    });
   }
   if (myM.length) { h += '<div class="sec">My matches</div>'; myM.forEach(m => h += userMatchHtml(m)); }
 
@@ -352,6 +382,7 @@ function render() {
   });
   h += '<p class="note">We never show or sell your details to anyone.</p>';
   $('app').innerHTML = h;
+  fillPhotos();
 }
 
 function openSheet(html, c) { $('sheetHost').innerHTML = '<div class="ov" data-act="closebg"><div class="sheet ' + theme(c) + '">' + html + '</div></div>'; }
@@ -479,22 +510,6 @@ function editCommSheet(c) {
   bindMedia(c);
 }
 
-function photoStrip() {
-  return ownPh.map(x => '<div class="phw"><img src="' + esc(x.storage_path) + '" alt=""><button class="x" data-act="delphoto" data-id="' + x.id + '">&times;</button></div>').join('');
-}
-async function addPhoto(inp) {
-  const f = inp.files[0]; if (!f) return;
-  if (ownPh.length >= 4) { toast('Maximum 4 photos.'); inp.value = ''; return; }
-  try {
-    const url = await uploadImg(f, 'photo', 900);
-    const r = await db.from('marriage_photos').insert({ user_id: me.id, storage_path: url });
-    if (r.error) { dropOld(url); throw r.error; }
-    const q = await db.from('marriage_photos').select('id,storage_path').eq('user_id', me.id);
-    ownPh = (q && q.data) || [];
-    const box = $('phs'); if (box) box.innerHTML = photoStrip();
-  } catch (e) { toast(errText(e)); }
-  inp.value = '';
-}
 function profileSheet(c) {
   const rq = myReqs[c.id] || {};
   let h = '<h2>Create your profile</h2><div class="sub">' + esc(c.name) + '</div>';
@@ -505,10 +520,9 @@ function profileSheet(c) {
   h += '<label class="f" for="pc">Your caste</label><input type="text" id="pc" maxlength="40">';
   h += '<label class="chk"><input type="checkbox" id="ps"> This is my second marriage</label>';
   h += '<label class="f" for="pi">About you (one or two lines)</label><textarea id="pi" maxlength="300"></textarea>';
-  h += '<label class="f">Photos (max 4)</label><div class="phs" id="phs">' + photoStrip() + '</div>';
-  h += '<div class="pickrow"><input type="file" id="pphoto" accept="image/*"></div>';
   h += '<button class="btn" style="margin-top:14px" data-act="saveprofile">Save profile</button>';
   h += '<p class="note" style="margin:10px 0 0">The community rules are checked automatically. Wrong religion or caste is not accepted.</p>';
+  h += '<button class="lnk" data-act="why">Why do we collect these details?</button>';
   openSheet(h, c);
   $('pn').value = rq.req_name || '';
   $('pg').value = rq.req_gender || 'male';
@@ -516,7 +530,111 @@ function profileSheet(c) {
   $('pc').value = rq.req_caste || '';
   $('ps').checked = !!rq.req_second_marriage;
   $('pi').value = rq.req_intro || '';
-  $('pphoto').addEventListener('change', () => addPhoto($('pphoto')));
+}
+
+function rupee(p) { return '₹' + (Number(p || 0) / 100).toFixed(2); }
+
+async function signed(paths) {
+  if (!paths.length) return {};
+  const r = await db.storage.from('marriage-photos').createSignedUrls(paths, 3600);
+  const o = {}; ((r && r.data) || []).forEach(x => { if (x.signedUrl) o[x.path] = x.signedUrl; });
+  return o;
+}
+async function fillPhotos() {
+  const els = Array.prototype.slice.call(document.querySelectorAll('[data-phuser]'));
+  for (const el of els) {
+    const uid = el.getAttribute('data-phuser');
+    try {
+      if (!phCache[uid]) {
+        const r = await db.from('marriage_photos').select('storage_path').eq('user_id', uid);
+        const paths = ((r && r.data) || []).map(x => x.storage_path);
+        const u = await signed(paths);
+        phCache[uid] = paths.map(x => u[x]).filter(Boolean);
+      }
+      el.innerHTML = phCache[uid].length ? phCache[uid].map(u => '<img src="' + esc(u) + '" alt="">').join('') : '<div class="sub">No photos added yet.</div>';
+    } catch (e) {}
+  }
+}
+
+async function photosSheet() {
+  const r = await db.from('marriage_photos').select('id,storage_path').eq('user_id', me.id);
+  ownPh = (r && r.data) || [];
+  const u = await signed(ownPh.map(x => x.storage_path));
+  let h = '<h2>My photos</h2><div class="sub">Add 2 or 3 clear photos. Only your match can see them, and only after the unlock. Max 3.</div><div class="phs">';
+  ownPh.forEach(x => h += '<div class="phw"><img src="' + esc(u[x.storage_path] || '') + '" alt=""><button class="x" data-act="phdel" data-id="' + x.id + '" data-p="' + esc(x.storage_path) + '">&times;</button></div>');
+  if (!ownPh.length) h += '<div class="sub">No photos yet.</div>';
+  h += '</div>';
+  if (ownPh.length < 3) h += '<div class="pickrow"><input type="file" id="phf" accept="image/*"><button class="btn sm" data-act="phup">Add photo</button></div>';
+  h += '<button class="btn ghost" style="margin-top:14px" data-act="closesheet">Close</button>';
+  openSheet(h);
+}
+async function addPhoto() {
+  const f = $('phf') && $('phf').files[0];
+  if (!f) { toast('Choose a photo first.'); return; }
+  if (busy) return; busy = true;
+  try {
+    const blob = await resizeImg(f, 900);
+    const path = me.id + '/' + Date.now() + '.jpg';
+    const up = await db.storage.from('marriage-photos').upload(path, blob, { contentType: 'image/jpeg' });
+    if (up.error) throw up.error;
+    const ins = await db.from('marriage_photos').insert({ storage_path: path });
+    if (ins.error) { await db.storage.from('marriage-photos').remove([path]); throw ins.error; }
+    delete phCache[me.id];
+    await photosSheet(); toast('Photo added.');
+  } catch (e) { toast(errText(e)); }
+  finally { busy = false; }
+}
+
+function reportSheet(mid) {
+  let h = '<h2>Report a problem</h2><div class="sub">Tell us what went wrong. If a payment error was on our side, it is refunded in full.</div>';
+  h += '<label class="f" for="rk">Type</label><select id="rk"><option value="payment">Payment or unlock problem</option><option value="chat">Chat or behaviour problem</option><option value="other">Other</option></select>';
+  h += '<label class="f" for="rm">What happened?</label><textarea id="rm" maxlength="500"></textarea>';
+  h += '<button class="btn" style="margin-top:14px" data-act="sendreport" data-id="' + (mid || '') + '">Send report</button><button class="btn ghost" style="margin-top:10px" data-act="closesheet">Cancel</button>';
+  openSheet(h);
+}
+
+function editProfSheet(cid) {
+  const pf = myProfiles[cid] || {}, c = comms.find(x => x.id === cid);
+  let h = '<h2>Edit profile</h2><div class="sub">Religion, caste and gender cannot be changed here.</div>';
+  h += '<label class="f" for="en">Name</label><input type="text" id="en" maxlength="60">';
+  h += '<label class="f" for="ea">Age</label><input type="number" id="ea" min="18" max="90">';
+  h += '<label class="f" for="ei">About you</label><textarea id="ei" maxlength="300"></textarea>';
+  h += '<button class="btn" style="margin-top:14px" data-act="saveeditprof" data-id="' + cid + '">Save</button><button class="btn ghost" style="margin-top:10px" data-act="closesheet">Cancel</button>';
+  openSheet(h, c);
+  $('en').value = pf.display_name || ''; $('ea').value = pf.age || ''; $('ei').value = pf.intro || '';
+}
+
+function helperSheet() {
+  let h = '<h2>Marriage Studio helper</h2><div class="sub">Ask how Marriage Studio works. ' + (hrem == null ? '5 questions per day.' : hrem + ' left today.') + '</div>';
+  h += '<div class="chatbox" id="hbox">' + (hmsgs.length ? hmsgs.map(x => '<div class="bub' + (x.role === 'user' ? ' me' : '') + '">' + esc(x.content) + '</div>').join('') : '<div class="sub" style="text-align:center">Ask your question below.</div>') + '</div>';
+  h += '<div class="chatin"><input type="text" id="hmsg" maxlength="300" placeholder="Type your question"><button class="btn sm" data-act="helpsend">Send</button></div>';
+  h += '<button class="btn ghost" style="margin-top:10px" data-act="closesheet">Close</button>';
+  openSheet(h);
+  const b = $('hbox'); if (b) b.scrollTop = b.scrollHeight;
+}
+async function helpSend() {
+  const inp = $('hmsg'), t = inp.value.trim();
+  if (!t || busy) return; busy = true; inp.value = '';
+  hmsgs.push({ role: 'user', content: t }); helperSheet();
+  try {
+    const r = await wpost('/marriage-ai-chat', { messages: hmsgs.slice(-6) });
+    const txt = r.d && r.d.content && r.d.content[0] ? r.d.content[0].text : (r.d && r.d.error) || 'Sorry, something went wrong. Please try again.';
+    if (r.d && typeof r.d.remaining === 'number') hrem = r.d.remaining;
+    if (r.d && r.d.error === 'daily_limit') hrem = 0;
+    hmsgs.push({ role: 'assistant', content: txt });
+  } catch (e) { hmsgs.push({ role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }); }
+  finally { busy = false; helperSheet(); }
+}
+
+function whySheet() {
+  openSheet('<h2>Why we collect these details</h2><div class="msg">Your religion, caste, age and gender are used only to match you with the right community and people. They are checked by the Coordinator and our verification step so every profile is genuine. We never show or sell your details to anyone.</div><button class="btn ghost" style="margin-top:14px" data-act="closesheet">Close</button>');
+}
+
+async function rpcDo(fn, args, okMsg) {
+  const r = await db.rpc(fn, args || {});
+  if (r.error) { toast(errText(r.error)); return null; }
+  await loadAll(); closeSheet(); render(); if (okMsg) toast(okMsg);
+  return r.data;
 }
 
 async function tok() { const r = await db.auth.getSession(); return r && r.data && r.data.session ? r.data.session.access_token : null; }
@@ -531,6 +649,7 @@ function buySheet(note) {
   if (note) h += '<div class="msg">' + esc(note) + '</div>';
   h += '<div class="sub" style="margin-top:8px">Bought Emo is for Marriage Studio only. No refund for your own mistakes; any error from our side is refunded in full.</div>';
   PACKS.forEach(k => { h += '<button class="btn" style="margin-top:10px" data-act="pay" data-amt="' + k[0] + '">' + k[1] + ' Emo for ₹' + k[0] + '</button>'; });
+  h += '<button class="lnk" data-act="report">Payment problem? Report a problem</button>';
   h += '<button class="btn ghost" style="margin-top:12px" data-act="closesheet">Close</button>';
   openSheet(h);
 }
@@ -572,6 +691,7 @@ function unlockSheet(m) {
   h += '<div class="sub" style="margin-top:8px">After payment there is no refund for your own mistakes. Any error from our side is refunded in full.</div>';
   if (wallet >= UNLOCK) h += '<button class="btn" style="margin-top:12px" data-act="dounlock" data-id="' + m.id + '">Pay ' + UNLOCK + ' Emo and unlock</button>';
   else h += '<div class="msg">You need ' + (UNLOCK - wallet) + ' more Emo.</div><button class="btn gold" style="margin-top:12px" data-act="buy">Buy Emo</button>';
+  h += '<button class="lnk" data-act="report" data-id="' + m.id + '">Payment problem? Report a problem</button>';
   h += '<button class="btn ghost" style="margin-top:10px" data-act="closesheet">Cancel</button>';
   openSheet(h);
 }
@@ -580,6 +700,61 @@ async function act(a, el, ev) {
   const id = el && el.dataset ? el.dataset.id : null;
   if (a === 'filter') { filter = el.dataset.v; render(); }
   else if (a === 'newcomm') newCommSheet();
+  else if (a === 'helper') helperSheet();
+  else if (a === 'helpsend') helpSend();
+  else if (a === 'why') whySheet();
+  else if (a === 'myphotos') photosSheet();
+  else if (a === 'phup') addPhoto();
+  else if (a === 'phdel') {
+    if (!confirm('Delete this photo?')) return;
+    const d = await db.from('marriage_photos').delete().eq('id', id);
+    if (d.error) { toast(errText(d.error)); return; }
+    await db.storage.from('marriage-photos').remove([el.dataset.p]);
+    delete phCache[me.id]; await photosSheet(); toast('Photo deleted.');
+  }
+  else if (a === 'report') reportSheet(id);
+  else if (a === 'sendreport') {
+    const msg = $('rm').value.trim();
+    if (msg.length < 5) { toast('Please describe the problem.'); return; }
+    const row = { kind: $('rk').value, message: msg }; if (id) row.match_id = id;
+    const r = await db.from('marriage_reports').insert(row);
+    if (r.error) { toast(errText(r.error)); return; }
+    closeSheet(); toast('Report sent. We will look into it.');
+  }
+  else if (a === 'editprof') editProfSheet(id);
+  else if (a === 'saveeditprof') {
+    const name = $('en').value.trim(), age = parseInt($('ea').value, 10);
+    if (name.length < 2) { toast('Please enter your name.'); return; }
+    if (!age || age < 18) { toast('You must be 18 or above.'); return; }
+    const r = await db.from('marriage_profiles').update({ display_name: name, age: age, intro: $('ei').value.trim() || null }).eq('community_id', id).eq('user_id', me.id);
+    if (r.error) { toast(errText(r.error)); return; }
+    await loadAll(); closeSheet(); render(); toast('Profile updated.');
+  }
+  else if (a === 'leave') {
+    const c = comms.find(x => x.id === id) || {};
+    openSheet('<h2>Leave ' + esc(c.name || 'community') + '?</h2><div class="msg">Your profile and join request will be removed and your open matches here will end. Any unlock payment already made is not refunded.</div><button class="btn" style="margin-top:14px" data-act="doleave" data-id="' + id + '">Yes, leave</button><button class="btn ghost" style="margin-top:10px" data-act="closesheet">Cancel</button>', c);
+  }
+  else if (a === 'doleave') { await rpcDo('marriage_leave', { p_community: id }, 'You left the community.'); }
+  else if (a === 'endm') {
+    const w = el.dataset.w;
+    const t = { decline: 'Decline this interest?', withdraw: 'Withdraw your interest?', coord: 'End this match for both people?' }[w] || 'End this match? Chat and photos will close. An unlock payment already made is not refunded.';
+    if (!confirm(t)) return;
+    const r = await db.rpc('marriage_end_match', { p_match: id });
+    if (r.error || !(r.data && r.data.ended)) { toast(r.error ? errText(r.error) : 'Could not end the match.'); return; }
+    await loadAll(); render(); toast('Match ended.');
+  }
+  else if (a === 'cash') {
+    openSheet('<h2>Cash out</h2><div class="msg">Amount: ' + rupee(cwal) + '</div><div class="sub" style="margin-top:8px">Your whole Cash wallet is requested. The payout is processed after PAN / KYC verification, and the payment provider fee is deducted from your amount.</div><button class="btn" style="margin-top:14px" data-act="docash">Request cash out</button><button class="btn ghost" style="margin-top:10px" data-act="closesheet">Cancel</button>');
+  }
+  else if (a === 'docash') {
+    const r = await db.rpc('marriage_request_payout');
+    if (r.error || !(r.data && r.data.requested)) { toast(r.error ? errText(r.error) : 'Nothing to cash out.'); return; }
+    await loadAll(); closeSheet(); render(); toast('Cash out requested.');
+  }
+  else if (a === 'rmmem') {
+    if (!confirm('Remove this member from your community? Their open matches will end.')) return;
+    await rpcDo('marriage_remove_member', { p_community: el.dataset.c, p_user: el.dataset.u }, 'Member removed.');
+  }
   else if (a === 'buy') buySheet();
   else if (a === 'pay') payEmo(Number(el.dataset.amt));
   else if (a === 'unlock') unlockSheet(matches.find(x => x.id === id));
@@ -698,15 +873,6 @@ async function act(a, el, ev) {
     const r = await db.from('marriage_join_requests').update({ status: a === 'accept' ? 'accepted' : 'rejected' }).eq('id', id);
     if (r.error) { toast(errText(r.error)); return; }
     await loadAll(); render(); toast(a === 'accept' ? 'Accepted.' : 'Rejected.');
-  }
-  else if (a === 'delphoto') {
-    const id = el.dataset.id, ph = ownPh.find(x => String(x.id) === String(id));
-    if (!ph) return;
-    const r = await db.from('marriage_photos').delete().eq('id', id).eq('user_id', me.id);
-    if (r.error) { toast(errText(r.error)); return; }
-    dropOld(ph.storage_path);
-    ownPh = ownPh.filter(x => String(x.id) !== String(id));
-    const box = $('phs'); if (box) box.innerHTML = photoStrip();
   }
   else if (a === 'saveprofile') {
     const name = $('pn').value.trim(), age = parseInt($('pa').value, 10);
