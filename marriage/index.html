@@ -85,6 +85,12 @@ input[type=file]{font-size:13px;max-width:100%}
 .pgbody{margin:12px 16px 0}
 .pgact{margin:14px 16px 0;display:flex;flex-direction:column;gap:10px}
 .backb{margin:8px 8px 0;min-height:44px;border:0;background:none;color:var(--brand,#0B5D46);font:600 14px inherit;cursor:pointer}
+.phs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.phw{position:relative}
+.phw img{width:96px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #DCEBE3;background:#EEF5F1}
+.phw .x{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:16px;line-height:28px;padding:0;cursor:pointer}
+.pickrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+input[type=file]{font-size:13px;max-width:100%}
 </style>
 </head>
 <body>
@@ -103,6 +109,7 @@ let me = null, comms = [], myReqs = {}, myProfiles = {}, pending = [], filter = 
 let pickAv = null, pickBn = null, rmAv = false, rmBn = false, busy = false;
 let matches = [], profs = {}, chatTimer = null, chatCtx = null, chatCount = -1;
 let viewing = null, ptab = 'about', stats = {}, wallet = 0, payBusy = false;
+let ownPh = [];
 const WORKER = 'https://ddott-add-ai-chat.meradivin.workers.dev', RZP_KEY = 'rzp_live_T7hoFzwN2P77Mf', UNLOCK = 50;
 const PACKS = [[500,50],[1000,100],[2000,200]];
 const RULES = [
@@ -266,6 +273,8 @@ async function loadAll() {
     db.from('marriage_coin_wallets').select('balance').eq('user_id', me.id).maybeSingle()
   ]);
   wallet = wl && wl.data ? Number(wl.data.balance) : 0;
+  const ph = await db.from('marriage_photos').select('id,storage_path').eq('user_id', me.id);
+  ownPh = (ph && ph.data) || [];
   matches = mt.data || [];
   profs = {};
   const ids = Array.from(new Set(matches.reduce((a, m) => a.concat([m.user_a, m.user_b]), [])));
@@ -470,6 +479,22 @@ function editCommSheet(c) {
   bindMedia(c);
 }
 
+function photoStrip() {
+  return ownPh.map(x => '<div class="phw"><img src="' + esc(x.storage_path) + '" alt=""><button class="x" data-act="delphoto" data-id="' + x.id + '">&times;</button></div>').join('');
+}
+async function addPhoto(inp) {
+  const f = inp.files[0]; if (!f) return;
+  if (ownPh.length >= 4) { toast('Maximum 4 photos.'); inp.value = ''; return; }
+  try {
+    const url = await uploadImg(f, 'photo', 900);
+    const r = await db.from('marriage_photos').insert({ user_id: me.id, storage_path: url });
+    if (r.error) { dropOld(url); throw r.error; }
+    const q = await db.from('marriage_photos').select('id,storage_path').eq('user_id', me.id);
+    ownPh = (q && q.data) || [];
+    const box = $('phs'); if (box) box.innerHTML = photoStrip();
+  } catch (e) { toast(errText(e)); }
+  inp.value = '';
+}
 function profileSheet(c) {
   const rq = myReqs[c.id] || {};
   let h = '<h2>Create your profile</h2><div class="sub">' + esc(c.name) + '</div>';
@@ -480,6 +505,8 @@ function profileSheet(c) {
   h += '<label class="f" for="pc">Your caste</label><input type="text" id="pc" maxlength="40">';
   h += '<label class="chk"><input type="checkbox" id="ps"> This is my second marriage</label>';
   h += '<label class="f" for="pi">About you (one or two lines)</label><textarea id="pi" maxlength="300"></textarea>';
+  h += '<label class="f">Photos (max 4)</label><div class="phs" id="phs">' + photoStrip() + '</div>';
+  h += '<div class="pickrow"><input type="file" id="pphoto" accept="image/*"></div>';
   h += '<button class="btn" style="margin-top:14px" data-act="saveprofile">Save profile</button>';
   h += '<p class="note" style="margin:10px 0 0">The community rules are checked automatically. Wrong religion or caste is not accepted.</p>';
   openSheet(h, c);
@@ -489,6 +516,7 @@ function profileSheet(c) {
   $('pc').value = rq.req_caste || '';
   $('ps').checked = !!rq.req_second_marriage;
   $('pi').value = rq.req_intro || '';
+  $('pphoto').addEventListener('change', () => addPhoto($('pphoto')));
 }
 
 async function tok() { const r = await db.auth.getSession(); return r && r.data && r.data.session ? r.data.session.access_token : null; }
@@ -670,6 +698,15 @@ async function act(a, el, ev) {
     const r = await db.from('marriage_join_requests').update({ status: a === 'accept' ? 'accepted' : 'rejected' }).eq('id', id);
     if (r.error) { toast(errText(r.error)); return; }
     await loadAll(); render(); toast(a === 'accept' ? 'Accepted.' : 'Rejected.');
+  }
+  else if (a === 'delphoto') {
+    const id = el.dataset.id, ph = ownPh.find(x => String(x.id) === String(id));
+    if (!ph) return;
+    const r = await db.from('marriage_photos').delete().eq('id', id).eq('user_id', me.id);
+    if (r.error) { toast(errText(r.error)); return; }
+    dropOld(ph.storage_path);
+    ownPh = ownPh.filter(x => String(x.id) !== String(id));
+    const box = $('phs'); if (box) box.innerHTML = photoStrip();
   }
   else if (a === 'saveprofile') {
     const name = $('pn').value.trim(), age = parseInt($('pa').value, 10);
