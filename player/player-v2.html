@@ -690,6 +690,32 @@
             <button class="ctrl-btn" id="fullscreenLandscapeBtn" title="Landscape Fullscreen">🔄</button>
             <span class="quality-badge">4K</span>
         </div>
+
+        <!-- ===== PLAYER OVERLAYS (inside container so they show in fullscreen) ===== -->
+    <!-- Pre-roll ad prompt: Skip vs Watch & Earn -->
+    <div class="ad-prompt-overlay" id="adPromptOverlay">
+        <div class="ad-prompt-box">
+            <div class="ad-prompt-title">📢 Sponsored Ad</div>
+            <div class="ad-prompt-sub" id="adPromptSub">Watch this short ad and earn Emo Coins, or skip straight to the video.</div>
+            <button class="ad-prompt-earn-btn" id="adWatchBtn" onclick="startAdPlayback()">▶ Watch &amp; Earn <span id="adRewardLabel">1.5</span> 🪙</button>
+            <button class="ad-prompt-skip-btn" onclick="skipAd()">Skip Ad</button>
+        </div>
+    </div>
+
+    <!-- Shared quiz overlay (used for both video quiz and ad quiz) -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-box">
+            <div class="quiz-title" id="quizTitle">🎬 Proof of Watch</div>
+            <div class="quiz-subtitle" id="quizSubtitle">Answer to earn your Emo Coins! 🪙</div>
+            <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult"></div>
+            <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
+            <button class="share-ad-btn" id="shareAdBtn" onclick="shareAd()">↗ Share This Ad</button>
+            <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
+        </div>
+    </div>
     </div>
 
     <div class="info-section">
@@ -777,30 +803,7 @@
         </a>
     </nav>
 
-    <!-- Pre-roll ad prompt: Skip vs Watch & Earn -->
-    <div class="ad-prompt-overlay" id="adPromptOverlay">
-        <div class="ad-prompt-box">
-            <div class="ad-prompt-title">📢 Sponsored Ad</div>
-            <div class="ad-prompt-sub" id="adPromptSub">Watch this short ad and earn Emo Coins, or skip straight to the video.</div>
-            <button class="ad-prompt-earn-btn" id="adWatchBtn" onclick="startAdPlayback()">▶ Watch &amp; Earn <span id="adRewardLabel">1.5</span> 🪙</button>
-            <button class="ad-prompt-skip-btn" onclick="skipAd()">Skip Ad</button>
-        </div>
-    </div>
 
-    <!-- Shared quiz overlay (used for both video quiz and ad quiz) -->
-    <div class="quiz-overlay" id="quizOverlay">
-        <div class="quiz-box">
-            <div class="quiz-title" id="quizTitle">🎬 Proof of Watch</div>
-            <div class="quiz-subtitle" id="quizSubtitle">Answer to earn your Emo Coins! 🪙</div>
-            <div class="quiz-timer" id="quizTimer">⏱ 90s</div>
-            <div class="quiz-question" id="quizQuestion"></div>
-            <div id="quizOptions"></div>
-            <div class="quiz-result" id="quizResult"></div>
-            <button class="quiz-earn-btn" id="quizEarnBtn" onclick="claimQuizCoins()">🪙 Claim Emo Coins</button>
-            <button class="share-ad-btn" id="shareAdBtn" onclick="shareAd()">↗ Share This Ad</button>
-            <div class="quiz-skip" onclick="closeQuiz()">Skip →</div>
-        </div>
-    </div>
 
     <script>
     // ============================================
@@ -1919,8 +1922,28 @@ async function shareVideo() {
         }
     }
 
-    document.getElementById('fullscreenLandscapeBtn').addEventListener('click', () => enterFullscreen('landscape'));
-    document.getElementById('fullscreenPortraitBtn').addEventListener('click', () => enterFullscreen('portrait'));
+    // ===== FULLSCREEN TOGGLE (same button opens and closes) =====
+    async function toggleFullscreen(orientation) {
+        const nativeFs = document.fullscreenElement || document.webkitFullscreenElement;
+        const isFs = nativeFs || playerContainer.classList.contains('fullscreen-mode');
+        if (isFs) {
+            try {
+                if (nativeFs) {
+                    if (document.exitFullscreen) { await document.exitFullscreen(); }
+                    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+                }
+            } catch (e) { console.warn('Exit fullscreen failed:', e); }
+            playerContainer.classList.remove('fullscreen-mode');
+            if (screen.orientation && screen.orientation.unlock) {
+                try { screen.orientation.unlock(); } catch (e) {}
+            }
+        } else {
+            enterFullscreen(orientation);
+        }
+    }
+
+    document.getElementById('fullscreenLandscapeBtn').addEventListener('click', () => toggleFullscreen('landscape'));
+    document.getElementById('fullscreenPortraitBtn').addEventListener('click', () => toggleFullscreen('portrait'));
 
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement) {
