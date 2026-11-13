@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Marriage Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/messaging/supabase-config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#F1F8F4;color:#12332A;padding-bottom:40px}
+header{background:#0B5D46;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px}
+header a{color:#fff;text-decoration:none;font-size:22px;min-width:44px;min-height:44px;display:flex;align-items:center}
+header h1{margin:0;font-size:17px}
+.sec{margin:16px 16px 8px;font-size:15px;font-weight:700}
+.card{background:#fff;border:1px solid #DCEBE3;border-radius:14px;padding:14px;margin:0 16px 12px;font-size:13px;line-height:1.5}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tag{font-size:11px;padding:3px 8px;border-radius:10px;background:#DDF3E8;font-weight:600}
+.tag.open,.tag.requested{background:#FCE9C8}
+.tag.refunded,.tag.paid,.tag.resolved{background:#DDF3E8}
+.tag.rejected{background:#F6D5D5}
+.msg{margin:8px 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.sub{font-size:12px;color:#4C6A60}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+button{min-height:44px;border:1px solid #0B5D46;border-radius:12px;background:#fff;color:#0B5D46;font:600 13px inherit;padding:0 14px;cursor:pointer}
+button.pri{background:#0B5D46;color:#fff}
+.center{text-align:center;padding:40px 24px;color:#4C6A60}
+.note{margin:0 16px 12px;font-size:12px;color:#4C6A60;line-height:1.5}
+#toast{position:fixed;left:16px;right:16px;bottom:20px;background:#12332A;color:#fff;padding:12px 14px;border-radius:12px;font-size:13px;display:none}
+</style>
+</head>
+<body>
+<header><a href="/marriage/" aria-label="Back">&#8592;</a><h1>Marriage Admin</h1></header>
+<div id="app"><div class="center">Loading...</div></div>
+<div id="toast"></div>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m) { const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.display = 'none', 3500); }
+function rupee(p) { return '\u20b9' + (Number(p || 0) / 100).toFixed(2); }
+let data = { reports: [], payouts: [] };
+
+function render() {
+  let h = '<div class="sec">Reports</div>';
+  if (!data.reports.length) h += '<div class="card">No reports yet.</div>';
+  data.reports.forEach(r => {
+    h += '<div class="card"><div class="top"><b>' + esc(r.kind) + '</b><span class="tag ' + esc(r.status) + '">' + esc(r.status) + '</span></div>';
+    h += '<div class="sub">' + esc(r.community || 'No match linked') + ' \u00b7 ' + esc(new Date(r.created_at).toLocaleString()) + (r.match_id ? ' \u00b7 ' + (r.unlocked ? 'unlocked' : 'not unlocked') : '') + '</div>';
+    h += '<div class="msg">' + esc(r.message) + '</div><div class="row">';
+    if (r.kind === 'payment' && r.match_id && r.unlocked && r.status === 'open') h += '<button class="pri" data-a="refund" data-id="' + r.id + '" data-m="' + r.match_id + '">Refund in full</button>';
+    h += '<button data-a="rep" data-id="' + r.id + '" data-s="' + (r.status === 'open' ? 'resolved' : 'open') + '">' + (r.status === 'open' ? 'Mark resolved' : 'Reopen') + '</button></div></div>';
+  });
+  h += '<div class="sec">Cash out requests</div><p class="note">Check PAN / KYC, pay outside the app, then press Mark paid. Reject returns the amount to the Coordinator wallet.</p>';
+  if (!data.payouts.length) h += '<div class="card">No requests yet.</div>';
+  data.payouts.forEach(p => {
+    h += '<div class="card"><div class="top"><b>' + rupee(p.amount_paise) + '</b><span class="tag ' + esc(p.status) + '">' + esc(p.status) + '</span></div>';
+    h += '<div class="sub">' + esc(p.coordinator || 'Coordinator') + ' \u00b7 ' + esc(p.community || '') + ' \u00b7 ' + esc(new Date(p.created_at).toLocaleString()) + '</div>';
+    if (p.status === 'requested') h += '<div class="row"><button class="pri" data-a="pay" data-id="' + p.id + '" data-s="paid">Mark paid</button><button data-a="pay" data-id="' + p.id + '" data-s="rejected">Reject</button></div>';
+    h += '</div>';
+  });
+  $('app').innerHTML = h;
+}
+
+async function load() {
+  const r = await db.rpc('marriage_admin_overview');
+  if (r.error) { $('app').innerHTML = '<div class="center">This page is only for the admin.</div>'; return false; }
+  data = r.data || data; render(); return true;
+}
+
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-a]'); if (!el) return;
+  const a = el.dataset.a, id = el.dataset.id; let r;
+  if (a === 'refund') {
+    if (!confirm('Refund this unlock in full? The user gets 50 Emo back and the Coordinator share is removed.')) return;
+    r = await db.rpc('marriage_admin_refund', { p_match: el.dataset.m });
+    if (r.error || !(r.data && r.data.refunded)) { toast(r.error ? r.error.message : 'Could not refund (' + ((r.data && r.data.reason) || 'unknown') + ').'); return; }
+    await db.rpc('marriage_admin_report', { p_id: id, p_status: 'resolved' });
+    toast('Refunded.');
+  } else if (a === 'rep') {
+    r = await db.rpc('marriage_admin_report', { p_id: id, p_status: el.dataset.s });
+    if (r.error) { toast(r.error.message); return; }
+  } else if (a === 'pay') {
+    if (!confirm(el.dataset.s === 'paid' ? 'Mark this cash out as paid?' : 'Reject and return the amount to the wallet?')) return;
+    r = await db.rpc('marriage_admin_payout', { p_id: id, p_status: el.dataset.s });
+    if (r.error || !(r.data && r.data.ok)) { toast(r.error ? r.error.message : 'Not possible now.'); return; }
+  }
+  await load();
+});
+
+(async function () {
+  if (typeof db === 'undefined') { $('app').innerHTML = '<div class="center">App connection not found.</div>'; return; }
+  const u = await db.auth.getUser();
+  if (!u.data || !u.data.user) { $('app').innerHTML = '<div class="center">Please log in to Ddott.TV first.</div>'; return; }
+  load();
+})();
+</script>
+</body>
+</html>

@@ -109,7 +109,7 @@ let me = null, comms = [], myReqs = {}, myProfiles = {}, pending = [], filter = 
 let pickAv = null, pickBn = null, rmAv = false, rmBn = false, busy = false;
 let matches = [], profs = {}, chatTimer = null, chatCtx = null, chatCount = -1;
 let viewing = null, ptab = 'about', stats = {}, wallet = 0, payBusy = false;
-let cwal = 0, cled = [], cpay = [], members = [], ownPh = [], hmsgs = [], hrem = null, phCache = {};
+let cwal = 0, cled = [], cpay = [], members = [], ownPh = [], hmsgs = [], hrem = null, phCache = {}, isAdmin = false;
 const WORKER = 'https://ddott-add-ai-chat.meradivin.workers.dev', RZP_KEY = 'rzp_live_T7hoFzwN2P77Mf', UNLOCK = 50;
 const PACKS = [[500,50],[1000,100],[2000,200]];
 const RULES = [
@@ -203,6 +203,7 @@ async function init() {
   if (!data || !data.user) { $('app').innerHTML = '<div class="center">Please log in to Ddott.TV to use Marriage Studio.<br><br><a class="btn sm" style="display:inline-flex" href="/">Go to Home</a></div>'; return; }
   me = data.user;
   await loadAll();
+  try { const ad = await db.rpc('marriage_is_admin'); isAdmin = !!(ad && ad.data === true); } catch (e) {}
   const qc = new URLSearchParams(location.search).get('c');
   if (qc && comms.some(x => x.id === qc)) { viewing = qc; ptab = 'about'; loadStats(qc); }
   render();
@@ -236,6 +237,21 @@ async function shareLink(id) {
   try { await navigator.clipboard.writeText(url); toast('Link copied.'); } catch (e) { toast(url); }
 }
 
+function needsHtml() {
+  const it = [];
+  const got = matches.filter(m => m.user_b === me.id && !m.b_accepted).length;
+  if (got) it.push(got + (got === 1 ? ' interest is' : ' interests are') + ' waiting for you. Accept or decline below.');
+  const ready = matches.filter(m => (m.user_a === me.id || m.user_b === me.id) && m.coordinator_approved && !m.unlocked_at).length;
+  if (ready) it.push(ready + (ready === 1 ? ' match is' : ' matches are') + ' approved and ready to unlock.');
+  comms.forEach(c => { const q = myReqs[c.id]; if (q && q.status === 'accepted' && !myProfiles[c.id]) it.push('Create your profile in ' + c.name + '.'); });
+  if (pending.length) it.push(pending.length + ' join ' + (pending.length === 1 ? 'request is' : 'requests are') + ' waiting for you as Coordinator.');
+  const mine = comms.filter(c => c.coordinator_id === me.id).map(c => c.id);
+  const appr = matches.filter(m => mine.indexOf(m.community_id) > -1 && m.a_ok && m.b_ok && !m.coordinator_approved).length;
+  if (appr) it.push(appr + (appr === 1 ? ' match is' : ' matches are') + ' ready for your approval.');
+  if (!it.length) return '';
+  return '<div class="card"><div class="name">Needs your attention</div>' + it.map(x => '<div class="msg">' + esc(x) + '</div>').join('') + '</div>';
+}
+
 function actionHtml(c) {
   const rq = myReqs[c.id], hasProfile = !!myProfiles[c.id];
   if (!rq) return c.accepting ? '<button class="btn" data-act="join" data-id="' + c.id + '">Request to join</button>' : '<button class="btn" disabled>Not accepting right now</button>';
@@ -245,7 +261,10 @@ function actionHtml(c) {
     if (myProfiles[c.id].kyc_verified) return '<button class="btn" data-act="browse" data-id="' + c.id + '">Browse members</button>';
     return '<div class="msg">Your profile is created. Browsing members opens after your verification (ID and face), which will be added soon.</div>';
   }
-  return '<div class="msg">' + esc(REJECT_MSG) + '</div>';
+  let rj = '<div class="msg">' + esc(REJECT_MSG) + '</div>';
+  const alt = comms.filter(x => x.id !== c.id && x.accepting && x.coordinator_id !== me.id && !myProfiles[x.id] && !(myReqs[x.id] && myReqs[x.id].status === 'rejected') && (x.religion === rq.req_religion || x.religion === 'mixed')).slice(0, 3);
+  if (alt.length) rj += '<div class="sub" style="margin-top:8px">You can try these communities:</div><div class="mrow">' + alt.map(x => '<button class="btn ghost sm" data-act="viewc" data-id="' + x.id + '">' + esc(x.name) + '</button>').join('') + '</div>';
+  return rj;
 }
 
 function pageHtml(c) {
@@ -320,7 +339,8 @@ function render() {
   [['all','All'],['hindu','Hindu'],['muslim','Muslim'],['christian','Christian'],['mixed','Mixed']].forEach(f => {
     h += '<button class="chip' + (filter === f[0] ? ' on' : '') + '" data-act="filter" data-v="' + f[0] + '">' + f[1] + '</button>';
   });
-  h += '</div><div class="top"><div class="mrow" style="margin-top:0"><button class="btn gold sm" style="flex:1" data-act="newcomm">Become a Coordinator</button><button class="btn ghost sm" data-act="helper">Ask helper</button></div></div>';
+  h += '</div><div class="top"><div class="mrow" style="margin-top:0"><button class="btn gold sm" style="flex:1" data-act="newcomm">Become a Coordinator</button><button class="btn ghost sm" data-act="helper">Ask helper</button>' + (isAdmin ? '<a class="btn ghost sm" href="/marriage/admin/">Admin</a>' : '') + '</div></div>';
+  h += needsHtml();
 
   if (mine.length) {
     h += '<div class="sec">Your communities</div>';
@@ -416,6 +436,9 @@ function chatSheet(mid, thread, title) {
   let h = '<h2>' + esc(title) + '</h2><div class="sub">Keep the chat about marriage only.</div>';
   h += '<div class="chatbox" id="chatbox"></div>';
   h += '<div class="chatin"><input type="text" id="chatmsg" maxlength="1000" placeholder="Type a message"><button class="btn sm" data-act="chatsend">Send</button></div>';
+  if (c && c.coordinator_id === me.id && thread !== 'direct' && m) {
+    h += '<div class="mrow"><button class="btn ghost sm" data-act="warn">Send warning</button><button class="btn ghost sm" data-act="blockm" data-c="' + c.id + '" data-u="' + (thread === 'coord_a' ? m.user_a : m.user_b) + '">Block member</button></div>';
+  }
   h += '<button class="btn ghost" style="margin-top:10px" data-act="closesheet">Close</button>';
   openSheet(h, c);
   $('chatmsg').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); act('chatsend', null, e); } });
@@ -800,6 +823,16 @@ async function act(a, el, ev) {
     await loadAll(); render(); toast('Match approved.');
   }
   else if (a === 'chat') { chatSheet(id, el.dataset.t, el.dataset.n === 'Coordinator' ? 'Coordinator chat' : 'Chat with ' + el.dataset.n); }
+  else if (a === 'warn') {
+    if (!chatCtx || !confirm('Send a warning to this member?')) return;
+    const w = await db.from('marriage_messages').insert({ match_id: chatCtx.mid, thread: chatCtx.thread, body: 'Warning from your Coordinator: please keep this chat about marriage only. If it happens again you will be blocked.' });
+    if (w.error) { toast(errText(w.error)); return; }
+    chatCount = -1; loadChat(); toast('Warning sent.');
+  }
+  else if (a === 'blockm') {
+    if (!confirm('Block this member? They are removed from your community and their matches end.')) return;
+    await rpcDo('marriage_remove_member', { p_community: el.dataset.c, p_user: el.dataset.u }, 'Member blocked.');
+  }
   else if (a === 'chatsend') {
     const inp = $('chatmsg'); if (!inp || !chatCtx) return;
     const body = inp.value.trim(); if (!body) return;
