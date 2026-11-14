@@ -9,7 +9,7 @@
 <script src="/config/auth.js"></script>
 <script src="/config/cloudinary-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
-<script src="/config/cloudflare-stream-config.js"></script>
+<script src="/config/cloudflare-stream-config.js?v=65"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
@@ -473,6 +473,50 @@ function extractVideoFrames(file, frameCount) {
   });
 }
 
+/* ===== UPLOAD PROGRESS DISPLAY (percent, MB, speed, time left; smoothed between chunks) ===== */
+function formatEta(sec) {
+  if (!isFinite(sec) || sec <= 0) return '';
+  if (sec < 60) return Math.max(1, Math.round(sec)) + ' s';
+  const m = Math.floor(sec / 60);
+  if (m < 60) return m + ' min ' + Math.round(sec % 60) + ' s';
+  return Math.floor(m / 60) + ' h ' + (m % 60) + ' min';
+}
+
+function startUploadProgress(totalBytes, render) {
+  let lastBytes = 0, lastTime = Date.now(), speed = 0, timer = null;
+  let chunkGuess = 5 * 1024 * 1024;
+  function current() {
+    const est = lastBytes + speed * (Date.now() - lastTime);
+    return Math.min(totalBytes, est, lastBytes + chunkGuess * 0.98);
+  }
+  function draw() {
+    const b = current();
+    const pct = Math.min(100, Math.floor((b / totalBytes) * 100));
+    const sp = speed * 1000;
+    render(pct, b, sp, sp > 0 ? (totalBytes - b) / sp : NaN);
+  }
+  return {
+    update: function(done) {
+      const now = Date.now();
+      if (done <= 0) { lastTime = now; }
+      else if (done > lastBytes) {
+        const dt = now - lastTime;
+        if (dt > 0) {
+          const inst = (done - lastBytes) / dt;
+          speed = speed ? speed * 0.6 + inst * 0.4 : inst;
+        }
+        if (done - lastBytes >= 1024 * 1024) chunkGuess = done - lastBytes;
+        lastBytes = done;
+        lastTime = now;
+      }
+      draw();
+      if (!timer) timer = setInterval(draw, 300);
+    },
+    stop: function() { if (timer) { clearInterval(timer); timer = null; } }
+  };
+}
+/* ===== END UPLOAD PROGRESS DISPLAY ===== */
+
 async function publishVideo() {
   if (!selectedFile) { alert('Please select a video first!'); return; }
   const title = document.getElementById('videoTitle').value.trim();
@@ -546,14 +590,22 @@ async function publishVideo() {
     const upSub = document.getElementById('uploadSub');
     const totalMB = (selectedFile.size / 1024 / 1024).toFixed(1);
     if (upSub) upSub.textContent = '⬆️ Uploading… ' + totalMB + ' MB';
-    const streamResult = await uploadToCloudflareStream(selectedFile, function(pct, done, total) {
+    const prog = startUploadProgress(selectedFile.size, function(pct, b, sp, left) {
       if (upBarWrap) upBarWrap.style.display = 'block';
       if (upBar) upBar.style.width = pct + '%';
-      if (upSub && done != null) {
-        upSub.textContent = '⬆️ Uploading… ' + pct + '% · ' + (done / 1024 / 1024).toFixed(1) + ' / ' + (total / 1024 / 1024).toFixed(1) + ' MB';
+      if (upSub) {
+        upSub.innerHTML = '⬆️ Uploading… ' + pct + '%<br><span style="font-size:.82rem;">' +
+          (b / 1048576).toFixed(1) + ' / ' + totalMB + ' MB' +
+          (sp > 0 ? ' · ' + (sp / 1048576).toFixed(1) + ' MB/s' : '') +
+          (isFinite(left) && left > 0 ? ' · ~' + formatEta(left) + ' left' : '') + '</span>';
       }
       btn.textContent = '⏳ Uploading ' + pct + '%…';
     });
+    window._upProg = prog;
+    const streamResult = await uploadToCloudflareStream(selectedFile, function(pct, done, total) {
+      prog.update(done != null ? done : (pct / 100) * selectedFile.size);
+    });
+    prog.stop();
     if (upBar) upBar.style.width = '100%';
     if (upSub) upSub.textContent = '✅ Upload complete · ' + totalMB + ' MB';
     const h264Url = streamResult.videoUrl;
@@ -602,6 +654,9 @@ async function publishVideo() {
 
   } catch (err) {
     console.error(err);
+    if (window._upProg) { window._upProg.stop(); }
+    const _failSub = document.getElementById('uploadSub');
+    if (_failSub) _failSub.textContent = '❌ Upload failed — press PUBLISH to try again';
     statusMsg.style.color = '#ff4444';
     statusMsg.textContent = '❌ Upload failed: ' + err.message;
     btn.textContent = '🚀 PUBLISH VIDEO';
