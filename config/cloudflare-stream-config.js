@@ -1,6 +1,6 @@
 const STREAM_WORKER_URL = 'https://ddott-stream-upload.meradivin.workers.dev';
 const STREAM_CUSTOMER_CODE = '1ailxmj6l2809ehq';
-const TUS_THRESHOLD_BYTES = 190 * 1024 * 1024;
+const TUS_THRESHOLD_BYTES = 5 * 1024 * 1024; // resumable (TUS) for all real videos
 
 async function uploadToCloudflareStream(file, onProgress) {
   if (file.size > TUS_THRESHOLD_BYTES) {
