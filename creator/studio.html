@@ -394,7 +394,7 @@ function handleFileSelect(input) {
   selectedFile = input.files[0];
   if (!selectedFile) return;
   const zone = document.getElementById('uploadZone');
-  zone.innerHTML = `<div class="upload-icon">✅</div><div class="upload-title">${selectedFile.name}</div><div class="upload-sub">${(selectedFile.size/1024/1024).toFixed(1)} MB selected</div>`;
+  zone.innerHTML = `<div class="upload-icon" id="uploadIcon">✅</div><div class="upload-title">${selectedFile.name}</div><div class="upload-sub" id="uploadSub">${(selectedFile.size/1024/1024).toFixed(1)} MB selected</div><div id="uploadBarWrap" style="display:none;height:8px;background:#1a1a1a;border-radius:6px;margin-top:14px;overflow:hidden;"><div id="uploadBar" style="height:100%;width:0%;background:linear-gradient(90deg,#00f5ff,#00ff88);transition:width .3s;"></div></div>`;
   zone.classList.add('success');
 }
 
@@ -493,7 +493,10 @@ async function publishVideo() {
 
   let frames = [];
   try {
-    frames = await extractVideoFrames(selectedFile, 3);
+    frames = await Promise.race([
+      extractVideoFrames(selectedFile, 3),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('Frame extraction timed out')), 15000))
+    ]);
   } catch (frameErr) {
     // Fail-open: some phone-recorded videos (HEVC codec, streaming layout)
     // can't be read by the browser's <video> element for canvas capture.
@@ -538,7 +541,21 @@ async function publishVideo() {
 
   try {
     // Step 1: Upload to Cloudflare Stream
-    const streamResult = await uploadToCloudflareStream(selectedFile);
+    const upBarWrap = document.getElementById('uploadBarWrap');
+    const upBar = document.getElementById('uploadBar');
+    const upSub = document.getElementById('uploadSub');
+    const totalMB = (selectedFile.size / 1024 / 1024).toFixed(1);
+    if (upSub) upSub.textContent = '⬆️ Uploading… ' + totalMB + ' MB';
+    const streamResult = await uploadToCloudflareStream(selectedFile, function(pct, done, total) {
+      if (upBarWrap) upBarWrap.style.display = 'block';
+      if (upBar) upBar.style.width = pct + '%';
+      if (upSub && done != null) {
+        upSub.textContent = '⬆️ Uploading… ' + pct + '% · ' + (done / 1024 / 1024).toFixed(1) + ' / ' + (total / 1024 / 1024).toFixed(1) + ' MB';
+      }
+      btn.textContent = '⏳ Uploading ' + pct + '%…';
+    });
+    if (upBar) upBar.style.width = '100%';
+    if (upSub) upSub.textContent = '✅ Upload complete · ' + totalMB + ' MB';
     const h264Url = streamResult.videoUrl;
     const streamThumbnailUrl = streamResult.thumbnailUrl;
 

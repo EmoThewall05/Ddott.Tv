@@ -187,7 +187,7 @@ function uploadViaTus(file, onProgress) {
           },
           onProgress: (bytesUploaded, bytesTotal) => {
             _dbg('progress: ' + bytesUploaded + '/' + bytesTotal);
-            if (onProgress) onProgress(Math.round((bytesUploaded / bytesTotal) * 100));
+            if (onProgress) onProgress(Math.round((bytesUploaded / bytesTotal) * 100), bytesUploaded, bytesTotal);
           },
           onSuccess: () => {
             _dbg('SUCCESS');
