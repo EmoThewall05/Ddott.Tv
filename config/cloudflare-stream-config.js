@@ -74,6 +74,25 @@ async function initTusSessionWithRetry(file, uploadMetadata, attempts) {
 
 let _pendingResumeUpload = null;
 
+/* ===== KEEP SCREEN AWAKE DURING UPLOAD (if the phone allows it) ===== */
+let _wakeLock = null;
+let _uploadActive = false;
+async function _keepAwake() {
+  try {
+    if ('wakeLock' in navigator) {
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _dbg('screen wake lock on');
+    }
+  } catch (e) { _dbg('wake lock not available: ' + e.message); }
+}
+function _releaseAwake() {
+  try { if (_wakeLock) { _wakeLock.release(); _wakeLock = null; } } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && _uploadActive) { _keepAwake(); }
+});
+/* ===== END KEEP AWAKE ===== */
+
 function _resumeBanner() {
   let el = document.getElementById('_resumeUploadBanner');
   if (!el) {
@@ -126,31 +145,37 @@ function uploadViaTus(file, onProgress) {
 
       function pickChunkSize(responseTimeMs) {
         if (responseTimeMs > 2000) {
-          _dbg('Slow connection detected (' + responseTimeMs + 'ms) - using 2MB chunks');
-          return 2 * 1024 * 1024;
+          _dbg('Slow connection detected (' + responseTimeMs + 'ms) - using 5MB chunks');
+          return 5 * 1024 * 1024;
         } else if (responseTimeMs > 800) {
-          _dbg('Medium connection detected (' + responseTimeMs + 'ms) - using 4MB chunks');
-          return 4 * 1024 * 1024;
+          _dbg('Medium connection detected (' + responseTimeMs + 'ms) - using 10MB chunks');
+          return 10 * 1024 * 1024;
         }
-        _dbg('Fast connection detected (' + responseTimeMs + 'ms) - using 8MB chunks');
-        return 8 * 1024 * 1024;
+        _dbg('Fast connection detected (' + responseTimeMs + 'ms) - using 20MB chunks');
+        return 20 * 1024 * 1024;
       }
 
       function startUpload(uploadURL, uid, chunkSize) {
+        _uploadActive = true;
+        _keepAwake();
         const upload = new tus.Upload(file, {
           uploadUrl: uploadURL,
           chunkSize: chunkSize,
-          retryDelays: [0, 1000, 3000, 5000, 10000, 20000, 30000],
+          retryDelays: [0, 1000, 3000, 5000, 10000, 20000].concat(new Array(240).fill(30000)),
           metadata: { name: file.name || 'video' },
           fingerprint: () => Promise.resolve(`${STREAM_WORKER_URL}-${file.name}-${file.size}-${file.lastModified}`),
           storeFingerprintForResuming: true,
           removeFingerprintOnSuccess: true,
           onError: (error) => {
             _dbg('ERROR: ' + error.message);
+            _uploadActive = false;
+            _releaseAwake();
             _pendingResumeUpload = upload;
             _showResumeBanner(
               () => {
                 _dbg('User chose: Resume Upload');
+                _uploadActive = true;
+                _keepAwake();
                 upload.start();
               },
               () => {
@@ -166,6 +191,8 @@ function uploadViaTus(file, onProgress) {
           },
           onSuccess: () => {
             _dbg('SUCCESS');
+            _uploadActive = false;
+            _releaseAwake();
             _pendingResumeUpload = null;
             _hideResumeBanner();
             resolve(buildResult(uid));
