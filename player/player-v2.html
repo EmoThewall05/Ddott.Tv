@@ -912,11 +912,36 @@
         await loadUserCoins();
     }
 
+    var uploadTimerId = null;
+    function formatTimeAgo(d) {
+        var s = Math.max(1, Math.floor((Date.now() - d.getTime()) / 1000));
+        var units = [['year', 31536000], ['month', 2592000], ['week', 604800], ['day', 86400], ['hour', 3600], ['minute', 60], ['second', 1]];
+        for (var i = 0; i < units.length; i++) {
+            if (s >= units[i][1]) {
+                var n = Math.floor(s / units[i][1]);
+                return n + ' ' + units[i][0] + (n > 1 ? 's' : '') + ' ago';
+            }
+        }
+        return '1 second ago';
+    }
+    function startUploadTimer(createdAt) {
+        var el = document.getElementById('uploadTime');
+        if (!el || !createdAt) return;
+        var str = String(createdAt).replace(' ', 'T');
+        if (!/(Z|[+-]\d{2}(:?\d{2})?)$/.test(str)) str += 'Z';
+        var d = new Date(str);
+        if (isNaN(d.getTime())) return;
+        if (uploadTimerId) clearInterval(uploadTimerId);
+        var tick = function () { el.textContent = formatTimeAgo(d); };
+        tick();
+        uploadTimerId = setInterval(tick, 1000);
+    }
+
     async function fetchVideoFromDB(id) {
         try {
             const { data, error } = await db
                 .from('videos')
-                .select('video_url,title,description,creator_id,likes,dislikes,views')
+                .select('video_url,title,description,creator_id,likes,dislikes,views,created_at')
                 .eq('id', id)
                 .single();
 
@@ -930,6 +955,7 @@
             if (data.title) document.getElementById('videoTitle').textContent = data.title;
             if (data.description) document.getElementById('videoDescription').textContent = data.description;
             document.getElementById('viewCount').textContent = (data.views || 0) + ' views';
+            startUploadTimer(data.created_at);
 
             likeCountVal = data.likes || 0;
             dislikeCountVal = data.dislikes || 0;
@@ -1185,12 +1211,11 @@
 
     // ===== ANTI-CHEAT: block forward-skipping past what's genuinely been watched =====
     video.addEventListener('seeking', () => {
+        // No native controls; forward skips via progress bar are blocked in its own click handler.
+        // Browser/HLS-generated seeks must NOT be rewound (caused stuck-at-75% loop).
         const jump = video.currentTime - lastSafeTime;
-        if (jump > 2) {
-            cheatDetected = true;
-            video.currentTime = lastSafeTime;
-            showToast('⚠️ Skipping ahead is not allowed — Proof of Watch will fail');
-        }
+        if (new URLSearchParams(location.search).get('debug') === '1') showToast('seek jump ' + jump.toFixed(1) + 's');
+        if (jump > 2) lastSafeTime = video.currentTime;
     });
 
     video.addEventListener('ended', () => {
@@ -1202,6 +1227,23 @@
             showVideoQuiz();
         }
     });
+
+    /* ===== DEBUG PANEL (?debug=1) ===== */
+    if (new URLSearchParams(location.search).get('debug') === '1') {
+        const dbgEl = document.createElement('div');
+        dbgEl.style.cssText = 'position:fixed;bottom:60px;left:0;right:0;background:rgba(0,0,0,.85);color:#0f0;font:11px monospace;padding:6px;z-index:99999;white-space:pre-wrap;pointer-events:none;';
+        document.body.appendChild(dbgEl);
+        const evLog = [];
+        ['waiting','stalled','playing','pause','seeking','seeked','suspend','emptied','abort','ended','loadedmetadata'].forEach(function(n) {
+            video.addEventListener(n, function() { evLog.push(n + '@' + video.currentTime.toFixed(1)); if (evLog.length > 6) evLog.shift(); });
+        });
+        setInterval(function() {
+            let be = 0;
+            try { if (video.buffered.length) be = video.buffered.end(video.buffered.length - 1); } catch (e) {}
+            dbgEl.textContent = 't=' + video.currentTime.toFixed(1) + ' dur=' + (video.duration || 0).toFixed(1) + ' buf=' + be.toFixed(1) + ' rs=' + video.readyState + ' ns=' + video.networkState + ' paused=' + video.paused + ' mode=' + playerMode + ' lastSafe=' + lastSafeTime.toFixed(1) + '\n' + evLog.join(' > ');
+        }, 500);
+    }
+    /* ===== END DEBUG PANEL ===== */
 
     // ===== ANTI-CHEAT: notification bar / app switch / lock screen pauses video =====
     document.addEventListener('visibilitychange', () => {
